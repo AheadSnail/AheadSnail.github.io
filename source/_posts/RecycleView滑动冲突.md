@@ -9,15 +9,17 @@ RecycleView 嵌套使用的時候，RecycleView滑动冲突
 <!--more-->
 
 # RecycleView嵌套滑动的冲突
-#### 1.当一个大的RecycleView中的item也是一个RecycleView的时候，滑动的时候，就会出现滑动不顺畅，比如我在子的RecycleView中斜着滑动的时候，为什么是里面的RecycleView 获取到了事件，可以左右滑动，上下滑动的时候，为什么是外面的RecycleView获取到了事件，可以上下滑动？
+1.当一个大的RecycleView中的item也是一个RecycleView的时候，滑动的时候，就会出现滑动不顺畅，比如我在子的RecycleView中斜着滑动的时候，
+为什么是里面的RecycleView 获取到了事件，可以左右滑动，上下滑动的时候，为什么是外面的RecycleView获取到了事件，可以上下滑动？
 
-```
 首先查看我们的RecycleView的继承关系，发现他是继承了ViewGroup的，事件的传递是从外层往里面传递的
+
+```java
 public class RecyclerView extends ViewGroup implements ScrollingView, NestedScrollingChild
 ```
 
-```
 事件的传递是会有父容器调用了  public boolean dispatchTouchEvent(MotionEvent ev) 方法，来触发的，然后执行里面的代码,下面大致的说下事件的流程
+```java
 @Override
 public boolean dispatchTouchEvent(MotionEvent ev) {
         if (mInputEventConsistencyVerifier != null) {
@@ -124,7 +126,7 @@ public boolean dispatchTouchEvent(MotionEvent ev) {
                                 childWithAccessibilityFocus = null;
                                 i = childrenCount - 1;
                             }
-			  判断当前的item，是否有资格接受到这个事件，比如是要可见的，没有执行动画，点击的范围在这个item里面
+							判断当前的item，是否有资格接受到这个事件，比如是要可见的，没有执行动画，点击的范围在这个item里面
                             if (!canViewReceivePointerEvents(child)
                                     || !isTransformedTouchPointInView(x, y, child, null)) {
                                 ev.setTargetAccessibilityFocus(false);
@@ -241,8 +243,9 @@ public boolean dispatchTouchEvent(MotionEvent ev) {
     }
 ```
 
-```
- dispatchTransformedTouchEvent函数中的关键代码为：如果child为null，就执行super.dispatchTouchEvent(),这个就会执行View对应的方法,如果不为空，就执行对应的child中的dispatchTouchEvent方法
+dispatchTransformedTouchEvent函数中的关键代码为：如果child为null，就执行super.dispatchTouchEvent(),这个就会执行View对应的方法,如果不为空，就执行对应的child中的dispatchTouchEvent方法
+
+```java
  // Perform any necessary transformations and dispatch.
         if (child == null) {
             handled = super.dispatchTouchEvent(transformedEvent);
@@ -258,8 +261,8 @@ public boolean dispatchTouchEvent(MotionEvent ev) {
         }
 ```
 
-```
-  View中的dispatchTouchEvent 关键方法的实现为：
+ View中的dispatchTouchEvent 关键方法的实现为：
+```java
   if (onFilterTouchEventForSecurity(event)) {
             if ((mViewFlags & ENABLED_MASK) == ENABLED && handleScrollBarDragging(event)) {
                 result = true;
@@ -279,8 +282,8 @@ public boolean dispatchTouchEvent(MotionEvent ev) {
         }
 ```
 
-```
  RecycleView中onInterceptTouchEvent 关键函数的实现
+```java
  @Override
     public boolean onInterceptTouchEvent(MotionEvent e) {
             case MotionEventCompat.ACTION_POINTER_DOWN:

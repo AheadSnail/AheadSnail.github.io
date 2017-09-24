@@ -12,7 +12,7 @@ View的事件传递的源码解析，也对一些疑问做了下解答
 
 # View的事件传递的源码解析
 我们就从Activity的中的下面的来触发，方法都为public的，说明是给别人调用的，我们就从这里出发
-```
+```java
 public boolean dispatchTouchEvent(MotionEvent ev) {
     if (ev.getAction() == MotionEvent.ACTION_DOWN) {
         onUserInteraction();
@@ -23,9 +23,11 @@ public boolean dispatchTouchEvent(MotionEvent ev) {
     return onTouchEvent(ev); 所以如果getWindow().superDispatchTouchEvent(ev)中有返回true的话，就不会执行到Activity中的onTouch事件
 }
 ```
-#### 要注意这边的getWindow()获取到的是phoneWindow的实例，只有一个孩子就是phoneWindow，所以就会调用到里面的superDispatchTouchEvent(ev)
 
-```
+**要注意这边的getWindow()获取到的是phoneWindow的实例，只有一个孩子就是phoneWindow，所以就会调用到里面的superDispatchTouchEvent(ev)**
+===
+
+```java
 @Override
 public boolean superDispatchTouchEvent(MotionEvent event) {
     return mDecor.superDispatchTouchEvent(event); 这里的mDecor为 DecorView，所以就会执行到对应的方法里面
@@ -37,13 +39,13 @@ public boolean superDispatchTrackballEvent(MotionEvent event) {
 ViewGroup中的实现为
 @Override
 public boolean dispatchTouchEvent(MotionEvent ev) {
- 判断是否有其他的输入设备，比如手写笔
+	判断是否有其他的输入设备，比如手写笔
     if (mInputEventConsistencyVerifier != null) {
         mInputEventConsistencyVerifier.onTouchEvent(ev, 1);
     }
     // If the event targets the accessibility focused view and this is it, start
     // normal event dispatch. Maybe a descendant is what will handle the click.
- 判断是否开启了Accessibility，残疾人服务
+	判断是否开启了Accessibility，残疾人服务
     if (ev.isTargetAccessibilityFocus() && isAccessibilityFocusedViewOrHost()) {
         ev.setTargetAccessibilityFocus(false);
     }
@@ -68,8 +70,9 @@ public boolean dispatchTouchEvent(MotionEvent ev) {
             resetTouchState();
         }
 ```
-#### Check for interception. 是否拦截#
-```
+**Check for interception. 是否拦截**
+===
+```java
 * 第二步:检查是否要拦截(Check for interception)
 * 在dispatchTouchEvent(MotionEventev)这段代码中
    * 使用变量intercepted来标记ViewGroup是否拦截Touch事件的传递.
@@ -79,14 +82,14 @@ public boolean dispatchTouchEvent(MotionEvent ev) {
         // Check for interception.
         final boolean intercepted;
         if (actionMasked == MotionEvent.ACTION_DOW || mFirstTouchTarget != null) {
-下面的这个设置是我们在代码中getParent().requestDisallowInterceptTouchEvent(true);中有这样的实现
-if (disallowIntercept) {mGroupFlags |= FLAG_DISALLOW_INTERCEPT;} else { mGroupFlags &= ~FLAG_DISALLOW_INTERCEPT;}，所以下面的就是用来检查是否有设置拦截的
+		下面的这个设置是我们在代码中getParent().requestDisallowInterceptTouchEvent(true);中有这样的实现
+		if (disallowIntercept) {mGroupFlags |= FLAG_DISALLOW_INTERCEPT;} else { mGroupFlags &= ~FLAG_DISALLOW_INTERCEPT;}，所以下面的就是用来检查是否有设置拦截的
             final boolean disallowIntercept = (mGroupFlags & FLAG_DISALLOW_INTERCEPT) != 0;
             如果不设置的话，默认都为false的   
-  if (!disallowIntercept) {
+		if (!disallowIntercept) {
                 intercepted = onInterceptTouchEvent(ev); 就会回调执行到decorView中的这个方法，默认为false的
-当然如果这个为true的话，代表拦截
-                ev.setAction(action); // restore action in case it was changed
+				当然如果这个为true的话，代表拦截
+				ev.setAction(action); // restore action in case it was changed
             } else {
                 intercepted = false;
             }
@@ -113,11 +116,11 @@ if (disallowIntercept) {mGroupFlags |= FLAG_DISALLOW_INTERCEPT;} else { mGroupFl
         final boolean split = (mGroupFlags & FLAG_SPLIT_MOTION_EVENTS) != 0;
         TouchTarget newTouchTarget = null;
         boolean alreadyDispatchedToNewTouchTarget = false;
- 	如果当前的事件没有被取消，并且没有被拦截的话
+		如果当前的事件没有被取消，并且没有被拦截的话
  		/**
-        * 第四步:事件分发(Update list of touch targets for pointer down, if needed)
-       */
-            不是ACTION_CANCEL并且ViewGroup的拦截标志位intercepted为false(不拦截)
+		  * 第四步:事件分发(Update list of touch targets for pointer down, if needed)
+		*/
+        不是ACTION_CANCEL并且ViewGroup的拦截标志位intercepted为false(不拦截)
         if (!canceled && !intercepted) {
             // If the event is targeting accessiiblity focus we give it to the
             // view that has accessibility focus and if it does not handle it
@@ -127,9 +130,9 @@ if (disallowIntercept) {mGroupFlags |= FLAG_DISALLOW_INTERCEPT;} else { mGroupFl
             View childWithAccessibilityFocus = ev.isTargetAccessibilityFocus()
                     ? findChildWithAccessibilityFocus() : null;
 
-     第二次 move  触发时  压根就不会遍历子控件
+			第二次 move  触发时  压根就不会遍历子控件
             if (actionMasked == MotionEvent.ACTION_DOWN
- || (split && actionMasked == 	MotionEvent.ACTION_POINTER_DOWN)
+				|| (split && actionMasked == 	MotionEvent.ACTION_POINTER_DOWN)
                     || actionMasked == MotionEvent.ACTION_HOVER_MOVE) {
 
                 final int actionIndex = ev.getActionIndex(); // always 0 for down
@@ -139,26 +142,26 @@ if (disallowIntercept) {mGroupFlags |= FLAG_DISALLOW_INTERCEPT;} else { mGroupFl
                 // Clean up earlier touch targets for this pointer id in case they
                 // have become out of sync.
                 removePointersFromTouchTargets(idBitsToAssign);
-   得到当前孩子的个数
+				得到当前孩子的个数
                 final int childrenCount = mChildrenCount;
-       如果当前没有的newTouchTarget 为空，并且 孩子的个数不为0，默认开始的时候，newTouchTarger为空
+				如果当前没有的newTouchTarget 为空，并且 孩子的个数不为0，默认开始的时候，newTouchTarger为空
                 if (newTouchTarget == null && childrenCount != 0) {
                     获取到按下的坐标点
- final float x = ev.getX(actionIndex);
+					final float x = ev.getX(actionIndex);
                     final float y = ev.getY(actionIndex);
                     // Find a child that can receive the event.
                     // Scan children from front to back.
-  重排序 根据绘制的先后顺序重新的排序，后面绘制的一般排在前面
+					重排序 根据绘制的先后顺序重新的排序，后面绘制的一般排在前面
                     final ArrayList<View> preorderedList = buildTouchDispatchChildList();
- 是否是自己排序，默认为false
+					是否是自己排序，默认为false
                     final boolean customOrder = preorderedList == null && isChildrenDrawingOrderEnabled();
                     final View[] children = mChildren;
- 事件分发down遍历子控件的过程
+					事件分发down遍历子控件的过程
                     for (int i = childrenCount - 1; i >= 0; i--) {
-  从上面排序后的集合里面得到索引
+					从上面排序后的集合里面得到索引
                         final int childIndex = getAndVerifyPreorderedIndex(
                                 childrenCount, i, customOrder);
-  在从上面排序后的集合里面得到孩子的view
+						在从上面排序后的集合里面得到孩子的view
                         final View child = getAndVerifyPreorderedView(
                                 preorderedList, children, childIndex);
 
@@ -249,7 +252,7 @@ if (disallowIntercept) {mGroupFlags |= FLAG_DISALLOW_INTERCEPT;} else { mGroupFl
             // dispatched to it.  Cancel touch targets if necessary.
             TouchTarget predecessor = null;
             TouchTarget target = mFirstTouchTarget; 所以如果没有找到可以消耗的childView的时候，这个就为空
-，同时alreadyDispatchedToNewTouchTarget 为true，所以下面的只有在找到的时候执行
+			，同时alreadyDispatchedToNewTouchTarget 为true，所以下面的只有在找到的时候执行
             while (target != null) {
                 final TouchTarget next = target.next;
                 if (alreadyDispatchedToNewTouchTarget && target == newTouchTarget) {
@@ -257,7 +260,8 @@ if (disallowIntercept) {mGroupFlags |= FLAG_DISALLOW_INTERCEPT;} else { mGroupFl
                 } else {
                     final boolean cancelChild = resetCancelNextUpFlag(target.child)
                             || intercepted;
-  touchMove事件调用的时候，因为在TouchDown的时候就已经可以确定了可以消耗当前事件的View，所以这边直接传递执行下面的方法 ，如果里面的孩子在执行获取到这个事件的时候，如果有消耗掉的话，就会返回true
+					touchMove事件调用的时候，因为在TouchDown的时候就已经可以确定了可以消耗当前事件的View，所以这边直接传递执行下面的方法
+					如果里面的孩子在执行获取到这个事件的时候，如果有消耗掉的话，就会返回true
                     if (dispatchTransformedTouchEvent(ev, cancelChild,target.child, target.pointerIdBits)) {
                         handled = true;
                     }
@@ -295,9 +299,10 @@ if (disallowIntercept) {mGroupFlags |= FLAG_DISALLOW_INTERCEPT;} else { mGroupFl
     return handled; 最终返回的是有没有消耗掉这个事件
 }
 ```
-#### 事件拦截处理 ，第三个参数如果为null的话，代表这个事件是给自己使用，被拦截了，如果不为null，要传递给子类
+** 事件拦截处理 ，第三个参数如果为null的话，代表这个事件是给自己使用，被拦截了，如果不为null，要传递给子类**
+===
 
-```
+```java
 /**
  * Transforms a motion event into the coordinate space of a particular child view,
  * filters out irrelevant pointer ids, and overrides its action if necessary.
@@ -361,11 +366,13 @@ private boolean dispatchTransformedTouchEvent(MotionEvent event, boolean cancel,
     } else {
         final float offsetX = mScrollX - child.mLeft;
         final float offsetY = mScrollY - child.mTop;
-##         transformedEvent.offsetLocation(offsetX, offsetY);
+			transformedEvent.offsetLocation(offsetX, offsetY);
         if (! child.hasIdentityMatrix()) {
             transformedEvent.transform(child.getInverseMatrix());
         }
-  当传递的child不为空的时候，就调用到了child的方法，当然如果当前的child就为一个简单的view，就调用到View中对应的这个方法，去判断是否有给当前的这个child设置onTouchListener，是否是返回true，如果返回true的时候，就不能执行到onTouchEvent方法，点击事件就会失灵等，如果当前的child为ViewGroup的话，就会跳到对应的方法，比如ViewGroup,然后ViewGroup中循环遍历起来
+		当传递的child不为空的时候，就调用到了child的方法，当然如果当前的child就为一个简单的view，就调用到View中对应的这个方法，
+		去判断是否有给当前的这个child设置onTouchListener，是否是返回true，如果返回true的时候，就不能执行到onTouchEvent方法，点击事件就会失灵等，
+		如果当前的child为ViewGroup的话，就会跳到对应的方法，比如ViewGroup,然后ViewGroup中循环遍历起来
         handled = child.dispatchTouchEvent(transformedEvent);
     }
 
@@ -375,9 +382,10 @@ private boolean dispatchTransformedTouchEvent(MotionEvent event, boolean cancel,
 }
 ```
 
-#### 下面的方法为View中的方法在 handled = super.dispatchTouchEvent(transformedEvent);触发# 
+** 下面的方法为View中的方法在 handled = super.dispatchTouchEvent(transformedEvent);触发**
+===
 
-```
+```java
 /*
  * Pass the touch screen motion event down to the target view, or this
  * view if it is the target.
@@ -397,7 +405,7 @@ public boolean dispatchTouchEvent(MotionEvent event) {
     }
 
     boolean result = false;
- 检查是否有其他的输入设备，比如手写笔
+	检查是否有其他的输入设备，比如手写笔
     if (mInputEventConsistencyVerifier != null) {
         mInputEventConsistencyVerifier.onTouchEvent(event, 0);
     }
@@ -420,7 +428,7 @@ public boolean dispatchTouchEvent(MotionEvent event) {
             result = true;
         }
 
-        if (!result && onTouchEvent(event)) { 如果上面没有设置touchListener的话，设置了没有返回true的话，就会执行到自己的onTouchEvent方法
+        if (!result && onTouchEvent(event)) {如果上面没有设置touchListener的话，设置了没有返回true的话，就会执行到自己的onTouchEvent方法
             result = true;
         }
     }

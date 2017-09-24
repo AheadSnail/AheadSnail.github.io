@@ -8,8 +8,8 @@ description: ListView复用源码解析
 大致的讲解了下ListView的复用的原理，了解手势触摸的时候大致做了什么操作
 <!--more-->
 
-```
 1.首先查看onTouchEvent，实现是在AbsListView里面
+```java
   case MotionEvent.ACTION_MOVE:
   {
         onTouchMove(ev, vtev);
@@ -17,8 +17,8 @@ description: ListView复用源码解析
   }
 ```
 
-```
 2.onTouchMove方法中，实现的过程,其中的mTouchMode 在滑动的时候取值为TOUCH_MODE_SCROLL
+```java
 private void onTouchMove(MotionEvent ev, MotionEvent vtev) 
 {
 	case TOUCH_MODE_SCROLL:
@@ -28,8 +28,8 @@ private void onTouchMove(MotionEvent ev, MotionEvent vtev)
 }
 ```
 
-```
 3.scrollIfNeeded方法的实现为
+```java
  private void scrollIfNeeded(int x, int y, MotionEvent vtev) 
  {
 	 。。。
@@ -41,9 +41,8 @@ private void onTouchMove(MotionEvent ev, MotionEvent vtev)
  }
 ```
 
-
-```
 4.trackMotionScroll方法的实现为这里传递的为滑动的距离
+```java
  boolean trackMotionScroll(int deltaY, int incrementalDeltaY)
   {
 	    //如果incrementalDeltay小于0，代表向下滑动，如果大于0，代表向上滑动
@@ -129,8 +128,8 @@ private void onTouchMove(MotionEvent ev, MotionEvent vtev)
     }
 ```
 
-```
-4.fillGap(down) 函数 在AbsListView中为 abstract void fillGap(boolean down); 是一个抽象的方法，所以实现类在具体的子类里面，这里为ListView，传递的参数down代表是否是从下往上的填充布局
+5.fillGap(down) 函数 在AbsListView中为 abstract void fillGap(boolean down); 是一个抽象的方法，所以实现类在具体的子类里面，这里为ListView，传递的参数down代表是否是从下往上的填充布局
+```java
     /**
      * {@inheritDoc}
      */
@@ -159,8 +158,8 @@ private void onTouchMove(MotionEvent ev, MotionEvent vtev)
     }
 ```
 
-```
-5.这里的函数有俩个主要的函数   fillDown(mFirstPosition + count, startOffset);或者 fillUp(mFirstPosition - 1, startOffset);我们查看那一个即可
+6.这里的函数有俩个主要的函数   fillDown(mFirstPosition + count, startOffset);或者 fillUp(mFirstPosition - 1, startOffset);我们查看那一个即可
+```java
  private View fillDown(int pos, int nextTop) {
         View selectedView = null;
 
@@ -187,8 +186,8 @@ private void onTouchMove(MotionEvent ev, MotionEvent vtev)
     }
 ```
 
-```
-6.makeAndAddView(pos, nextTop, true, mListPadding.left, selected);函数的实现为
+7.makeAndAddView(pos, nextTop, true, mListPadding.left, selected);函数的实现为
+```java
  private View makeAndAddView(int position, int y, boolean flow, int childrenLeft,
             boolean selected) {
         if (!mDataChanged) {
@@ -214,8 +213,8 @@ private void onTouchMove(MotionEvent ev, MotionEvent vtev)
     }
 ```
 
-```
-7.关注函数的 final View child = obtainView(position, mIsScrap);的实现为：
+8.关注函数的 final View child = obtainView(position, mIsScrap);的实现为：
+```java
  View obtainView(int position, boolean[] outMetadata) {
 		.......
 		 //这里是从我们的缓存池中获取回收的view，有可能为空，所以我们在适配器中的getView中要对scrapView中要判断是否为空，当为空的时候，就自己创建一个view,这就是listView的复用机制

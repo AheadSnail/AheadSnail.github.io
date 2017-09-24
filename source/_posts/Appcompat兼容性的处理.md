@@ -8,13 +8,18 @@ description: Appcompat兼容性的处理
 了解了下AppcompatActivity的中的兼容性的处理
 <!--more-->
 
-# AppCompat兼容性
-### 控件的兼容性 v4 v7 v13 数字代表的是支持的api 的version
-## AppCompatActivity 是如何做到兼容性的
-#### 原理： 继承了AppCompatActivity 的Activity 都会在解析XML 的时候，将xml里面所有的系统控件转换为 appCompatButton。 它的源码是怎样的呢？ 所谓的兼容，就是一个着色问题！！！ AppCompatDelegate 的工作就是涂色。 替换：widget着色是通过这个widget 的layout 在inflation 的时候，被AppCompatDelegate 拦截下来，然后根据 控件的名字，强制被系统转换成为 以AppCompat 开头的控件。
+**AppCompat兼容性**
+===
+**控件的兼容性 v4 v7 v13 数字代表的是支持的api 的version
+AppCompatActivity 是如何做到兼容性的
+原理： 继承了AppCompatActivity 的Activity 都会在解析XML 的时候，将xml里面所有的系统控件转换为 appCompatButton。它的源码是怎样的呢？ 所谓的兼容，就是一个着色问题！！！
+AppCompatDelegate 的工作就是涂色。 替换：widget着色是通过这个widget 的layout 在inflation 的时候，被AppCompatDelegate 拦截下来，然后根据 控件的名字，强制被系统转换成为 
+以AppCompat 开头的控件。
+**
 
-#### 1.首先查看继承的关系
-```
+**1.首先查看继承的关系**
+===
+```java
 public class AppCompatActivity extends FragmentActivity implements AppCompatCallback,
         TaskStackBuilder.SupportParentable, ActionBarDrawerToggle.DelegateProvider {
 public class FragmentActivity extends BaseFragmentActivityJB implements
@@ -25,8 +30,9 @@ abstract class BaseFragmentActivityHoneycomb extends BaseFragmentActivityGingerb
 abstract class BaseFragmentActivityGingerbread extends SupportActivity {
 public class SupportActivity extends Activity {
 ```
-#### 2.AppCompatActivity 中代理的实现
-```
+**2.AppCompatActivity 中代理的实现**
+===
+```java
   @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
 	    //获取到代理的实例对象
@@ -58,7 +64,7 @@ public class SupportActivity extends Activity {
     }
     private static AppCompatDelegate create(Context context, Window window,
             AppCompatCallback callback) {
-       //这边会根据不同的系统的版本号得到不同的代理对象，但是其他的本质都是直接，或者间接的继承AppCompatDelegateImplV9的s
+    //这边会根据不同的系统的版本号得到不同的代理对象，但是其他的本质都是直接，或者间接的继承AppCompatDelegateImplV9的s
         final int sdk = Build.VERSION.SDK_INT;
         if (BuildCompat.isAtLeastN()) {
             return new AppCompatDelegateImplN(context, window, callback);
@@ -238,14 +244,15 @@ public class SupportActivity extends Activity {
     }
 ```
 
-### LinearLayoutCompat 中的源码
-```
- 1.这个类是干什么的，是控件还是组件，看他的初始化在干什么
- 2.找到入口，一般是构造器
- 3.找关键方法：onMeasure  onLayout   onDraw
- onMeasure 是 计算子控件的大小，同时计算自己的大小。自己的宽高是由子空间的宽高决定的，根据摆放的方向不同而算法不同
- onLayout 是将子控件的上下左右位置进行确定。然后布局到layout上面
- onDraw    只用来画layout 自己的分割线，其他的内容由具体的item来绘制
+**LinearLayoutCompat**
+===
+ - 这个类是干什么的，是控件还是组件，看他的初始化在干什么
+ - 找到入口，一般是构造器
+ - 找关键方法：onMeasure  onLayout   onDraw
+ - onMeasure 是 计算子控件的大小，同时计算自己的大小。自己的宽高是由子空间的宽高决定的，根据摆放的方向不同而算法不同
+ - onLayout 是将子控件的上下左右位置进行确定。然后布局到layout上面
+ - onDraw    只用来画layout 自己的分割线，其他的内容由具体的item来绘制
+```java
  @Override
  protected void onDraw(Canvas canvas) {
         if (mDivider == null) {
