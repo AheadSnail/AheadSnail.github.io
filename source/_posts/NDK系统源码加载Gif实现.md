@@ -36,7 +36,8 @@ java方法加载gif内存消耗,这个gif比较大，有14M，而且还有一个
 ===
 
 ```
-首先android里面是肯定支持gif图的，所以就可以去查找系统的源码实现，系统gif源码的路径在系统的源码\external\giflib里面，把全部的文件拷贝出来，新建一个工程
+首先android里面是肯定支持gif图的，要不然系统要怎么显示gif
+所以就可以去查找系统的源码实现，系统gif源码的路径在系统的源码\external\giflib里面，把全部的文件拷贝出来，新建一个工程
 Gif的基础知识
 扩展块 
 图形控制扩展(Graphic Control Extension)        固定值0xF9
@@ -48,13 +49,13 @@ Gif的基础知识
 应用程序扩展   固定值 0xFF
 作用：这是提供给应用程序自己使用的，应用程序可以在这里定义自己的标识、
 信息。可以做到当前app所生成的gif只能由我这个app打开
-
-gif   加密  
-
+可以用来做 gif   加密  
  a   r  g   b   一个像素   4  个字节
  a  24位   r   《16 位     g <位   b 
-
 ```
+
+系统gif支持的系统路径
+![结果显示](/uploads/系统gif支持的系统路径.png)
 
 GIf知识详解 [Gif基础知识]: http://blog.csdn.net/wzy198852/article/details/17266507
 **代码的实现**
