@@ -29,25 +29,27 @@ private static boolean startSystemServer(String abiList, String socketName)
 //.......  
     /* Hardcoded command line to start the system server */  
     String args[] = {         //准备启动System Server所需要的参数  
-        "--setuid=1000",       //进程的uid
+        "--setuid=1000",       //设置用户的ID为1000，这个UID代表系统权限
         "--setgid=1000",       
         "--setgroups=1001,1002,1003,1004,1005,1006,1007,1008,1009,1010,1018,1021,1032,3001,3002,3003,3006,3007,3009,3010",  
         "--capabilities=" + capabilities + "," + capabilities,  
         "--nice-name=system_server",   //进程的名字为system_server  
         "--runtime-args",  
-        "com.android.server.SystemServer",    //包名  
+        "com.android.server.SystemServer",    //设置要启动的类名
     };  
     ZygoteConnection.Arguments parsedArgs = null;  
   
     int pid;  
   
     try {  
+	   //将数组分解成Arguments类型的对象，过程很简单
         parsedArgs = new ZygoteConnection.Arguments(args);    //通过ZygoteConnection对参数进行封装  
         ZygoteConnection.applyDebuggerSystemProperty(parsedArgs);  
         ZygoteConnection.applyInvokeWithSystemProperty(parsedArgs);  
   
         /* Request to fork the system server process */   
-        pid = Zygote.forkSystemServer(    //请求孵化SystemServer进程, 将创建的进程号赋值给pid  
+		//调用系统fork函数创建子进程，这个子进程就是sysytem_server
+        pid = Zygote.forkSystemServer(  
                 parsedArgs.uid, parsedArgs.gid,  
                 parsedArgs.gids,  
                 parsedArgs.debugFlags,  
@@ -59,14 +61,16 @@ private static boolean startSystemServer(String abiList, String socketName)
     }  
   
     /* For child process */  
-    if (pid == 0) {            //pid=0为zygote的子进程  
+    if (pid == 0) {            //pid为0说明在子进程system_server中
         if (hasSecondZygote(abiList)) {  
             waitForSecondaryZygote(socketName);  //等待zygote第二阶段  
         }  
-  
+		
+		 //在子进程system_server中调用了handleSystemServerProcess方法
         handleSystemServerProcess(parsedArgs);    //运行SystemServer,之后SystemServer就与Zygote分道扬镳,在自己的进程中运行  
     }  
-  
+	
+	//在父进程中返回 
     return true;  
 }  
 
@@ -490,5 +494,11 @@ public static class MethodAndArgsCaller extends Exception
     }  
 }  
 ```
+zygotefork进程的流程
+![结果显示](/uploads/Android启动流程四/zygotefork进程的流程图.png)
+
+systemServerClasspath的内容为
+![结果显示](/uploads/Android启动流程四/总结.png)
+
 
 后文将继续讲解进入SystemServer后系统做了那些事情.
