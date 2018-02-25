@@ -300,7 +300,10 @@ startActivityUnchecked() 就会执行到
 	
 }
  
-mSupervisor 是一个专门用来管理应用程序的栈的，每一个应用程序对应有一个栈，如果有newTask就会再创建一个栈，里面存储了我们应用程序的activity，而所有的应用对应的栈
+mSupervisor 是一个专门用来管理应用程序的栈的，每一个应用程序对应有一个栈，也即是ActivityStack对象，ActivityStack是用来
+把所有的Activity按照先后顺序放在一个堆栈中，所以当我们按下返回键的时候，它会知道当前要显示哪个Activity,而mSupervisor是用来
+管理应用程序的ActiviyStack的，所以它知道当你按下home键的时候，哪些应用程序要显示，哪些要隐藏，当你一直按后退键的时候
+也知道哪一个应用程序将要显示，也即是对应的哪个ActivityStack将要显示，如果有newTask就会再创建一个栈，里面存储了我们应用程序的activity，而所有的应用对应的栈
 又可以看成是一个小栈，是由mSupervisor来管理的，所以，这就是为什么但我们同时开启多个app，进入最后一个app，然后按返回键，为什么能看到其他的app界面的原因，我们没有做任何的处理
 这都是由mSuperVisor来管理的，它将每一个应用程序的栈又做为一个栈的一个元素，当这个应用程序的栈从顶部移开的时候，那么下一个栈元素，也即是应用程序的栈，自动的会显示出来
 
@@ -512,11 +515,259 @@ stack.activityPausedLocked(token, false);
   void startSpecificActivityLocked(ActivityRecord r,
             boolean andResume, boolean checkConfig) {
 
-	....
-	 realStartActivityLocked(r, app, andResume, checkConfig);
-	 ......
+	// Is this activity's application already running? 首先去检查当前要显示的Activity的应用程序是否正在运行，如果是通过启动界面进来的化，这里就会返回一个null
+    ProcessRecord app = mService.getProcessRecordLocked(r.processName,
+                r.info.applicationInfo.uid, true);
+	r.task.stack.setLaunchTime(r);
+
+	//如果应用程序已经启动了，就直接启动指定的Activity
+    if (app != null && app.thread != null) {
+        try {
+                if ((r.info.flags&ActivityInfo.FLAG_MULTIPROCESS) == 0
+                        || !"android".equals(r.info.packageName)) {
+                    // Don't add this if it is a platform component that is marked
+                    // to run in multiple processes, because this is actually
+                    // part of the framework so doesn't make sense to track as a
+                    // separate apk in the process.
+                    app.addPackage(r.info.packageName, r.info.applicationInfo.versionCode,
+                            mService.mProcessStats);
+                }
+                realStartActivityLocked(r, app, andResume, checkConfig);
+                return;
+            } catch (RemoteException e) {
+                Slog.w(TAG, "Exception when starting activity "
+                        + r.intent.getComponent().flattenToShortString(), e);
+            }
+
+            // If a dead object exception was thrown -- fall through to
+            // restart the application.
+    }
+	
+	//如果应用程序没有启动，就会来到这边
+	mService.startProcessLocked(r.processName, r.info.applicationInfo, true, 0,
+                "activity", r.intent.getComponent(), false, false, true);
+	
 }
 
+下面是应用程序没有启动的情况
+final ProcessRecord startProcessLocked(String processName,
+            ApplicationInfo info, boolean knownToBeDead, int intentFlags,
+            String hostingType, ComponentName hostingName, boolean allowWhileBooting,
+            boolean isolated, boolean keepIfLarge) {
+        return startProcessLocked(processName, info, knownToBeDead, intentFlags, hostingType,
+                hostingName, allowWhileBooting, isolated, 0 /* isolatedUid */, keepIfLarge,
+                null /* ABI override */, null /* entryPoint */, null /* entryPointArgs */,
+                null /* crashHandler */);
+}
+
+ final ProcessRecord startProcessLocked(String processName, ApplicationInfo info,
+            boolean knownToBeDead, int intentFlags, String hostingType, ComponentName hostingName,
+            boolean allowWhileBooting, boolean isolated, int isolatedUid, boolean keepIfLarge,
+            String abiOverride, String entryPoint, String[] entryPointArgs, Runnable crashHandler) {
+        long startTime = SystemClock.elapsedRealtime();
+	......
+	startProcessLocked(
+                app, hostingType, hostingNameStr, abiOverride, entryPoint, entryPointArgs);
+	......
+}
+
+private final void startProcessLocked(ProcessRecord app, String hostingType,
+            String hostingNameStr, String abiOverride, String entryPoint, String[] entryPointArgs) {
+
+	....
+	if (entryPoint == null) entryPoint = "android.app.ActivityThread";
+            Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, "Start proc: " +
+                    app.processName);
+	Process.ProcessStartResult startResult = Process.start(entryPoint,
+                    app.processName, uid, uid, gids, debugFlags, mountExternal,
+                    app.info.targetSdkVersion, app.info.seinfo, requiredAbi, instructionSet,
+                    app.info.dataDir, entryPointArgs);
+	.....
+}
+
+
+上面会通过Process.start的方式启动ActivityThread中的main函数，所以说每一个应用程序都有一个ActivityThread，它里面有一个主线程的Looper对象，一致循环执行，响应四大组件还有用户在主线程
+通过handler发消息的作用，是很重要的
+public static void main(String[] args) {
+	Process.setArgV0("<pre-initialized>");
+
+    Looper.prepareMainLooper();
+
+    ActivityThread thread = new ActivityThread();
+    thread.attach(false);
+		
+	Looper.loop();	
+}
+
+thread.attach(false);
+private void attach(boolean system) {
+	....
+	final IActivityManager mgr = ActivityManagerNative.getDefault();
+    try {
+            mgr.attachApplication(mAppThread);
+        } catch (RemoteException ex) {
+            throw ex.rethrowFromSystemServer();
+    }
+	.....
+}
+通过Binder机制调用到ActivityManagerService中对应的方法即为
+@Override
+public final void attachApplication(IApplicationThread thread) {
+    synchronized (this) {
+        int callingPid = Binder.getCallingPid();
+        final long origId = Binder.clearCallingIdentity();
+        attachApplicationLocked(thread, callingPid);
+        Binder.restoreCallingIdentity(origId);
+    }
+}
+
+private final boolean attachApplicationLocked(IApplicationThread thread,int pid)
+{
+	....
+	thread.bindApplication(processName, appInfo, providers, app.instrumentationClass,
+                    profilerInfo, app.instrumentationArguments, app.instrumentationWatcher,
+                    app.instrumentationUiAutomationConnection, testMode,
+                    mBinderTransactionTrackingEnabled, enableTrackAllocation,
+                    isRestrictedBackupMode || !normalMode, app.persistent,
+                    new Configuration(mConfiguration), app.compat,
+                    getCommonServicesLocked(app.isolated),
+                    mCoreSettingsObserver.getCoreSettingsLocked());
+	
+	...
+	// See if the top visible activity is waiting to run in this process...
+    if (normalMode) {
+        try {
+                if (mStackSupervisor.attachApplicationLocked(app)) {
+                    didSomething = true;
+            }
+        } catch (Exception e) {
+                Slog.wtf(TAG, "Exception thrown launching activities in " + app, e);
+                badApp = true;
+        }
+    }
+}
+
+thread.bindApplication()又会通过BINDER机制，执行到ActivityThread中对应的方法
+public final void bindApplication(String processName, ApplicationInfo appInfo,
+                List<ProviderInfo> providers, ComponentName instrumentationName,
+                ProfilerInfo profilerInfo, Bundle instrumentationArgs,
+                IInstrumentationWatcher instrumentationWatcher,
+                IUiAutomationConnection instrumentationUiConnection, int debugMode,
+                boolean enableBinderTracking, boolean trackAllocation,
+                boolean isRestrictedBackupMode, boolean persistent, Configuration config,
+                CompatibilityInfo compatInfo, Map<String, IBinder> services, Bundle coreSettings) {
+
+	AppBindData data = new AppBindData();
+	data.processName = processName;
+    data.appInfo = appInfo;
+    data.providers = providers;
+    data.instrumentationName = instrumentationName;
+    data.instrumentationArgs = instrumentationArgs;
+    data.instrumentationWatcher = instrumentationWatcher;
+    data.instrumentationUiAutomationConnection = instrumentationUiConnection;
+    data.debugMode = debugMode;
+    data.enableBinderTracking = enableBinderTracking;
+    data.trackAllocation = trackAllocation;
+    data.restrictedBackupMode = isRestrictedBackupMode;
+    data.persistent = persistent;
+    data.config = config;
+    data.compatInfo = compatInfo;
+    data.initProfilerInfo = profilerInfo;
+	//发送系统的Hanlder
+    sendMessage(H.BIND_APPLICATION, data);
+}
+case BIND_APPLICATION:
+    Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, "bindApplication");
+    AppBindData data = (AppBindData)msg.obj;
+    handleBindApplication(data);
+    Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);
+break;
+
+private void handleBindApplication(AppBindData data) {
+	....
+	 if (ii != null) {
+            final ApplicationInfo instrApp = new ApplicationInfo();
+            ii.copyTo(instrApp);
+            instrApp.initForUser(UserHandle.myUserId());
+            final LoadedApk pi = getPackageInfo(instrApp, data.compatInfo,
+                    appContext.getClassLoader(), false, true, false);
+            final ContextImpl instrContext = ContextImpl.createAppContext(this, pi);
+
+            try {
+                final ClassLoader cl = instrContext.getClassLoader();
+                mInstrumentation = (Instrumentation)
+                    cl.loadClass(data.instrumentationName.getClassName()).newInstance();
+            } catch (Exception e) {
+                throw new RuntimeException(
+                    "Unable to instantiate instrumentation "
+                    + data.instrumentationName + ": " + e.toString(), e);
+            }
+
+            final ComponentName component = new ComponentName(ii.packageName, ii.name);
+            mInstrumentation.init(this, instrContext, appContext, component,
+                    data.instrumentationWatcher, data.instrumentationUiAutomationConnection);
+
+            if (mProfiler.profileFile != null && !ii.handleProfiling
+                    && mProfiler.profileFd == null) {
+                mProfiler.handlingProfiling = true;
+                final File file = new File(mProfiler.profileFile);
+                file.getParentFile().mkdirs();
+                Debug.startMethodTracing(file.toString(), 8 * 1024 * 1024);
+            }
+        } else {
+            mInstrumentation = new Instrumentation();
+        }
+	...
+	 try {
+                mInstrumentation.onCreate(data.instrumentationArgs);
+            }
+            catch (Exception e) {
+                throw new RuntimeException(
+                    "Exception thrown in onCreate() of "
+                    + data.instrumentationName + ": " + e.toString(), e);
+            }
+
+            try {
+                mInstrumentation.callApplicationOnCreate(app);
+            } catch (Exception e) {
+                if (!mInstrumentation.onException(app, e)) {
+                    throw new RuntimeException(
+                        "Unable to create application " + app.getClass().getName()
+                        + ": " + e.toString(), e);
+                }
+            }
+}
+
+上面做的操作即是通过类加载器，加载到Instruction，创建这个对象，Application对象，然后回掉执行对应的函数，比如
+ mInstrumentation.callApplicationOnCreate(app);
+ public void callApplicationOnCreate(Application app) {
+        app.onCreate();//即是会回掉到Application中的onCreate函数
+}
+
+程序继续执行当执行到
+mStackSupervisor.attachApplicationLocked(app)
+boolean attachApplicationLocked(ProcessRecord app) throws RemoteException {
+	...
+	ActivityRecord hr = stack.topRunningActivityLocked();
+                if (hr != null) {
+                    if (hr.app == null && app.uid == hr.info.applicationInfo.uid
+                            && processName.equals(hr.processName)) {
+                        try {
+                            if (realStartActivityLocked(hr, app, true, true)) {//这个就是跟启动了应用程序执行一样的逻辑，所以下面分析应用程序启动的时候，原理是一样的
+                                didSomething = true;
+                            }
+                        } catch (RemoteException e) {
+                            Slog.w(TAG, "Exception in new application when starting activity "
+                                  + hr.intent.getComponent().flattenToShortString(), e);
+                            throw e;
+                        }
+                    }
+    }
+	
+}
+
+
+下面是应用程序已经启动的情况
 final boolean realStartActivityLocked(ActivityRecord r, ProcessRecord app,
             boolean andResume, boolean checkConfig) throws RemoteException {//抛出RemoteException 说明里面涉及到了远程的跨进程的调用
 			
