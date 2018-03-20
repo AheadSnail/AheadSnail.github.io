@@ -70,8 +70,8 @@ class PackageManagerService extends IPackageManager.Stub {
             boolean factoryTest, boolean onlyCore) {
 		....
 		
-		File dataDir = Environment.getDataDirectory();
-        mAppInstallDir = new File(dataDir, "app");
+		File dataDir = Environment.getDataDirectory();   //private static final File DIR_ANDROID_DATA = getDirectory(ENV_ANDROID_DATA, "/data");
+        mAppInstallDir = new File(dataDir, "app"); 这里也即是获取到/data/app目录
         mAppLib32InstallDir = new File(dataDir, "app-lib");
         mEphemeralInstallDir = new File(dataDir, "app-ephemeral");
         mAsecInternalPath = new File(dataDir, "app-asec").getPath();
@@ -125,6 +125,18 @@ class PackageManagerService extends IPackageManager.Stub {
                     | PackageParser.PARSE_IS_SYSTEM
                     | PackageParser.PARSE_IS_SYSTEM_DIR, scanFlags, 0);
 		
+		
+		EventLog.writeEvent(EventLogTags.BOOT_PROGRESS_PMS_DATA_SCAN_START,
+                        SystemClock.uptimeMillis());
+        scanDirTracedLI(mAppInstallDir, 0, scanFlags | SCAN_REQUIRE_KNOWN, 0);
+
+        scanDirTracedLI(mDrmAppPrivateInstallDir, mDefParseFlags
+                        | PackageParser.PARSE_FORWARD_LOCK,
+                        scanFlags | SCAN_REQUIRE_KNOWN, 0);
+
+		scanDirLI(mEphemeralInstallDir, mDefParseFlags
+                        | PackageParser.PARSE_IS_EPHEMERAL,
+                        scanFlags | SCAN_REQUIRE_KNOWN, 0);
 		....
 	}
 	....
@@ -153,13 +165,21 @@ private static final File DIR_OEM_ROOT = getDirectory(ENV_OEM_ROOT, "/oem");
 /system/app
 
 /vendor/app
+
+/data/app
+
+/data/app-lib等
 ```
 
-/system/app
+/system/app  这里保存的是系统的应用
 ![结果显示](/uploads/PackageManagerService/system-app.png)
 
 /system/framework
 ![结果显示](/uploads/PackageManagerService/system-framewokr.png)
+
+而我们的应用程序是保存在/data/app目录下的
+![结果显示](/uploads/PackageManagerService/data-app.png)
+
 
 ```java
 继续执行 scanDirTracedLI函数
