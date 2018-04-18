@@ -307,6 +307,9 @@ target_link_libraries( Aria
                        )
 ```
 
+[CMake语法](https://cmake.org/cmake/help/latest/index.html)
+
+
 AndroidStudio 文件目录显示
 ![结果显示](/uploads/Aria2编译/AndroidStudioCmakeList文件编写.png)
 
