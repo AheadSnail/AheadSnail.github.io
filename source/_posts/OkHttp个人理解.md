@@ -2,7 +2,7 @@
 layout: pager
 title: OkHttp个人理解
 date: 2018-05-21 09:42:33
-tags: [OkHttp]
+tags: [Android,OkHttp]
 description:  OkHttp个人理解
 ---
 

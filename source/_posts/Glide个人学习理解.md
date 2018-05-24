@@ -2,7 +2,7 @@
 layout: pager
 title: Glide个人学习理解
 date: 2018-05-18 13:55:17
-tags: [Glide]
+tags: [Android,Glide]
 description:  Glide个人学习理解
 ---
 
