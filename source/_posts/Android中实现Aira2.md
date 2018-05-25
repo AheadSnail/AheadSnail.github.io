@@ -352,14 +352,14 @@ public class AriaApi
 JNI函数的编写
 ```java
 由于下载涉及到了一些耗时的操作，所以我们会在JNI中创建一个子线程来执行这些内容
-    //2创建子线程,用于下载，检测等,创建成功之后，就会执行run的回调
-    if (pthread_create(&pthread_tid, NULL, run, NULL)) {
-        //创建失败
-        pthread_detach(pthread_tid);
-        rev = 1;
-        return rev;
-    }
+//2创建子线程,用于下载，检测等,创建成功之后，就会执行run的回调
+if (pthread_create(&pthread_tid, NULL, run, NULL)) {
+    //创建失败
+    pthread_detach(pthread_tid);
+    rev = 1;
     return rev;
+}
+return rev;
 	
 //全局的配置选项
 static aria2::KeyVals gloableOptions;
@@ -377,11 +377,11 @@ void *run(void *pVoid) {
     //如果keepRunning成员为true，则即使没有要执行的下载，运行（会话，RUN_ONCE）也会返回1 ，也即是下面的这个调用 int rv = aria2::run(session, aria2::RUN_ONCE);也会返回1
     config.keepRunning = true;
 	
-	//指定Aria2日志输出的文件,这个可选择，这里选择是为了方便开发得到信息
+    //指定Aria2日志输出的文件,这个可选择，这里选择是为了方便开发得到信息
     gloableOptions.push_back(std::pair<std::string, std::string> ("log", c_Aria2LogPath));
     // 指定日志的级别 "--log-level=debug";
     gloableOptions.push_back(std::pair<std::string, std::string> ("log-level", "debug"));
-	//gloableOptions中可以添加很多的参数选项，有关参数的详细，可以查看官网
+    //gloableOptions中可以添加很多的参数选项，有关参数的详细，可以查看官网
 	....
     //使用这些选项创建新的Session对象作为附加参数。 这些选项被视为在命令行中指定给aria2c传递的命令行。 如果成功，该函数返回指向创建的Session对象的指针，或返回NULL。
     //请注意，每个进程只能创建一个Session对象。
@@ -394,7 +394,7 @@ void *run(void *pVoid) {
     for(;;){
         //执行事件轮询和操作, 如果|模式|是 ：c：macro：`RUN_DEFAULT`，这个函数在没有下载时返回 留下来处理。 在这种情况下，这个函数返回0。
         //如果|模式| 是：c：macro：`RUN_ONCE`，这个函数返回之后  在当前的实现中，事件轮询1秒内超时。如果函数返回0则代表出现了异常.否则，返回1，表示该 调用者必须调用此函数一次或多次完成下载。
-		//只有执行了aria2::shoutdow();函数这个返回值才会为1，所以会退出无限循环
+        //只有执行了aria2::shoutdow();函数这个返回值才会为1，所以会退出无限循环
         int rv = aria2::run(globalSession, aria2::RUN_ONCE);
         if (rv != 1) {
             LOGD("aria2 thread_run exit");
@@ -579,7 +579,7 @@ struct ShutdownJob : public Job {
     ShutdownJob(bool force) : force(force) {}
     virtual int execute(aria2::Session* session)
     {
-	    //终止无限循环的关键代码,当执行了这段代码之后，int rv = aria2::run(globalSession, aria2::RUN_ONCE); 才会返回1，这样才会进入break，退出无限循环
+        //终止无限循环的关键代码,当执行了这段代码之后，int rv = aria2::run(globalSession, aria2::RUN_ONCE); 才会返回1，这样才会进入break，退出无限循环
         int ret = aria2::shutdown(session, force);
         return ret;
     }
@@ -637,13 +637,13 @@ void ShowToastCallbackForAndroid(std::string info){
     //showToast(LISTCMD_HIDEGAME, 0);
     if(android_showToast != NULL)
     {
-	    //直接使用env->NewStringUTF() 在部分的手机有问题，所以这里先转成jbyteArray数组，对应的android就为byte[]数组
+        //直接使用env->NewStringUTF() 在部分的手机有问题，所以这里先转成jbyteArray数组，对应的android就为byte[]数组
         const char * c_info = info.c_str();
         int strLen = strlen(c_info);
         jbyteArray byteArray = env->NewByteArray(strLen);
         env->SetByteArrayRegion(byteArray, 0, strLen, reinterpret_cast<const jbyte*>(c_info));
         env->CallStaticVoidMethod(aria2ApiClass,android_showToast,byteArray);
-		//释放局部引用
+        //释放局部引用
         env->DeleteLocalRef(byteArray);
     }
     if(attached)

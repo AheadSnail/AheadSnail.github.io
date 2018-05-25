@@ -23,7 +23,7 @@ Glide源码众多，自然没有办法做到每一个都去详细的了解。。
 ```java
 Glide中的内存缓存分为活动缓存还有内存缓存，对应的类为ActiveResources,LruResourceCache
 我们先看看他们在Glide中是怎么样使用的，在Engine中有这样的代码
-	//构建一个key ，利用EngineKey来构建一个key，如果宽高不一样的化，这里会得到俩个不一样的key
+    //构建一个key ，利用EngineKey来构建一个key，如果宽高不一样的化，这里会得到俩个不一样的key
     EngineKey key = keyFactory.buildKey(model, signature, width, height, transformations, resourceClass, transcodeClass, options);
 
     //首先从活动的缓存中获取
@@ -92,7 +92,7 @@ Glide中的内存缓存分为活动缓存还有内存缓存，对应的类为Act
    //资源引用
   void activate(Key key, EngineResource<?> resource) {
     //将这个资源构成一个WeakReference对象，注意这里传递了 getReferenceQueue() ，大体的作用就是当你这个虚引用被资源回收掉了，这个被回收的对象会添加到ReferenceQueue中
-	//这样我们查看这个ReferenceQueue中有没有内容就可以知道哪个对象被回收了，这样我们可以将这个引用从我们的HashMap中移除，防止内存泄漏
+    //这样我们查看这个ReferenceQueue中有没有内容就可以知道哪个对象被回收了，这样我们可以将这个引用从我们的HashMap中移除，防止内存泄漏
     ResourceWeakReference toPut =
         new ResourceWeakReference(
             key,
@@ -123,13 +123,13 @@ Glide中的内存缓存分为活动缓存还有内存缓存，对应的类为Act
           cleanReferenceQueue();
         }
       }, "glide-active-resources");
-	  //线程启动
+      //线程启动
       cleanReferenceQueueThread.start();
     }
     return resourceReferenceQueue;
   }
   
-    //清除WeakReference引用对象
+  //清除WeakReference引用对象
   @SuppressWarnings("WeakerAccess")
   @Synthetic void cleanReferenceQueue() {
     while (!isShutdown) {
@@ -142,7 +142,7 @@ Glide中的内存缓存分为活动缓存还有内存缓存，对应的类为Act
         // This section for testing only.
         DequeuedResourceCallback current = cb;
         if (current != null) {
-          current.onResourceDequeued();
+            current.onResourceDequeued();
         }
         // End for testing only.
       } catch (InterruptedException e) {
@@ -156,7 +156,7 @@ Glide中的内存缓存分为活动缓存还有内存缓存，对应的类为Act
     @Override
     public boolean handleMessage(Message msg) {
       if (msg.what == MSG_CLEAN_REF) {
-	    //从活动缓存中移除这个对象引用，同时给这个资源设置监听，回调执行onResourceReleased
+        //从活动缓存中移除这个对象引用，同时给这个资源设置监听，回调执行onResourceReleased
         cleanupActiveReference((ResourceWeakReference) msg.obj);
         return true;
       }
@@ -306,7 +306,7 @@ Glide中的内存缓存分为活动缓存还有内存缓存，对应的类为Act
       throw new IllegalThreadStateException("Must call release on the main thread");
     }
 	
-	//当引用计数达到了0的时候，执行回调函数，就会将这个资源添加到内存缓存中，或者回收掉
+    //当引用计数达到了0的时候，执行回调函数，就会将这个资源添加到内存缓存中，或者回收掉
     if (--acquired == 0) {
       listener.onResourceReleased(key, this);
     }
@@ -442,7 +442,7 @@ Glide中的内存缓存分为活动缓存还有内存缓存，对应的类为Act
       current = pendingRequestManagerFragments.get(fm);
       //如果还是没有，就构建一个
       if (current == null) {
-	    //构建一个新的RequestManagerFragment对象
+        //构建一个新的RequestManagerFragment对象
         current = new RequestManagerFragment();
         current.setParentFragmentHint(parentHint);
         if (isParentVisible) {
@@ -465,30 +465,30 @@ Handler接收到了  ID_REMOVE_FRAGMENT_MANAGER消息的实现
 case ID_REMOVE_FRAGMENT_MANAGER://如果收到了这个消息，说明创建的Fragment肯定已经添加到了FragmentManager中，所以这里可以从临时集合中移除了
     android.app.FragmentManager fm = (android.app.FragmentManager) message.obj;
     key = fm;
-	如果执行到了这里，那么肯定是已经将创建的RequestManagerFragment对象添加到了FragmentManager中了
+    //如果执行到了这里，那么肯定是已经将创建的RequestManagerFragment对象添加到了FragmentManager中了
     removed = pendingRequestManagerFragments.remove(fm);
 break;
 
     构建RequestManagerFragment对象的时候
     RequestManagerFragment current = new RequestManagerFragment();
 	 public RequestManagerFragment() {
-		this(new ActivityFragmentLifecycle());
-	}
+        this(new ActivityFragmentLifecycle());
+    }
 	
    对于ActivityFragmentLifecycle，他是实现了 class ActivityFragmentLifecycle implements Lifecycle ，而Lifecycle接口有这样的函数
    public interface Lifecycle {
-    void addListener(@NonNull LifecycleListener listener);
-    void removeListener(@NonNull LifecycleListener listener);
-  }
+        void addListener(@NonNull LifecycleListener listener);
+        void removeListener(@NonNull LifecycleListener listener);
+    }
 
-	RequestManagerFragment(@NonNull ActivityFragmentLifecycle lifecycle) {
-		this.lifecycle = lifecycle;
-	}
+    RequestManagerFragment(@NonNull ActivityFragmentLifecycle lifecycle) {
+        this.lifecycle = lifecycle;
+    }
 	
-	//构建一个RequestManager对象,同时将在RequestManagerFragment中创建的lifecycle对象传递过去
-	requestManager = factory.build(glide, current.getGlideLifecycle(), current.getRequestManagerTreeNode(), context);
+    //构建一个RequestManager对象,同时将在RequestManagerFragment中创建的lifecycle对象传递过去
+    requestManager = factory.build(glide, current.getGlideLifecycle(), current.getRequestManagerTreeNode(), context);
 	
-	RequestManager(
+    RequestManager(
       Glide glide,
       Lifecycle lifecycle,
       RequestManagerTreeNode treeNode,
@@ -500,12 +500,12 @@ break;
     this.treeNode = treeNode;
     this.requestTracker = requestTracker;
     this.context = context;
-	....
+    ....
 	
-	//将RequestManager添加到lifecycle里面，这样RequestManager就能接受到生命周期的回调
+    //将RequestManager添加到lifecycle里面，这样RequestManager就能接受到生命周期的回调
     lifecycle.addListener(this);
 	
-	//将监听网络的类，加入生命周期的集合中,受到生命周期的回调
+    //将监听网络的类，加入生命周期的集合中,受到生命周期的回调
     lifecycle.addListener(connectivityMonitor);
 }
 
@@ -541,7 +541,7 @@ break;
     lifecycle.onStop();
   }  
   
-   lifecycle.onStart(); 就会执行到ActivityLifeCycle中的onStart()函数
+  lifecycle.onStart(); 就会执行到ActivityLifeCycle中的onStart()函数
   //接受到了RequestManagerFragment的生命周期的回调
   void onStart() {
     //标识已经开始
@@ -763,38 +763,39 @@ break;
   而MulteModelLoaderFacotry的构造函数为
   public class MultiModelLoaderFactory {
     ....
-	//Entry集合对象
-	private final List<Entry<?, ?>> entries = new ArrayList<>();
-	...
-	public MultiModelLoaderFactory(@NonNull Pool<List<Throwable>> throwableListPool) {
-		this(throwableListPool, DEFAULT_FACTORY);
-  }
-  ...
+    //Entry集合对象
+    private final List<Entry<?, ?>> entries = new ArrayList<>();
+    ...
+    public MultiModelLoaderFactory(@NonNull Pool<List<Throwable>> throwableListPool)
+    {
+        this(throwableListPool, DEFAULT_FACTORY);
+    }
+    ...
   }
   再比如EncoderRegistry 构造函数为
   public class EncoderRegistry {
-	private final List<Entry<?>> encoders = new ArrayList<>();
-	...
+    private final List<Entry<?>> encoders = new ArrayList<>();
+    ...
   }
   ResourceDecoderRegistry 构造函数为
   public class ResourceDecoderRegistry {
-	//解码的集合
-	private final Map<String, List<Entry<?, ?>>> decoders = new HashMap<>();
-	...
+    //解码的集合
+    private final Map<String, List<Entry<?, ?>>> decoders = new HashMap<>();
+    ...
   }
   在Glide的构造函数中还有这样的代码,下面的是省略的代码，每一种都抽出一个来解析
   //注册
   registry
         .append(ByteBuffer.class, new ByteBufferEncoder())//ByteBuffer转换为File
-		...
+        ...
         /* Bitmaps */
         .append(Registry.BUCKET_BITMAP, ByteBuffer.class, Bitmap.class, byteBufferBitmapDecoder)//添加一个从ByteBuffer转成Bitmap的 byteBufferBitmapDecoder Entry对象
-		...
-		.register(new ByteBufferRewinder.Factory())
+        ...
+        .register(new ByteBufferRewinder.Factory())
         .append(File.class, ByteBuffer.class, new ByteBufferFileLoader.Factory())
-		...
-		.register(Bitmap.class, byte[].class, bitmapBytesTranscoder)
-		...
+        ...
+        .register(Bitmap.class, byte[].class, bitmapBytesTranscoder)
+        ...
     
 首先看 .append(ByteBuffer.class, new ByteBufferEncoder()) 源码实现为
   @NonNull
@@ -816,7 +817,7 @@ public <Data, TResource> Registry append( String bucket,Class<Data> dataClass,Cl
 public synchronized <T, R> void append(@NonNull String bucket,
       @NonNull ResourceDecoder<T, R> decoder,
       @NonNull Class<T> dataClass, @NonNull Class<R> resourceClass) {
-      //getOrAddEntryList(bucket) 可能会返回一个刚构建的集合，也可能返回之前已经存在的集合，添加一个entry对象
+    //getOrAddEntryList(bucket) 可能会返回一个刚构建的集合，也可能返回之前已经存在的集合，添加一个entry对象
     getOrAddEntryList(bucket).add(new Entry<>(dataClass, resourceClass, decoder));
 }
 //如果根据制定的bucket的key获取到value，如果没有就构建一个然后添加到decoders 里面，否则就直接的获取到
@@ -1138,7 +1139,7 @@ private <A> List<ModelLoader<A, ?>> getModelLoadersForClass(@NonNull Class<A> mo
     //首先从缓存的cache 中获取到 modelClass对应的List<ModelLoader>集合
     List<ModelLoader<A, ?>> loaders = cache.get(modelClass);
     if (loaders == null) {
-	  //如果是第一次的化，那么当然是没有缓存的了，所以会进入这里面，根据mutimodelLoaderFactory来构建一个 
+    //如果是第一次的化，那么当然是没有缓存的了，所以会进入这里面，根据mutimodelLoaderFactory来构建一个 
       loaders = Collections.unmodifiableList(multiModelLoaderFactory.build(modelClass));
       cache.put(modelClass, loaders);
     }
@@ -1149,9 +1150,9 @@ multiModelLoaderFactory.build(modelClass)函数的实现为
 @NonNull
 synchronized <Model> List<ModelLoader<Model, ?>> build(@NonNull Class<Model> modelClass) {
     try {
-	  //查找到的要返回的ModelLoader集合
+      //查找到的要返回的ModelLoader集合
       List<ModelLoader<Model, ?>> loaders = new ArrayList<>();
-	  //遍历集合中的内容，查看哪个是合适的
+      //遍历集合中的内容，查看哪个是合适的
       for (Entry<?, ?> entry : entries) {
         // Avoid stack overflow recursively creating model loaders by only creating loaders in
         // recursive requests if they haven't been created earlier in the chain. For example:
@@ -1161,10 +1162,10 @@ synchronized <Model> List<ModelLoader<Model, ?>> build(@NonNull Class<Model> mod
         if (alreadyUsedEntries.contains(entry)) {
           continue;
         }
-		//判断当前的这个entry是否能够处理这个modelClass，这里的判断为  return this.modelClass.isAssignableFrom(modelClass); 也即是简单的判断俩个class是否是一样的，或者是对应的子类
+        //判断当前的这个entry是否能够处理这个modelClass，这里的判断为  return this.modelClass.isAssignableFrom(modelClass); 也即是简单的判断俩个class是否是一样的，或者是对应的子类
         if (entry.handles(modelClass)) {
           alreadyUsedEntries.add(entry);
-		  //如果找到了进入里面，首先根据build函数根据entry获取到一个ModelLoader对象,然后添加到loaders集合中
+          //如果找到了进入里面，首先根据build函数根据entry获取到一个ModelLoader对象,然后添加到loaders集合中
           loaders.add(this.<Model, Object>build(entry));
           alreadyUsedEntries.remove(entry);
         }
@@ -1243,7 +1244,7 @@ multiFactory.build(Uri.class, InputStream.class)函数的实现为
 public synchronized <Model, Data> ModelLoader<Model, Data> build(@NonNull Class<Model> modelClass,
       @NonNull Class<Data> dataClass) {
     try {
-	  //用来存储当前哪些是合法的
+      //用来存储当前哪些是合法的
       List<ModelLoader<Model, Data>> loaders = new ArrayList<>();
       boolean ignoredAnyEntries = false;
       for (Entry<?, ?> entry : entries) {
@@ -1256,7 +1257,7 @@ public synchronized <Model, Data> ModelLoader<Model, Data> build(@NonNull Class<
           ignoredAnyEntries = true;
           continue;
         }
-		//判断当前的这个entry是否能够处理这个modelClass，这里的判断为  return handles(modelClass) && this.dataClass.isAssignableFrom(dataClass); 也只是简单的判断俩个类的类型都要符合
+        //判断当前的这个entry是否能够处理这个modelClass，这里的判断为  return handles(modelClass) && this.dataClass.isAssignableFrom(dataClass); 也只是简单的判断俩个类的类型都要符合
         if (entry.handles(modelClass, dataClass)) {
           alreadyUsedEntries.add(entry);
           loaders.add(this.<Model, Data>build(entry));
@@ -1264,7 +1265,7 @@ public synchronized <Model, Data> ModelLoader<Model, Data> build(@NonNull Class<
         }
       }
 	  
-	  //这里还会根据得到的结果数量，构造不同的Loader,如果这里返回的loaders的数量大于1的化，则会执行factory.build(loaders, throwableListPool); 构建一个MultiModelLoader同时传递集合进去
+      //这里还会根据得到的结果数量，构造不同的Loader,如果这里返回的loaders的数量大于1的化，则会执行factory.build(loaders, throwableListPool); 构建一个MultiModelLoader同时传递集合进去
       if (loaders.size() > 1) {
         return factory.build(loaders, throwableListPool);
       } else if (loaders.size() == 1) {
@@ -1335,7 +1336,7 @@ private static final class ByteBufferFetcher implements DataFetcher<ByteBuffer> 
         @NonNull DataCallback<? super ByteBuffer> callback) {
       ByteBuffer result;
       try {
-	    //真正的从文件中获取到流
+        //真正的从文件中获取到流
         result = ByteBufferUtil.fromFile(file);
       } catch (IOException e) {
         if (Log.isLoggable(TAG, Log.DEBUG)) {

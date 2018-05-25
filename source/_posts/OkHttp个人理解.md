@@ -331,9 +331,9 @@ public Response proceed(Request request, StreamAllocation streamAllocation, Http
     Call call = realChain.call();
     EventListener eventListener = realChain.eventListener();
 
-	//构建一个StreamAllocation对象
+    //构建一个StreamAllocation对象
     StreamAllocation streamAllocation = new StreamAllocation(client.connectionPool(),
-        createAddress(request.url()), call, eventListener, callStackTrace);
+    createAddress(request.url()), call, eventListener, callStackTrace);
     this.streamAllocation = streamAllocation;
 
     int followUpCount = 0;
@@ -347,7 +347,7 @@ public Response proceed(Request request, StreamAllocation streamAllocation, Http
       Response response;
       boolean releaseConnection = true;
       try {
-	    //又调用了proceed函数
+        //又调用了proceed函数
         response = realChain.proceed(request, streamAllocation, null, null);
         releaseConnection = false;
       } catch (RouteException e) {
@@ -376,8 +376,8 @@ public Response proceed(Request request, StreamAllocation streamAllocation, Http
 		
     Interceptor interceptor = interceptors.get(index);然后从集合中获取到当前所有的Interceptor对象
     Response response = interceptor.intercept(next);//然后执行对象的对应的方法,同时将刚构建的RealInterceptorChain对象传递进去,注意这里不会往下执行，跳到了另一边了
-	...
-	 return response;
+    ...
+    return response;
 }
 
 所以这次获取的Interceptor对象为BridgeInterceptor 对象，所以执行对应的方法 ,这个拦截器主要进行的操作就是用来拼接请求的
@@ -431,9 +431,9 @@ public Response proceed(Request request, StreamAllocation streamAllocation, Http
       requestBuilder.header("User-Agent", Version.userAgent());
     }
 
-	//又执行到了chain中的proceed函数，继而转到对应的方法实现
+    //又执行到了chain中的proceed函数，继而转到对应的方法实现
     Response networkResponse = chain.proceed(requestBuilder.build());
-	//下面不会再往下面执行
+    //下面不会再往下面执行
     HttpHeaders.receiveHeaders(cookieJar, userRequest.url(), networkResponse.headers());
 
     Response.Builder responseBuilder = networkResponse.newBuilder()
@@ -470,14 +470,14 @@ public Response proceed(Request request, StreamAllocation streamAllocation, Http
 		
     Interceptor interceptor = interceptors.get(index);然后从集合中获取到当前所有的Interceptor对象
     Response response = interceptor.intercept(next);//然后执行对象的对应的方法,同时将刚构建的RealInterceptorChain对象传递进去,注意这里不会往下执行，跳到了另一边了
-	...
-	 return response;
+    ...
+    return response;
 }
 
 当执行interceptors.get(index)的时候，这里获取到的Interceptor对象为CacheInterceptor 对象，执行对应的方法
  @Override public Response intercept(Chain chain) throws IOException {
  
-	...
+    ...
 	// If we don't need the network, we're done. 如果有缓存，就直接从缓存中获取
     if (networkRequest == null) {
       return cacheResponse.newBuilder()
@@ -485,7 +485,7 @@ public Response proceed(Request request, StreamAllocation streamAllocation, Http
           .build();
     }
 
-	//否则执行网络请求
+    //否则执行网络请求
     Response networkResponse = null;
     try {
       networkResponse = chain.proceed(networkRequest);
@@ -495,8 +495,7 @@ public Response proceed(Request request, StreamAllocation streamAllocation, Http
         closeQuietly(cacheCandidate.body());
       }
     }
-	...
- 
+    ...
  }
  
 当执行 networkResponse = chain.proceed(networkRequest)的时候
@@ -507,34 +506,34 @@ public Response proceed(Request request, StreamAllocation streamAllocation, Http
 public Response proceed(Request request, StreamAllocation streamAllocation, HttpCodec httpCodec, RealConnection connection) throws IOException {
     if (index >= interceptors.size()) throw new AssertionError(); index代表当前正在执行的拦截器在集合中的索引，所以这个所以不能大于拦截器集合的大小值
 
-	...
-	// Call the next interceptor in the chain. 这里又构建一个RealInterceptorChain 对象，要注意这里的索引为index+1,而且其他的参数都为同一个对象
+    ...
+    // Call the next interceptor in the chain. 这里又构建一个RealInterceptorChain 对象，要注意这里的索引为index+1,而且其他的参数都为同一个对象
     RealInterceptorChain next = new RealInterceptorChain(interceptors, streamAllocation, httpCodec,  
         connection, index + 1, request, call, eventListener, connectTimeout, readTimeout,
         writeTimeout);
 		
     Interceptor interceptor = interceptors.get(index);然后从集合中获取到当前所有的Interceptor对象
     Response response = interceptor.intercept(next);//然后执行对象的对应的方法,同时将刚构建的RealInterceptorChain对象传递进去,注意这里不会往下执行，跳到了另一边了
-	...
-	 return response;
+    ...
+    return response;
 }
    
 
 当执行interceptors.get(index)的时候，这里获取到的Interceptor对象为ConnectInterceptor 对象，执行对应的方法
  @Override public Response intercept(Chain chain) throws IOException {
 	RealInterceptorChain realChain = (RealInterceptorChain) chain;
-	//获取到Request对象,也即是获取到第三个拦截器中传递的Request对象
+    //获取到Request对象,也即是获取到第三个拦截器中传递的Request对象
     Request request = realChain.request();
-	//获取到StreamAllocation 对象，也即是第一个拦截器中构建的对象
+    //获取到StreamAllocation 对象，也即是第一个拦截器中构建的对象
     StreamAllocation streamAllocation = realChain.streamAllocation();
 
     // We need the network to satisfy this request. Possibly for validating a conditional GET.
     boolean doExtensiveHealthChecks = !request.method().equals("GET");
-	//得到一个HttpCodec对象
+    //得到一个HttpCodec对象
     HttpCodec httpCodec = streamAllocation.newStream(client, chain, doExtensiveHealthChecks);
-	//得到RealConnection对象
+    //得到RealConnection对象
     RealConnection connection = streamAllocation.connection();
-	//执行下一个拦截器
+    //执行下一个拦截器
     return realChain.proceed(request, streamAllocation, httpCodec, connection);
 } 
 
@@ -655,7 +654,7 @@ private RealConnection findConnection(int connectTimeout, int readTimeout, int w
                 }
             }
 
-			//如果到了这里就说明没有找到可以用的连接
+            //如果到了这里就说明没有找到可以用的连接
             if (!foundPooledConnection) {
                 if (selectedRoute == null) {
                     selectedRoute = routeSelection.next();
@@ -708,12 +707,12 @@ private RealConnection findConnection(int connectTimeout, int readTimeout, int w
     static {
         Internal.instance = new Internal() {
 		
-		....
-		@Override
+        ....
+        @Override
         public RealConnection get(ConnectionPool pool, Address address,StreamAllocation streamAllocation, Route route) {
             return pool.get(address, streamAllocation, route);
         }
-		...	
+        ...	
 	}
 }
 
@@ -765,9 +764,9 @@ result.connect(connectTimeout, readTimeout, writeTimeout, pingIntervalMillis,con
       EventListener eventListener) {
     if (protocol != null) throw new IllegalStateException("already connected");
 	...
-	//连接socket
+    //连接socket
     connectSocket(connectTimeout, readTimeout, call, eventListener);
-	...
+    ...
 }
 
 connectSocket() 函数的实现为:
@@ -884,7 +883,7 @@ void put(RealConnection connection) {
         cleanupRunning = true;
         executor.execute(cleanupRunnable);
     }
-	//最终将这个连接保存到了连接池的队列中
+    //最终将这个连接保存到了连接池的队列中
     connections.add(connection);
 }
 下面来分析下连接池中的清理操作: 连接池里面有一个线程是用来清理连接的,清理当一个连接在连接池中超过了最大的存活的时间之后，就会被清理掉
@@ -918,7 +917,7 @@ private final Runnable cleanupRunnable = new Runnable() {
         @Override
         public void run() {
             while (true) {
-			    //获取下一个需要的清理的时间
+                //获取下一个需要的清理的时间
                 long waitNanos = cleanup(System.nanoTime());
                 if (waitNanos == -1) return;
                 if (waitNanos > 0) {
@@ -926,7 +925,7 @@ private final Runnable cleanupRunnable = new Runnable() {
                     waitNanos -= (waitMillis * 1000000L);
                     synchronized (ConnectionPool.this) {
                         try {
-						    //等待多久达到最大闲置
+                            //等待多久达到最大闲置
                             ConnectionPool.this.wait(waitMillis, (int) waitNanos);
                         } catch (InterruptedException ignored) {
                         }
@@ -1073,7 +1072,7 @@ public Http1Codec(OkHttpClient client, StreamAllocation streamAllocation, Buffer
 public Response proceed(Request request, StreamAllocation streamAllocation, HttpCodec httpCodec, RealConnection connection) throws IOException {
     if (index >= interceptors.size()) throw new AssertionError(); index代表当前正在执行的拦截器在集合中的索引，所以这个所以不能大于拦截器集合的大小值
 
-	...
+    ...
 	// Call the next interceptor in the chain. 这里又构建一个RealInterceptorChain 对象，要注意这里的索引为index+1,而且其他的参数都为同一个对象
     RealInterceptorChain next = new RealInterceptorChain(interceptors, streamAllocation, httpCodec,  
         connection, index + 1, request, call, eventListener, connectTimeout, readTimeout,
@@ -1081,8 +1080,8 @@ public Response proceed(Request request, StreamAllocation streamAllocation, Http
 		
     Interceptor interceptor = interceptors.get(index);然后从集合中获取到当前所有的Interceptor对象
     Response response = interceptor.intercept(next);//然后执行对象的对应的方法,同时将刚构建的RealInterceptorChain对象传递进去,注意这里不会往下执行，跳到了另一边了
-	...
-	 return response;
+    ...
+    return response;
 }
 
 这个时候获取到的是拦截器对象为CallServerInterceptor对象，执行对应的方法
@@ -1102,7 +1101,7 @@ public Response proceed(Request request, StreamAllocation streamAllocation, Http
     realChain.eventListener().requestHeadersEnd(realChain.call(), request);
 
     Response.Builder responseBuilder = null;
-	....
+    ....
     //完成请求，
     httpCodec.finishRequest();
 

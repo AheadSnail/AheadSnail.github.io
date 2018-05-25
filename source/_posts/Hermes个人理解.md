@@ -146,7 +146,7 @@ public static void register(Class<?> clazz)
 private static final TypeCenter TYPE_CENTER = TypeCenter.getInstance();
 public class TypeCenter
 {
-	private final ConcurrentHashMap<String, Class<?>> mAnnotatedClasses;
+    private final ConcurrentHashMap<String, Class<?>> mAnnotatedClasses;
 
     //hashMap 用来缓存，防止下次要用的时候还要再获取 保存了要注册类的信息 key为要className,value为对应的Class
     private final ConcurrentHashMap<String, Class<?>> mRawClasses;
@@ -429,7 +429,7 @@ public abstract class HermesService extends Service {
                     //设置回调函数
                     receiver.setHermesServiceCallback(callback);
                 }
-                //
+                //执行解析操作
                 return receiver.action(mail.getTimeStamp(), mail.getMethod(), mail.getParameters());
             } catch (HermesException e) {
                 e.printStackTrace();
@@ -451,7 +451,7 @@ public abstract class HermesService extends Service {
 	};
 	@Override
 	public IBinder onBind(Intent intent) {
-			return mBinder;
+	    return mBinder;
 	}
 
 	public static class HermesService0 extends HermesService {}
@@ -531,11 +531,11 @@ public ObjectWrapper(Class<?> clazz, int type)
 {
     //设置ClassName，判断当前的clazz是否有含有ClassId注解，如果获取到注解的值，否则获取当前class的全类名
     setName(!clazz.isAnnotationPresent(ClassId.class), TypeUtils.getClassId(clazz));
-	//存储当前要获取的类，这里为 IUserManager.class
+    //存储当前要获取的类，这里为 IUserManager.class
     mClass = clazz;
-	//获取到时间戳
+    //获取到时间戳
     mTimeStamp = TimeStampGenerator.getTimeStamp();
-	//获取的方式，由外面传递进来，这里为 TYPE_OBJECT_TO_GET 标识为获取单例对象，对应的type还有 TYPE_OBJECT 表示获取的为一个对象 等
+    //获取的方式，由外面传递进来，这里为 TYPE_OBJECT_TO_GET 标识为获取单例对象，对应的type还有 TYPE_OBJECT 表示获取的为一个对象 等
     mType = type;
 }
 
@@ -546,7 +546,7 @@ protected void setName(boolean isName, String name)
     {
         throw new IllegalArgumentException();
     }
-    mIsName = isName;//标识当前mName获取是否是通过class的全类名，如果为false就表示为class的全类名
+    mIsName = isName;//标识当前mName获取是否是通过class的全类名，如果为true就表示为class的全类名，fasle为获取到注解上的值
     mName = name;
 }
 
@@ -601,7 +601,7 @@ for (int i = 0; i < length; ++i)
     tmp[i + 1] = parameters[i];
 }
 
-程序继续执行 执行发送,可以看到他并没有用到返回的这个对象，
+程序继续执行 执行发送,
 Reply reply = sender.send(null, tmp);
 
 //根据方法名已经参数的列表,构建一个Reply对象
@@ -742,7 +742,7 @@ protected MethodWrapper getMethodWrapper(Method method, ParameterWrapper[] param
         parameterTypes[i - 1] = parameterWrapper == null ? null : parameterWrapper.getClassType();
     }
 
-	//得到参数类型集合然后构造一个MethodWrapper对象
+    //得到参数类型集合然后构造一个MethodWrapper对象
     return new MethodWrapper(methodName, parameterTypes);
 }
 public MethodWrapper(String methodName, Class<?>[] parameterTypes)
@@ -751,7 +751,7 @@ public MethodWrapper(String methodName, Class<?>[] parameterTypes)
     setName(true, methodName);
     if (parameterTypes == null)
     {
-		parameterTypes = new Class<?>[0];
+        parameterTypes = new Class<?>[0];
     }
 
     //感觉参数的列表类型数组，转成TypeWrapper 数组
@@ -767,7 +767,7 @@ TypeWrapper构造函数为，
 public TypeWrapper(Class<?> clazz)
 {
     //设置参数的字符串，如果当前参数有注解就获取ClassId注解上面的内容，否则获取clazz的全类名
-	setName(!clazz.isAnnotationPresent(ClassId.class), TypeUtils.getClassId(clazz));
+    setName(!clazz.isAnnotationPresent(ClassId.class), TypeUtils.getClassId(clazz));
 }
 所以对于getMethodWrapper(method, parameterWrappers) 所做的事就是将参数列表的集合，转换成对应的参数列表类型的集合，然后在转成TypeWrapper，最后返回一个对象MethodWrapper对象
 
@@ -825,7 +825,8 @@ public Reply send(Class<? extends HermesService> service, Mail mail)
     }
 }
 
-所以对于进程B来说做了那么多事情，就是封装一些有用的信息，给进程A用来确定调用哪个类，哪个方法，传递了什么参数进来，最终封装在一起之后，本质还是通过远程的IBinder引用来通信的
+所以对于进程B来说做了那么多事情，就是封装一些有用的信息，给进程A用来确定调用哪个类，哪个方法，传递了什么参数进来，因为最终要通过反射的方式来调用，所以这边做的无非就是将要反射用到的
+信息封装在一起，最终本质还是通过远程的IBinder引用来通信的
 
 所以就会调用到进程A对应的函数
 private final IHermesService.Stub mBinder = new IHermesService.Stub() {
@@ -843,7 +844,7 @@ private final IHermesService.Stub mBinder = new IHermesService.Stub() {
                 //设置回调函数
                 receiver.setHermesServiceCallback(callback);
             }
-            //
+            //执行解析
             return receiver.action(mail.getTimeStamp(), mail.getMethod(), mail.getParameters());
         } catch (HermesException e) {
             e.printStackTrace();
@@ -929,7 +930,7 @@ public void setMethod(MethodWrapper methodWrapper, ParameterWrapper[] parameterW
         }
         //检查方法的合法性
         TypeUtils.validateAccessible(method);
-		//最终赋值给mMethod
+        //最终赋值给mMethod
         mMethod = method;
  }
 
@@ -943,12 +944,12 @@ private void setParameters(long methodInvocationTimeStamp, ParameterWrapper[] pa
         }
         else
         {
-		    //根据传递的参数的个数，构造一个对应长度的数组
+            //根据传递的参数的个数，构造一个对应长度的数组
             int length = parameterWrappers.length;
             mParameters = new Object[length];
             for (int i = 0; i < length; ++i)
             {
-				//遍历获取到里面的值,然后填充到对象数组中
+                //遍历获取到里面的值,然后填充到对象数组中
                 ParameterWrapper parameterWrapper = parameterWrappers[i];
                 if (parameterWrapper == null)
                 {
@@ -969,7 +970,7 @@ private void setParameters(long methodInvocationTimeStamp, ParameterWrapper[] pa
                     }
                     else
                     {
-						//其他的情况
+                        //其他的情况
                         String data = parameterWrapper.getData();
                         if (data == null)
                         {
@@ -977,7 +978,7 @@ private void setParameters(long methodInvocationTimeStamp, ParameterWrapper[] pa
                         }
                         else
                         {
-							//使用Gson来解析传递的json变成对应的对象
+                            //使用Gson来解析传递的json变成对应的对象
                             mParameters[i] = CodeUtils.decode(data, clazz);
                         }
                     }
@@ -1027,11 +1028,11 @@ public ParameterWrapper(Object object) throws HermesException
 public Reply(ParameterWrapper parameterWrapper) {
     //获取到返回对象的类型
     Class<?> clazz = TYPE_CENTER.getClassType(parameterWrapper);
-	//将返回的对象，利用gson，转成字符串,方便传输
+    //将返回的对象，利用gson，转成字符串,方便传输
     mResult = CodeUtils.decode(parameterWrapper.getData(), clazz);
-	//标识当前请求成功
+    //标识当前请求成功
     mErrorCode = ErrorCodes.SUCCESS;
-	//错误信息为空
+    //错误信息为空
     mErrorMessage = null;
     mClass = new TypeWrapper(clazz);
 	...

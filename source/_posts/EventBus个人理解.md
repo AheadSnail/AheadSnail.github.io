@@ -33,7 +33,7 @@ public class MainActivity extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-		//注册
+        //注册
         EventBus.getDefault().register(this);
 
         findViewById(R.id.but).setOnClickListener(new View.OnClickListener()
@@ -45,7 +45,7 @@ public class MainActivity extends Activity
             }
         });
     }
-	//接受
+    //接收
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(String info) {
         Toast.makeText(MainActivity.this,info,Toast.LENGTH_SHORT).show();
@@ -56,7 +56,7 @@ public class MainActivity extends Activity
     protected void onDestroy()
     {
         super.onDestroy();
-		//取消注册
+        //取消注册
         EventBus.getDefault().unregister(this);
     }
 }
@@ -126,7 +126,7 @@ public void register(Object subscriber) {
     synchronized (this) {
         //遍历集合
         for (SubscriberMethod subscriberMethod : subscriberMethods) {
-            subscribe(subscriber, subscriberMethod);
+             subscribe(subscriber, subscriberMethod);
         }
     }
 }
@@ -176,8 +176,8 @@ class SubscriberMethodFinder {
          //将当前的class 已经对应的list<SubscriberMethod>填充到缓存中,并返回这个集合
         METHOD_CACHE.put(subscriberClass, subscriberMethods);
         return subscriberMethods;
-		`}
 	}
+  }
  ...
 
   根据上面的注释以及代码，可以看到首先会获取到当前注册对象的class类型，从缓存的集合中 METHOD_CACHE获取，如果获取不到，则新建一个，然后执行下面的代码
@@ -297,7 +297,7 @@ public class SubscriberMethod {
     final int priority;
     //是否是占性事件
     final boolean sticky;
-	//方法名
+    //方法名
     String methodString;
 
     public SubscriberMethod(Method method, Class<?> eventType, ThreadMode threadMode, int priority, boolean sticky) {
@@ -364,8 +364,8 @@ public void register(Object subscriber) {
     List<SubscriberMethod> subscriberMethods = subscriberMethodFinder.findSubscriberMethods(subscriberClass);
     synchronized (this) {
         //遍历集合
-		for (SubscriberMethod subscriberMethod : subscriberMethods) {
-            subscribe(subscriber, subscriberMethod);
+        for (SubscriberMethod subscriberMethod : subscriberMethods) {
+                subscribe(subscriber, subscriberMethod);
         }
     }
 }
@@ -718,7 +718,7 @@ public void enqueue(Subscription subscription, Object event) {
             if (!handlerActive) {
                 handlerActive = true;
                 //发送消息
-				if (!sendMessage(obtainMessage())) {
+                if (!sendMessage(obtainMessage())) {
                     throw new EventBusException("Could not send handler message");
             }
         }
