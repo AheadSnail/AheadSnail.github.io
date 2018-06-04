@@ -414,7 +414,7 @@ private void parseBindView(Element element, Map<TypeElement, BindingSet.Builder>
     //获取到注解BindView中设置的值,也即是传递的id 比如我们是这样使用@BindView(R.id.title) TextView title 那么这个id就为R.id.title
     int id = element.getAnnotation(BindView.class).value();
 
-    //以当前注解的类为key从builderMap中获取到对应的 BindingSet.Builder
+    //以当前注解的类为key从builderMap中获取到对应的 BindingSet.Builder,key为 enclosingElement类型为TypeElement，也就是以类的Element代表key获取到对应的BindingSet.Builder对象
     BindingSet.Builder builder = builderMap.get(enclosingElement);
     //将获取到的id注解的值，转为一个对象Id
     Id resourceId = elementToId(element, BindView.class, id);
@@ -430,7 +430,7 @@ private void parseBindView(Element element, Map<TypeElement, BindingSet.Builder>
         return;
       }
     } else {
-      //如果为空，则创建一个BindingSet对象
+      //如果为空，则创建一个BindingSet.Builder对象,内部实现了将创建的BindingSet.Builder对象添加到了builderMap集合中
       builder = getOrCreateBindingBuilder(builderMap, enclosingElement);
     }
 
@@ -563,7 +563,41 @@ static Builder newBuilder(TypeElement enclosingElement) {
     return new Builder(targetType, bindingClassName, isFinal, isView, isActivity, isDialog);
 }
 
-之后执行 builder.addField(resourceId, new FieldViewBinding(name, type, required));首先是构造一个FieldViewBinding对象
+new Builder(targetType, bindingClassName, isFinal, isView, isActivity, isDialog); 函数实现为：
+static final class Builder {
+    //当前类的类型
+    private final TypeName targetTypeName;
+    //要创建目标类的全类名，有包括包名的
+    private final ClassName bindingClassName;
+    //标识是否为final类型
+    private final boolean isFinal;
+    //标识是否为一个view
+    private final boolean isView;
+    //标识是否为一个Activity
+    private final boolean isActivity;
+    //标识是否为一个dialog
+    private final boolean isDialog;
+
+    private BindingSet parentBinding;
+
+    //用来存储当前类，对应的资源id为key，value为ViewBinding.Builder，封装了属性的基本信息
+    private final Map<Id, ViewBinding.Builder> viewIdMap = new LinkedHashMap<>();
+    private final ImmutableList.Builder<FieldCollectionViewBinding> collectionBindings = ImmutableList.builder();
+    private final ImmutableList.Builder<ResourceBinding> resourceBindings = ImmutableList.builder();
+
+    private Builder(TypeName targetTypeName, ClassName bindingClassName, boolean isFinal,
+        boolean isView, boolean isActivity, boolean isDialog) {
+      this.targetTypeName = targetTypeName;
+      this.bindingClassName = bindingClassName;
+      this.isFinal = isFinal;
+      this.isView = isView;
+      this.isActivity = isActivity;
+      this.isDialog = isDialog;
+    }
+	....
+}
+
+得到TypeElement 对应的 BindingSet.Builder对象之后执行 builder.addField(resourceId, new FieldViewBinding(name, type, required));首先是构造一个FieldViewBinding对象
 
 final class FieldViewBinding implements MemberViewBinding {
   //代表当前属性名
@@ -598,7 +632,7 @@ private ViewBinding.Builder getOrCreateViewBindings(Id id) {
     return viewId;
 }
 
-viewIdMap 的声明为：
+viewIdMap为BingdingSet.Builder 对象中的一个成员变量,定义为：
 //用来存储当前类，对应的资源id为key，value为ViewBinding.Builder，这个对象封装了属性的基本信息
 private final Map<Id, ViewBinding.Builder> viewIdMap = new LinkedHashMap<>();
 
@@ -629,7 +663,8 @@ public static final class Builder {
 }
 
 所以builder.addField(resourceId, new FieldViewBinding(name, type, required));执行操作就是将属性的name，type等，封装成一个对象FieldViewBinding,然后以
-当前属性的resourceId，保存在 ViewBinding.Builder 对象中的private final Map<Id, ViewBinding.Builder> viewIdMap = new LinkedHashMap<>()中
+当前属性的resourceId，保存在 ViewBinding.Builder 对象中的private final Map<Id, ViewBinding.Builder> viewIdMap = new LinkedHashMap<>()中,也即是会将当前类中
+含有BindView注解的属性，会存储在BindingSet.Builder 对象中的 viewIdMap 集合中
 
 parseBindView()函数执行完毕之后，findAndParseTargets继续执行
 
