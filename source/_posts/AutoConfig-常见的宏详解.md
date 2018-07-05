@@ -201,6 +201,8 @@ AC_CHECK_HEADER([wincrypt.h], [have_wintls_headers=yes], [have_wintls_headers=no
 #endif
   ]])
   
+AC_CHECK_FUNCS：检查C标准库中是否存在函数。 如果找到，则定义预处理器宏HAVE_ [function]。它生成一个测试程序，声明一个具有相同名称的函数，然后编译并链接它。
+  
 检测是否有这样的库，存在就执行aciton-true，否则执行action-no-found
 AC_HAVE_LIBRARY([crypt32],[have_wintls_libs=yes],[have_wintls_libs=no])
 

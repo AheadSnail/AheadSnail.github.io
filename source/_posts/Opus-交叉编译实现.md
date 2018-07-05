@@ -90,7 +90,7 @@ CXX=$HOST-g++
 #LDFLAGS="-L$DEST/lib 指定要连接库的时候，寻找的地方
 LDFLAGS="-L$DEST/lib -march=armv7-a"
 #CPPFLAGS="-I$DEST/include 指定头文件寻找的地方
-CPPFLAGS="-I$DEST/include -march=armv7-a -mfloat-abi=softfp -ffast-math"
+CPPFLAGS="-I$DEST/include -march=armv7-a"
 CXXFLAGS=$CFLAGS
 
 # c-ares library build
@@ -121,7 +121,7 @@ DEST=$ANDROID_HOME/usr/local
 CC="$HOST-gcc -march=armv7-a"
 CXX=$HOST-g++
 LDFLAGS="-L$DEST/lib -march=armv7-a"
-CPPFLAGS="-I$DEST/include -march=armv7-a -mfloat-abi=softfp -ffast-math"
+CPPFLAGS="-I$DEST/include -march=armv7-a"
 CXXFLAGS=$CFLAGS
 
 # c-ares library build
@@ -154,11 +154,11 @@ DEST=$ANDROID_HOME/usr/local
 CC="$HOST-gcc -march=armv7-a"
 CXX=$HOST-g++
 LDFLAGS="-L$DEST/lib -march=armv7-a"
-CPPFLAGS="-I$DEST/include -march=armv7-a -mfloat-abi=softfp -ffast-math"
+CPPFLAGS="-I$DEST/include -march=armv7-a"
 CXXFLAGS=$CFLAGS
 
   PKG_CONFIG_PATH=$PREFIX/lib/pkgconfig/ LD_LIBRARY_PATH=$PREFIX/lib/ ./configure --host=$HOST --build=`dpkg-architecture -qDEB_BUILD_GNU_TYPE` 
---prefix=$PREFIX --disable-asm --enable-fixed-point
+--prefix=$PREFIX
   make
   make install
   
@@ -182,7 +182,7 @@ DEST=$ANDROID_HOME/usr/local
 CC="$HOST-gcc -march=armv7-a"
 CXX=$HOST-g++
 LDFLAGS="-L$DEST/lib -march=armv7-a"
-CPPFLAGS="-I$DEST/include -march=armv7-a -mfloat-abi=softfp -ffast-math"
+CPPFLAGS="-I$DEST/include -march=armv7-a"
 CXXFLAGS=$CFLAGS
 
   PKG_CONFIG_PATH=$PREFIX/lib/pkgconfig/ LD_LIBRARY_PATH=$PREFIX/lib/ export CROSS_COMPILE=$TOOLCHAIN/bin/arm-linux-androideabi-
@@ -208,7 +208,7 @@ DEST=$ANDROID_HOME/usr/local
 CC="$HOST-gcc -march=armv7-a"
 CXX=$HOST-g++
 LDFLAGS="-L$DEST/lib -march=armv7-a"
-CPPFLAGS="-I$DEST/include -march=armv7-a -mfloat-abi=softfp -ffast-math"
+CPPFLAGS="-I$DEST/include -march=armv7-a"
 CXXFLAGS=$CFLAGS
 
   PKG_CONFIG_PATH=$PREFIX/lib/pkgconfig/ LD_LIBRARY_PATH=$PREFIX/lib/ ./configure --host=$HOST --build=`dpkg-architecture -qDEB_BUILD_GNU_TYPE` --prefix=$PREFIX
@@ -234,7 +234,7 @@ DEST=$ANDROID_HOME/usr/local
 CC="$HOST-gcc -march=armv7-a"
 CXX=$HOST-g++
 LDFLAGS="-L$DEST/lib -march=armv7-a"
-CPPFLAGS="-I$DEST/include -march=armv7-a -mfloat-abi=softfp -ffast-math"
+CPPFLAGS="-I$DEST/include -march=armv7-a"
 CXXFLAGS=$CFLAGS
 
 PKG_CONFIG_PATH=$PREFIX/lib/pkgconfig/ LD_LIBRARY_PATH=$PREFIX/lib/ ./configure --host=$HOST --build=`dpkg-architecture -qDEB_BUILD_GNU_TYPE` --prefix=$PREFIX
@@ -259,13 +259,16 @@ opusinfo使用结果
 ![结果显示](/uploads/Opus交叉编译/opusinfo手机调用.png)
 
 opusdec使用结果
-![结果显示](/uploads/Opus交叉编译/opusinfo手机调用.png)
+![结果显示](/uploads/Opus交叉编译/opusdec手机实验.jpg)
 
 opusdec使用结果
-![结果显示](/uploads/Opus交叉编译/opusinfo手机调用.png)
+![结果显示](/uploads/Opus交叉编译/opusenc手机实验.jpg)
+
+将压缩之后，还有解压缩生成的文件，可以直接使用音乐播放器播放，qq音乐也是支持直接播放opus文件的，还有google浏览器也是支持的，我们可以根据这个来判断是否生成有问题
+![结果显示](/uploads/Opus交叉编译/opus文件google浏览器运行.png)
 
 ****总结****
 ===
 ```
-至此，Opus交叉编译已经完成，接下来一篇文章会介绍怎么集成到Android Studio中
+至此，Opus交叉编译已经完成，接下来一篇文章会介绍怎么集成到Android Studio中，而且实现边录音边压缩，边解压缩边播放
 ```
