@@ -18,23 +18,31 @@ Opus Ubuntu实现交叉编译
 由于最新版的NDK 已经不能指定编译armeabi了，所以我们直接编译armv7-a的
 ```
 
-****准备****
+****环境准备****
 ===
 ```
 1.采用的是ubuntu16.04来编译
 2.NDK采用的是android-ndk-r14b
 3.下载Opus需要使用的库,具体可以参照官网的最新稳定介绍 https://www.opus-codec.org/downloads/
 
-opus-tools 0.1.10   https://archive.mozilla.org/pub/opus/opus-tools-0.1.10.tar.gz
+opus-tools 0.1.10       https://archive.mozilla.org/pub/opus/opus-tools-0.1.10.tar.gz
 opusfile 0.9   		https://archive.mozilla.org/pub/opus/opusfile-0.9.tar.gz
 libopus 1.2.1		https://archive.mozilla.org/pub/opus/opus-1.2.1.tar.gz
 libogg-1.3.3		https://ftp.osuosl.org/pub/xiph/releases/ogg/libogg-1.3.3.tar.gz
-flac-1.3.2			https://ftp.osuosl.org/pub/xiph/releases/flac/flac-1.3.2.tar.xz
+flac-1.3.2		https://ftp.osuosl.org/pub/xiph/releases/flac/flac-1.3.2.tar.xz
 openssl-1.0.2m		https://www.openssl.org/source/openssl-1.0.2m.tar.gz
-
-目标是我们要编译出opus-tools里面的可执行程序，然后放到手机里面跑，看是否能够正常工作
 ```
-这是从官网下载下来的内容opus-tools可执行程序
+需要的文件结构图
+![结果显示](/uploads/Opus交叉编译/Opus目录结构.jpg)
+
+****目标****
+===
+```
+目标是我们要编译出opus-tools里面的可执行程序，然后放到手机里面跑，看是否能够正常工作,在此之前，我们可以先看下官网提供的opus-tools可执行的程序
+这个是官网提供的最新版的 Window下的可执行程序下载地址  https://archive.mozilla.org/pub/opus/win64/opus-tools-0.1.10-win64.zip
+下面了解他们是干嘛用的，提供了什么功能
+```
+压缩包文件内容
 ![结果显示](/uploads/Opus交叉编译/官网提供opustools工具.png)
 
 opusdec.exe是用来将一个opus文件还原成一个wav文件
@@ -45,9 +53,6 @@ opusenc.exe 是用来将一个wav文件，压缩成一个opus格式的文件
 
 opusinfo.exe 可以用来显示一个opus文件的信息
 ![结果显示](/uploads/Opus交叉编译/opusinfo工具使用.png)
-
-Opus目录结构
-![结果显示](/uploads/Opus交叉编译/Opus目录结构.jpg)
 
 ****交叉编译实现****
 ===
