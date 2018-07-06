@@ -525,5 +525,107 @@ target_link_libraries( transmission
 ![结果显示](/uploads/Transmision 交叉编译/CmakeList编译结果.png)
 
 
+****验证是否可以真的下载****
+===
+```java
+官网的transmission中有一个cli模块，这个是一个命令行模式的，通过了解他的代码，需要传递的参数，大致下了个简单的demo，验证是否可以真的下载
+
+@Override
+public void onClick(View view)
+{
+    switch (view.getId())
+    {
+        case R.id.but_start:
+            //是否有权限
+            if (PermissionManager.getInstance().isHasNecessaryPermissions(this))
+            {
+                String[] commands = new String[3];
+                //第一个参数
+                //设置下载文件保存的目录
+                commands[0] = "-w=" + FileUtils.getTransmissionDataPath();
+                commands[1] = "-g=" + FileUtils.getTransmissionConfigPath();
+                //设置种子文件的路径
+                commands[2] = FileUtils.getTransmissionTorrentPath();
+                Transmission.initTransmission(commands);
+            }
+            else
+            {
+                Toast.makeText(MainActivity.this,"没有权限",Toast.LENGTH_SHORT).show();
+            }
+            break;
+    }
+}
+上面是传递的参数，至于这些要传递什么参数，只能去看cli.c的代码,上面是我了解之后，需要传递的参数
+
+/**
+ * 初始化Transmission
+*/
+public static native int initTransmission(String[] pArgs);
+
+/**
+ * 初始化Transmission，开启线程
+ * @param env
+ * @param jstr
+ */
+JNIEXPORT jint JNICALL Java_com_example_com_transmissionandroidproject_Transmission_initTransmission
+        (JNIEnv * env, jclass jstr,jobjectArray pArgs)
+{
+    //pArgs 传递的是命令参数
+    argc = env->GetArrayLength(pArgs);
+    LOGD("pArgs length %d", argc);
+
+    //将java对应的每一个参数解析到char * argv数组中
+    for (int i = 0; i < argc; i++) {
+        jstring js = (jstring) env->GetObjectArrayElement(pArgs, i);
+        argv[i] = (char *) env->GetStringUTFChars(js, 0);
+        LOGD("pArgs argv %s", argv[i]);
+    }
+
+    int rev = 0;
+    //2创建子线程,用于下载，检测等,创建成功之后，就会执行run的回调
+    if (pthread_create(&pthread_tid, NULL, run, NULL)) {
+        //创建失败
+        LOGD("cannot create the thread\n");
+        pthread_detach(pthread_tid);
+        rev = 1;
+        return rev;
+    }
+    return rev;
+}
+
+extern "C" {
+extern int cli_tr_main(int argc, char *argv[]);
+}
+
+/**
+ * 线程执行的方法回调
+ * @param pVoid
+ * @return
+ */
+void *run(void *pVoid) {
+    cli_tr_main(argc, argv);
+    return NULL;
+}
+
+//命令行的入口函数 这个是cli.c文件的main 函数，这里直接改了个函数名
+int cli_tr_main (int argc, char * argv[])
+{
+  tr_session  * h;
+  tr_ctor     * ctor;
+  tr_torrent  * tor = NULL;
+  tr_variant       settings;
+  const char  * configDir;
+  uint8_t     * fileContents;
+  size_t        fileLength;
+  const char  * str;
+  
+  .....
+}
+```
+
+下面是下载的结果,可以看出来，我们的移植是没有出现问题的
+![结果显示](/uploads/Transmision 交叉编译/transmission结果验证.png)
+
+
 
 
