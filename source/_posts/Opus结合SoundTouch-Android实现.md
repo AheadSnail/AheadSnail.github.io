@@ -39,7 +39,7 @@ SoundTouch只能操作Wav文件，不能操作其他格式的文件
 ****编译****
 ===
 ```java
-首先要修改SoundTouch的代码，因为demo默认处理的是一个完整的文件，我们要改成流的形势，下面是关键的代码
+首先要修改SoundTouch的代码，因为demo默认处理的是一个完整的文件，我们要改成流的形式，下面是关键的代码
 
 /**
 *
@@ -249,8 +249,10 @@ LOCAL_LDLIBS 	:= -llog
 LOCAL_STATIC_LIBRARIES := FLAc Ogg Opus soundtouch
 
 include $(BUILD_SHARED_LIBRARY)
-
-这里要注意的一个是-DANDROID -D__SOFTFP__ 这个设计到了SoundTouch 决定SAMPLETYPE 类型，在STTypes.h中有这样代码
+```
+上面的MakeFile文件中要注意的一个点
+```java
+这里要注意的一个是-DANDROID -D__SOFTFP__ 这个涉及到了SoundTouch 决定SAMPLETYPE 类型，在STTypes.h中有这样代码
 #if (defined(__SOFTFP__) && defined(ANDROID))
         // For Android compilation: Force use of Integer samples in case that
         // compilation uses soft-floating point emulation - soft-fp is way too slow
