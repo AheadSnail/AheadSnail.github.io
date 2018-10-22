@@ -906,7 +906,6 @@ void InitiatorMSEHandshakeCommand::dispatchUtpMessage(const unsigned char *buff,
     mseHandshake_->utpRecvDataProcess(buff,buffLen);
 }
 
-
 最后说下Utp的销毁操作,由于BtRegister是跟DownloadEngine共生死的，而我们的UtpContext也是类似的，所以将UtpContext放到了BtRegister中，所以在此处来执行销毁的操作
 //增加一个虚构函数，移除utpContext对象
 BtRegistry::~BtRegistry()
