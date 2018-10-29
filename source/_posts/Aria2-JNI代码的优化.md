@@ -144,8 +144,38 @@ jobject globalRefObj = env->NewGlobalRef(entity);
 //首先保存java层的下载实体类
 downloadEntitys.push_back(globalRefObj);
 
-但是如果使用了全局引用，一定记得当不用的时候，要调用 env->DeleteGlobalRef(xxx); 释放,
+当然其他类似的要在多线程访问的变量也要做类似的处理，比如
+int JNI_OnLoad(JavaVM* vm, void* reserved) {
 
+    JNIEnv *env;
+    if(vm ->GetEnv((void**) &env, JNI_VERSION_1_4) != JNI_OK)
+    {
+        LOGD("Failed to get the environment using GetEnv()");
+        return -1;
+    }
+    //持有env的引用
+    jVM = vm;
+    //demo/kaillera/org/myapplication/KailleraJni com.example.com.aria2libandroidproject
+    aria2ApiClass = env->FindClass ("com/example/com/aria2libandroidproject/AriaApi");
+    if(aria2ApiClass == NULL)
+    {
+        LOGD("Failed to find class com.example.com.aria2libandroidproject.AriaApi");
+        return -1;
+    }
+    aria2ApiClass = (jclass) env->NewGlobalRef(aria2ApiClass);
+	....
+}
+这个class的引用，如果不使用NewGlobalRef的化，在子线程中访问也会有类似的问题
+
+但是如果使用了全局引用，一定记得当不用的时候，要调用 env->DeleteGlobalRef(xxx); 释放, 类似这样
+//释放class全局引用
+env->DeleteGlobalRef(downloadGlobalEntity);
+env->DeleteGlobalRef(aria2ApiClass);
+env->DeleteGlobalRef(android_arrayListClass);
+env->DeleteGlobalRef(android_downloadEntityClass);
+env->DeleteGlobalRef(android_downloadglobalClass);
+env->DeleteGlobalRef(android_downloadShowFileEntityClass);
+env->DeleteGlobalRef(android_downloadPeerEntityClass);
 
 下面我们要验证java层对象跟JNI层的对象是同一个对象 我们通过简单的验证俩者的hashCode，比如我们在java层可以这样写
 public void addDownLoad(DownloadEntity downloadEntity)
