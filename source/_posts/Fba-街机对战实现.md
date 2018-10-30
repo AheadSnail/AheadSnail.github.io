@@ -6,18 +6,20 @@ tags: [Android,NDK,Fba]
 description: Fba 街机对战实现
 ---
 
-Fba 街机对战实现
+### 概述
+
+> Fba 街机对战实现
+
 <!--more-->
-****简介****
-===
-```
+
+### Fba源码分析
+
 前面一篇文章中分析了FBa 中引入开源的Kaillera库，可以实现街机的对战，简要的介绍了他对应的功能，也从对应的网站上下载到了开源的代码，客户端以及服务端，测试是可以使用的，下面就简要的分析
 下，这个对战库在Fba 源码中是怎么样使用的，这样才能写出对应的测试代码，来调试分析对战库
 
 前面已经分析过了，主函数的入口位置为 src/burn/win32/main.cpp文件,下面就大致的介绍看下对应的源码
-```
 
-```java
+```C
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nShowCmd)
 {
 	...
@@ -82,6 +84,7 @@ static struct BurnDriver* pDriver[] = {
 	&BurnDrvMSX_180,			// 180 Degrees
 .....
 }
+
 其中的BurnDriver 结构体代表引擎的通用结构体
 struct BurnDriver {
 	char* szShortName;			// The filename of the zip file (without extension)
@@ -369,7 +372,6 @@ static struct VidOut *pVidOut[] = {
 #endif
 };
 所以之类的初始化过程，跟上面也是类似的
-
 
 接着回到主函数的 RunMessageLoop();					// Run the application message loop 
 // The main message loop
@@ -774,13 +776,12 @@ extern "C" INT32 BurnDrvFrame()
 	return pDriver[nBurnDrvActive]->Frame();		// Forward to drivers function
 }
 
-
 由于每次渲染界面都要去获取到对应的按键情况，然后去修改引擎原本的按键内容，执行对应的引擎渲染，那么引擎就能事实的获取到这些按键的情况,这就是大致的流程，当然还有很多细节
 ```
 
-****对战代码实现****
-===
-```java
+### 对战代码实现
+
+```C++
 static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
 {
 	...

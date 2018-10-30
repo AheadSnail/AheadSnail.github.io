@@ -4,7 +4,7 @@
 
 # Site
 title: AheadSnail's blog
-subtitle: 屌丝的安卓日记
+subtitle: 安卓开发日记
 description: 
 author: AheadSnail
 language: zh-Hans
@@ -72,7 +72,7 @@ pagination_dir: page
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: smackdown
+theme: yelee
 
 gcs: # GOOGLE CUSTOM SEARCH
 baidutongji: # BAIDU TONGJI CODE

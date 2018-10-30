@@ -6,40 +6,46 @@ tags: [Android,NDK,Aria2]
 description:  Aria2 组播实现
 ---
 
-Aria2 组播实现
-<!--more-->
-****简介****
-===
-```
-组播协议允许将一台主机发送的数据通过网络路由器和交换机复制到多个加入此组播的主机，是一种一对多的通讯方式。
-组播协议与现在广泛使用的单播协议的不同之处在于，一个主机用单播协议向n个主机发送相同的数据时，发送主机需要分别向n个主机发送，共发送n次。一个主机用组播协议向n个主机发送相同的数据时，
-只要发送1次，其数据由网络中的路由器和交换机逐级进行复制并发送给各个接收方，这样既节省服务器资源也节省网络主干的带宽资源。与广播协议相比，只有组播接收方向路由器发出请求后，
-网络路由器才复制一份数据给接收方，从而节省接收方的带宽。而广播方式无论接收方是否需要，网络设备都将所有广播信息向所有设备发送，从而大量占据接收方的接入带宽。
-```
-![结果显示](/uploads/Aria2Utp/组播.png)
-```
-就是在一个网络组里面，当有一个用户发送消息给特定的组播地址，其他在这个网络组里面的用户也能收到这条消息,而不用逐一的发送
+### 概述
 
-当然并不是每一个网络都支持组播，这要看路由器的设置，可以通过下面的方式判断当前的这个网络是否支持组播
-```
+> Aria2 组播实现
+
+<!--more-->
+
+### 组播
+
+组播协议允许将一台主机发送的数据通过网络路由器和交换机复制到多个加入此组播的主机，是一种一对多的通讯方式。组播协议与现在广泛使用的单播协议的不同之处在于，一个主机用单播协议向n个主机发送相同的数据时，发送主机需要分别向n个主机发送，
+共发送n次。一个主机用组播协议向n个主机发送相同的数据时，只要发送1次，其数据由网络中的路由器和交换机逐级进行复制并发送给各个接收方，这样既节省服务器资源也节省网络主干的带宽资源。与广播协议相比，只有组播接收方向路由器发出请求后，网络路由器才复制一份数据给接收方，从而节省接收方的带宽。而广播方式无论接收方是否需要，网络设备都将所有广播信息向所有设备发送，从而大量占据接收方的接入带宽。
+
+大概的工作方式类似于
+
+![结果显示](/uploads/Aria2Utp/组播.png)
+
+就是在一个网络组里面，当有一个用户发送消息给特定的组播地址，其他在这个网络组里面的用户也能收到这条消息,而不用逐一的发送,当然并不是每一个网络都支持组播，这要看路由器的设置，可以通过下面的方式判断当前的这个网络是否支持组播
+
+判断是否支持组播协议:
+
 ![结果显示](/uploads/Aria2Utp/判断是否支持组播.png)
-```
+
+### 本地发现
+
 而Bt协议中有一个协议叫做本地发现，在Bt协议中，tracker服务器返回的都是外网的ip和对应的端口号，如果当前俩个用户同处于Nat后的网络，那么这俩个用户直接使用tracker服务器返回的ip和端口号
 是没有办法直接连接的，此时如果要连接的化，就应该用本地ip和端口号，而不应该使用tracker服务器返回的ip和端口号，在Bt协议中的本地发现就是使用了组播的技术，做到了这一点，下面是对应的官网介绍
 
-http://bittorrent.org/beps/bep_0014.html
-```
-![结果显示](/uploads/Aria2Utp/Bt组播协议.png)
-```
-可以看出Bt本地发现协议发送的内容中有俩个比较重要的字段，一个是hash值，代表当前种子文件的hash值，可以根据这个hash值判断是否是自己需要的
-port: 对方bt 监听的端口号，得到了这个端口号，就可以直接的跟对方通信了
-```
+> http://bittorrent.org/beps/bep_0014.html
 
-****源码实现****
-===
-```java
+Bt组播协议内容
+
+![结果显示](/uploads/Aria2Utp/Bt组播协议.png)
+
+
+可以看出Bt本地发现协议发送的内容中有俩个比较重要的字段，一个是hash值，代表当前种子文件的hash值，可以根据这个hash值判断是否是自己需要的 port: 对方bt 监听的端口号，得到了这个端口号，就可以直接的跟对方通信了
+
+### 源码实现
+
 首先要开启这个选项，默认是关闭的，如果要打开，可以动态的设置这个选项 gloableOptions.push_back(std::pair<std::string,std::string> ("bt-enable-lpd","true"));
 
+```C++
 //设置是否本地发现,如果设置为tru的化，就可以在同一个局域网下载，默认是关闭的,还有不能为私有的种子
 if (option->getAsBool(PREF_BT_ENABLE_LPD) && btReg->getTcpPort() && (metadataGetMode || !torrentAttrs->privateTorrent)) {
     //如果还没有构建，进行初始化,这里要注意的是对应LpdMessageReciver的对象是全局的，是单例的存在，他作用于所有的种子
@@ -80,8 +86,11 @@ if (option->getAsBool(PREF_BT_ENABLE_LPD) && btReg->getTcpPort() && (metadataGet
     }
 }
 
+```
+
 上面的逻辑就是，判断是否支持本地发现，如果支持，当前还没有进行初始化的化，执行对应的初始化，会构建LpdMessageReceiver ，用于接受所有种子文件对应的本地发现消息
 
+```C++
 auto receiver = std::make_shared<LpdMessageReceiver>(LPD_MULTICAST_ADDR, LPD_MULTICAST_PORT);
 constexpr const char LPD_MULTICAST_ADDR[] = "239.192.152.143";
 constexpr uint16_t LPD_MULTICAST_PORT = 6771;
@@ -113,8 +122,11 @@ bool LpdMessageReceiver::init(const std::string& localAddr)
   }
   return false;
 }
+```
 
 当前主机加入组播
+
+```C++
 void SocketCore::joinMulticastGroup(const std::string& multicastAddr, uint16_t multicastPort, const std::string& localAddr)
 {
   //将  multicastAddr 转成 in_addr
@@ -154,10 +166,10 @@ if (initialized) {
 else{
     LOGD("LpdMessageReceiver not initialized.");
 }
-
+```
 如果初始化完成，则将LpdMessageReciever对象保存到BtRegister中，这个对象是唯一的,前面有介绍,之后构建LpdReceiveMessageCommand 对象，这个command 是用来接受Lpd的消息的，这个对象也是
 作用于所有的种子，并且这个对象会一直处于运行中，也即是一直处于接受lpd的消息
-
+```C++
 bool LpdReceiveMessageCommand::execute()
 {
   //只有引擎退出的时候，这个对象才会被销毁
@@ -198,7 +210,9 @@ if (btReg->getLpdMessageReceiver()) {
     }
 }
 
+```
 首先获取到当前种子对应的hash值，然后获取到对应的bt端口号，由于这里我做了utp的支持，所以相应的这个端口号也要设置成udp监听的那个端口号
+```C++
 //构建当前种子对应的LpdMessageDispatcher 对象  这里应该要修改，因为  btReg->getTcpPort()  代表当前服务端监听的tcp端口号，如果是utp实现的化，这里要换成我们的udp端口号
 auto dispatcher = std::make_shared<LpdMessageDispatcher>(std::string(&infoHash[0], &infoHash[INFO_HASH_LENGTH]), port, LPD_MULTICAST_ADDR, LPD_MULTICAST_PORT);
 constexpr const char LPD_MULTICAST_ADDR[] = "239.192.152.143";
@@ -231,12 +245,12 @@ bool LpdMessageDispatcher::init(const std::string& localAddr, unsigned char ttl,
   }
   return false;
 }
-
+```
 首先构建一个udp的soketCore，然后加入这个组播,然后针对当前的这个种子文件，构建一个LpdDispatchMessageCommand 消息对象
 //初始化成功，构建  LpdDispatchMessageCommand 对象，然后添加到engine中 这也是对应的每一个种子文件对应的一个对象
 auto cmd = make_unique<LpdDispatchMessageCommand>(e->newCUID(), dispatcher, e);
 这个对象主要用来针对当前的种子文件，发送对应的组播消息，组播协议中每5分钟就要发送对应消息，这样其他刚加入的主机才有机会收到这个消息，当然也不能发送的太频繁，会引起阻塞,检验是5分钟
-
+```C++
 //command命令的执行
 bool LpdDispatchMessageCommand::execute()
 {
@@ -283,8 +297,9 @@ bool LpdMessageDispatcher::isAnnounceReady() const
   return timer_.difference(global::wallclock()) >= interval_;
 }
 
+```
 上面的逻辑就是判断是否有必要再次发送lpd消息，当时间间隔到达了5分钟就发送一个lpd消息，就会触发  dispatcher_->sendMessage()
-
+```C++
 //发送消息 ，将创建的LPD消息发送到 组指定的  multicastAddress_   multicastPort_ 上 这样在这个组的其他主机就可以接收到消息了
 bool LpdMessageDispatcher::sendMessage()
 {
@@ -314,10 +329,10 @@ std::string createLpdRequest(const std::string& multicastAddress, uint16_t multi
              multicastAddress.c_str(), multicastPort, port,
              util::toHex(infoHash).c_str());
 }
-
+```
 这样当前种子的lpd消息就发送出去了，可以看出来协议的内容跟bt协议的一样,携带了当前种子对应的hash值，已经本地监听的端口号,所以如果要支持utp的化，我们只要改这个值为我们udp监听的端口号就好
-
 对于本地发现消息的接受端，就是前面介绍的LpdReceiveMessageCommand 来统一的接受所有的本地发现的消息,
+```C++
 bool LpdReceiveMessageCommand::execute()
 {
   //只有引擎退出的时候，这个对象才会被销毁
@@ -440,7 +455,6 @@ std::unique_ptr<LpdMessage> LpdMessageReceiver::receiveMessage()
   }
 }
 
-
 //根据接受到的LPD 消息中传递种子的infoHash值，判断是否是我们需要的
 auto& dctx = reg->getDownloadContext(m->infoHash);
 //当前的种子不是我需要的，直接跳过
@@ -472,11 +486,13 @@ else {
    LOGD("LPD peer %s:%u local=%d not added.", peer->getIPAddress().c_str(), peer->getPort(), peer->isLocalPeer() ? 1 : 0);
 }
 
+```
+
 最后通过比较当前接收到的lpd消息的infoHash值是否我们当前有，没有就代表这个种子我们不关心，所以直接省略掉，如果这个lpd消息满足条件，则添加到PeerStorage对象中，后面会触发对应的连接
 操作,那这样俩者就可以通信了，
 
 下面是组播的日志，可以看出能得到对方的本地ip和端口号,这里要注意的是，这个组播是否能支持要看路由器是否能够支持，所以有些情况下组播得到对方的组播信息，那估计就是路由器不支持了
-```
+
 ![结果显示](/uploads/Aria2Utp/Aria2组播日志.png)
 
 

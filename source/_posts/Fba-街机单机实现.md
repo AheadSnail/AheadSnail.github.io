@@ -6,21 +6,20 @@ tags: [Android,NDK,Fba]
 description:  Fba Android版本 街机单机实现
 ---
 
-Fba Android版本 街机单机实现
+### 概述
+
+> Fba Android版本 街机单机实现
+
 <!--more-->
 
-****简介****
-===
-```
-这里总结下之前做的街机项目，要不然过段时间之后会忘的一干二净，目前街机主流的好几种，比如 fc,Fba,Mame,小鸡等， 而目前做的比较好的就是悟饭的游戏厅了，里面集成了多种的街机版本,但是Fba
-仍然是他们的主流，之前有尝试过使用Mame，但是因为项目工程太大，编译出来的项目也是非常大，所以通过分析悟饭的做法，采用了Fba，而且最主要的一个原因是Window下的实现是支持对战的，对于
-其他的fc,小鸡等官网不支持对战的，所以我们参考他对应window的实现
+### 简介
+
+这里总结下之前做的街机项目，要不然过段时间之后会忘的一干二净，目前街机主流的好几种，比如 fc,Fba,Mame,小鸡等， 而目前做的比较好的就是悟饭的游戏厅了，里面集成了多种的街机版本,但是Fba仍然是他们的主流，之前有尝试过使用Mame，但是因为项目工程太大，编译出来的项目也是非常大，所以通过分析悟饭的做法，采用了Fba，而且最主要的一个原因是Window下的实现是支持对战的，对于其他的fc,小鸡等官网不支持对战的，所以我们参考他对应window的实现
 
 这里是Fba的官网  https://www.fbalpha.com/
-```
 
-****实现的效果****
-===
+### 实现的效果
+
 单机的效果
 ![结果显示](/uploads/Fba/单机效果.png)
 
@@ -30,24 +29,20 @@ Fba Android版本 街机单机实现
 玩家B显示
 ![结果显示](/uploads/Fba/玩家B效果.gif)
 
-****Fba Window编译****
-===
-```
+### Fba Window编译
+
 编译Window 其实在官网就有体现 https://www.fbalpha.com/compile/ ，按照他的编译效果最终编译结果为
-```
+
 ![结果显示](/uploads/Fba/AFbaWindow编译后的结果.png)
 
 双击编译之后的exe文件，就可以打开这个游戏了，我们可以找到对应的游戏文件，放到roms文件夹下面，扫描roms，选择游戏，就可以玩游戏了
 ![结果显示](/uploads/Fba/Window单机实现.png)
 
-****Fba Android编译****
-===
-```java
-Fba 单机的实现，其实在Github上面就有了，链接地址为 https://github.com/Cpasjuste/libarcade ，当然这个直接下载下来是不能运行的，缺少了部分的内容，接下来就是修改对应的错误，
-错误修改完之后，由于这个项目放在是5年前开发的，现在的Fba官网早就更新了多个版本，所以接下来我们要参照他编译的makefile 整合当前最新的代码 而且可以参考
-https://github.com/libretro/fbalpha 这个是当前最新的Fba  可以编译出对应的lib库的实现，当然也是支持Android对应的编译实现，所以可以结合这俩个项目来整理，所以下面来分析下这个项目的
-MakeFile
+### Fba Android编译
 
+Fba 单机的实现，其实在Github上面就有了，链接地址为 https://github.com/Cpasjuste/libarcade ，当然这个直接下载下来是不能运行的，缺少了部分的内容，接下来就是修改对应的错误，错误修改完之后，由于这个项目放在是5年前开发的，现在的Fba官网早就更新了多个版本，所以接下来我们要参照他编译的makefile 整合当前最新的代码 而且可以参考https://github.com/libretro/fbalpha 这个是当前最新的Fba  可以编译出对应的lib库的实现，当然也是支持Android对应的编译实现，所以可以结合这俩个项目来整理，所以下面来分析下这个项目的MakeFile
+
+```MakeFile
 首先是  Application.mk文件 
 APP_ABI			:= armeabi-v7a , x86
 APP_PLATFORM		:= android-9
@@ -148,6 +143,7 @@ LOCAL_LDLIBS:
 使用第三方的动态库，静态库需要采用预编译( BUILD_SHARED_LIBRARY 或 PREBUILT_STATIC_LIBRARY)
 
 比如我们的对战库，虽然也是自己编译的源文件，但是如果只是提供一个so的化，就要类似这样的 方式来编译进来，叫做预编译，针对第三方提供的so，或者lib，如果是源码的化就不是这样
+
 LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 LOCAL_MODULE := kailleraDemo
@@ -237,24 +233,26 @@ CPU := 	    $(subst $(LOCAL_PATH)/,, \
 $(warning "Test....." $(call my-dir))
 $(warning "Test....." $(LOCAL_PATH))
 ```
+打印的结果显示
+
 ![结果显示](/uploads/Fba/call_dir结果.png)
-```java
-通过结果可以知道，$(call my_dir) 代表的是当前makefile的目录 所以为 jni/src/cpu 
-而$(LOCAL_PATH) 结果为  jni/src  所以这个代表的是src MakeFile的目录，为什么会这样，因为当前的这个Makefile是 src 的Android.mk文件包含进来的，而且在Android.mk文件中有这样的写法
-LOCAL_PATH := $(call my-dir),所以当前的Local_PATH 就为 当前这个src目录下的Makefile的路径，当然如果我在当前 cpu/路径下的Android.mk文件写上这句话，
-```
+
+通过结果可以知道，$(call my_dir) 代表的是当前makefile的目录 所以为 jni/src/cpu 而$(LOCAL_PATH) 结果为  jni/src  所以这个代表的是src MakeFile的目录，为什么会这样，因为当前的这个Makefile是 src 的Android.mk文件包含进来的，而且在Android.mk文件中有这样的写法LOCAL_PATH := $(call my-dir),所以当前的Local_PATH 就为 当前这个src目录下的Makefile的路径，当然如果我在当前 cpu/路径下的Android.mk文件写上这句话，
+
 ![结果显示](/uploads/Fba/添加之后的结果.jpg)
-```java
+
 可以看到当前 $(LOCAL_PATH) 重新改为了 jni/src/cpu  至于后面的错误，是因为你在这边改变了src/Android.mk文件的 LOCAL_PATH的内容，所以导致那边会出现这个问题，也即是多了前面的内容
-```
+
 ![结果显示](/uploads/Fba/错误的结果.png)
-```java
+
 搞懂了这俩个的区别，继续分析
+
+```MakeFile
 CPU := 	    $(subst $(LOCAL_PATH)/,, \
 			$(wildcard $(CPU_PATH)/*.cpp) \
 			$(wildcard $(CPU_PATH)/arm/*.cpp) \
 			....
-		
+```		
 首先 subst 函数 是MakeFile的字符串替换函数 ，比如 $(subst FROM, TO, TEXT)，即将字符串TEXT中的子串FROM变为TO。
 wildcard 函数是用来获取目标文件的 比如一般我们可以使用“$(wildcard *.c)”来获取工作目录下的所有的.c文件列表。
 复杂一些用法；可以使用“$(patsubst %.c,%.o,$(wildcard *.c))”，首先使用“wildcard”函数获取工作目录下的.c文件列表；
@@ -263,9 +261,10 @@ wildcard 函数是用来获取目标文件的 比如一般我们可以使用“$
 
 所以对于我们上面的写法就是获取当前 jni/src/cpu目录下对应的所有的.cpp文件，然后将他们jni/src 替换成空字符串，结果就变为/cpu/*.cpp类似的结果, 所以外面就可以这样调用了直接使用这个$(CPU)
 就可以代表当前目录下的所有要编译的文件了
-```
+
 ![结果显示](/uploads/Fba/截取之后的结果.png)
-```java
+
+```MakeFile
 LOCAL_SRC_FILES := $(filter-out intf/input/sdl/inp_sdl.cpp, $(LOCAL_SRC_FILES))  filter-out 函数可以做到过滤的作用，就是当前的inp_sdl.cpp文件从$(LOCAL_SRC_FILES)中移除,比如
 $(filter-out $(mains),$(objects))  实现了去除变量“objects”中“mains”定义的字串（文件名）功能。它的返回值 为“foo.o bar.o”。
 
@@ -277,53 +276,49 @@ LOCAL_C_INCLUDES := $(call my-dir) \
 			....
 这个头文件指定路径是非常重要的，如果不指定的化，就要改变源码的原有的include 代码，所以当你发现在编译源码的时候发现 某个源码文件里面找不到什么头文件的时候，就要查看是否有指定 LOCAL_C_INCLUDES			
 ```
-****Eclipse中配置JNI****
-===
-```java
-虽然AndroidStudio 中早就支持NDK的配置，包括俩种方式一种是Makfile,一种是CmakeList，虽然这俩种配置，都可以做到 方便的阅读代码，可以调试代码，但是这俩种对应MakeFile的书写，或者CmakeList
-的写法，支持的不够好，比如MakeFile的语法关键字就没有像Eclipse中这样有标红的显示，让人不知道是否有写对,我将这个Eclipse项目移植到AndroidStuio编译,对应JNI的代码是不用做任何修改的
-只要在build.gradle中配置一下就好
-```
-![结果显示](/uploads/Fba/buildGradle写法.png)
 
+### Eclipse中配置JNI
+
+虽然AndroidStudio 中早就支持NDK的配置，包括俩种方式一种是Makfile,一种是CmakeList，虽然这俩种配置，都可以做到 方便的阅读代码，可以调试代码，但是这俩种对应MakeFile的书写，或者CmakeList的写法，支持的不够好，比如MakeFile的语法关键字就没有像Eclipse中这样有标红的显示，让人不知道是否有写对,我将这个Eclipse项目移植到AndroidStuio编译,对应JNI的代码是不用做任何修改的只要在build.gradle中配置一下就好
+
+![结果显示](/uploads/Fba/buildGradle写法.png)
 AndroidStudio Makefile显示
 ![结果显示](/uploads/Fba/AndroidStuioMakeFile的写法.png)
 
 Eclipse Makefile显示
 ![结果显示](/uploads/Fba/EclipseMakeFile显示.png)
-```java
-是不是Eclipse 对这方面支持的更友好，下面介绍Eclipse中配置JNI
 
-首先要在eclipse中配置NDK的路径，这里采用的是最新版的ndk和最新版的eclipse，在填写ndk的路径的时候，不能填写到根目录下面，一定要到对应的 build目录下，有ndk-build.cmd的这个目录下，
-才能识别，以前老的版本这个是在根目录下面的
-```
+**是不是Eclipse 对这方面支持的更友好，下面介绍Eclipse中配置JNI：**
+
+首先要在eclipse中配置NDK的路径，这里采用的是最新版的ndk和最新版的eclipse，在填写ndk的路径的时候，不能填写到根目录下面，一定要到对应的 build目录下，有ndk-build.cmd的这个目录下，才能识别，以前老的版本这个是在根目录下面的
+
 ![结果显示](/uploads/Fba/EclipseNdk路径配置.png)
-```
+
 新建一个普通的android项目，然后在项目的右键点击属性找到Android-Tools的选项，选择support-native
-```
+
 ![结果显示](/uploads/Fba/Eclipse新建NDK项目.png)
-```
+
 会弹出一个对话框，叫你输入so的目标名称,点击完成，会默认的帮你添加这些东西
-```
+
 ![结果显示](/uploads/Fba/Eclipse默认生成的内容.png)
-```
+
 编写对应的jni代码，会发现识别不了
-```
+
 ![结果显示](/uploads/Fba/Eclipse不识别NDK.png)
-```
+
 选择项目的属性右键，选择propertity，在这个选项卡中
-```
+
 ![结果显示](/uploads/Fba/Eclipse配置识别NDK.png)
 ![结果显示](/uploads/Fba/Eclipse配置识别NDK二.png)
-```
+
 添加你JNi对应的版本中的jni.h的路径
-```
+
 ![结果显示](/uploads/Fba/NDK选择文件路径.png)
-```
+
 选择完之后，点击ok，再回来看
-```
+
 ![结果显示](/uploads/Fba/Eclipse配置NDK结果.png)
-```
+
 就已经支持了，ctr可以进入jni.h的文件里面，说明支持完成,支持Eclipse 配置NDK完成
-```
+
 

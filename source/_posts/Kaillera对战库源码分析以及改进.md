@@ -6,14 +6,19 @@ tags: [Android,NDK,Kaillera]
 description: Kaillera对战库源码分析以及改进
 ---
 
-Kaillera对战库源码分析以及改进
+### 概述
+
+> Aria2 Kaillera对战库源码分析以及改进
+
 <!--more-->
-****简介****
-===
-```java
+
+
+### Kaillera测试代码的编写
+
 前面一篇文章大致的介绍了Fba流程，这篇会大致的讲解下Kaillera对战库的实现，以及改进的方式，最后怎么样移植到Android上面,首先是对战库的大致的实现，我们可以在前面调试这个对战库的
 代码来看代码这样会简单很多，那么我们就可以根据上一篇中发生怎么样使用Kaillera 对战库，下面是对应的测试代码
 
+```C
 static int WINAPI gameCallback(char* game, int player, int numplayers)
 {
 	printf("select game == %s\n",game);
@@ -70,24 +75,33 @@ int main()
 	kailleraSelectServerDialog(NULL);
 	....
 }
+```
 
 测试代码相应的源码结构为：
-```
+
 ![结果显示](/uploads/Fba对战/kaillera对战库源码结构.jpg)
 
-****Kaillera对战库Android移植****
-===
-```java
+### Kaillera对战库Android移植
+
 移植也不算难，他本身就是支持linux，window 只是他还有界面，我们要做的就是看懂代码的基础上，去除对应的界面逻辑，然后将原有界面的逻辑，采用NDK的方式调用java层，达到类似的界面改变
 下面是对应的移植代码的结果
-```
+
+进入服务器
+
 ![结果显示](/uploads/Fba对战/进入服务器.png)
+
+相互聊天
+
 ![结果显示](/uploads/Fba对战/相互聊天已经创建游戏.png)
+
+进入游戏房间
+
 ![结果显示](/uploads/Fba对战/进入游戏房间.png)
-```java
+
 
 客户端CmakeList的写法
 
+```cmake
 cmake_minimum_required(VERSION 3.6.0)
 add_library(kailleraDemo
     SHARED
@@ -125,9 +139,11 @@ add_library(kailleraDemo
 include_directories(../../common ../../interface ../  ../../)
 find_library(log-lib log)
 target_link_libraries(kailleraDemo ${log-lib})
-
+```
 
 服务端的CmakeList写法
+
+```cmake
 cmake_minimum_required(VERSION 3.6.0)
 #file (GLOB COMMON_SRC *.cpp EXCLUDE k_server.cpp)
 set (
@@ -142,8 +158,11 @@ find_library(llog log)
 add_library(kaisev SHARED k_server.cpp ${COMMON_SRC})
 target_link_libraries(kaisev ${llog})
 
+```
 
 由于对战库内部是新建了一个线程，所以对应JNI的调用，要注意线程的问题，要采用这种方法
+
+```C++
 static void N02CCNV gameClosed ()
 {
     TRACE();
@@ -170,11 +189,12 @@ static void N02CCNV gameClosed ()
     TRACE();
 }
 ```
-****Kaillera不足以及改进****
-===
-```java
+
+### Kaillera不足以及改进
+
 代码移植完之后， 下面就来分析Kailler对战库的不足，所以这里先要了解帧锁定以及乐观帧锁定概念
 
+#### 帧锁定
 1．客户端定时（比如每五帧）上传控制信息。
 2．服务器收到所有控制信息后广播给所有客户。
 3．客户端用服务器发来的更新消息中的控制信息进行游戏。
@@ -184,7 +204,8 @@ static void N02CCNV gameClosed ()
 这个等待关键帧更新数据的过程称为“帧锁定”
 
 
-乐观帧锁定
+#### 乐观帧锁定
+
 针对传统严格帧锁定算法中网速慢会卡到网速快的问题，实践中线上动作游戏通常用“定时不等待”的乐观方式再每次Interval时钟发生时固定将操作广播给所有用户，不依赖具体每个玩家是否有操作更新：
 
 1. 单个用户当前键盘上下左右攻击跳跃是否按下用一个32位整数描述，服务端描述一局游戏中最多8玩家的键盘操作为：int player_keyboards[8];
@@ -195,15 +216,17 @@ update=（FrameID，player_keyboards）
 5. 客户端如果一下子收到很多连续的update，则快进播放。
 6. 客户端只有按键按下或者放开，就会发送消息给服务端（而不是到每帧开始才采集键盘），消息只包含一个整数。服务端收到以后，改写player_keyboards
 
-相同点：
+#### 相同点：
 俩种实现方式都要有一个服务端，服务端做的事情只是用来收集数据，转发数据，而且如果没有服务端的化，后面设计到网络对战的时候，还要解决打洞的问题，也即是p2p通信，但是当用户处于多重Nat
 设备下，或者对称型网络，是不能打洞的，这种情况下，最好就是将服务端放在外网的ip上，由服务端来转发数据，这样就不存在这样的问题
 
-不同点：
+#### 不同点：
 虽然网速慢的玩家网络一卡，可能就被网速快的玩家给秒了（其他游戏也差不多）。但是网速慢的玩家不会卡到快的玩家，只会感觉自己操作延迟而已。另一个侧面来说，土豪的网宿一般比较快，我们要照顾。
 所以相比于帧锁定，乐观帧锁定才是更好的选择，要不然采用帧锁定当多个玩家一起玩游戏，只要有一个玩家网速慢，大家都要等待这个玩家，这样会导致独家都卡顿，显然这是不合理的，
 
 而Kaillera对战库采用的就是帧锁定下面是对应的服务端代码体现：
+
+```C++
 if(players.length > 0) {
 			//遍历当前所有的玩家，
 			for (int index_ = 0; index_ < players.length; index_++) {
@@ -265,22 +288,27 @@ if(players.length > 0) {
 		....		
 	}
 }
+```
 
-从上面的逻辑可以发现，当其中有一个玩家没有数据到来的时候，就退出了这个循环，尽管其他的玩家有数据，也要等待这个玩家的数据到来，显然这就是帧锁定的关键实现
+从上面的逻辑可以发现，当其中有一个玩家没有数据到来的时候，就退出了这个循环，尽管其他的玩家有数据，也要等待这个玩家的数据到来，显然这就是帧锁定的关键实现,
+
+#### 大量发送冗余数据包
 
 问题二，Kaillera 存在大量的发送冗余包的问题,而且会出现由于丢失了某个数据包，导致一直卡顿的问题
-```
+
 客户端发送冗余数据包体现
+
 ![结果显示](/uploads/Fba对战/客户端发送冗余包.png)
 
 服务端发送冗余数据包体现
+
 ![结果显示](/uploads/Fba对战/服务端发送冗余数据.png)
 
-```java
-客户端以及服务端是怎么样保证数据按照顺序到达，由于采用的是udp实现的，所以肯定会存在丢包的情况，相应的就应该有集合来保存双方发送的数据包，方便重发数据，还要有标识，标识当前数据包的
-序列号，以及当前已经接受的数据包的序列号，类比于tcp的化，就是seq以及ack
+
+客户端以及服务端是怎么样保证数据按照顺序到达，由于采用的是udp实现的，所以肯定会存在丢包的情况，相应的就应该有集合来保存双方发送的数据包，方便重发数据，还要有标识，标识当前数据包的序列号，以及当前已经接受的数据包的序列号，类比于tcp的化，就是seq以及ack
 
 客户端同步代码的实现
+```C++
 // recv input data
 int  N02CCNV recvSyncData(void * value, const int /*len*/)
 {
@@ -296,8 +324,11 @@ int  N02CCNV recvSyncData(void * value, const int /*len*/)
 	
 	return -1;
 }
+```
 
 前面说过客户端，以及服务端都会发送冗余的数据包，对应的找到正确的数据包的体现
+
+```C++
 void dataArrivalCallback()
 {
    
@@ -348,6 +379,7 @@ inline bool searchProcessInstruction(unsigned short forSerial, unsigned char * b
     TRACE();
     return false;
 }
+```
 
 当然这些问题相应的在服务端也是有的，下面提出对应的解决方案,对应发送冗余数据包的问题，我们可以采用第三库的来实现，由于是基于udp的，所以推荐的有俩个，一个kcp，一个utp，大体的实现
 思路都是模拟tcp，像utp可能做的更好，他有做对应的tcp的拥塞控制，以及滑动窗口，但是使用都差不多，对于使用层来说，不用理会他的内部实现，他会自动的做到丢包冲发，保证序列号的问题
@@ -355,7 +387,7 @@ inline bool searchProcessInstruction(unsigned short forSerial, unsigned char * b
 他们，他们会做进一步的处理，大致就是往头里面添加一些内容，然后处理完之后，会通知你发送数据,具体的使用可以查看官网的demo
 
 下面是服务端的关键代码实现
-```
+
 ![结果显示](/uploads/Fba对战/服务端发送kcp数据包.png)
 ![结果显示](/uploads/Fba对战/服务端接受数据kcp.png)
 ![结果显示](/uploads/Fba对战/服务端接受数据kcp2.png)
@@ -364,14 +396,16 @@ inline bool searchProcessInstruction(unsigned short forSerial, unsigned char * b
 ![结果显示](/uploads/Fba对战/客户端关键代码kcp发送.png)
 ![结果显示](/uploads/Fba对战/客户度kcp发送数据包2.png)
 ![结果显示](/uploads/Fba对战/客户端kcp接受数据.png)
-```java
-下面修改掉这种帧锁定机制
+
+#### 修改这种帧锁定机制
 
 首先是：
 1. 单个用户当前键盘上下左右攻击跳跃是否按下用一个32位整数描述，服务端描述一局游戏中最多8玩家的键盘操作为：int player_keyboards[8];
 6. 客户端只有按键按下或者放开，就会发送消息给服务端（而不是到每帧开始才采集键盘），消息只包含一个整数。服务端收到以后，改写player_keyboards
 
 收集当前用户是否有操作
+
+```C++
 //先将第一个玩家的当前按键不为0的值，存储到nControls 里面
 for (i = 0, j = 0; i < nPlayerInputs[0]; i++, j++) {
 	BurnDrvGetInputInfo(&bii, i + nPlayerOffset[0]);
@@ -437,9 +471,11 @@ void N02CCNV sendSyncData(const void * value, const int len,int isNeedSend)
         }
     }	
 }
+```
 
-其次是
-2. 服务端每秒钟20-50次向所有客户端发送更新消息（包含所有客户端的操作和递增的帧号）：update=（FrameID，player_keyboards）响应的代码体现是
+其次是 2. 服务端每秒钟20-50次向所有客户端发送更新消息（包含所有客户端的操作和递增的帧号）：update=（FrameID，player_keyboards）响应的代码体现是
+
+```C++
 //乐观帧的机制实现,乐观帧的实现原理即为，不管当前的玩家有没有数据到来，只要到了服务端发送数据的时间，就收集当前所有玩家距离上一次
 //收集到的数据包，发送给每一个用户，这样块的用户就不用等待慢的用户。。。
 bool k_user::k_game::game_data_time_to_send()
@@ -566,12 +602,14 @@ void k_user::k_game::collect_all_players_game_data()
 		}
 	}
 }
+```
 
 最后是：
 3. 客户端就像播放游戏录像一样不停的播放这些包含每帧所有玩家操作的 update消息。
 4. 客户端如果没有update数据了，就必须等待，直到有新的数据到来。
 5. 客户端如果一下子收到很多连续的update，则快进播放。
 
+```C++
 // recv input data 同步的接受数据
 int  N02CCNV recvSyncData(void * value, const int len)
 {
@@ -646,8 +684,11 @@ int  N02CCNV recvSyncData(void * value, const int len)
     modHelper.endGame();
     return -1;
 }
+```
 
 相应的客户端加速也要在游戏引擎中设置对应的快进的回调，gameSpeedRunCallBack 函数指针
+
+```C++
 //设置游戏加速的回调
 speedGameInfo.speedGameRunInfo = gameSpeedRunCallBack;
 kailleraSetSpeddGameRunInfo(&speedGameInfo);
