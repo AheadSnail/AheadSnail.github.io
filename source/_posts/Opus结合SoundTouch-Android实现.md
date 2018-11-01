@@ -6,27 +6,24 @@ tags: [Opus,SoundTouch,NDK,Android]
 description:  Opus结合SoundTouch Android实现
 ---
 
-Opus结合SoundTouch Android实现
+### 概述
+
+> Opus结合SoundTouch Android实现
+
 <!--more-->
 
-****简介****
-===
-```
-前面一篇文章介绍到SoundTouch可以做到变声的效果，大致的效果是可以做到变速，变音调，还可以结合使用，官网也有提供Android版本的实现，也即是上一篇文章中介绍到的
+### 简介
+> 前面一篇文章介绍到SoundTouch可以做到变声的效果，大致的效果是可以做到变速，变音调，还可以结合使用，官网也有提供Android版本的实现，也即是上一篇文章中介绍到的
 下载下来的源码目录里面有一个Android-lib的目录，甚至连NDK的Android.mk文件都写好了，是一个可以在Eclipse直接运行的
-
 SoundTouch的优缺点:
 优点是:
 SoundTouch是一个很小的开源库，源码文件很少，是纯c++写法
 缺点是:
 SoundTouch 提供的变音效果不够多，最起码是比QQ的效果少
 SoundTouch只能操作Wav文件，不能操作其他格式的文件
-```
 
-****目标****
-===
-```
-查看SoundTouch的demo可以知道，他操作的也是文件的形式，也就是要给出一个源文件，以及处理后要生成的目标文件，由于操作的为WAV的无损的格式，所以输出的文件也是非常的巨大的
+### 目标
+> 查看SoundTouch的demo可以知道，他操作的也是文件的形式，也就是要给出一个源文件，以及处理后要生成的目标文件，由于操作的为WAV的无损的格式，所以输出的文件也是非常的巨大的
 对应传输来说，是非常不友好的，QQ的变音处理是这样的，首先录制声音的时候会生成一个pcm格式的文件，然后当你选择变音的时候，会在边操作边生成一个目标文件，目标文件名为
 .slk格式，每次选择一种变音就会相应的生成一个目标文件，这样估计是防止多次的压缩处理吧，当你点击发送成功的时候，会删除刚刚变音生成的目标文件，包括原本的pcm数据
 只会保留一个当前发送的变音源文件,QQ存放录音路径为:/tencent/MobileQQ/qq号码/ppt/后面是加上时间格式的文件夹/.....slk文件
@@ -34,13 +31,10 @@ SoundTouch只能操作Wav文件，不能操作其他格式的文件
 使用Opus结合SoundTouch能实现一个效果，我们可以在录音的时候，就压缩成一个标准的Opus文件，如果有选择变音，那么我们可以在播放的时候，使用Opus解压缩成一个原始流
 然后传递给SoundTouch处理，将处理之后的结果，再丢给AudioTrack来播放，这样就能做到一个效果，我们可只保留一个源文件，而不会生成对应的中间产物
 
-```
-
-****编译****
-===
-```java
+### 编译
 首先要修改SoundTouch的代码，因为demo默认处理的是一个完整的文件，我们要改成流的形式，下面是关键的代码
 
+```java
 /**
 *
 * @param handle  c++中的对象指针
@@ -154,16 +148,16 @@ JNIEXPORT jint JNICALL Java_example_com_opussoundtouchdemo_SoundTouch_processFil
     //返回最终处理的结果长度,因为java里面不能传递一个指针，只能通过返回值来做处理
     return pageCount;
 }
-
-对应这里private native final int processFile(long handle, short [] inputData,int inputLength, short [] outputData,int outputMaxLength); 
-为什么处理之后的返回的数据是一个short 类型的,原因是AudioTracker 处理float类型的数据有Api的限制，所以这里返回的结果为short类型
-
+```
+对应这里private native final int processFile(long handle, short [] inputData,int inputLength, short [] outputData,int outputMaxLength); 为什么处理之后的返回的数据是一个short 类型的,原因是AudioTracker 处理float类型的数据有Api的限制，所以这里返回的结果为short类型
 
 下面是文件的结构图
-```
+
 ![结果显示](/uploads/SoundTouchopus/文件目录结构图.png)
-```java
+
 下面是对应的Android.mk文件编写
+
+```Makefile
 LOCAL_PATH := $(call my-dir)
 
 $(warning ${LOCAL_PATH})
@@ -206,7 +200,6 @@ LOCAL_SRC_FILES := \
             ${LOCAL_PATH}/SoundTouch/src/PeakFinder.cpp
 
 include $(BUILD_STATIC_LIBRARY)
-
 
 #此变量指向的构建脚本用于取消定义下面“开发者定义的变量”一节中列出的几乎全部 LOCAL_XXX 变量。（模块之前使用这个，会清除LOCAL的系统变量） 在描述新模块之前
 include $(CLEAR_VARS)
@@ -251,7 +244,7 @@ LOCAL_STATIC_LIBRARIES := FLAc Ogg Opus soundtouch
 include $(BUILD_SHARED_LIBRARY)
 ```
 上面的MakeFile文件中要注意的一个点
-```java
+```C++
 这里要注意的一个是-DANDROID -D__SOFTFP__ 这个涉及到了SoundTouch 决定SAMPLETYPE 类型，在STTypes.h中有这样代码
 #if (defined(__SOFTFP__) && defined(ANDROID))
         // For Android compilation: Force use of Integer samples in case that
@@ -278,10 +271,11 @@ include $(BUILD_SHARED_LIBRARY)
         #endif
     #endif
 #else
-
+```
 因为前面介绍SoundTouch native接口说到，要使用short 类型的 ，所以这里的SAMPLETYPE 类型也要为short，所以要加上这个宏的定义
 
 Application.mk 文件的编写：
+```Makefile
 APP_PLATFORM := android-14
 APP_ABI := armeabi-v7a
 NDK_TOOLCHAIN_VERSION := 4.9
@@ -293,9 +287,10 @@ APP_STL := gnustl_static
 #APP_PLATFORM  此变量包含目标 Android 平台的名称。例如，android-3 指定 Android 1.5 系统映像
 #APP_STL  默认情况下，NDK 构建系统为 Android 系统提供的最小 C++ 运行时库 (system/lib/libstdc++.so) 提供 C++ 标头
 #NDK_TOOLCHAIN_VERSION 将此变量定义为 4.9 或 4.8 以选择 GCC 编译器的版本。 64 位 ABI 默认使用版本 4.9 ，32 位 ABI 默认使用版本 4.8
-
+```
 
 修改app目录下的build.gradle文件
+```gradle
 defaultConfig{
     ...
     externalNativeBuild {
@@ -314,17 +309,19 @@ externalNativeBuild {
             path "/src/main/jni/Android.mk"
     }
 }
+```
 
 执行编译产生的结果：
-```
+
 ![结果显示](/uploads/SoundTouchopus/OpusSoundTouch编译之后内容.png)
 
-```java
 录音部分跟之前的Opus一样，这里主要讲下播放部分,下面是界面的展示
-```
+
 ![结果显示](/uploads/SoundTouchopus/界面视图.png)
-```java
+
 我们可以在播放的时候，设置好，音调跟音速 然后点击播放按钮
+
+```java
 
 File sdCard = Environment.getExternalStorageDirectory();
 File dir = new File(sdCard.getAbsolutePath() + this.audioFolder);
@@ -542,12 +539,7 @@ public final class SoundTouch
         setRate(handle, speed);
     }
 }
-
-
 ```
 
-****总结****
-===
-```
-上面就是关键的代码实现了，目前采用的录音的采样率为8000，录制出来的文件大小，在同等时间上跟微信，qq是差不多的
-```
+### 总结
+> 上面就是关键的代码实现了，目前采用的录音的采样率为8000，录制出来的文件大小，在同等时间上跟微信，qq是差不多的

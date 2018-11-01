@@ -6,32 +6,31 @@ tags: [Opus,AndroidStudio,NDK]
 description:  Opus Android Studio移植
 ---
 
-Opus Android Studio移植
+### 概述
+
+> Opus Android Studio移植
+
 <!--more-->
 
-****简介****
-===
-```
-这篇文章会介绍怎么在Android Studio中编译Opus，至于为什么要在Android Studio中编译，是为了营造一个可以直接调试C代码的环境，这样可以方便我们开发人员查看代码，调试代码
+
+### 简介
+> 这篇文章会介绍怎么在Android Studio中编译Opus，至于为什么要在Android Studio中编译，是为了营造一个可以直接调试C代码的环境，这样可以方便我们开发人员查看代码，调试代码
 前面一篇文章已经介绍了在Ubuntu 使用NDKr14-b来编译最新版的Opus，而且验证了在手机上是可以正常运行的，而且我们知道opus-tools，需要依赖ogg,flac,opus库，这些库对于我们
 使用者来说，是完全没有必要去修改的，所以我们直接用Ubuntu中交叉编译的内容，然后查看他们是怎么编译的，需要什么样的参数，采集然后填充到我们的项目中，自己来编译
-
 下面会采用ndk-build的模式来编译，至于为什么不采用cmakeList来编译，是因为使用cmakeList编译的时候，出现了录的声音在播放的时候会有停顿，但是采用ndk-build来编译就没有这个问题
-至于为什么会这样，到目前为止我也没有发现，我猜可能是clang的问题，因为我使用ndk-build编译采用的是gcc，这两者都可以支持调试代码，都可以将生成的so自动的打包进apk，不同的地方就是
-cmakeList的语法，可能更加简单，毕竟Google 原本采用的是ndk-build，后才出来这个CmakeList
-```
+至于为什么会这样，到目前为止我也没有发现，我猜可能是clang的问题，因为我使用ndk-build编译采用的是gcc，这两者都可以支持调试代码，都可以将生成的so自动的打包进apk，不同的地方就是cmakeList的语法，可能更加简单，毕竟Google 原本采用的是ndk-build，后才出来这个CmakeList
 
-****Android Studio移植****
-===
-```
-我们将Ubuntu交叉编译之后产生的local,opus-tools文件,拿出来,创建一个NDK工程，我们直接创建一个CmakeList的NDK项目,将我们需要的文件拷贝到工程中
+### Android Studio移植
+> 我们将Ubuntu交叉编译之后产生的local,opus-tools文件,拿出来,创建一个NDK工程，我们直接创建一个CmakeList的NDK项目,将我们需要的文件拷贝到工程中
 这里我们需要拷贝生成的lib目录，已经include目录，这里都只要oput-tools的依赖文件，ogg,flac,opus 还有直接将opus-tools的源码直接包含进来,
 接着创建一个Android.mk文件，以及Application.mk文件,下面是文件的结构图
-```
+
+目录结构图:
 ![结果显示](/uploads/Opus交叉编译/OpusAndroidStudio移植.jpg)
-```java
 
 1.修改app目录下的build.gradle文件
+
+```gradle
 defaultConfig{
     ...
     externalNativeBuild {
@@ -50,14 +49,14 @@ externalNativeBuild {
             path "/src/main/jni/Android.mk"
     }
 }
-
+```
 
 由于最新版的ndk_bundle 不支持了armeabi，如果构建一个armeabi 就会出现下面的这种错误
 ABIs [armeabi] are not supported for platform. Supported ABIs are [armeabi-v7a, arm64-v8a, x86, x86_64]. 所以我们可以直接构建一个armeabi-v7a
 
-
 下面是Android.mk的内容
 
+```MakeFile
 #此变量用于指定当前文件的路径。必须在 Android.mk 文件的开头定义它。 以下示例向您展示如何操作： LOCAL_PATH := $(call my-dir)
 #CLEAR_VARS 指向的脚本不会清除此变量。因此，即使您的 Android.mk 文件描述了多个模块，您也只需定义它一次。
 
@@ -148,10 +147,11 @@ LOCAL_STATIC_LIBRARIES := FLAc Ogg Opus
 
 #指向编译脚本，根据所有的在 LOCAL_XXX 变量把列出的源代码文件编译成一个共享库。 注意，必须至少在包含这个文件之前定义 LOCAL_MODULE 和 LOCAL_SRC_FILES。
 include $(BUILD_SHARED_LIBRARY)
-
+```
 
 下面是Appliation.mk文件的内容
 
+```MakeFile
 APP_PLATFORM := android-14
 APP_ABI := armeabi-v7a
 NDK_TOOLCHAIN_VERSION := 4.9
@@ -163,262 +163,22 @@ APP_STL := gnustl_static
 #APP_PLATFORM  此变量包含目标 Android 平台的名称。例如，android-3 指定 Android 1.5 系统映像
 #APP_STL  默认情况下，NDK 构建系统为 Android 系统提供的最小 C++ 运行时库 (system/lib/libstdc++.so) 提供 C++ 标头
 #NDK_TOOLCHAIN_VERSION 将此变量定义为 4.9 或 4.8 以选择 GCC 编译器的版本。 64 位 ABI 默认使用版本 4.9 ，32 位 ABI 默认使用版本 4.8
-
 ```
 
-****源码修改****
-===
-```java
+### 源码修改
 从Android.mk文件中有俩个文件是经过修改过后的
 ${LOCAL_PATH}/opustools/src/mydecoder.c
 ${LOCAL_PATH}/opustools/src/myencode.c
 
-原本的文件为decoder.c encoder.c，对于decoder.c提供的功能可以将一个opus文件，变成一个wav文件，对于encoder.c文件，可以将一个wav文件变成opus文件
+> 原本的文件为decoder.c encoder.c，对于decoder.c提供的功能可以将一个opus文件，变成一个wav文件，对于encoder.c文件，可以将一个wav文件变成opus文件
 但是我们在使用的时候，并不会说提供一个wav文件，然后让你去压缩变成一个opus文件，播放语音的时候也不会说提供一个opus文件，经过解压缩变成一个wav文件，然后再来播放这个wav文件
 这样太慢了，对于解压缩，跟压缩的过程都是有时间延迟的，而且时长越大，延迟也就越大，所以我们需要修改原本的代码,建议在Visual Studio中阅读代码，然后修改,Visual Studio是在Pc上
 而如果采用NDK中调试，修改代码属于手机端，对应方便来说肯定是PC方便，而且Visual Studio 用来开发c/c++ 是非常强大的，非常方便的 ,而且从git clone的代码来看官网对visual Studio默认是支持的
 可能人家开发采用的就是Visual Studio ,所以对于前面的文章 Visual Studio中搭建这个环境的必要,下面会直接贴出这些修改文件的全部内容
 
-1.首先是audio-in.c 文件
-//自己定义的函数
-void setup_padder_from_my(oe_enc_opt *opt, ogg_int64_t *original_samples)
-{
-    padder *d = calloc(1, sizeof(padder));
-
-    d->real_reader_from_my = opt->read_samples_my;
-    d->real_readdata = opt->readdata;
-    //指针做函数参数,改变read_samples这个值，最终变成有
-    //加上padding的函数，用来处理缺少的数据opt->read_samples = read_padder;
-    opt->read_samples_my = read_padder_from_srcData;
-    opt->readdata = d;
-    d->channels = opt->channels;
-    d->extra_samples = &opt->extraout;
-    d->original_samples = original_samples;
-    d->lpc_ptr = -1;
-    d->lpc_out = NULL;
-}
-
-//自己定义的函数
-static long read_padder_from_srcData(void *data, float *buffer,signed char * srcData,int realReadData, int samples)
-{
-    padder *d = data;
-    long in_samples = d->real_reader_from_my(d->real_readdata, buffer, srcData, realReadData,samples);
-    int i, extra = 0;
-    const int lpc_order = 32;
-
-    //d->original_samples=original_samples; *original_samples = 0
-    if (d->original_samples)
-    {
-        *d->original_samples += in_samples;
-    }
-    //如果小于samples的话，补
-    if (in_samples<samples) {
-        if (d->lpc_ptr<0)
-        {
-            d->lpc_out = calloc(d->channels * *d->extra_samples, sizeof(*d->lpc_out));
-            if (in_samples>lpc_order * 2)
-            {
-                float *lpc = alloca(lpc_order * sizeof(*lpc));
-                for (i = 0; i<d->channels; i++) {
-                    vorbis_lpc_from_data(buffer + i, lpc, in_samples, lpc_order, d->channels);
-                    vorbis_lpc_predict(lpc, buffer + i + (in_samples - lpc_order)*d->channels,
-                                       lpc_order, d->lpc_out + i, *d->extra_samples, d->channels);
-                }
-            }
-            d->lpc_ptr = 0;
-        }
-        extra = samples - in_samples;
-        if (extra > *d->extra_samples)
-        {
-            extra = *d->extra_samples;
-        }
-        *d->extra_samples -= extra;
-    }
-    //内存的拷贝in_samples = 240
-    memcpy(buffer + in_samples*d->channels, d->lpc_out + d->lpc_ptr*d->channels, extra*d->channels * sizeof(*buffer));
-    d->lpc_ptr += extra;
-    return in_samples + extra;
-}
-
-typedef struct {
-    audio_read_func real_reader;
-    audio_read_func_my real_reader_from_my;//添加的内容
-    void *real_readdata;
-    ogg_int64_t *original_samples;
-    int channels;
-    int lpc_ptr;
-    int *extra_samples;
-    float *lpc_out;
-} padder;
-
-//自己写的，用来改造数据从外界获取到
-int raw_open_my(FILE * in,oe_enc_opt * opt,unsigned char * buf, int buflen)
-{
-    wavfile *wav = malloc(sizeof(wavfile));
-    int i;
-    (void)buf;/*unused*/
-    (void)buflen;/*unused*/
-
-    wav->f = in;
-    wav->samplesread = 0;
-    wav->bigendian = opt->endianness;//0
-    wav->unsigned8bit = opt->samplesize == 8; // wav->unsigned8bit = 0;
-    wav->channels = opt->channels;//1
-    wav->samplesize = opt->samplesize;//16
-    wav->totalsamples = 0;
-    //分配四个字节
-    wav->channel_permute = malloc(wav->channels * sizeof(int));
-    //wav->channels = 1;
-    for (i = 0; i < wav->channels; i++)
-    {
-        wav->channel_permute[i] = i;//0
-    }
-    //自己添加
-    opt->read_samples_my = wav_read_from_data;
-    opt->readdata = (void *)wav;
-    opt->total_samples_per_channel = 0; /* raw mode, don't bother */
-    return 1;
-}
-
-//自己添加的内容  srcData 一般要为320 长度的大小
-long wav_read_from_data(void * in,float * buffer, signed char * srcData,int realReadLength,int samples)
-{
-    wavfile *f = (wavfile *)in;
-    //重新的分配内存空间 160 * 2 * 1
-    int i, j;
-    /*分配四个字节
-    wav->channel_permute = malloc(wav->channels * sizeof(int));
-    wav->channels = 1;
-    for (i = 0; i < wav->channels; i++)
-    {
-        wav->channel_permute[i] = i;//0
-    }
-    */
-    int *ch_permute = f->channel_permute;
-    // wav->samplesread =   0;
-    f->samplesread += realReadLength;
-
-    if (f->samplesize == 8)
-    {
-        if (f->unsigned8bit)
-        {
-            unsigned char *bufu = (unsigned char *)srcData;
-            for (i = 0; i < realReadLength; i++)
-            {
-                for (j = 0; j < f->channels; j++)
-                {
-                    //将signed  signed char *buf 变成float *buffer数组
-                    buffer[i*f->channels + j] = ((int)(bufu[i*f->channels + ch_permute[j]]) - 128) / 128.0f;
-                }
-            }
-        }
-        else
-        {
-            for (i = 0; i < realReadLength; i++)
-            {
-                for (j = 0; j < f->channels; j++)
-                {
-                    buffer[i*f->channels + j] = srcData[i*f->channels + ch_permute[j]] / 128.0f;
-                }
-            }
-        }
-    }
-    else if (f->samplesize == 16)
-    {
-        if (!f->bigendian)
-        {
-            for (i = 0; i < realReadLength; i++)
-            {
-                for (j = 0; j < f->channels; j++)
-                {
-                    buffer[i*f->channels + j] = ((srcData[i * 2 * f->channels + 2 * ch_permute[j] + 1] << 8) |
-                                                 (srcData[i * 2 * f->channels + 2 * ch_permute[j]] & 0xff)) / 32768.0f;
-                }
-            }
-        }
-        else
-        {
-            for (i = 0; i < realReadLength; i++)
-            {
-                for (j = 0; j < f->channels; j++)
-                {
-                    buffer[i*f->channels + j] = ((srcData[i * 2 * f->channels + 2 * ch_permute[j]] << 8) |
-                                                 (srcData[i * 2 * f->channels + 2 * ch_permute[j] + 1] & 0xff)) / 32768.0f;
-                }
-            }
-        }
-    }
-    else if (f->samplesize == 24)
-    {
-        if (!f->bigendian) {
-            for (i = 0; i < realReadLength; i++)
-            {
-                for (j = 0; j < f->channels; j++)
-                {
-                    buffer[i*f->channels + j] = ((srcData[i * 3 * f->channels + 3 * ch_permute[j] + 2] << 16) |
-                                                 (((unsigned char *)srcData)[i * 3 * f->channels + 3 * ch_permute[j] + 1] << 8) |
-                                                 (((unsigned char *)srcData)[i * 3 * f->channels + 3 * ch_permute[j]] & 0xff))
-                                                / 8388608.0f;
-
-                }
-            }
-        }
-        else {
-            fprintf(stderr, _("Big endian 24 bit PCM data is not currently "
-                                      "supported, aborting.\n"));
-            return 0;
-        }
-    }
-    else {
-        fprintf(stderr, _("Internal error: attempt to read unsupported "
-                                  "bitdepth %d\n"), f->samplesize);
-        return 0;
-    }
-    return realReadLength;
-}
-
-opusenc.h 修改的内容
-typedef long (*audio_read_func)(void *src, float *buffer, int samples);
-typedef long(*audio_read_func_my)(void *src,float *buffer,signed char * srcData,int realReadLength,int samples); //添加的内容
-
-typedef struct
-{
-    audio_read_func read_samples;
-    audio_read_func_my read_samples_my; //添加的内容
-    void *readdata;
-    opus_int64 total_samples_per_channel;
-    int rawmode;
-    int channels;
-    long rate;
-    int gain;
-    int samplesize;
-    int endianness;
-    char *infilename;
-    int ignorelength;
-    int skip;
-    int extraout;
-    char *comments;
-    int comments_length;
-    int copy_comments;
-    int copy_pictures;
-} oe_enc_opt;
-
-void setup_padder(oe_enc_opt *opt, ogg_int64_t *original_samples);
-//自己添加的函数
-void setup_padder_from_my(oe_enc_opt *opt, ogg_int64_t *original_samples);
-
-int raw_open(FILE *in, oe_enc_opt *opt, unsigned char *buf, int buflen);
-//自己添加的函数
-int raw_open_my(FILE * in, oe_enc_opt * opt, unsigned char * buf, int buflen);
-int wav_open(FILE *in, oe_enc_opt *opt, unsigned char *buf, int buflen);
-
-long wav_read(void *, float *buffer, int samples);
-//自己添加的函数
-long wav_read_from_data(void * in,float * buffer, signed char * srcData,int realReadLength,int samples);
-long wav_ieee_read(void *, float *buffer, int samples);
-
-
 压缩提供的接口为
+
+```java
 private native int nativeInitEncoder(String fileName);
 
 /**
@@ -433,8 +193,11 @@ private native int nativeEncodeBytes(byte[] sourceIn,int length);
  *  如果返回的值不是0，代表初始化失败
  */
 private native int nativeReleaseEncoder();
+```
 
 myencode.c实现：
+
+```C++
 /*
  * Class:     vide_m4399_com_newopusdemo_OpusEncoder
  * Method:    nativeInitEncoder
@@ -764,7 +527,6 @@ JNIEXPORT jint JNICALL Java_com_example_administrator_opusnativebuild_OpusEncode
 	return ret;
  }
 
-
 int MyOpusEncoder(signed char * srcDataBuff, int readSize)
 {
 	int ret = 0;
@@ -1001,7 +763,11 @@ JNIEXPORT jint JNICALL Java_com_example_administrator_opusnativebuild_OpusEncode
 	 LOGD("Debug: opus clear memory success.\n");
 	return ret;
 }
+```
 
+解码对应的java接口
+
+```java
 /**
 * opus解码器的初始化,初始话成功返回0
 */
@@ -1021,6 +787,11 @@ private native int nativeDecodeBytes(byte[] in,int readSize,short[] out);
  * opus解码器的释放,释放成功返回0
 */
 private native int nativeReleaseDecoder();
+```
+
+JNI接口对应的源码实现
+
+```C++
 int MyOpusDecoder(char * srcData,int nb_read,short * destData)
 {
 	int ret = 0;
@@ -1436,8 +1207,10 @@ JNIEXPORT jint JNICALL Java_com_example_administrator_opusnativebuild_OpusDecode
   	LOGD("opusDecoder free success\n");
   	return ret;
 }
-
+```
 java代码
+
+```java
 public class OpusDecoder
 {
     public static final String TAG = "OpusDecoder";

@@ -6,13 +6,16 @@ tags: [Android,NDK,Transmission]
 description:  Transmission Ubuntu NDK 交叉编译
 ---
 
-Transmission Ubuntu NDK 交叉编译
+### 概述
+
+> Transmission Ubuntu NDK 交叉编译
+
 <!--more-->
 
-****什么是Transmission？****
-===
-```
-Transmission是一种BitTorrent客户端，特点是一个跨平台的后端和其上的简洁的用户界面。Transmission以MIT许可证和GNU通用公共许可证双许可证授权，因此是一款自由软件
+
+### 什么是Transmission?
+
+> Transmission是一种BitTorrent客户端，特点是一个跨平台的后端和其上的简洁的用户界面。Transmission以MIT许可证和GNU通用公共许可证双许可证授权，因此是一款自由软件
 优点是
 开源跨平台，由社区志愿者开发
 绝无各种广告及浏览器工具栏插件等
@@ -29,29 +32,24 @@ Transmission是一种BitTorrent客户端，特点是一个跨平台的后端和�
 HTTPS tracker支持以及tracker编辑功能支持
 IPv6支持
 对应不同平台有着特定的图形用户界面。
-```
 
-****为什么要研究Transmission？****
-===
-```
-为什么要研究这个东西，是因为之前搞的Aria2 p2p下载，后面在测试的时候发现了一个很重大的问题，就是内网之间不支持连接，这样内网之间的用户也就无法贡献速度，原来Aria2采用的是
+### 为什么要研究Transmission？
+
+> 为什么要研究这个东西，是因为之前搞的Aria2 p2p下载，后面在测试的时候发现了一个很重大的问题，就是内网之间不支持连接，这样内网之间的用户也就无法贡献速度，原来Aria2采用的是
 TCP连接，而Transmission 支持utp的协议，也即是 udp的一种，udp是支持在内网连接的，下面是这俩中穿透的原理
-
 至于为什么要用UDP，这是由于UDP的某些特性。UDP通信需要先绑定本地机器的端口，完成后就可以从这个端口收发数据，至于从哪里收，发到哪里，可以在收发数据的时候再决定，
 这也就意味着我可以用这一个端口同时和多个对象通信，只要我收发数据的时候指定不同的对象即可。当本地机器用UDP向英特网上的某个服务器发送数据的时候，
 这个映射不但能用来和这个服务器进行数据交互，也能用来接收其他主机发来的数据。NAT穿透就是本地主机向公网上的某台服务器发送数据，这时服务器就可以获得NAT对这台主机的映射，
 在之前举得例子中就是55.66.77.88:5000这个地址。由于NAT会将55.66.77.88:5000收到的数据转发至本地主机，所以公网上的其他机器可以从服务器获取到55.66.77.88:5000这个网络地址，
 然后通过这个网络地址向私网下的机器发出数据。
-
 而至于为什么不用TCP，也是由于TCP的某些特性。TCP通信的步骤与UDP不同，它需要先在两个对象之间建立一个专用通道，再用这个通道收发数据。也就是说外人无法插手。
 这样一来，虽然其他机器可以通过服务器获取到NAT的映射对象，也没办法利用它向私网下的机器发出数据。
-```
 
-****Transmission ubuntu 编译****
-===
-官网 https://transmissionbt.com/
+### Transmission ubuntu 编译
+> 官网 https://transmissionbt.com/
 transmission编译 https://github.com/transmission/transmission/wiki/Building-Transmission
-```
+
+```bash
 1.首先在ubuntu 执行下面的命令，用来安装一些依赖 
 sudo apt-get install build-essential automake autoconf libtool pkg-config intltool libcurl4-openssl-dev libglib2.0-dev libevent-dev libminiupnpc-dev libgtk-3-dev libappindicator3-dev
 
@@ -75,20 +73,19 @@ CFLAGS="-Os -march=native" ./configure && make && checkinstall
 生成的结果：
 ![结果显示](/uploads/Transmision 交叉编译/ubuntu生成的文件.png)
 
-****Transmission ubuntu NDK 交叉编译****
-===
-```
-如果采用交叉编译的化，就要自己生成这些依赖库，这里需要手动的编译的库文件有libcurl ,libevent openssl,所以要提前下载好这些文件，对应的我们编译都是采用最新版本的库
-```
+### Transmission NDK 交叉编译
+
+> 如果采用交叉编译的化，就要自己生成这些依赖库，这里需要手动的编译的库文件有libcurl ,libevent openssl,所以要提前下载好这些文件，对应的我们编译都是采用最新版本的库
 libevent 最新库的下载地址  https://github.com/libevent/libevent/releases/download/release-2.1.8-stable/libevent-2.1.8-stable.tar.gz
 openssl 最新库的下载地址  https://www.openssl.org/source/openssl-1.0.2o.tar.gz
 curl  最新库的下载地址    https://curl.haxx.se/download/curl-7.60.0.tar.gz
 transmission 最新的下载地址  https://raw.githubusercontent.com/transmission/transmission-releases/master/transmission-2.94.tar.xz
 
-编译openssl
-```java
+#### 编译openssl
+
 下面是编译的脚本文件
 
+```bash
 #!/bin/sh
 OPENSSL_SOURCE="openssl-1.0.2m"
 FAT="TS-Android"
@@ -131,18 +128,20 @@ build_openssl "arm"
 echo "build openssl success"
 exit 1
 
+```
 
 这里需要注意的是,如果GCC 不是这样指定的化，会出现 error: C compiler cannot create executables的错误 ,sysroot 也即是指定环境的意思
 export CC="$NDK/toolchains/${ACT_ARCH}-${PLATFROM}-4.9/prebuilt/linux-x86_64/bin/${ACT_ARCH}-${PLATFROM}-gcc --sysroot=${SYSROOT}"
 
-下面是介绍为什么要这样写的原因 
-这个一般是跟ndk相关的错误,某些头文件或者obj文件找不到。可以编写个简单的hello world源文件测试
+下面是介绍为什么要这样写的原因  这个一般是跟ndk相关的错误,某些头文件或者obj文件找不到。可以编写个简单的hello world源文件测试
 
+```C++
 #include 
 int main() { 
 printf("Hello world."); 
 return 0; 
 } 
+
 使用ndk中的编译器进行编译,如
 
 export $ANDROID_NDK=/home/longjing/tools/Android/android-ndk-r15c 
@@ -184,10 +183,12 @@ $ANDROID_NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-
 至于这里这么多是因为没有再次的编译了，这是全部编译成功产生的文件
 ```
 ![结果显示](/uploads/Transmision 交叉编译/openssl编译结果.png)
-编译libevent
-```java
+
+#### 编译libevent
+
 下面是编译的脚本文件
 
+```bash
 LIBEVENT_SOURCE="libevent-2.1.8-stable"
 FAT="TS-Android"
 SCRATCH="scratch"
@@ -235,10 +236,10 @@ build_libevent() {
         --prefix=$THIN/$ARCH
     make install
 }
-
-这里要注意的，这里一定要使用ndkr11以下的版本，要不然会出现找不到arc4random_addrandom 之类的错误，这主要是因为ndkr11以上，有对这个函数最修改
-下面分别在对应的r10e ，r14b中查询这个函数
 ```
+
+这里要注意的，这里一定要使用ndkr11以下的版本，要不然会出现找不到arc4random_addrandom 之类的错误，这主要是因为ndkr11以上，有对这个函数最修改 下面分别在对应的r10e ，r14b中查询这个函数
+
 r10e 查询的结果为：
 ![结果显示](/uploads/Transmision 交叉编译/arc4andomR10查询结果.png)
 
@@ -250,16 +251,16 @@ arc4random_addrandom的改动 https://github.com/android-ndk/ndk/issues/48
 
 所以这里要使用ndkr11以下的版本来编译，要不然会编译不过
 
-```
 通过上面的脚本文件可以知道，我们的编译成功之后存放的目录为/thin/arm/ 目录下，如果这个目录就会存放编译产生的文件，其中lib目录如果有下面的俩个红色的就代表成功了，
 至于这里这么多是因为没有再次的编译了，这是全部编译成功产生的文件
-```
+
 ![结果显示](/uploads/Transmision 交叉编译/libevent编译结果.png)
 
-编译curl
-```java
+#### 编译curl
+
 下面是编译的脚本文件
 
+```bash
 CURL_SOURCE="curl-7.60.0"
 FAT="TS-Android"
 SCRATCH="scratch"
@@ -267,7 +268,6 @@ SCRATCH="scratch"
 THIN=`pwd`/"thin"
 NDK="/home/yuhui/workSpace/android-ndk-r10e"
 SYSROOT_PREFIX="$NDK/platforms/android-16/arch-"
-
 
 build_Curl() {
     ARCH="$1"
@@ -304,25 +304,27 @@ build_Curl() {
         --prefix=$THIN/$ARCH
     make install
 }
-
-#执行这个函数,传递的参数为arm
+```
+执行这个函数,传递的参数为arm
+```bash
 build_Curl "arm"
 echo "build Curl success"
 exit 1
+```
 
 通过上面的脚本文件可以知道，我们的编译成功之后存放的目录为/thin/arm/ 目录下，如果这个目录就会存放编译产生的文件，其中lib目录如果有下面的俩个红色的就代表成功了，
 至于这里这么多是因为没有再次的编译了，这是全部编译成功产生的文件
-```
+
 ![结果显示](/uploads/Transmision 交叉编译/curl编译结果.png)
 
 最终这三个库编译出来的内容为
 ![结果显示](/uploads/Transmision 交叉编译/外部依赖库编译结果.png)
 
+#### 编译 transmission2.9.4
 
-编译 transmission2.9.4
-```java
 下面是编译的脚本文件
 
+```bash
 SOURCE="transmission-2.94"
 FAT="TS-Android"
 SCRATCH="scratch"
@@ -425,19 +427,29 @@ then
 fi
 
 echo Done
+```
 
 在上面的脚本中有这样的一句 export CFLAGS="$CFLAGS -Din_addr_t=uint32_t  -D__android__  -Din_port_t=uint16_t"，后面的-Din_addr_t=uint32_t  -D__android__  -Din_port_t=uint16_t
 的意思是给in_addr_t ,in_port_t 赋值，定义__android__ 这样的宏，可以看出来，我们要对应的修改代码，原本也是transimssion的官网介绍默认是不支持android的，也即是android的编译要自己做一些
-修改，下面是修改的内容
+修改，
 
-第一处是在transmission源码中的third-party\miniupnp\miniwget.c文件
-修改的内容为：
+### 源码对应的修改内容
+
+#### miniwget.c文件 
+
+third-party\miniupnp\miniwget.c文件 修改的内容为：
+
+```C++
 #if defined(__sun) || defined(sun) || defined(__android__)
 #define MIN(x,y) (((x)<(y))?(x):(y))
 #endif
+```
 
-第二处修改的内容在 transmission源码中的libtransmission目录下的variant.c文件
-修改的内容为：
+#### variant.c
+
+libtransmission目录下的variant.c 修改的内容为：
+
+```C++
 #ifndef __android__
 #include <locale.h> /* setlocale() */
 #endif
@@ -582,9 +594,13 @@ tr_variantFromBuf (tr_variant      * setme,
 #endif
   return err;
 }
+```
 
-第三处修改的内容在 transmission源码中的libtransmission目录下的platform-quote.c文件
-修改的内容为：
+#### platform-quote.c
+
+transmission源码中的libtransmission目录下的platform-quote.c 修改的内容为：
+
+```C++
 #elif defined (__sun)
   #include <sys/fs/ufs_quota.h> /* quotactl */
  #elif defined (__android__)
@@ -600,8 +616,6 @@ tr_variantFromBuf (tr_variant      * setme,
 static const char *
 getdev (const char * path)
 {
-
-
 
 #endif /* disabel quota on android */
 
@@ -649,10 +663,13 @@ tr_device_info_get_free_space (const struct tr_device_info * info)
 
   return free_space;
 }
+```
 
-第四处修改的内容在 transmission源码中的libtransmission目录下的util.c文件
-修改的内容为：
+#### util.c
 
+libtransmission目录下的util.c 修改的内容为：
+ 
+```C++
 double
 tr_truncd (double x, int precision)
 {
@@ -666,10 +683,13 @@ tr_truncd (double x, int precision)
 #endif
   return atof (buf);
 }
+```
 
-第五处修改的内容在 transmission 源码中的 libtransmission目录下的util.h文件
-修改的内容为：
+#### util.h
 
+libtransmission目录下的util.h 修改的内容为：
+
+```C++
 /** @brief Private libtransmission function to update tr_time ()'s counter */
 static inline void tr_timeUpdate (time_t now) { __tr_current_time = now; }
 
@@ -687,14 +707,13 @@ static inline void tr_timeUpdate (time_t now) { __tr_current_time = now; }
 
 /** @brief Portability wrapper for htonll () that uses the system implementation if available */
 uint64_t tr_htonll (uint64_t);
+```
 
 这些内容修改完之后，就可以执行脚本的执行了，如果正常执行的没有错误的化，会生成下面的文件 因为脚本指定了 --prefix=$THIN/$ARCH 所以会在/thin/arm/目录下生成对应的内容
-```
+
 ![结果显示](/uploads/Transmision 交叉编译/transmission编译结果.png)
 
-****Transmission ubuntu NDK 交叉编译总结****
-===
-```
-至此Transmission交叉编译成功,我们为什么要先在ubuntu下面交叉编译，是为了后面移植到android studio 编译做准备，接下来会介绍怎么在Android Studio 中采用CmakeList直接编译源码
+### 交叉编译总结
+> 至此Transmission交叉编译成功,我们为什么要先在ubuntu下面交叉编译，是为了后面移植到android studio 编译做准备，接下来会介绍怎么在Android Studio 中采用CmakeList直接编译源码
 弄成一个可以调试的NDK项目,这样对于我们的开发能做到事半功倍的效果
-```
+
