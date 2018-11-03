@@ -1,29 +1,30 @@
 ---
 layout: pager
 title: Android中实现Aira2
-date: 2018-05-18 11:01:40
+date: 2018-06-20 10:28:07
 tags: [AndroidStudio,Aria2,P2P]
 description: Android 中利用Aria2 完成一个P2P的下载神器
 ---
 
-Android 中利用Aria2 完成一个P2P的下载神器
+### 概述
+
+> Android 中利用Aria2 完成一个P2P的下载神器
+
 <!--more-->
 
-简介
-```
+
+### 简介
 上一篇文章中，介绍了怎么将Aria2库移植到了AndroidStudio中，而且使用了最新的编译方式CmakeList的方式接入，在接下来的一个月实现Android p2p下载的时候，发现使用CmakeList来编译真的
 很重要，因为他可以使你断点调试代码。。如果不能调试的化。。那么这个工作的进程就会大打折扣，甚至有可能误解，现在请允许我来吹一下目前的实现成果
 
 1.首先我们是用使用Aria2库实现的，所以对于他的优点我们肯定是有的，他的优点有aria2是一款用于下载文件的工具。 支持的协议是HTTP（S），FTP，SFTP，BitTorrent和Metalink。
 aria2可以从多种来源/协议下载文件，并尝试利用您的最大下载带宽。它支持从HTTP（S）/ FTP / SFTP和BitTorrent同时下载文件，而从HTTP（S）/ FTP / SFTP下载的数据则上传到BitTorrent群。 
 使用Metalink块校验和，aria2在下载文件时自动验证数据块。网络上关于他的各种优点也是有很多。。不太懂的可以自行百度
-
 2.支持并发下载，支持断点下载
 2.当下载磁力链接或者本地的种子文件，Metalink文件的时候，支持选择文件下载,做到想下什么就下什么文件
 3.下载的过程中支持暂停，恢复，删除操作
 
-```
-
+### 效果
 支持并发下下载
 ![结果显示](/uploads/Arir2Android实现/Aria并发下载.jpg)
 
@@ -33,9 +34,8 @@ aria2可以从多种来源/协议下载文件，并尝试利用您的最大下�
 支持断点下载，甚至可以做到当你出现异常的情况导致退出，下次进来也可以断点下载
 ![结果显示](/uploads/Arir2Android实现/Aria2支持断点下载.jpg)
 
-JNI接口
+### JNI接口
 ```java
-
 /**
  * Project Name: Aria2AndroidProject
  * File Name:    AriaApi.java
@@ -346,11 +346,9 @@ public class AriaApi
         }
     }
 }
-
 ```
-
-JNI函数的编写
-```java
+### JNI函数的编写
+```C++
 由于下载涉及到了一些耗时的操作，所以我们会在JNI中创建一个子线程来执行这些内容
 //2创建子线程,用于下载，检测等,创建成功之后，就会执行run的回调
 if (pthread_create(&pthread_tid, NULL, run, NULL)) {
@@ -539,8 +537,6 @@ struct PauseDownloadJob : public Job{
     aria2::A2Gid gid;
 };
 
-	
-
 比如 添加下载的url,支持添加http 连接，或者磁力链接 ,
 JNIEXPORT void JNICALL Java_com_example_com_aria2libandroidproject_AriaApi_Aria2AddUrlDownLoad
         (JNIEnv * env, jclass clz, jstring javaDownloadUrl,jint jDownLoadId)
@@ -553,7 +549,6 @@ JNIEXPORT void JNICALL Java_com_example_com_aria2libandroidproject_AriaApi_Aria2
     //左值引用的基本语法：type &引用名 = 左值表达式；  右值引用的基本语法type &&引用名 = 右值表达式；
     jobQueue.push(std::unique_ptr<Job>(new AddUriJob(std::move(uris), std::move(gloableOptions),jDownLoadId)));
 }
-
 
 /**
  * 销毁函数，在应用程序退出的时候，执行这个方法
@@ -651,7 +646,6 @@ void ShowToastCallbackForAndroid(std::string info){
         jVM->DetachCurrentThread();
     }
 }
-
 ```
 
 整体来讲目前已经可以满足我一个做为种子用户的需求,我也是基于种子用户的角度来实现的

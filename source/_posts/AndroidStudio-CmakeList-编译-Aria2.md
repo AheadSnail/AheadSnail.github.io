@@ -1,33 +1,28 @@
 ---
 layout: pager
 title: AndroidStudio CmakeList 编译 Aria2
-date: 2018-04-17 16:03:27
+date: 2018-06-17 10:28:07
 tags: [AndroidStudio,CmakeList,Aria2]
 description:  AndroidStudio CmakeList 编译 Aria2为一个动态库
 ---
 
-AndroidStudio CmakeList 编译 Aria2为一个动态库
+### 概述
+
+> AndroidStudio CmakeList 编译 Aria2为一个动态库
+
 <!--more-->
 
-简介
-```
-上一篇文章中，介绍了AutoConf，AutoMake，LibTool的基本语法，已经简单的使用，如何生成还有是怎么样来维护MakeFile的，之前都有分析过，大致我们要维护的文件就有configure.ac文件，还有
-Makefile.am文件，其中的configure.ac文件主要是用来检测环境的，使我们可以做到条件编译，比如检测当前的系统，检测当前环境是否含有某个库，检测函数等，根据检测的结果可以生成不同的变量
-传递到我们的MakeFile.am或者直接传递到Makefile文件中，还有一个文件就是Makefile.am文件，这个用来定义我们当前要编译的文件，还有编译的参数，连接的参数等，还可以接受到configure.ac文件
-检测的结果来做到条件的编译，有选择的编译需要的文件
 
-我们为什么需要去了解这个文件，是因为当前的Aria2虽然在ubuntu利用android的交叉编译链可以生成可执行文件，但是我们需要移植到AndroidStudio上面去的化，就需要我们自己来编写CmakeList文件
-而且我们需要生成的文件是一个so文件，不是一个可执行的文件，至于为什么要采用CmakeList来写主要是因为Google推荐使用，还有AndroidStudio在CmakeList下面如果配置的好，是可以调试的，
-方便我们查看代码，本身目前就缺少一个编译器查看这些源码还有断点调试，所以采用CmakeList来写
+### 简介
+> 上一篇文章中，介绍了AutoConf，AutoMake，LibTool的基本语法，已经简单的使用，如何生成还有是怎么样来维护MakeFile的，之前都有分析过，大致我们要维护的文件就有configure.ac文件，还有Makefile.am文件，其中的configure.ac文件主要是用来检测环境的，使我们可以做到条件编译，比如检测当前的系统，检测当前环境是否含有某个库，检测函数等，根据检测的结果可以生成不同的变量传递到我们的MakeFile.am或者直接传递到Makefile文件中，还有一个文件就是Makefile.am文件，这个用来定义我们当前要编译的文件，还有编译的参数，连接的参数等，还可以接受到configure.ac文件检测的结果来做到条件的编译，有选择的编译需要的文件
 
-因为我们需要手动的写CmakeList所以我们就有必要去了解文件，去了解他是怎么编译的。然后提取我们需要的信息，比如需要编译什么文件
-编译的时候传递什么样的参数，需要连接什么库等，
-```
+我们为什么需要去了解这个文件
+> 是因为当前的Aria2虽然在ubuntu利用android的交叉编译链可以生成可执行文件，但是我们需要移植到AndroidStudio上面去的化，就需要我们自己来编写CmakeList文件 而且我们需要生成的文件是一个so文件，不是一个可执行的文件，至于为什么要采用CmakeList来写主要是因为Google推荐使用，还有AndroidStudio在CmakeList下面如果配置的好，是可以调试的， 方便我们查看代码，本身目前就缺少一个编译器查看这些源码还有断点调试，所以采用CmakeList来写
 
+因为我们需要手动的写CmakeList所以我们就有必要去了解文件，去了解他是怎么编译的。然后提取我们需要的信息，比如需要编译什么文件 编译的时候传递什么样的参数，需要连接什么库等，
 
-确定需要编译的文件
-```java
-
+### 确定需要编译的文件
+```MakeFile
 首先我们在Ubuntu，Aria源码目录下面执行 ./android-config文件，用来检测当前的环境，并且生成对应的变量，以便条件编译，其中configure.ac中有这样的输出文件
 AC_CONFIG_FILES([Makefile
                 src/Makefile
@@ -62,9 +57,8 @@ make "$@"
 ```
 [MakeFile.am基本知识](http://www.cnblogs.com/ranson7zop/p/8268196.html)
 
-
 确定MakeFIle文件中哪些文件是需要编译的
-```java
+```MakeFile
 下面的这些宏都是通过configure.ac检测之后生成的宏
 如果当前是window下编译的化
 if MINGW_BUILD			   MINGW_BUILD 为false
@@ -93,11 +87,12 @@ SRCS += \
 	XmlParser.cc XmlParser.h
 endif # HAVE_SOME_XMLLIB
 ....
+```
 
-如果你不知道，或者不确定那些宏的值，也是可以知道 MakeFIle.am文件，需要什么样的文件，我们知道最终肯定都是由MakeFile来编译的，所以我们可以直接看MakeFile文件，他肯定会将要编译的文件
-收集起来，不需要编译的文件就注释掉，而且这样比较保险
+如果你不知道，或者不确定那些宏的值，也是可以知道 MakeFIle.am文件，需要什么样的文件，我们知道最终肯定都是由MakeFile来编译的，所以我们可以直接看MakeFile文件，他肯定会将要编译的文件收集起来，不需要编译的文件就注释掉，而且这样比较保险
 
 MakeFIle文件其中指定要编译的文件是用这个变量来收集的
+```MakeFIle
 SRCS = a2algo.h a2functional.h a2io.h a2iterator.h a2netcompat.h \
 	 ......
 	 libssl_compat.h $(am__append_1) $(am__append_2) \
@@ -134,7 +129,7 @@ am__append_4 = \
 ```
 
 从MakeFIle文件中确定连接的参数，以及对应的编译参数
-```java
+```MakeFIle
 MakeFile文件中的 AM_CPPFLAGS这个变量就代表编译需要传递的编译参数，这个我们是需要的，这里解释下期中的变量
 -I$(top_srcdir)/lib ， -I 代表需要导入哪个文件，也即是定位文件，可以用来定义头文件的地方，这样系统就会去对应的目录中去查找对应的文件
 -DLOCALEDIR=\"${datarootdir}/locale\" -DHAVE_CONFIG_H  -D代表定义一个宏
@@ -183,11 +178,11 @@ EXTLDADD =  \
 也可以在Aria2根目录中，执行./android-config命令，改命令会去检测环境，同时最后面会将检测的结果，还有编译的一些参数，打印出来
 ![结果显示](/uploads/Aria2编译/android-config配置.png)
 
-AndroidStudio CmakeList编写
+### AndroidStudio CmakeList编写
 
-```java
 这里我们需要连接的库是从Ubuntu，跨平台吧编译Android的时候生成导出来的,下面是我CmakeList文件的编写
 
+```Cmake
 cmake_minimum_required(VERSION 3.4.1)
 
 #设置变量 自定义变量使用SET(OBJ_NAME xxxx)，使用时${OBJ_NAME}
@@ -306,7 +301,6 @@ target_link_libraries( Aria
                        openssl-ssl openssl-crypto
                        )
 ```
-
 [CMake语法](https://cmake.org/cmake/help/latest/index.html)
 
 
@@ -318,8 +312,8 @@ AndroidStuido编译的结果
 
 ![结果显示](/uploads/Aria2编译/Aria2生成的so.png)
 
-其中遇到的问题记录
-```
+### 其中遇到的问题记录
+
 1.posix_memalign() undeclared identifier issue.
 这个出现的原因就是：posix_memalign这个函数，在Api16以下是不存在的
 解决的方案就是：这个需要我们提高Android Api的最低等级，也即是minSdkVersion 16
@@ -334,6 +328,5 @@ AndroidStuido编译的结果
 大致就是说在链接的时候找不到ENGINE_load_builtin_engines 跟  ENGINE_register_all_complete对应的函数实现，但是本质这俩个函数是存在的
 这里涉及到了一个链接的先后顺序的问题，这个函数对应的库为openssl，这个库在openssh2中是有用到的
 解决方案就是：将openssl库链接放到最后
-```
 
 总结：什么事情都不会那么简单，主要一步一步来，如果遇到问题，就要去解决问题，这个库从我接触到编译出来我想要的大致用了1个月的时间,看来我的耐心确实很好..哈哈
