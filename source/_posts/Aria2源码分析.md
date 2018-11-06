@@ -15,23 +15,18 @@ description: Aria2源码分析
 
 ### 简介
 
-之前文章分析过，怎么样使用Aria2，以及对应的编译，如果只是做为简单的使用的化，估计早就已经解决了问题，先说说使用这个项目的原由吧，就是公司想节省带宽，比如在下载游戏，下载视频等方面
-所以可以使用p2p技术，而Aria2是p2p开源中最火的一个，也是最多start数的一个，所以采用了这个开源库，但是由于Aria2 不具备打洞的方案，他原本是采用tcp的方式来传输内容，而像有些种子工具
-比如Utorrent是具备这种打洞技术的，采用了utp的协议，而这个utp的库也是由Utorrent开源的，不足的是，这个库并没有开源，但是linux下面的p2p工具 transmission是具备utp，tcp协议的，而且是开源的
-所以就要去阅读transmission的源码，查看他对应的utp以及tcp有什么不同点，在发的数据方面，这里就直接告诉大家答案，对于这俩种协议在发数据的时候，并没有任何的区别,由于要设计到修改源码，就有
-必要对Aria2的源码有一定深度的认识，要不然是改不动的
+> 之前文章分析过，怎么样使用Aria2，以及对应的编译，如果只是做为简单的使用的化，估计早就已经解决了问题，先说说使用这个项目的原由吧，就是公司想节省带宽，比如在下载游戏，下载视频等方面,所以可以使用p2p技术，而Aria2是p2p开源中最火的一个，也是最多start数的一个，所以采用了这个开源库，但是由于Aria2 不具备打洞的方案，他原本是采用tcp的方式来传输内容，而像有些种子工具,比如Utorrent是具备这种打洞技术的，采用了utp的协议，而这个utp的库也是由Utorrent开源的，不足的是，这个库并没有开源，但是linux下面的p2p工具 transmission是具备utp，tcp协议的，而且是开源的所以就要去阅读transmission的源码，查看他对应的utp以及tcp有什么不同点，在发的数据方面，这里就直接告诉大家答案，对于这俩种协议在发数据的时候，并没有任何的区别,由于要设计到修改源码，就有必要对Aria2的源码有一定深度的认识，要不然是改不动的
 
 ### P2P技术
 
-`p2p`也叫做变态下载，何为变态就是同一时刻当下载的人越多，速度就越快， p2p为什么能节省带宽，也就是本身你要从服务器下载的资源，可以直接从其他的用户那里获取到，由其他的用户提供带宽，
-下面说下p2p大致的工作流程
-1.首先客户端启动要监听一个端口号，用来接受其他客户端的连接，就相当于是服务端的角色，因为对于任何的一个用户来说，即是客户端又是服务端，但你没有资源的时候，相当于是一个客户端，从别人
-下载内容，当你有内容之后，就变成了服务端，就可以响应其他用户的连接，共享资源
+`p2p`也叫做变态下载，何为变态就是同一时刻当下载的人越多，速度就越快， p2p为什么能节省带宽，也就是本身你要从服务器下载的资源，可以直接从其他的用户那里获取到，由其他的用户提供带宽，下面说下p2p大致的工作流程
+> 1.首先客户端启动要监听一个端口号，用来接受其他客户端的连接，就相当于是服务端的角色，因为对于任何的一个用户来说，即是客户端又是服务端，但你没有资源的时候，相当于是一个客户端，从别人下载内容，当你有内容之后，就变成了服务端，就可以响应其他用户的连接，共享资源
 2.客户端要连接tracker 服务器，连接的时候，要告知本地客户端监听的端口号，下载的情况，比如下载了多少内容，还有多少内容没有下载等，不过最重要的是这个监听的端口号
 3.tracker服务器收到了之后，就会返回给你，当前同时在线的所用用户的外网的ip和端口号，有几个用户下载完了，有几个用户还没有下载完，这个可以通过客户端连接tracker服务器的时候告知的下载情况可以得知
 4.客户端收到了tracker服务器返回的当前在线用户的ip和端口号，此时客户端就可以尝试的跟他们连接，大致的连接内容有，说先公布下加密的情况，然后是握手的消息，最后是对应要下载内容的信息，比如告知他当前我有什么资源，我要什么资源等，对方得到回应之后，就会传递对应的资源
 
-当然种子技术设计到了很多的协议，比如Dht等，具体的可以查看官网的介绍 http://bittorrent.org/beps/bep_0000.html
+当然种子技术设计到了很多的协议，比如Dht等，具体的可以查看官网的介绍
+> http://bittorrent.org/beps/bep_0000.html
 
 ### Aria2源码分析
 
@@ -47,7 +42,7 @@ int DownloadEngine::run(bool oneshot)
 {
   //如果  commands_ 或者 routineCommands_ 队列不为空，commands_一开始就有添加了一个保持事件响应的引用对象KeepRunningCommand  所以不为空
   while (!commands_.empty() || !routineCommands_.empty()) {
-	...
+    ...
     //判断是否达到了刷新界面的时间，constexpr auto A2_DELTA_MILLIS = std::chrono::milliseconds(10);
     if (lastRefresh_.difference(global::wallclock()) + A2_DELTA_MILLIS >= refreshInterval_) {
       //刷新的间隔为1秒
@@ -211,16 +206,16 @@ std::tie(c, rc) = DHTSetup().setup(e, AF_INET);
 //在这种情况下，每一个peer节点变成了一个tracker服务器，dht协议是在udp通信协议的基础上使用Kademila（俗称Kad算法）算法实现。
 DHTSetup::setup(DownloadEngine* e, int family)
 {
-	...
-	//这里要注意，  DHTRegistry::isInitialized() 这个取的是静态对象值，所以对于多个种子来说，如果之前dht已经初始化过了，就不会再继续往下执行了，直接return 处理,那这样也可以保证我们的
-	//utpContext  的创建也是只会有一份 ,也即是后面的这些对象关于Dht的创建都是只有一份的，也即是所有的种子文件公用的
-	if ((family != AF_INET && family != AF_INET6) || (family == AF_INET && DHTRegistry::isInitialized()) || (family == AF_INET6 && DHTRegistry::isInitialized6())) {
-		return {};
-	}
-	...
-	//标识初始化完成,下次另一个种子文件，就不会再次的执行初始化了
+    ...
+    //这里要注意，  DHTRegistry::isInitialized() 这个取的是静态对象值，所以对于多个种子来说，如果之前dht已经初始化过了，就不会再继续往下执行了，直接return 处理,那这样也可以保证我们的
+    //utpContext  的创建也是只会有一份 ,也即是后面的这些对象关于Dht的创建都是只有一份的，也即是所有的种子文件公用的
+    if ((family != AF_INET && family != AF_INET6) || (family == AF_INET && DHTRegistry::isInitialized()) || (family == AF_INET6 && DHTRegistry::isInitialized6())) {
+       return {};
+    }
+    ...
+    //标识初始化完成,下次另一个种子文件，就不会再次的执行初始化了
     DHTRegistry::setInitialized(true);
-	...
+    ...
 }	
 
 所以对应dht后面初始化的对象也都是独有的是为所有的种子文件共享的,以及生成的各种command也是独有的，是不会销毁的，只有当引擎退出的时候才会退出，比如
@@ -245,21 +240,14 @@ bool DHTInteractionCommand::execute()
 ```
 
 ### 源码执行流程
-
 下面是做这个项目的时候整理的源码过程
-
-[BT(带中心Tracker)通信协议的分析](http://note.youdao.com/noteshare?id=0c030a62ab1994e3539ccbec25c28a20&sub=3B8250E73A1F44E7B35CE099B116383E)
-
+>[BT(带中心Tracker)通信协议的分析](http://note.youdao.com/noteshare?id=0c030a62ab1994e3539ccbec25c28a20&sub=3B8250E73A1F44E7B35CE099B116383E)
 [Aria2 Tracker连接过程](http://note.youdao.com/noteshare?id=6b622065253105bb9ec1e742272f621b&sub=5B58733856A447ED814D75346D2598B3)
-
 [Aria2 客户端Peer 逻辑](http://note.youdao.com/noteshare?id=a0c82267bb9bd047fb75a3531a14243d&sub=EFA1737AB5784AFDA622CB939DBE0E79)
-
 [Aria2 服务端Peer逻辑](http://note.youdao.com/noteshare?id=54aba8c5205c0458d6fc133c03bc305e&sub=53E793F9F728480CB4E31214F928ADCD)
 
 当然由于要参考transmission的源码，对应的源码分析过程
-
-[Transmission Tracker连接过程](http://note.youdao.com/noteshare?id=6996c89f4c794afb8157aa5a060b468d&sub=A86A1FBFA4FD4F5F962E6D77D6211418)
-
+> [Transmission Tracker连接过程](http://note.youdao.com/noteshare?id=6996c89f4c794afb8157aa5a060b468d&sub=A86A1FBFA4FD4F5F962E6D77D6211418)
 [Transmission Peer连接](http://note.youdao.com/noteshare?id=2f856b2d03517b3e845e88585a16e26e&sub=3C36D35980224DFDAC2A924D2D888AA2)
 
 
