@@ -20,7 +20,7 @@ description: Aria2,transmission 速度统计原理以及Utp下载限速实现
 ![结果显示](/uploads/Utp下载限速/transmission限速配置.png)
 上面是设置为允许限速，并且限速的大小为50k，结果显示为
 ![结果显示](/uploads/Utp下载限速/transmission限速的结果.png)
-可以看到transmission是可以做到下载限速的，而且是采用utp库来实现的，前面有说过，utp是模拟实现tcp，对于utp库使用者来说不用去管理类似的udp丢包，包的顺序等问题，还既有tcp的滑动窗口，拥塞控制等而实现utp的下载限速就是要使用到滑动窗口这个特性，这个特性是告知对方我当前所能接收的容量，你不应该发送大于这个值的内容，想想也是，要想做到真正意义上的下载限速，只有控制发送方才能做到
+可以看到transmission是可以做到下载限速的，而且是采用utp库来实现的，前面有说过，utp是模拟实现tcp，对于utp库使用者来说不用去管理类似的udp丢包，包的顺序等问题，具有tcp的滑动窗口，拥塞控制等而实现utp的下载限速就是要使用到滑动窗口这个特性，这个特性是告知对方我当前所能接收的容量，你不应该发送大于这个值的内容，想想也是，要想做到真正意义上的下载限速，只有控制发送方才能做到
 
 要想检测分析utp发送的内容，可以通过Wireshake检测到,至于要想看到utp的兼容的信息，可以这样配置 下载一个 utp.lua 放到wireshark/plugins/2.6/目录下把bt-utp的端口改回去，比方说0 然后就可以看了
 ![结果显示](/uploads/Utp下载限速/检测utp滑动窗口.png)
@@ -70,7 +70,7 @@ tr_bandwidthClap函数实现，这里注意第一个参数io->bandwidth代表当
 ![结果显示](/uploads/Utp下载限速/bandwidthClamp上.png)
 ![结果显示](/uploads/Utp下载限速/tr_bandwidth下.png)
 
-从函数中可以知道，这里当前滑动窗口的大小跟 byteLeft大小有关，这个代表最大的滑动的窗口大小，如果当前下载速度已经超过了限速的值，那么就直接byteCount返回为0，相应的对应父类的速度监控器对象也要更新获取当前速度部分等下再来看，先来看下载的时候做了什么处理
+从函数中可以知道，这里当前滑动窗口的大小跟 byteLeft大小有关，这个代表最大的滑动的窗口大小，如果当前下载速度已经超过了限速的值，那么就直接byteCount返回为0，相应的对应父类的速度监控器对象也要更新,获取当前速度部分等下再来看，先来看下载的时候做了什么处理
 
 utp读取数据回调
 ![结果显示](/uploads/Utp下载限速/utp读取数据回调.png)
@@ -82,7 +82,7 @@ utp读取数据回调
 ![结果显示](/uploads/Utp下载限速/utpCandRead函数实现.png)
 通过函数可知，只有读取piece数据的时候，才会给这个pieceLength赋值，所以外面才可以根据这个值来判断是否为pieceData,所以当判断是否为 pieceData 之后，调用 tr_bandWidthUsed  函数,下面是这个函数主要的部分
 ![结果显示](/uploads/Utp下载限速/tr_bandWidthUsed函数实现.png)
-从函数实现中可以知道，这里会获取到当前任务的速度监控器对象，如果当前有设置限速，并且为pieceData 就会更新当前速度监控器对象 bytesLeft值，这边更新了这个值，那么utp获取滑动窗口就会变化当然如果变为0的时候会怎么办，这个不用担心，前面有分析过 专门有一个定时器 用来重置这个值的，会每隔500毫秒重置为最开始设置限速的值，之后再慢慢变小，接着调用了bytesUsed函数bytesUsed函数这个是用来统计下载速度的 
+从函数实现中可以知道，这里会获取到当前任务的速度监控器对象，如果当前有设置限速，并且为pieceData 就会更新当前速度监控器对象 bytesLeft值，这边更新了这个值，那么utp获取滑动窗口就会变化当然如果变为0的时候会怎么办，这个不用担心，前面有分析过 专门有一个定时器 用来重置这个值的，会每隔500毫秒重置为最开始设置限速的值，之后再慢慢变小，接着调用了bytesUsed函数bytesUsed函数这个是用来统计下载速度的,在这之前先来看看这个结构体 
 
 bratecontrol结构体定义为
 ![结果显示](/uploads/Utp下载限速/bratecontrol结构体.png)
@@ -95,6 +95,7 @@ tr_bandwidthGetRawSpeedBps函数实现
 getSpeed_Bps 函数实现为
 ![结果显示](/uploads/Utp下载限速/getSpeed_Bps函数实现.png)
 通过函数可知，这里是获取到统计的速度情况，算一个平均值，注意这里有一个这样的逻辑，如果当前统计的时间还没有达到2000毫秒就返回上一次统计的值
+
 获取到期望值函数实现
 ![结果显示](/uploads/Utp下载限速/获取到期望值.png)
 判断是否超速下载
@@ -159,7 +160,8 @@ private:
   int64_t sessionUploadLength_;
   ...
 }
-而NetStat内部含有俩个成员变量一个是针对下载的统计，一个是针对上传的统计
+NetStat内部含有俩个成员变量一个是针对下载的统计，一个是针对上传的统计
+
 class SpeedCalc {
 private:
   //用来存储10秒之内的下载内容
@@ -198,8 +200,7 @@ private:
   NetStat netStat_;
 }
 
-其实Aria2做法更加简单的，他限速的处理只针对piece数据才会统计分析，对于其他的消息，不管,下面来分析下Aria2 接收到Piece Data的逻辑
-
+其实Aria2做法更加简单的，他限速的处理只针对piece数据才会统计分析，对于其他的消息不做处理,下面来分析下Aria2 接收到Piece Data的逻辑
 
 //接受传递过来的内容，这里既是 接受到了peer传递回来的我们需要的pieceIndex 所对应的块的内容
 void BtPieceMessage::doReceivedAction()
