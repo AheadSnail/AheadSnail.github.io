@@ -499,6 +499,61 @@ static void set_evtimer_from_status(tr_shared * s) {
 ```
 
 ### Aria2 移植upnp,pmp
+```Cmake
+首先我们需要将这俩个库引进来，对应的CmakeList中添加要编译的内容
+
+#添加头文件的查找目录
+include_directories(${CMAKE_SOURCE_DIR}/src/main/cpp/src/includes
+                    ${CMAKE_SOURCE_DIR}/src/main/cpp/src/includes/libutp
+                    ${CMAKE_SOURCE_DIR}/src/main/cpp/src/includes/libnatpmp
+                    ${CMAKE_SOURCE_DIR}/src/main/cpp/src/includes/miniupnp
+                    ${CMAKE_SOURCE_DIR}/src/main/cpp/third/includes )
+
+...
+set(libnatpmp
+        ${My_ARIC_SRC}/libnatpmp/getgateway.c
+        ${My_ARIC_SRC}/libnatpmp/natpmp.c
+        ${My_ARIC_SRC}/libnatpmp/wingettimeofday.c )
+
+set(libupnp
+        ${My_ARIC_SRC}/miniupnp/connecthostport.c
+        ${My_ARIC_SRC}/miniupnp/igd_desc_parse.c
+        ${My_ARIC_SRC}/miniupnp/minisoap.c
+        ${My_ARIC_SRC}/miniupnp/minissdpc.c
+        ${My_ARIC_SRC}/miniupnp/miniupnpc.c
+        ${My_ARIC_SRC}/miniupnp/miniwget.c
+        ${My_ARIC_SRC}/miniupnp/minixml.c
+        ${My_ARIC_SRC}/miniupnp/portlistingparse.c
+        ${My_ARIC_SRC}/miniupnp/receivedata.c
+        ${My_ARIC_SRC}/miniupnp/upnpcommands.c
+        ${My_ARIC_SRC}/miniupnp/upnpreplyparse.c )
+		
+#之后，添加编译		
+
+add_library( # Sets the name of the library.
+             Aria
+
+             # Sets the library as a shared library.
+             SHARED
+
+            ${AriaSrc}
+            ${am__append_1_4}
+            ${am__append_6_22}
+            ${am__append_23_29}
+            ${am__append_30}
+            ${am__append_31}
+            ${wslay_Src}
+            ${libutp}
+            ${libnatpmp}
+            ${libupnp}
+
+            #自己的源码文件
+            src/main/cpp/Aria2AndroidJni.cpp
+            )
+```
+CmakeList目录结构
+![结果显示](/uploads/upnp协议支持/CmakeList目录结构.png)
+transmission中代码为C风格，这里要改成C++11的方式  ，接下来就是对应的移植了
 ```C++
 首先 我们也要搞一个开关配置，具体怎么添加，可以参照源码原本的添加过程
 //设置允许端口隐射
