@@ -769,11 +769,11 @@ if(e->getOption()->getAsBool(PREF_ENABLE_PORT_FORWARD))
     e->getBtRegistry()->setBtPortForward(portForward);
     ...
 }
+```
+### Aria2 释放操作
+> 由于我们采用的是智能指针，所以不用关心对象的销毁动作，比如 BtPortForward ，我们把他保存到了 BtRegistery中，这样当BtRegistery销毁的时候，这个BtPortForward的引用才会变成0,进而完成它的销毁操作,又因为  BtPortForward 中以智能指针的方式持有 BtUpnp,BtNatpmp 的引用，所以对应 BtUpnp,BtNatpmp 只要以智能指针的方式初始化，之后设置到这个对象中，对应这俩个对象也不用管理销毁的操作
 
-由于我们采用的是智能指针，所以不用关心对象的销毁动作，比如 BtPortForward ，我们把他保存到了 BtRegistery中，这样当BtRegistery销毁的时候，这个BtPortForward的引用才会变成0
-进而完成它的销毁操作
-
-又因为  BtPortForward 中以智能指针的方式持有 BtUpnp,BtNatpmp 的引用，所以对应 BtUpnp,BtNatpmp 只要以智能指针的方式初始化，之后设置到这个对象中，对应这俩个对象也不用管理销毁的操作
+```C++
 //对应的 upnp的协议的 对象指针
 std::shared_ptr<BtUpnp> _upnp;
 //对应的 pmp 协议的 对象指针
@@ -791,7 +791,7 @@ if (!portForward_->getBtUpnp())
     portForward_->setBtUpnp(std::make_shared<BtUpnp>());
 }
 
-相应的我们可以在这俩个对象的虚构函数中，完成销毁的操作
+相应的我们可以在这俩个对象的虚构函数中，完成销毁的操作，比如退出的时候，删除之前的隐射关系
 
 BtNatpmp::~BtNatpmp()
 {
@@ -826,6 +826,10 @@ BtUpnp::~BtUpnp()
     //LOGD("BtUpnp 虚构函数执行");
 }
 ```
-
 Aria2 移植成功
 ![结果显示](/uploads/upnp协议支持/Aria2 移植成功.png)
+比如当我们程序退出的时候查看释放的过程
+![结果显示](/uploads/upnp协议支持/Aria2删除隐射.png)
+在路由器上查看是否释放成功
+![结果显示](/uploads/upnp协议支持/查看Aria2释放映射是否成功.png)
+
