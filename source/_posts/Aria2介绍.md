@@ -1,7 +1,7 @@
 ---
 layout: pager
 title: Aria2介绍 与 Linux下编译 Window,Linux,Android 产物
-date: 2018-06-04 10:28:07
+date: 2018-08-23 09:21:02
 tags: [Aria2,Linux,Android,Window]
 description: Aria2介绍 与 Linux下编译Window,Linux,Android 产物
 ---
@@ -203,7 +203,8 @@ cd aria2 && autoreconf -i && ./mingw-config && make install && $HOST-strip /usr/
 
 把 /usr/local/x86_64-w64-mingw32 文件夹复制到 Windows 中，这个文件夹中的文件就是 Windows 所需要的二进制,这个就是最后到Window中bin目录下的内容
 ![结果显示](/uploads/Aria2编译/window编译.png)
-### Android编译
+
+### Android Arm 编译
 编译的系统为Ubuntu16.04 号称是最稳定的版本
 
 下面是build-libraries.sh的脚本，用来保证编译android的时候，需要的库等
@@ -331,6 +332,135 @@ cd $ANDROID_HOME
 mkdir -p usr/local/lib/pkgconfig
 ```
 在root的权限下面，执行 ./build-ndk-toolchain.sh 没有错误之后 执行 ./build-libraries.sh 如果有发生了错误，要修正这些错误，比如资源包查找不到的化，自行修改。找到一个可以下载的地址，替换上去既可然后进入aria2的源码文件里面 执行./android-config 用来确定当前的配置，这个android-config文件跟源码提供的一样，没有做任何的修改。。然后执行./android-make 如果没有错误的化，就会编译完成
+
+这里要注意下载Aria2源码的时候，要下载正确，不要选择最后面的source Code ，里面的文件不齐全，还要自己构建 configure 文件
+![结果显示](/uploads/Aria2编译/Aria2下载源码的时候要注意.png)
+
+### Android X86编译
+要注意的是Aria2 也是支持X86平台的编译的,首先是构建X86下面的交叉编译链
+```bash
+#!/bin/sh
+export NDK=/opt/android-ndk-r14b
+export ANDROID_HOME=/opt/android-ndk-r14b
+
+$ANDROID_HOME/build/tools/make_standalone_toolchain.py \
+   --arch x86 --api 16  \
+   --install-dir $ANDROID_HOME/toolchainX86
+cd $ANDROID_HOME
+mkdir -p usr/local/lib/pkgconfig
+```
+
+之后其他的外部库编译脚本文件稍微的改动就可以,比如 编译Care库，脚本文件就要变成这样，其他的类似
+```bash
+#!/bin/bash
+
+C_ARES=https://c-ares.haxx.se/download/c-ares-1.13.0.tar.gz
+DOWNLOADER="wget -c"
+
+ANDROID_HOME=/opt/android-ndk-r14b
+TOOLCHAIN=$ANDROID_HOME/toolchainX86
+PATH=$TOOLCHAIN/bin:$PATH
+HOST=i686-linux-android
+PREFIX=$ANDROID_HOME/usr/local
+LOCAL_DIR=$ANDROID_HOME/usr/local
+TOOL_BIN_DIR=$ANDROID_HOME/toolchainX86/bin
+PATH=${TOOL_BIN_DIR}:$PATH
+DEST=$ANDROID_HOME/usr/local
+CC="$HOST-gcc -march=x86"
+CXX=$HOST-g++
+LDFLAGS="-L$DEST/lib -march=x86"
+CPPFLAGS="-I$DEST/include -march=x86 -std=gnu99"
+CXXFLAGS=$CFLAGS
+
+# c-ares library build
+cd /tmp
+  $DOWNLOADER $C_ARES
+  tar xf c-ares-1.13.0.tar.gz
+  cd c-ares-1.13.0/
+  PKG_CONFIG_PATH=$PREFIX/lib/pkgconfig/ LD_LIBRARY_PATH=$PREFIX/lib/ ./configure --host=$HOST --build=`dpkg-architecture -qDEB_BUILD_GNU_TYPE` --prefix=$PREFIX --enable-static --disable-shared
+  make
+  make install
+
+cd /tmp
+  rm -rf c-ares*
+echo "build libCars complete!"
+```
+
+编译OpenSSL库，脚本文件就要变成这样，注意 CROSS_COMPILE=$TOOLCHAIN/bin/i686-linux-android- 这里已经不是Arm的了，相应的要为x86
+```bash
+OPENSSL=https://www.openssl.org/source/openssl-1.0.2m.tar.gz
+DOWNLOADER="wget -c"
+
+ANDROID_HOME=/opt/android-ndk-r14b
+TOOLCHAIN=$ANDROID_HOME/toolchainX86
+PATH=$TOOLCHAIN/bin:$PATH
+HOST=i686-linux-android
+PREFIX=$ANDROID_HOME/usr/local
+LOCAL_DIR=$ANDROID_HOME/usr/local
+TOOL_BIN_DIR=$ANDROID_HOME/toolchainX86/bin
+PATH=${TOOL_BIN_DIR}:$PATH
+DEST=$ANDROID_HOME/usr/local
+CC="$HOST-gcc -march=x86"
+CXX=$HOST-g++
+LDFLAGS="-L$DEST/lib -march=x86"
+CPPFLAGS="-I$DEST/include -march=x86 -std=gnu99"
+CXXFLAGS=$CFLAGS
+
+
+# openssl library build
+cd /tmp
+  $DOWNLOADER $OPENSSL
+  tar xf openssl-1.0.2m.tar.gz
+  cd openssl-1.0.2m/
+  PKG_CONFIG_PATH=$PREFIX/lib/pkgconfig/ LD_LIBRARY_PATH=$PREFIX/lib/ export CROSS_COMPILE=$TOOLCHAIN/bin/i686-linux-android-
+./Configure --prefix=$PREFIX android
+
+  make
+  make install
+cd /tmp
+  rm -rf openssl*
+echo "build openssl complete!"
+```
+
+由于没有设置ANDROID_HOME 环境变量，对应的Aria2源码中的android-config文件就要变成
+```bash
+ANDROID_HOME=/opt/android-ndk-r14b
+TOOLCHAIN=$ANDROID_HOME/toolchainX86
+
+PREFIX=$ANDROID_HOME/usr/local
+PATH=$TOOLCHAIN/bin:$PATH
+
+./configure \
+    --host=i686-linux-android \
+    --build=`dpkg-architecture -qDEB_BUILD_GNU_TYPE` \
+    --disable-nls \
+    --without-gnutls \
+    --with-openssl \
+    --without-sqlite3 \
+    --without-libxml2 \
+    --with-libexpat \
+    --with-libcares \
+    --with-libz \
+    --with-libssh2 \
+    CC="$TOOLCHAIN"/bin/i686-linux-android-clang \
+    CXX="$TOOLCHAIN"/bin/i686-linux-android-clang++ \
+    CXXFLAGS="-Os -g" \
+    CFLAGS="-Os -g" \
+    CPPFLAGS="-fPIE" \
+    LDFLAGS="-fPIE -pie -L$PREFIX/lib" \
+    PKG_CONFIG_LIBDIR="$PREFIX/lib/pkgconfig"
+```
+
+Aria2源码中的android-make文件就要变成
+```bash
+ANDROID_HOME=/opt/android-ndk-r14b
+TOOLCHAIN=$ANDROID_HOME/toolchainX86
+PATH=$TOOLCHAIN/bin:$PATH
+
+make "$@"
+```
+
+### 编译结果验证
 
 最后的编译产物为
 ![结果显示](/uploads/Aria2编译/android编译.png)
