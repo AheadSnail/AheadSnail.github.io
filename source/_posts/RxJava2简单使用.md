@@ -6,32 +6,27 @@ tags: [Android,RxJava,RxAndroid]
 description:  RxJava2简单使用
 ---
 
-RxJava2简单使用
+### 概述
+
+> RxJava2简单使用
+
 <!--more-->
 
-****为什么要学 RxJava？****
-===
-```
-提升开发效率，降低维护成本一直是开发团队永恒不变的宗旨。近两年来国内的技术圈子中越来越多的开始提及 RxJava ，越来越多的应用和面试中都会有 RxJava ，而就目前的情况，
-Android 的网络库基本被 Retrofit + OkHttp 一统天下了，而配合上响应式编程 RxJava 可谓如鱼得水。想必大家肯定被近期的 Kotlin 炸开了锅，
-发现其中有个非常好的优点就是简洁，支持函数式编程。是的， RxJava 最大的优点也是简洁，但它不止是简洁，而且是** 随着程序逻辑变得越来越复杂，它依然能够保持简洁 **（这货洁身自好呀有木有）。
-```
-****什么是响应式编程？****
-===
-```
-上面我们提及了响应式编程，不少新司机对它可谓一脸懵逼，那什么是响应式编程呢？响应式编程是一种基于异步数据流概念的编程模式。数据流就像一条河：它可以被观测，被过滤，被操作，
+### 为什么要学 RxJava?
+> 提升开发效率，降低维护成本一直是开发团队永恒不变的宗旨。近两年来国内的技术圈子中越来越多的开始提及 RxJava ，越来越多的应用和面试中都会有 RxJava ，而就目前的情况，Android 的网络库基本被 Retrofit + OkHttp 一统天下了，而配合上响应式编程 RxJava 可谓如鱼得水。想必大家肯定被近期的 Kotlin 炸开了锅，发现其中有个非常好的优点就是简洁，支持函数式编程。是的， RxJava 最大的优点也是简洁，但它不止是简洁，而且是** 随着程序逻辑变得越来越复杂，它依然能够保持简洁 **（这货洁身自好呀有木有）。
+
+### 什么是响应式编程？
+> 上面我们提及了响应式编程，不少新司机对它可谓一脸懵逼，那什么是响应式编程呢？响应式编程是一种基于异步数据流概念的编程模式。数据流就像一条河：它可以被观测，被过滤，被操作，
 或者为新的消费者与另外一条流合并为一条新的流。
 
-响应式编程的一个关键概念是事件。事件可以被等待，可以触发过程，也可以触发其它事件。事件是唯一的以合适的方式将我们的现实世界映射到我们的软件中：如果屋里太热了我们就打开一扇窗户。
-同样的，当我们的天气app从服务端获取到新的天气数据后，我们需要更新app上展示天气信息的UI；汽车上的车道偏移系统探测到车辆偏移了正常路线就会提醒驾驶者纠正，就是是响应事件。
+响应式编程的一个关键概念是事件
+> 事件可以被等待，可以触发过程，也可以触发其它事件。事件是唯一的以合适的方式将我们的现实世界映射到我们的软件中：如果屋里太热了我们就打开一扇窗户。同样的，当我们的天气app从服务端获取到新的天气数据后，我们需要更新app上展示天气信息的UI；汽车上的车道偏移系统探测到车辆偏移了正常路线就会提醒驾驶者纠正，就是是响应事件。
 
 今天，响应式编程最通用的一个场景是UI：我们的移动App必须做出对网络调用、用户触摸输入和系统弹框的响应。在这个世界上，软件之所以是事件驱动并响应的是因为现实生活也是如此。
-```
-****create操作符****
-===
-```java
-最常见的操作符，用于生产一个发射对象
 
+### create操作符
+最常见的操作符，用于生产一个发射对象
+```java
 Observable.create(new ObservableOnSubscribe<Integer>() {
             @Override
             public void subscribe(@NonNull ObservableEmitter<Integer> e) throws Exception {
@@ -88,11 +83,11 @@ Observable.create(new ObservableOnSubscribe<Integer>() {
 ```
 ![结果显示](/uploads/RxJava简单使用/create.png)
 
-****Zip操作符****
-===
-```java
+### Zip操作符
+
 Zip操作符 用来合并事件专用，分别从俩个上游事件中各取一个组合，一个事件只能被使用一次，顺序严格按照事件发送的顺序 最终下游事件收到的是上游事件最少的数目相同,必须俩俩配对，多余的舍弃
 
+```java
 Observable.zip(getStringObservable(), getIntegerObservable(), new BiFunction<String, Integer, String>() {
     @Override
     public String apply(@NonNull String s, @NonNull Integer integer) throws Exception {
@@ -134,7 +129,7 @@ private Observable<Integer> getIntegerObservable() {
                 mRxOperatorsText.append("Integer emit : 3 \n");
                 e.onNext(4);
                 mRxOperatorsText.append("Integer emit : 4 \n");
-				e.onNext(5);
+                e.onNext(5);
                 mRxOperatorsText.append("Integer emit : 5 \n");
             }
         }
@@ -143,11 +138,11 @@ private Observable<Integer> getIntegerObservable() {
 ```
 ![结果显示](/uploads/RxJava简单使用/zip.png)
 
-****Map操作符****
-===
-```java
+### Map操作符
+
 Map操作符，可以针对上游发送的每一个事件应用一个函数，使得每一个事件都按照指定的函数去变化
 
+```java
 Observable.create(new ObservableOnSubscribe<Integer>() {
             @Override
             public void subscribe(@NonNull ObservableEmitter<Integer> e) throws Exception {
@@ -170,12 +165,11 @@ Observable.create(new ObservableOnSubscribe<Integer>() {
 ```
 ![结果显示](/uploads/RxJava简单使用/map.png)
 
-****FlatMap操作符****
-===
-```java
+### FlatMap操作符
 
 FlatMap将一个发送事件的上游Observable变成多个发送事件的Observables 然后将他们发射的结果合并后放进一个单独的Observable里面,注意FlatMap不保证事件的顺序
 
+```java
 Observable.create(new ObservableOnSubscribe<Integer>() {
             @Override
             public void subscribe(@NonNull ObservableEmitter<Integer> e) throws Exception {
@@ -205,11 +199,11 @@ Observable.create(new ObservableOnSubscribe<Integer>() {
 ```
 ![结果显示](/uploads/RxJava简单使用/flatMap.png)
 
-****concatMap操作符****
-===
-```java
+### concatMap操作符
 
 concatMap作用和flatMap几乎一模一样，唯一的区别是它能保证事件的顺序
+
+```java
  
 Observable.create(new ObservableOnSubscribe<Integer>() {
             @Override
@@ -241,11 +235,11 @@ Observable.create(new ObservableOnSubscribe<Integer>() {
 ```
 ![结果显示](/uploads/RxJava简单使用/concatMap.png)
 
-****doOnNext操作符****
-===
-```java
+### doOnNext操作符
+
 让订阅者在接受到数据之前干点事情的操作符
 
+```java
 Observable.just(1, 2, 3, 4)
                 .doOnNext(new Consumer<Integer>() {
                     @Override
@@ -262,11 +256,11 @@ Observable.just(1, 2, 3, 4)
 ```
 ![结果显示](/uploads/RxJava简单使用/doOnOneNext.png)
 
-****filter操作符****
-===
-```java
+### filter操作符
+
 Filter 操作符，过滤操作符，取正确的值，当filter函数中返回true的就会被获取，返回false的就会被过滤掉
 
+```java
 Observable.just(1, 20, 65, -5, 7, 19)
                 .filter(new Predicate<Integer>() {
                     @Override
@@ -283,12 +277,11 @@ Observable.just(1, 20, 65, -5, 7, 19)
 ```
 ![结果显示](/uploads/RxJava简单使用/filter.png)
 
+### skip操作符
 
-****skip操作符****
-===
-```java
 skip操作符，接受一个long型参数，代表跳过多少个数目的事件再开始接收 ,这里是跳过前面的俩个，才开始接收，所以打印3,4,5
 
+```java
 Observable.just(1,2,3,4,5)
                 .skip(2)
                 .subscribe(new Consumer<Integer>() {
@@ -300,11 +293,11 @@ Observable.just(1,2,3,4,5)
 ```
 ![结果显示](/uploads/RxJava简单使用/skip.png)
 
-****take操作符****
-===
-```java
+### take操作符
+
 用于指定订阅者最多收到多少数据 ,这里是指定最多能收到2个数据，所以会打印 前面的俩个内容 也即是 1,2
 
+```java
 Flowable.fromArray(1,2,3,4,5)
                 .take(2)
                 .subscribe(new Consumer<Integer>() {
@@ -317,12 +310,11 @@ Flowable.fromArray(1,2,3,4,5)
 ```
 ![结果显示](/uploads/RxJava简单使用/take.png)
 
-****timer操作符****
-===
-```java
+### timer操作符
 
 Timer 操作符既可以延迟执行一段逻辑，也可以间隔的执行一段逻辑，要注意的是timer和Interval都默认执行在一个新线程上
 
+```java
 mRxOperatorsText.append("timer start : " + TimeUtil.getNowStrTime() + "\n");
 Observable.timer(2, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
@@ -337,11 +329,11 @@ Observable.timer(2, TimeUnit.SECONDS)
 ```
 ![结果显示](/uploads/RxJava简单使用/timer.png)
 
-****interval操作符****
-===
-```java
+### interval操作符
+
 Interval可以间隔的执行操作，默认在新线程，所以对于返回的结果要执行切换线程
 
+```java
 mRxOperatorsText.append("interval start : " + TimeUtil.getNowStrTime() + "\n");
 
 mDisposable = Observable.interval(3, 2, TimeUnit.SECONDS)
@@ -357,11 +349,11 @@ mDisposable = Observable.interval(3, 2, TimeUnit.SECONDS)
 ```
 ![结果显示](/uploads/RxJava简单使用/interval.png)
 
-****just操作符****
-===
-```java
+### just操作符
+
 just操作符，接收可变的参数，依次发送事件，观察者会依次的收到onNext事件
 
+```java
 Observable.just("1", "2", "3")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -374,11 +366,11 @@ Observable.just("1", "2", "3")
 ```
 ![结果显示](/uploads/RxJava简单使用/just.png)
 
-****Single操作符****
-===
-```java
+### Single操作符
+
 Single 操作符，只会接收一个参数，而SingleObserver只会调用onError或者onSuccess回调
 
+```java
 Single.just(new Random().nextInt())
                 .subscribe(new SingleObserver<Integer>() {
                     @Override
@@ -399,11 +391,11 @@ Single.just(new Random().nextInt())
 ```
 ![结果显示](/uploads/RxJava简单使用/Single.png)
 
-****concat操作符****
-===
-```java
+### concat操作符
+
 concat连接操作符，可接收Observable的可变参数，或者Observable的集合 ,可以保证顺序
 
+```java
 Observable.concat(Observable.just(1,2,3), Observable.just(4,5,6))
                 .subscribe(new Consumer<Integer>() {
                     @Override
@@ -415,11 +407,11 @@ Observable.concat(Observable.just(1,2,3), Observable.just(4,5,6))
 ```
 ![结果显示](/uploads/RxJava简单使用/concat.png)
 
-****distinct操作符****
-===
-```java
+### distinct操作符
+
 distinct操作符，简单的去重操作符,就是将重复的事件过滤掉
 
+```java
 Observable.just(1, 1, 1, 2, 2, 3, 4, 5)
                 .distinct()
                 .subscribe(new Consumer<Integer>() {
@@ -431,11 +423,11 @@ Observable.just(1, 1, 1, 2, 2, 3, 4, 5)
 ```
 ![结果显示](/uploads/RxJava简单使用/distinct.png)
 
-****buffer操作符****
-===
-```java
+### buffer操作符
+
 buffer操作符，将数据按skip分成最长不超过 count的 buffer，然后生成一个Observable
 
+```java
 Observable.just(1, 2, 3, 4, 5)
                 .buffer(3, 2)
                 .subscribe(new Consumer<List<Integer>>() {
@@ -452,11 +444,11 @@ Observable.just(1, 2, 3, 4, 5)
 ```
 ![结果显示](/uploads/RxJava简单使用/buffer.png)
 
-****debounce操作符****
-===
-```java
+### debounce操作符
+
 debounce 操作符，可以用来过滤掉发射速率过快的数据项，这里的意思就是用来过滤小于500毫秒的事件，所以大于500毫秒的才会打印出来
 
+```java
 Observable.create(new ObservableOnSubscribe<Integer>() {
             @Override
             public void subscribe(@NonNull ObservableEmitter<Integer> emitter) throws Exception {
@@ -486,11 +478,11 @@ Observable.create(new ObservableOnSubscribe<Integer>() {
 ```
 ![结果显示](/uploads/RxJava简单使用/debonce.png)
 
-****defer操作符****
-===
-```java
+### defer操作符
+
 defer操作符，如果该Observable没有被订阅，就不会生成新的Observable
 
+```java
 Observable<Integer> observable = Observable.defer(new Callable<ObservableSource<Integer>>() {
             @Override
             public ObservableSource<Integer> call() throws Exception {
@@ -523,12 +515,11 @@ Observable<Integer> observable = Observable.defer(new Callable<ObservableSource<
 ```
 ![结果显示](/uploads/RxJava简单使用/defer.png)
 
+### last操作符
 
-****last操作符****
-===
-```java
 Last操作符，取出最后的一个值，参数是没有值的时候默认值,不管参数是怎么设置的，反正就只会取出事件中的最后一个值
 
+```java
 Observable.just(1, 2, 3)
                 .last(1)
                 .subscribe(new Consumer<Integer>() {
@@ -542,11 +533,11 @@ Observable.just(1, 2, 3)
 ```
 ![结果显示](/uploads/RxJava简单使用/last.png)
 
-****merge操作符****
-===
-```java
+### merge操作符
+
 merge操作符，将多个的Observable合起来，可以接收可变参数，也支持使用迭代器集合 ,注意它和concat的区别在于，不用等到发射器A发送完所有的事件再进行发射器B的发送
 
+```java
 Observable.merge(Observable.just(1, 2), Observable.just(3, 4, 5))
                 .subscribe(new Consumer<Integer>() {
                     @Override
@@ -557,11 +548,11 @@ Observable.merge(Observable.just(1, 2), Observable.just(3, 4, 5))
 ```
 ![结果显示](/uploads/RxJava简单使用/merge.png)
 
-****reduce操作符****
-===
-```java
+### reduce操作符
+
 reduce操作符，就是一次用一个方法处理一个值，这里就是将所有的输入事件执行相加，只会得到最后的一个结果
 
+```java
 Observable.just(1, 2, 3)
                 .reduce(new BiFunction<Integer, Integer, Integer>() {
                     @Override
@@ -577,11 +568,11 @@ Observable.just(1, 2, 3)
 ```
 ![结果显示](/uploads/RxJava简单使用/redouce.png)
 
-****scan操作符****
-===
-```java
+### scan操作符
+
 scan操作符，跟reduce操作符差不多，区别在于reduce只会输出结果，而scan会将过程中的每一个结果输出
 
+```java
 Observable.just(1, 2, 3)
                 .scan(new BiFunction<Integer, Integer, Integer>() {
                     @Override
@@ -598,12 +589,11 @@ Observable.just(1, 2, 3)
 ```
 ![结果显示](/uploads/RxJava简单使用/scan.png)
 
-****PublishSubject操作符****
-===
-```java
+### PublishSubject操作符
 
 创建一个PublishSubject对象，PublishSubject的特点就是会通知每一个观察者，调用对应的onNext函数
 
+```java
 mRxOperatorsText.append("PublishSubject\n");
 PublishSubject<Integer> publishSubject = PublishSubject.create();
 publishSubject.subscribe(new Observer<Integer>() {
@@ -664,13 +654,12 @@ publishSubject.onComplete();
 ```
 ![结果显示](/uploads/RxJava简单使用/publishSubject.png)
 
-****AsyncSubject操作符****
-===
-```java
+### AsyncSubject操作符
 
 跟PublisShSubject一样既有将事件发送给每一个观察者的能力，当执行事件发送的时候，但是，他在调用onComplete之前，除了subscribe()函数，其他的操作都会被缓存
 在调用onComplete之后，只有最后一个onNext会生效
 
+```java
 mRxOperatorsText.append("AsyncSubject\n");
 AsyncSubject<Integer> asyncSubject = AsyncSubject.create();
 asyncSubject.subscribe(new Observer<Integer>() {
@@ -730,13 +719,12 @@ asyncSubject.onComplete();
 ![结果显示](/uploads/RxJava简单使用/AsyncSubject.png)
 
 
-****BehaviorSubject操作符****
-===
-```java
+### BehaviorSubject操作符
 
 BehaviorSubject操作也有跟PublishSubject 一样的功能既有将事件发送给每一个订阅者的能力，但是使用BehaviorSubject，会缓存第一个订阅者的事件
 当第二个订阅者订阅的时候，当执行了onSubscribe之后，就会先将缓存的第一个订阅者的事件，发送给这个订阅者，之后再执行当前订阅事件的分发操作
 
+```java
 mRxOperatorsText.append("BehaviorSubject\n");
 BehaviorSubject<Integer> behaviorSubject = BehaviorSubject.create();
 behaviorSubject.subscribe(new Observer<Integer>() {
@@ -793,13 +781,11 @@ behaviorSubject.onComplete();
 ```
 ![结果显示](/uploads/RxJava简单使用/BehaviorSubject.png)
 
-
-****Completable操作符****
-===
-```java
+### Completable操作符
 
 Completable 操作符，只关心结果，也即是说CompleteAble 是没有onNext的，要不成功，要不出错,在Subscribe后的某一个时间点返回结果
 
+```java
 mRxOperatorsText.append("Completable\n");
 Completable.timer(1, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
@@ -824,11 +810,11 @@ Completable.timer(1, TimeUnit.SECONDS)
 ```
 ![结果显示](/uploads/RxJava简单使用/Completable.png)
 
-****Flowable操作符****
-===
-```java
+### Flowable操作符
+
 reduce 操作符会会将最终的结果返回，可以指定一个基数，这里就是将所有的值相加，在100的基础上
 
+```java
 Flowable.just(1,2,3,4)
                 .reduce(100, new BiFunction<Integer, Integer, Integer>() {
                     @Override
@@ -845,13 +831,13 @@ Flowable.just(1,2,3,4)
 ![结果显示](/uploads/RxJava简单使用/flowable.png)
 
 
-****flatMap使用场景****
-===
-```java
+### flatMap使用场景
+
 多个网络请求依次依赖，比如：
 1、注册用户前先通过接口A获取当前用户是否已注册，再通过接口B注册;
 2、注册后自动登录，先通过注册接口注册用户信息，注册成功后马上调用登录接口进行自动登录。
- 
+
+```java
 Rx2AndroidNetworking.get("http://www.tngou.net/api/food/list")
                 .addQueryParameter("rows", 1 + "")
                 .build()
@@ -893,9 +879,8 @@ Rx2AndroidNetworking.get("http://www.tngou.net/api/food/list")
                 });
 
 ```
+### map使用场景
 
-****map使用场景****
-===
 ```java
 mRxOperatorsText.append("RxNetworkActivity\n");
 Rx2AndroidNetworking.get("http://api.avatardata.cn/MobilePlace/LookUp?key=ec47b85086be4dc8b5d941f5abd37a4e&mobileNumber=13021671512")
@@ -933,11 +918,11 @@ Rx2AndroidNetworking.get("http://api.avatardata.cn/MobilePlace/LookUp?key=ec47b8
 });
 ```
 
-****debounce使用场景****
-===
-```java
+### debounce使用场景
+
 debounce 操作符可以过滤掉发射频率过快的数据项
 
+```java
 RxView.clicks(mRxOperatorsBtn)
                 .debounce(2,TimeUnit.SECONDS) // 过滤掉发射频率小于2秒的发射事件
                 .subscribe(new Consumer<Object>() {
@@ -969,8 +954,7 @@ private void clickBtn() {
 }
 ```
 
-****线程切换使用场景****
-===
+### 线程切换使用场景
 ```java
 Observable.create(new ObservableOnSubscribe<Response>() {
             @Override
@@ -1018,12 +1002,11 @@ Observable.create(new ObservableOnSubscribe<Response>() {
 });
 ```
 
-****zip使用场景****
-===
-```java
+### zip使用场景
 
 结合多个接口的数据再更新 UI
 
+```java
 Observable<MobileAddress> observable1 = Rx2AndroidNetworking.get("http://api.avatardata.cn/MobilePlace/LookUp?key=ec47b85086be4dc8b5d941f5abd37a4e&mobileNumber=13021671512")
                 .build()
                 .getObjectObservable(MobileAddress.class);
@@ -1051,14 +1034,13 @@ Observable<MobileAddress> observable1 = Rx2AndroidNetworking.get("http://api.ava
 });
 ```
 
-****concat使用场景****
-===
-```java
+### concat使用场景
 
 Concat 先读取缓存数据并展示UI再获取网络数据刷新UI
 1、concat 可以做到不交错的发射两个甚至多个 Observable 的发射物;
 2、并且只有前一个 Observable 终止（onComplete）才会订阅下一个 Observable
 
+```java
 Observable<FoodList> cache = Observable.create(new ObservableOnSubscribe<FoodList>() {
             @Override
             public void subscribe(@NonNull ObservableEmitter<FoodList> e) throws Exception {

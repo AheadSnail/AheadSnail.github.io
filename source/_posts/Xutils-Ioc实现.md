@@ -6,28 +6,27 @@ tags: [Android,Xutils,Ioc]
 description:  Xutils Ioc实现
 ---
 
-Xutils Ioc实现
+### 概述
+
+> Xutils Ioc实现
+
 <!--more-->
 
-****简介****
-===
-```
-什么是IOC：
-Ioc也叫 控制反转(Inversion of Control，英文缩写为IoC)把创建对象的权利交给框架,是框架的重要特征，并非面向对象编程的专用术语。
-它包括依赖注入(Dependency Injection，简称DI)和依赖查找(Dependency Lookup)。通俗点的意思就是说把创建对象的权利交给框架来实现，比如这个事情本身是我做的，但是我可以交给你来完成
-```
+### 什么是IOC
+> Ioc也叫 控制反转(Inversion of Control，英文缩写为IoC)把创建对象的权利交给框架,是框架的重要特征，并非面向对象编程的专用术语。它包括依赖注入(Dependency Injection，简称DI)和依赖查找(Dependency Lookup)。通俗点的意思就是说把创建对象的权利交给框架来实现，比如这个事情本身是我做的，但是我可以交给你来完成
 
-****Xutils Ioc使用****
-===
-```java
-
+### Xutils Ioc使用
+```gradle
 使用Gradle构建时添加一下依赖即可:
 compile 'org.xutils:xutils:3.5.0'
-
+```
 需要的权限
+```xml
 <uses-permission android:name="android.permission.INTERNET" />
 <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
+```
+Java代码的编写
+```java
 //首先在BaseActivity里面执行注册
 public class BaseActivity extends AppCompatActivity {
     @Override
@@ -51,22 +50,20 @@ public class MainActivity extends BaseActivity {
     @ViewInject(R.id.tabs) //findViewById的操作
     private TabLayout tabLayout;
 	
-	...
+    ...
 	
     @Event(R.id.btn_test_db)//事件的绑定操作
     private void onTestDbClick(View view) {
 	
-	}
+    }
 }
 
-上面就是xUtils中的IOC实现
-
+下面 分析 xUtils中的IOC实现
 ```
 
-****Xutils Ioc分析****
-===
-```java
+### Xutils Ioc分析
 
+```java
 1.@ContentView(R.layout.activity_main) 原理实现：
 
 ContentView注解的声明为：
@@ -87,6 +84,7 @@ public class BaseActivity extends AppCompatActivity {
         x.view().inject(this);
     }
 }
+
 执行了 x.view().inject(this);的操作，最终会执行到这个方法
 @Override
 public void inject(Activity activity) {
@@ -113,10 +111,8 @@ public void inject(Activity activity) {
     injectObject(activity, handlerType, new ViewFinder(activity));
 }
 
- findContentView(handlerType)的实现：
-/**
- * 从父类获取注解View
- */
+findContentView(handlerType)的实现：
+//首先从当前类中查找 是否有 ContentView.class 注解，如果没有，再从父类中查找 
 private static ContentView findContentView(Class<?> thisCls) {
     if (thisCls == null || IGNORED.contains(thisCls)) {
         return null;
@@ -146,7 +142,7 @@ public @interface ViewInject {
     int parentId() default 0;
 }
 
-经前面分析知道  injectObject(activity, handlerType, new ViewFinder(activity));这句代码会实现 ViewInject原理：
+前面分析到了这个地方  injectObject(activity, handlerType, new ViewFinder(activity)); ，现在就可以接着分析了,下面是这个函数的关键代码
 
 // inject view
 Field[] fields = handlerType.getDeclaredFields();
@@ -227,8 +223,9 @@ final class ViewFinder {
     }
 }
 
-所以对于@ViewInject(R.id.toolbar) 所做的事无非就是通过持有要注册Activity对象引用，然后通过findViewById的方式来获取到对应view，然后获取到ViewInject注解的值，找到对应的成员变量
-然后通过反射的方式将这个view的值设置到这个字段上面，这样就完成了赋值操作，其实findViewById完全也可以通过反射的方式来获取，但是这样性能就比较低，由于是对于大量的findViewById操作
+所以对于@ViewInject(R.id.toolbar) 所做的事无非就是通过持有要注册Activity对象引用，然后通过findViewById的方式来获取到对应view，然后获取到ViewInject注解的值，
+找到对应的成员变量,然后通过反射的方式将这个view的值设置到这个字段上面，这样就完成了赋值操作，其实findViewById完全也可以通过反射的方式来获取，但是这样性能就比较低
+由于是对于大量的findViewById操作
 
 
 3 分析事件的绑定 @Event(R.id.btn_test_db)//事件的绑定操作
@@ -288,7 +285,7 @@ public @interface Event {
 }
 
 
-// inject event
+// inject event 方法实现
 //获取到所有的方法
 Method[] methods = handlerType.getDeclaredMethods();
 if (methods != null && methods.length > 0) {
@@ -369,6 +366,7 @@ public static void addEventMethod(
                  */
                 if (listener != null) {
                     dynamicHandler = (DynamicHandler) Proxy.getInvocationHandler(listener);
+                    //判断当前是否已经添加过，如果为true的化，为之前已经添加过
                     addNewMethod = handler.equals(dynamicHandler.getHandler());
                     if (addNewMethod) {
                         dynamicHandler.addMethod(methodName, method);
@@ -399,7 +397,7 @@ public static void addEventMethod(
 我们看看DynamicHandler的实现为：
 public static class DynamicHandler implements InvocationHandler {
 
-	@Override
+    @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         ....
         try {
@@ -407,18 +405,18 @@ public static class DynamicHandler implements InvocationHandler {
             } catch (Throwable ex) {
                 throw new RuntimeException("invoke method error:" + handler.getClass().getName() + "#" + method.getName(), ex);
             }
-        ....	
+        ...	
     }	
 }
 
-可以发现事件的绑定主要是通过注解id，找到对应的View，然后根据注解上面要设置的listener的三要素，找到对应的Method，然后利用反射的形式设置给这个view一个监听，只不过这个监听对象是
-通过动态代理获取到的，当真正触发操作的时候，再利用反射的方式回调到我们创建的方法上面
+可以发现事件的绑定主要是通过注解id，找到对应的View，然后根据注解上面要设置的listener的三要素，找到对应的Method，然后利用反射的形式设置给这个view一个监听
+只不过这个监听对象是通过动态代理获取到的，当真正触发操作的时候，再利用反射的方式回调到我们创建的方法上面
+
 ```
 
-****手写Xutils的Ioc****
-===
-```java
+### 手写Xutils的Ioc
 
+```java
 用来填充布局的注解
 @Retention(RetentionPolicy.RUNTIME)
 //标识注解用在类上面
@@ -566,7 +564,8 @@ public class InjectUtils
             //遍历方法上面的每一个注解
             for (Annotation annotation:annotations)
             {
-                //获取到当前注解的类型，注解也是一个类，获取到注解的类型，也就可以获取到当前class上面有么有这个注解,获取注解的类型要用annotionType()，而不能用getClass
+                //获取到当前注解的类型，注解也是一个类，获取到注解的类型，也就可以获取到当前class上面有么有这个注解,获取注解的类型要用annotionType()，
+                //而不能用getClass
                 Class<? extends Annotation> annotationClass = annotation.annotationType();
                 //获取到当前的注解类型再去获取这个类型上面的EventBase这个注解
                 EventBase eventBase = annotationClass.getAnnotation(EventBase.class);
