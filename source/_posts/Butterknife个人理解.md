@@ -6,28 +6,23 @@ tags: [Android,Butterknife,Apt]
 description:  Butterknife个人理解
 ---
 
-Butterknife个人理解
+### 概述
+
+> Butterknife个人理解
+
 <!--more-->
 
-****什么是APT？****
-===
-```
-APT(Annotation Processing Tool)是一种处理注释的工具,它对源代码文件进行检测找出其中的Annotation，使用Annotation进行额外的处理。
-Annotation处理器在处理Annotation时可以根据源文件中的Annotation生成额外的源文件和其它的文件(文件具体内容由Annotation处理器的编写者决定),
+### 什么是APT?
+> APT(Annotation Processing Tool)是一种处理注解的工具,它对源代码文件进行检测找出其中的Annotation，使用Annotation进行额外的处理。Annotation处理器在处理Annotation时可以根据源文件中的Annotation生成额外的源文件和其它的文件(文件具体内容由Annotation处理器的编写者决定),
 APT还会编译生成的源文件和原来的源文件，将它们一起生成class文件,简而言之就是说apt可以帮我们搜索我们需要处理的注解，这个时机点发生在编译阶段，也就是由java文件，编译成class阶段
 注意这个时间点，apt处理的时候，对应的class文件是没有生成的
-```
 
-****APT使用场景****
-===
-```
-Android注解越来越引领潮流，比如 Dagger2, ButterKnife, EventBus3 等，他们都是注解类型，而且他们都有个共同点就是编译时生成代码，而不是运行时利用反射，这样大大优化了性能；
+### APT使用场景
+> Android注解越来越引领潮流，比如 Dagger2, ButterKnife, EventBus3 等，他们都是注解类型，而且他们都有个共同点就是编译时生成代码，而不是运行时利用反射，这样大大优化了性能；
 而这些框架都用到了同一个工具就是：APT(Annotation Processing Tool )，可以在代码编译期解析注解，并且生成新的 Java 文件，减少手动的代码输入
-```
 
-****Butterknife简单使用****
-===
-```java
+### Butterknife简单使用
+```gradle
 1.在工程的build.gradle中导入butterknife插件 
 
 buildscript {
@@ -65,7 +60,9 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
 
 }
-
+```
+ButterKnife java代码的编写
+```java
 执行绑定: ButterKnife.bind(this);注意这个绑定的操作要放在setContentView()的后面,因为本质还是调用了findViewById的操作，所以要放在后面
 @Override 
 protected void onCreate(Bundle savedInstanceState) {
@@ -78,9 +75,7 @@ protected void onCreate(Bundle savedInstanceState) {
 @BindView(R.id.title) TextView title;
 ```
 
-
-****Butterknife源码分析****
-===
+### Butterknife源码分析
 ```java
 首先看BindView这个注解的声明：
 
@@ -154,7 +149,7 @@ private static Constructor<? extends Unbinder> findBindingConstructorForClass(Cl
     try {
       //加载目标类，目标类的形式为：clsName + "_ViewBinding" 如果当前是SimpleActivity 那么要加载的目标类就为SimpleActivity_ViewBinding
       Class<?> bindingClass = cls.getClassLoader().loadClass(clsName + "_ViewBinding");
-      //得到目标类的结构体
+      //得到目标类的构造函数
       bindingCtor = (Constructor<? extends Unbinder>) bindingClass.getConstructor(cls, View.class);
       if (debug) Log.d(TAG, "HIT: Loaded binding class and constructor.");
     } catch (ClassNotFoundException e) {
@@ -176,17 +171,17 @@ private static Constructor<? extends Unbinder> findBindingConstructorForClass(Cl
 ![结果显示](/uploads/Apt/目标类.jpg)
 
 ```java
-经过上图可以知道，果然ButterKnife帮我们生成了一个目标类，而我们要加载的这个类就是他，经过上面我们知道我们还会调用这个类的构造函数，传递了目标对象，已经跟布局进去
+经过上图可以知道，果然ButterKnife帮我们生成了一个目标类，而我们要加载的这个类就是他，经过上面我们知道我们还会调用这个类的构造函数，传递了目标对象，以及根布局进去
 对应的代码为：
 
 @UiThread
 public SimpleActivity_ViewBinding(final SimpleActivity target, View source) {
     this.target = target;
 
-    View view;他
+    View view;
     //给title变量初始化
     target.title = Utils.findRequiredViewAsType(source, R.id.title, "field 'title'", TextView.class);
-	.....
+    ...
 }
 
 这里的target.title就为我们在使用的时候使用注解 @BindView(R.id.title) TextView title; 声明的变量，看来他的初始化操作是后面代码实现的
@@ -245,7 +240,7 @@ public final class ButterKnifeProcessor extends AbstractProcessor {
   //初始化的操作,可以得到一些有用的工具类
   @Override public synchronized void init(ProcessingEnvironment env) {
     super.init(env);
-	.....
+    ...
     typeUtils = env.getTypeUtils();
     filer = env.getFiler();
     try {
@@ -287,7 +282,7 @@ public final class ButterKnifeProcessor extends AbstractProcessor {
     annotations.addAll(LISTENERS);
     return annotations;
   }
-  ....
+  ...
   
   //这个方法是这个注解处理器，帮我们查找分析我们的代码之后，找到我们需要的注解，返回的结果
   @Override public boolean process(Set<? extends TypeElement> elements, RoundEnvironment env) {
@@ -320,8 +315,8 @@ private Map<TypeElement, BindingSet> findAndParseTargets(RoundEnvironment env) {
     Map<TypeElement, BindingSet.Builder> builderMap = new LinkedHashMap<>();
     Set<TypeElement> erasedTargetNames = new LinkedHashSet<>();
 	
-	....
-	//处理BindView注解的集合 env.getElementsAnnotatedWith(BindView.class)能得到当前的代码中使用了BindView注解的Element对象集合
+    ....
+    //处理BindView注解的集合 env.getElementsAnnotatedWith(BindView.class)能得到当前的代码中使用了BindView注解的Element对象集合
     for (Element element : env.getElementsAnnotatedWith(BindView.class)) {
       try {
         //解析BindView注解,存储必要的信息
@@ -330,13 +325,13 @@ private Map<TypeElement, BindingSet> findAndParseTargets(RoundEnvironment env) {
         logParsingError(element, BindView.class, e);
       }
     }
-	....
+    ....
 }
 
 env.getElementsAnnotatedWith(BindView.class) 能得到当前的代码中使用了BindView注解的Element对象集合,这里介绍下Element
-
+```
 Element元素，源代码中的每一个部分都是一个特定的元素类型，分别代表了包，类，方法等，下面是一个列子
-
+```java
 package com.example;//PackageElement
 
 public class Foo()//TypeElement
@@ -352,11 +347,12 @@ public class Foo()//TypeElement
 	}
 }
 
-这些Element元素，相当于XML中d中的DOM树，可以通过一个元素去访问它的父元素，或者子元素
+这些Element元素，相当于XML中d中的DOM树，可以通过一个元素去访问它的父元素，或者子元素,比如:
+
 element.getEnclosingElement();//获取父元素
 element.getEnclosedElement();//获取子元素
 
-上面就是Element的大概了
+上面就是Element的大概了,接着分析
 
 for (Element element : env.getElementsAnnotatedWith(BindView.class)) {
     try {
@@ -550,11 +546,11 @@ static Builder newBuilder(TypeElement enclosingElement) {
       targetType = ((ParameterizedTypeName) targetType).rawType;
     }
 
-    //获取到当前类的包名,根据当前属于TypeElement，再上一级也即是到了 PackageElement，代表包的Element，这个肯定能获取到值
+    //获取到当前类的包名,根据当前属于TypeElement，再上一级也即是到了 PackageElement，代表包的Element，这个肯定能获取到值,所以要裁剪
     String packageName = getPackage(enclosingElement).getQualifiedName().toString();
     //获取到全类名，这里是有包括包名的
     String className = enclosingElement.getQualifiedName().toString().substring(packageName.length() + 1).replace('.', '$');
-    //获取到要创建目标类的全类名,类的简称为 className + "_ViewBinding"
+    //指定要创建目标类的全类名,类的简称为 className + "_ViewBinding"
     ClassName bindingClassName = ClassName.get(packageName, className + "_ViewBinding");
 
     //判断是否为final类型
@@ -594,7 +590,7 @@ static final class Builder {
       this.isActivity = isActivity;
       this.isDialog = isDialog;
     }
-	....
+    ....
 }
 
 得到TypeElement 对应的 BindingSet.Builder对象之后执行 builder.addField(resourceId, new FieldViewBinding(name, type, required));首先是构造一个FieldViewBinding对象
@@ -939,9 +935,8 @@ private void addViewBinding(MethodSpec.Builder result, ViewBinding binding, bool
 上面就是Butterknife怎么帮我们动态的生成一个这样类的过程
 ```
 
-****实现BindView简单版****
-===
-```java
+### 实现BindView简单版
+```gradle
 1.首先在根目录的build.gradle 中添加下面的代码
 buildscript {
     
@@ -970,8 +965,9 @@ compile project(':butterknife-annotion')
 
 //指明这个可以用来处理app目录的注解
 apt project(':butterkniffe-complier')
-
+```
 这个是在app代码中
+```java
 public class MainActivity extends AppCompatActivity
 {
     @BindView(R.id.tv1)
@@ -1103,8 +1099,7 @@ public class ButterKnifeAnnotaionProcess extends AbstractProcessor
             System.out.println(typeElement.getQualifiedName());
         }
 
-        //获取到含有BindView注解的Element集合，也即是当前BindView作用的元素所对应的Element集合,注意，这里是收集了所有的
-        //含有这个注解的集合
+        //获取到含有BindView注解的Element集合，也即是当前BindView作用的元素所对应的Element集合,注意，这里是收集了所有的含有这个注解的集合
         Set<? extends Element> annotatedWith = roundEnvironment.getElementsAnnotatedWith(BindView.class);
 
         //这个集合用来将所采集的全部的Element集合，用来分隔开，key为全类名，value为当前这个类所包含的这个Element的集合
@@ -1113,7 +1108,7 @@ public class ButterKnifeAnnotaionProcess extends AbstractProcessor
         Iterator<? extends Element> annotaionIterator = annotatedWith.iterator();
         while (annotaionIterator.hasNext())
         {
-            //因为我们的注解只是用在成员变量上面，所有这里返回的type
+            //因为我们的注解只是用在成员变量上面，所有这里返回的Type即为VariableElement 类型
             VariableElement variableElement = (VariableElement) annotaionIterator.next();
             //获取到当前成员变量对应的全类名
             String activityName = getActivityName(variableElement);
@@ -1147,7 +1142,7 @@ public class ButterKnifeAnnotaionProcess extends AbstractProcessor
                 //创建一个类
                 JavaFileObject sourceFile = mFiler.createSourceFile(newActivityBinder);
                 Writer writer = sourceFile.openWriter();
-                //获取到包名
+                //获取到包名  , getEnclosingElement 获取到父类，这里也即为Class
                 TypeElement typeElement = (TypeElement) variableElements.get(0).getEnclosingElement();
                 String packageName = mElementUtils.getPackageOf(typeElement).getQualifiedName().toString();
 
