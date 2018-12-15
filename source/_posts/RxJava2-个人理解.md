@@ -6,20 +6,21 @@ tags: [Android,RxJava,RxAndroid]
 description:  RxJava2 个人理解
 ---
 
-RxJava2个人理解
+### 概述
+
+> RxJava2个人理解
+
 <!--more-->
 
-****简介****
-===
-```
-前面一篇文章中，分析了RxJava的简单的使用，这篇文章将会分析部分的源码，这里不会分析所有的操作符
+
+### 简介
+> 前面一篇文章中，分析了RxJava的简单的使用，这篇文章将会分析部分的源码，这里不会分析所有的操作符
 1.Create操作符
 2.Map操作符
 3.subscribeOn操作符
-```
 
-****Create操作符****
-===
+
+### Create操作符
 ```java
 我们通过下面的方式来使用Create操作符:
 
@@ -92,10 +93,12 @@ public final class ObservableCreate<T> extends Observable<T> {
 }
 
 所以Observable.create(new ObservableOnSubscribe<Integer>()) 此时就会返回一个ObservableCreate对象，本身是一个观察者对象
-然后执行.subscribe(new Observer<Integer>()); 所以就会执行到ObservableCreate对象对应的函数,进过发现在ObservableCreate中并没有这个方法，但是他继承了Observable，所以这个方法是在父类的
+然后执行.subscribe(new Observer<Integer>()); 所以就会执行到ObservableCreate对象对应的函数,进过发现在ObservableCreate中并没有这个方法，但是他继承了Observable，
+所以这个方法是在父类的
 
-这里传递的参数为 Observer<? super T> observer ,为什么不能传递 Observer<? extends T> observer ，具体怎么解释就不知道了，主要记住，如果是传递参数的化，就要用super ，如果是返回值的化
-就要使用extends ，记住就好了....
+这里传递的参数为 Observer<? super T> observer ,为什么不能传递 Observer<? extends T> observer ，具体怎么解释就不知道了，主要记住，如果是传递参数的化，就要用super ，
+如果是返回值的化,就要使用extends ，记住就好了....
+
 public final void subscribe(Observer<? super T> observer) {
     //检查观察者是否为空，如果为空，会抛出异常
     ObjectHelper.requireNonNull(observer, "observer is null");
@@ -267,8 +270,7 @@ if (!isDisposed()) {
 流程分析：
 ![结果显示](/uploads/RxJava简单使用/create操作符流程.png)
 
-****Map操作符****
-===
+### Map操作符
 ```java
 我们通过下面的方式来使用Map操作符
 
@@ -315,8 +317,7 @@ Observable.create(new ObservableOnSubscribe<Integer>() {
 首先执行Observable.create(new ObservableOnSubscribe<Integer>(),这里上面已经分析过了，无非就是返回一个ObserverCreate对象，本身为一个Observable观察者对象
 当执行.map(new Function<Integer, String>()
 
-//<R>泛型要先定义，对于<T>可以直接使用，因为Observable本身是一个泛型类 ，这里注意一下Function<? super T, ? extends R> mapper，根据前面的介绍知道，super可以用来传递参数，extends
-用来返回值，这里用到了俩个，这里是因为Function 泛型的定义，可以知道R是作为返回值的，所以用extends，T是用来做参数的，所以用super
+先看Function 接口的定义
 public interface Function<T, R> {
     /**
      * Apply some calculation to the input value and return some other value.
@@ -327,6 +328,7 @@ public interface Function<T, R> {
     R apply(@NonNull T t) throws Exception;
 }
 
+接着分析 .map(new Function<Integer, String>() 函数实现
 public final <R> Observable<R> map(Function<? super T, ? extends R> mapper) {
     //检查Map对象不能为空,为空会抛出异常
     ObjectHelper.requireNonNull(mapper, "mapper is null");
@@ -335,18 +337,29 @@ public final <R> Observable<R> map(Function<? super T, ? extends R> mapper) {
     return RxJavaPlugins.onAssembly(new ObservableMap<T, R>(this, mapper));
 }
 
+<R>泛型要先定义，对于<T>可以直接使用，因为Observable本身是一个泛型类，所以可以直接使用，不用再定义
+public abstract class Observable<T> implements ObservableSource<T> {
+    ...
+}
+
+这里注意一下Function<? super T, ? extends R> mapper，根据前面的介绍知道，super可以用来传递参数,extends用来返回值，这里用到了俩个，这里是因为Function 泛型的定义，
+可以知道R是作为返回值的，所以用extends，T是用来做参数的，所以用super
+
+
 当执行到 new ObservableMap<T, R>(this, mapper)
 public final class ObservableMap<T, U> extends AbstractObservableWithUpstream<T, U> {
     //保存Function对象，对于参数里面的泛型中使用super,或者extends 关键字，如果是传递参数就用super，如果是获取到内容，就用extends
     final Function<? super T, ? extends U> function;
 
-    //构造ObservableMap对象，保存观察者对象 source
+    //构造ObservableMap对象，保存观察者对象,这里也即是 ObservableCreate 对象  使用 source 成员保存起来
     public ObservableMap(ObservableSource<T> source, Function<? super T, ? extends U> function) {
         super(source);
         this.function = function;
     }
-	....
+    ...
 }
+
+接下来看AbstractObservableWithUpstream 中类的定义
 abstract class AbstractObservableWithUpstream<T, U> extends Observable<U> implements HasUpstreamObservableSource<T> {
     /** The source consumable Observable. */
     //源的观察者对象
@@ -356,7 +369,7 @@ abstract class AbstractObservableWithUpstream<T, U> extends Observable<U> implem
      * Constructs the ObservableSource with the given consumable.
      * @param source the consumable Observable
      */
-    //父类的构造函数，保存源的观察者对象
+    //父类的构造函数，保存源的观察者对象,对应本文也即是 ObservableCreate 对象
     AbstractObservableWithUpstream(ObservableSource<T> source) {
         this.source = source;
     }
@@ -367,11 +380,11 @@ abstract class AbstractObservableWithUpstream<T, U> extends Observable<U> implem
     }
 }
 
-可以看出ObservableMap类继承了Observable ，本身是一个被观察者对象，所以对于map操作返回了一个ObservableMap对象，这个对象本身为一个被观察者对象，同时这个对象里面保存了map里面匿名的
-Function对象,还有上一个操作符create创建的ObservableCreate对象
+可以看出ObservableMap类继承了Observable ，本身是一个被观察者对象，所以对于map操作返回了一个ObservableMap对象，这个对象本身为一个被观察者对象，
+同时这个对象里面保存了map里面匿名的Function对象,还有上一个操作符create创建的ObservableCreate对象
 
-之后执行.subscribe(new Observer<String>()，因为当前的被观察者对象为ObservableMap对象，本身为一个Observable，所以会执行对应的subscribe函数，经前面介绍可知，这个最终会调用子类的
-subscribeActual函数，所以就会调用到ObservableMap中对应的函数
+之后执行.subscribe(new Observer<String>()，因为当前的被观察者对象为ObservableMap对象，本身为一个Observable，所以会执行对应的subscribe函数，经前面介绍可知，
+这个最终会调用子类的subscribeActual函数，所以就会调用到ObservableMap中对应的函数
 
 这里因为是传递参数，所以可以用super关键字，这里传递的对象t为我们创建的匿名观察者对象
 @Override
@@ -392,21 +405,23 @@ static final class MapObserver<T, U> extends BasicFuseableObserver<T, U> {
         super(actual);
         this.mapper = mapper;
     }
-	...	
+    ...	
 }
 
+接着分析 BasicFuseableObserver 类的定义
 public abstract class BasicFuseableObserver<T, R> implements Observer<T>, QueueDisposable<R> {
     //构造函数，保存观察者对象
     public BasicFuseableObserver(Observer<? super R> actual) {
         this.actual = actual;
     }
-	....
+    ...
 }
 
-所以可以知道 MapObserver类，实现了Observer接口，还有Disposal接口,本身是一个观察者对象,他持有上一个观察者对象这里也即是创建的匿名观察者对象，以及Map操作符中创建的Function对象
+所以可以知道 MapObserver类，实现了Observer接口，还有Disposal接口,本身是一个观察者对象,他持有上一个观察者对象这里也即是创建的匿名观察者对象，
+以及Map操作符中创建的Function对象
 
-之后执行  source.subscribe(new MapObserver<T, U>(t, function));，因为这里的source保存的为上一个操作符中创建的被观察者对象，这里即为observableCreate对象，又因为subscribe为抽象函数
-最终会执行子类的subscribeActual函数
+之后执行  source.subscribe(new MapObserver<T, U>(t, function));，因为这里的source保存的为上一个操作符中创建的被观察者对象，这里即为observableCreate对象，
+又因为subscribe为抽象函数,最终会执行子类的subscribeActual函数
 
 @Override
 protected void subscribeActual(Observer<? super T> observer) {//此时传递的observer对象即为刚刚创建的MapObserver 对象
@@ -436,7 +451,7 @@ static final class CreateEmitter<T> extends AtomicReference<Disposable> implemen
     CreateEmitter(Observer<? super T> observer) {
         this.observer = observer;
     }
-	...	
+    ...	
 }
 
 之后执行  observer.onSubscribe(parent);这里的observer 对象为 MapObserver 对象，所以会执行对应的函数,经过发现MapObserver 中并没有这个函数，但是他的父类有实现，下面为函数的定义
@@ -532,16 +547,16 @@ public void onNext(String s)
 
 至此事件从发送到接受都已经完成
 
-总结：从Map的流程可以看出，创建了多个观察者，已经多个被观察者对象，为什么要这样做呢，原因1：因为要保持链式的调度，而且返回的不是同一个对象，而是同一类型的对象，而且后面一个对象会持有
-前面一个对象的引用，这样做到了层层的相扣的样子，比如一开始使用create操作符产生一个ObservableCreate被观察者对象，然后经过map操作符，返回一个MapObservable对象，同时他持有上一个的引用
-至于观察者来说也是一样的，当订阅发生的时候，就可以通过这种层层相扣，找到最始的源，执行对应的回调，事件的发送也是一样，最终找到最开始的那个观察者对象，这估计就是层层相扣的原因
+总结：从Map的流程可以看出，创建了多个观察者，已经多个被观察者对象，为什么要这样做呢，原因1：因为要保持链式的调度，而且返回的不是同一个对象，而是同一类型的对象，
+而且后面一个对象会持有前面一个对象的引用，这样做到了层层的相扣的样子，比如一开始使用create操作符产生一个ObservableCreate被观察者对象，然后经过map操作符，
+返回一个MapObservable对象，同时他持有上一个的引用至于观察者来说也是一样的，当订阅发生的时候，就可以通过这种层层相扣，找到最始的源，执行对应的回调，事件的发送也是一样，
+最终找到最开始的那个观察者对象，这估计就是层层相扣的原因
 ```
 
 流程分析：
 ![结果显示](/uploads/RxJava简单使用/Map流程图.png)
 
-****subscribeOn(线程切换)操作符****
-===
+### subscribeOn 操作符
 ```java
 我们通过下面的方式来使用subscribeOn操作符:
 
@@ -625,7 +640,7 @@ public final class Schedulers {
 
         NEW_THREAD = RxJavaPlugins.initNewThreadScheduler(new NewThreadTask());
     }
-	...
+    ...
 }
 可以看到Sechedulers.Io是这个类中的一个静态的成员变量 static final Scheduler IO，并且赋值操作发生在静态代码块内 IO = RxJavaPlugins.initIoScheduler(new IOTask());
 分析下RxJavaPlugins.initIoScheduler(new IOTask())发生了什么 ：首先构造一个IOTask对象 new IOTask(),实现了Callable接口
@@ -637,6 +652,7 @@ static final class IOTask implements Callable<Scheduler> {
     }
 }
 
+接着分析initIoScheduler 函数
 public static Scheduler initIoScheduler(@NonNull Callable<Scheduler> defaultScheduler) {
     //检查对象是否为空,如果为空，抛出异常
     ObjectHelper.requireNonNull(defaultScheduler, "Scheduler Callable can't be null");
@@ -693,7 +709,7 @@ public final class ObservableSubscribeOn<T> extends AbstractObservableWithUpstre
         super(source);
         this.scheduler = scheduler;
     }
-	....
+    ...
 }
 
 abstract class AbstractObservableWithUpstream<T, U> extends Observable<U> implements HasUpstreamObservableSource<T> {
@@ -719,8 +735,8 @@ abstract class AbstractObservableWithUpstream<T, U> extends Observable<U> implem
 }
 
 ObservableSubscribeOn对象，本身继承了Observable，为一个被观察者,他持有了IoSchedler ，以及 前一个操作符create对象返回的ObservableCreate对象
-
-之后执行subscribe(new Observer<String>());,这里的对象为刚刚返回的 ObservableSubscribeOn对象 ,经前面介绍可知，subscribe 为一个抽象函数，这个最终会调用子类的 subscribeActual，所以会调用
+之后执行subscribe(new Observer<String>());,这里的对象为刚刚返回的 ObservableSubscribeOn对象 ,经前面介绍可知，subscribe 为一个抽象函数，
+这个最终会调用子类的 subscribeActual，所以会调用
 
 @Override
 public void subscribeActual(final Observer<? super T> s) {//这里传递的s为一个真正的观察者对象，也即是我们创建的匿名的观察者对象
@@ -748,7 +764,7 @@ static final class SubscribeOnObserver<T> extends AtomicReference<Disposable> im
         this.actual = actual;
         this.s = new AtomicReference<Disposable>();
     }
-	....
+    ...
 }
 所以这里 构建一个SubscribeOnObserver对象，本身实现了Observer接口，为一个观察者对象,同时保存了真正的观察者对象，也即是我们创建的匿名的观察者对象
 
@@ -763,8 +779,8 @@ public void onSubscribe(Disposable d)
 首先分析 new SubscribeTask(parent)
 
 final class SubscribeTask implements Runnable {
-	//保存SubscribeOnObserver对象
-	private final SubscribeOnObserver<T> parent;
+    //保存SubscribeOnObserver对象
+    private final SubscribeOnObserver<T> parent;
 
     SubscribeTask(SubscribeOnObserver<T> parent) {
         this.parent = parent;
@@ -803,13 +819,13 @@ public Worker createWorker() {
 }
 
 static final class EventLoopWorker extends Scheduler.Worker {
-	....
+    ....
     EventLoopWorker(CachedWorkerPool pool) {
         this.pool = pool;
         this.tasks = new CompositeDisposable();
         this.threadWorker = pool.get();
     }
-	...
+    ...
 }
 
 所以当执行  final Worker w = createWorker(); w对象为EventLoopWorker 
@@ -876,7 +892,7 @@ public final class ScheduledRunnable extends AtomicReferenceArray<Object> implem
         this.actual = actual;
         this.lazySet(0, parent);
     }
-	...
+    ...
 }
 可以知道构建一个ScheduledRunnable对象，本身实现了Runnable接口，同时保存了run对象，这里为SubscribeTask对象
 之后执行 
@@ -892,9 +908,9 @@ if (delayTime <= 0) {
 当任务执行的时候，就会回调执行提交任务的run方法也即是ScheduledRunnable对象 中的run方法
 
 public void run() {
-	...
+    ...
     actual.run();
-	....
+    ....
 }
 执行 actual.run(); 这里的actual对象为我们传递进来的SubscribeTask对象,所以执行对应的方法
 final class SubscribeTask implements Runnable {
@@ -982,8 +998,8 @@ public void onNext(String s)
 至此事件从发送到接受都已经完成
 
 
-总结：线程的切换是通过线程池的方式来做到的，通过提交一个任务，让这个任务回调执行run方法的时候，才可以执行订阅的操作，通过RxJava的层层相扣的特性，找到最始的那个源，完成订阅，对于
-事件的发送也是一样，最终找到最开始的那个观察者对象，这估计就是层层相扣的原因
+总结：线程的切换是通过线程池的方式来做到的，通过提交一个任务，让这个任务回调执行run方法的时候，才可以执行订阅的操作，通过RxJava的层层相扣的特性，找到最始的那个源，
+完成订阅，对于事件的发送也是一样，最终找到最开始的那个观察者对象，这估计就是层层相扣的原因
 ```
 
 流程分析：
