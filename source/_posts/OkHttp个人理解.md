@@ -6,24 +6,27 @@ tags: [Android,OkHttp]
 description:  OkHttp个人理解
 ---
 
-OkHttp个人理解
+### 概述
+
+> OkHttp个人理解
+
 <!--more-->
 
-简介
-```
-OkHttp做为一种很牛逼的网络框架，目前使用的人数越来越多，在github上面项目的start数也达到了28k的存在，可谓是一种很牛逼的网络框架，所以做为一个小菜鸡的我，就有必要的去学习
-下人家的牛逼所在,下面分几个点来分析
 
+### 简介
+> OkHttp做为一种很牛逼的网络框架，目前使用的人数越来越多，在github上面项目的start数也达到了28k的存在，可谓是一种很牛逼的网络框架，所以做为一个小菜鸡的我，就有必要的去学习
+下人家的牛逼所在,下面分几个点来分析
 1.OkHttp 的简单使用
 2.OkHttp 提交请求
 3.OkHttp 传说中的责任链的模式
 
+### OkHttp的简单使用
+```gradle
+我们可以在项目的build.gradle 中简单的添加一句   implementation 'com.squareup.okhttp3:okhttp:3.10.0' 就可以将okhttp包含进来
+当然要网络请求，还要配置相应的网络权限  <uses-permission android:name="android.permission.INTERNET"/>
 ```
- ****OkHttp的简单使用****
- ===
- ```java
- 我们可以在项目的build.gradle 中简单的添加一句   implementation 'com.squareup.okhttp3:okhttp:3.10.0' 就可以将okhttp包含进来,下面是简单的提交一个同步的请求
- 
+下面是简单的提交一个同步的请求
+```java
  OkHttpClient client = new OkHttpClient();
  Request request = new Request.Builder()
                 .url("http://www.baidu.com")
@@ -70,15 +73,14 @@ OkHttp做为一种很牛逼的网络框架，目前使用的人数越来越多�
     }
 	
 ```
-****OkHttp提交任务****
-===
+### OkHttp提交任务
 ```java
 1.创建OkHttpClient对象
 OkHttpClient client = new OkHttpClient();
-咦，怎么不见 builder？莫急，且看其构造函数：
 public OkHttpClient() {
   this(new Builder());
 }
+
 原来是方便我们使用，提供了一个“快捷操作”，全部使用了默认的配置。OkHttpClient.Builder类成员很多，后面我们再慢慢分析，这里先暂时略过：
 public Builder() {
   dispatcher = new Dispatcher();
@@ -105,15 +107,19 @@ public Builder() {
 Request request = new Request.Builder()
                 .url("http://www.baidu.com")
                 .build();
+				
+首先是Builder 构造函数的执行				
 public Builder() {
     this.method = "GET";
     this.headers = new Headers.Builder();
 }
 
+
 public Request build() {
       if (url == null) throw new IllegalStateException("url == null");
       return new Request(this);
 }
+
 创建Requeest内部也是通过Build模式来解析传递进来的url来构建一个请求对象
 
 3.发起 HTTP 请求
@@ -121,6 +127,10 @@ Response response = client.newCall(request).execute();
 response.body().string(); 
 
 OkHttpClient实现了Call.Factory，负责根据请求创建新的Call。
+public class OkHttpClient implements Cloneable, Call.Factory, WebSocket.Factory {
+   ....
+}
+
 那我们现在就来看看它是如何创建 Call 的：
 /**
   * Prepares the {@code request} to be executed at some point in the future.
@@ -128,11 +138,15 @@ OkHttpClient实现了Call.Factory，负责根据请求创建新的Call。
 @Override public Call newCall(Request request) {
   return new RealCall(this, request);
 }
-如此看来功劳全在RealCall类了，下面我们一边分析同步网络请求的过程，一边了解RealCall的具体内容。 
+如此看来功劳全在RealCall类了，下面我们一边分析同步网络请求的过程，一边了解RealCall的具体内容。 首先来看RealCall 的构造函数的创建
+static RealCall newRealCall(OkHttpClient client, Request originalRequest, boolean forWebSocket) {
+    // Safely publish the Call instance to the EventListener.
+    RealCall call = new RealCall(client, originalRequest, forWebSocket);
+    call.eventListener = client.eventListenerFactory().create(call);
+    return call;
+}
 
-4.同步请求的添加
-
-我们首先看RealCall#execute：
+同步请求的执行 接着分析 RealCall#execute：
 @Override public Response execute() throws IOException {
   synchronized (this) {
     if (executed) throw new IllegalStateException("Already Executed");  // (1)
@@ -150,8 +164,8 @@ OkHttpClient实现了Call.Factory，负责根据请求创建新的Call。
  
 这里我们做了 4 件事：
 检查这个 call 是否已经被执行了，每个 call 只能被执行一次，如果想要一个完全一样的 call，可以利用call#clone方法进行克隆。
-利用client.dispatcher().executed(this)来进行实际执行dispatcher是刚才看到的OkHttpClient.Builder的成员之一，它的文档说自己是异步 HTTP 请求的执行策略，现在看来，同步请求它也有掺和。
-调用getResponseWithInterceptorChain()函数获取 HTTP 返回结果，从函数名可以看出，这一步还会进行一系列“拦截”操作。这个会在后面进行分析
+利用client.dispatcher().executed(this)来进行实际执行dispatcher是刚才看到的OkHttpClient.Builder的成员之一，它的文档说自己是异步 HTTP 请求的执行策略，现在看来，
+同步请求它也有掺和。调用getResponseWithInterceptorChain()函数获取 HTTP 返回结果，从函数名可以看出，这一步还会进行一系列“拦截”操作。这个会在后面进行分析
 最后还要通知dispatcher自己已经执行完毕。
 
 首先分析 client.dispatcher().executed(this) 实现，下面是对应的函数的实现
@@ -159,10 +173,10 @@ synchronized void executed(RealCall call) {
   runningSyncCalls.add(call);
 }
 
-而runningSyncCalls 的定义为   private final Deque<AsyncCall> runningAsyncCalls = new ArrayDeque<>(); 代表一个正在进行请求的同步队列，而真正的执行网络请求的部分是在这部分的代码
-getResponseWithInterceptorChain()；这里接下来分析
+而runningSyncCalls 的定义为   private final Deque<AsyncCall> runningAsyncCalls = new ArrayDeque<>(); 代表一个正在进行请求的同步队列，
+而真正的执行网络请求的部分是在这部分的代码  getResponseWithInterceptorChain()；所以对应同步的请求，这里只是创建一个RealCall然后添加到runningAsyncCalls 队列中
 
-对于异步请求的添加
+这里接下来分析 对于异步请求的添加
 client.newCall(request).enqueue(new Callback());函数的实现为
 
 @Override public void enqueue(Callback responseCallback) {
@@ -175,7 +189,18 @@ client.newCall(request).enqueue(new Callback());函数的实现为
     client.dispatcher().enqueue(new AsyncCall(responseCallback));
 } 
 
-首先构建一个一个AsyncCall对象，AsyncCall本质是实现了Runnbale接口，client.dispatcher()会执行到默认的Dispatcher类，也即是Dispatcher类中的对应方法
+首先执行 new AsyncCall(responseCallback) 构建一个一个AsyncCall对象，AsyncCall本质是实现了Runnbale接口，同时将回调函数保存到responseCallback 成员变量中
+final class AsyncCall extends NamedRunnable {
+    private final Callback responseCallback;
+
+    AsyncCall(Callback responseCallback) {
+      super("OkHttp %s", redactedUrl());
+      this.responseCallback = responseCallback;
+    }
+    ...	
+}
+
+接着执行 client.dispatcher()会执行到默认的Dispatcher类，也即是Dispatcher类中的对应方法
 synchronized void enqueue(AsyncCall call) {
     if (runningAsyncCalls.size() < maxRequests && runningCallsForHost(call) < maxRequestsPerHost) {
       runningAsyncCalls.add(call);
@@ -184,9 +209,14 @@ synchronized void enqueue(AsyncCall call) {
       readyAsyncCalls.add(call);
     }
 }
-runningAsyncCalls 定义为   private final Deque<AsyncCall> runningAsyncCalls = new ArrayDeque<>();   private int maxRequests = 64;  private int maxRequestsPerHost = 5;
-上面的判断也即是如果当前正在运行的异步队列的大小，小于最大的同时请求的大小，对于同一个host的请求不能超过5个，才会将当前的请求，添加到runningAsyncCalls,否则会添加到readyAsyncCalls
-也即是一个异步的等待队列,当请求添加到了正在运行的异步队列的时候，执行 executorService().execute(call);
+
+runningAsyncCalls 定义为 
+private final Deque<AsyncCall> runningAsyncCalls = new ArrayDeque<>();  
+private int maxRequests = 64;  
+private int maxRequestsPerHost = 5;
+
+上面的判断也即是如果当前正在运行的异步队列的大小，小于最大的同时请求的大小，对于同一个host的请求不能超过5个，才会将当前的请求，添加到runningAsyncCalls,
+否则会添加到readyAsyncCalls 也即是一个异步的等待队列,当请求添加到了正在运行的异步队列的时候，执行 executorService().execute(call);
 
 executorService()函数的实现：
 public synchronized ExecutorService executorService() {
@@ -197,13 +227,30 @@ public synchronized ExecutorService executorService() {
     return executorService;
 }
 
-所以对于异步的请求的添加也即是构建一个Runnable对象，然后通过线程池的形式，execute(call)的形式来添加任务
+大致的理解下这个线程池的配置，这个线程池核心线程数为0，但是最大的线程数量没有限制，60, TimeUnit.SECONDS 代表这些线程 空闲如果超过了60秒，就会被回收掉,
+这里的队列为 new SynchronousQueue<Runnable>() 内部没有任何容量的阻塞队列。在它内部没有任何的缓存空间。也即是只要提交一个任务就会执行，不会添加到队列中
 
-如果当前的正在运行的请求队列执行完毕了，怎么样将正在等待的队列转移到执行的队列，会在分析完了责任链模式之后分析
+而由于当前的call 为 AsyncCall 所以当这个任务执行的时候，会执行对应的execute函数，下面是这个函数的关键实现
+@Override protected void execute() {
+    boolean signalledCallback = false;
+    try {
+        Response response = getResponseWithInterceptorChain();
+        ...
+    }
+    ...
+}
+
+可以看出，最后执行的还是getResponseWithInterceptorChain()函数，这个才会真正的执行网络的请求等操作，对于同步跟异步的区别就是，同步直接在当前线程中跑这个函数，
+异步的化，会通过任务的方式提交给线程池执行，当这个任务执行的时候，再来执行这个函数，这就是唯一的区别
+
+所以对于异步的请求的添加也即是构建一个Runnable对象，然后通过线程池的形式，execute(call)的形式来添加任务,在添加任务的时候，会判断当前是否允许立刻执行，
+如果不允许就放在等待队列中,如果当前的正在运行的请求队列执行完毕了，怎么样将正在等待的队列转移到执行的队列，会在分析完了责任链模式之后分析
 ```
-****OkHttp责任链模式(真正执行请求的地方)****
-===
+
+### OkHttp责任链模式(真正执行请求的地方)
 ```java
+前面分析了执行同步请求，跟执行异步请求的区别，最终都会执行execute函数，下面是这俩种exeuute函数的实现
+
 执行异步请求的方法
 @Override protected void execute() {
    boolean signalledCallback = false;
@@ -228,6 +275,7 @@ public synchronized ExecutorService executorService() {
         client.dispatcher().finished(this);
       }
 }
+
 执行同步请求的方法
 @Override public Response execute() throws IOException {
     synchronized (this) {
@@ -276,8 +324,8 @@ public interface Interceptor {
   Response intercept(Chain chain) throws IOException;
 }
 
-接下来就是往集合中添加元素了，第一个 interceptors.addAll(client.interceptors()); 获取的是用户自定义的拦截器集合，Okhttp是允许自定义拦截器的，加下来添加的是Okhttp内部的拦截器对象
-对应的拦截器功能为：
+接下来就是往集合中添加元素了，第一个 interceptors.addAll(client.interceptors()); 获取的是用户自定义的拦截器集合，Okhttp是允许自定义拦截器的，
+接下来添加的是Okhttp内部的拦截器对象对应的拦截器功能为：
 
 负责失败重试以及重定向的RetryAndFollowUpInterceptor；
 负责把用户构造的请求转换为发送到服务器的请求、把服务器返回的响应转换为用户友好的响应的BridgeInterceptor；
@@ -286,7 +334,8 @@ public interface Interceptor {
 配置OkHttpClient时设置的networkInterceptors；
 负责向服务器发送请求数据、从服务器读取响应数据CallServerInterceptor
 
-添加完之后，然后构建一个RealInterceptorChain对象,这里有几个是比较关键的参数 比如第一个interceptors 代表拦截器的集合，index 代表当前拦截器的索引 对应的构造方法的实现为：
+添加完之后，然后构建一个RealInterceptorChain对象,这里有几个是比较关键的参数 比如第一个interceptors 代表拦截器的集合，index 代表当前拦截器的索引 
+也即是当前正要处理的拦截器相应的在集合中的索引，对应的构造方法的实现为：
 
 public RealInterceptorChain(List<Interceptor> interceptors, StreamAllocation streamAllocation,
       HttpCodec httpCodec, RealConnection connection, int index, Request request, Call call,
@@ -309,25 +358,26 @@ public Response proceed(Request request, StreamAllocation streamAllocation, Http
     RealConnection connection) throws IOException {
     if (index >= interceptors.size()) throw new AssertionError(); index代表当前正在执行的拦截器在集合中的索引，所以这个所以不能大于拦截器集合的大小值
 
-	...
-	// Call the next interceptor in the chain. 这里又构建一个RealInterceptorChain 对象，要注意这里的索引为index+1,而且其他的参数都为同一个对象
+    ...
+    // Call the next interceptor in the chain. 这里又构建一个RealInterceptorChain 对象，要注意这里的索引为index+1,而且其他的参数都为同一个对象
     RealInterceptorChain next = new RealInterceptorChain(interceptors, streamAllocation, httpCodec,  
         connection, index + 1, request, call, eventListener, connectTimeout, readTimeout,
         writeTimeout);
 		
     Interceptor interceptor = interceptors.get(index);然后从集合中获取到当前所有的Interceptor对象
     Response response = interceptor.intercept(next);//然后执行对象的对应的方法,同时将刚构建的RealInterceptorChain对象传递进去,注意这里不会往下执行，跳到了另一边了
-	...
-	 return response;
+    ...
+    return response;
 }
 
-假设我们这里采用默认的配置，也即是我上面写的那样，就是没有配置自定义的拦截器的，所以第一个获取到的拦截器为retryAndFollowUpInterceptor 对象，代表重试的拦截器对象，所以执行对应的方法
+假设我们这里采用默认的配置，也即是我上面写的那样，就是没有配置自定义的拦截器的，所以第一个获取到的拦截器为retryAndFollowUpInterceptor 对象，代表重试的拦截器对象，
+所以执行对应的方法
 
 @Override public Response intercept(Chain chain) throws IOException {
-	//获取到Chain中的Request对象
+    //获取到Chain中的Request对象
     Request request = chain.request();
     RealInterceptorChain realChain = (RealInterceptorChain) chain;
-	//获取到Chain中的Call对象
+    //获取到Chain中的Call对象
     Call call = realChain.call();
     EventListener eventListener = realChain.eventListener();
 
@@ -338,6 +388,7 @@ public Response proceed(Request request, StreamAllocation streamAllocation, Http
 
     int followUpCount = 0;
     Response priorResponse = null;
+    //要注意这里是while(true)
     while (true) {
       if (canceled) {
         streamAllocation.release();
@@ -353,22 +404,23 @@ public Response proceed(Request request, StreamAllocation streamAllocation, Http
       } catch (RouteException e) {
        ...
       } 
-	  ....
+      ....
+      //当重试的此时大于了最大的限制之后，就会抛出一个异常，这样while(true)就会中断,支持重试终止
       if (++followUpCount > MAX_FOLLOW_UPS) {
         streamAllocation.release();
         throw new ProtocolException("Too many follow-up requests: " + followUpCount);
       }
-	  ...
+      ...
       request = followUp;
       priorResponse = response;
     }
   }
   
-当调用到 response = realChain.proceed(request, streamAllocation, null, null);的时候，又到了,这是这个时候，第二个参数streamAllocation有值了，第一次的时候，后面的三个参数都为null
+当调用到 response = realChain.proceed(request, streamAllocation, null, null);的时候，此时,第二个参数streamAllocation有值了，第一次的时候，后面的三个参数都为null
 public Response proceed(Request request, StreamAllocation streamAllocation, HttpCodec httpCodec, RealConnection connection) throws IOException {
     if (index >= interceptors.size()) throw new AssertionError(); index代表当前正在执行的拦截器在集合中的索引，所以这个所以不能大于拦截器集合的大小值
 
-	...
+    ...
 	// Call the next interceptor in the chain. 这里又构建一个RealInterceptorChain 对象，要注意这里的索引为index+1,而且其他的参数都为同一个对象
     RealInterceptorChain next = new RealInterceptorChain(interceptors, streamAllocation, httpCodec,  
         connection, index + 1, request, call, eventListener, connectTimeout, readTimeout,
@@ -385,10 +437,10 @@ public Response proceed(Request request, StreamAllocation streamAllocation, Http
 @Override public Response intercept(Chain chain) throws IOException {
     //获取到chain中的Request对象
     Request userRequest = chain.request();
-	//构建一个Request对象
+    //构建一个Request对象
     Request.Builder requestBuilder = userRequest.newBuilder();
 
-	//拼接一些参数
+    //拼接一些参数
     RequestBody body = userRequest.body();
     if (body != null) {
       MediaType contentType = body.contentType();
@@ -433,7 +485,7 @@ public Response proceed(Request request, StreamAllocation streamAllocation, Http
 
     //又执行到了chain中的proceed函数，继而转到对应的方法实现
     Response networkResponse = chain.proceed(requestBuilder.build());
-    //下面不会再往下面执行
+    //下面不会再往下面执行,要等待上面的方式执行完毕之后，才会往下执行,也即是后面是请求结果的处理了
     HttpHeaders.receiveHeaders(cookieJar, userRequest.url(), networkResponse.headers());
 
     Response.Builder responseBuilder = networkResponse.newBuilder()
@@ -454,7 +506,23 @@ public Response proceed(Request request, StreamAllocation streamAllocation, Http
 
     return responseBuilder.build();
 }
+
+执行到 chain.proceed(requestBuilder.build());
+public Request build() {
+   if (url == null) throw new IllegalStateException("url == null");
+   return new Request(this);
+}
+
+构建一个Request对象，存储Http的请求地址，请求头,请求体等
+Request(Builder builder) {
+   this.url = builder.url;
+   this.method = builder.method;
+   this.headers = builder.headers.build();
+   this.body = builder.body;
+   this.tag = builder.tag != null ? builder.tag : this;
+}
  
+之后继续执行 chain.proceed()函数
 @Override public Response proceed(Request request) throws IOException {
     return proceed(request, streamAllocation, httpCodec, connection);
 } 
@@ -462,8 +530,8 @@ public Response proceed(Request request, StreamAllocation streamAllocation, Http
 public Response proceed(Request request, StreamAllocation streamAllocation, HttpCodec httpCodec, RealConnection connection) throws IOException {
     if (index >= interceptors.size()) throw new AssertionError(); index代表当前正在执行的拦截器在集合中的索引，所以这个所以不能大于拦截器集合的大小值
 
-	...
-	// Call the next interceptor in the chain. 这里又构建一个RealInterceptorChain 对象，要注意这里的索引为index+1,而且其他的参数都为同一个对象
+    ...
+    // Call the next interceptor in the chain. 这里又构建一个RealInterceptorChain 对象，要注意这里的索引为index+1,而且其他的参数都为同一个对象
     RealInterceptorChain next = new RealInterceptorChain(interceptors, streamAllocation, httpCodec,  
         connection, index + 1, request, call, eventListener, connectTimeout, readTimeout,
         writeTimeout);
@@ -476,9 +544,8 @@ public Response proceed(Request request, StreamAllocation streamAllocation, Http
 
 当执行interceptors.get(index)的时候，这里获取到的Interceptor对象为CacheInterceptor 对象，执行对应的方法
  @Override public Response intercept(Chain chain) throws IOException {
- 
     ...
-	// If we don't need the network, we're done. 如果有缓存，就直接从缓存中获取
+    // If we don't need the network, we're done. 如果有缓存，就直接从缓存中获取
     if (networkRequest == null) {
       return cacheResponse.newBuilder()
           .cacheResponse(stripBody(cacheResponse))
@@ -498,7 +565,7 @@ public Response proceed(Request request, StreamAllocation streamAllocation, Http
     ...
  }
  
-当执行 networkResponse = chain.proceed(networkRequest)的时候
+这里假设没有缓存，也即是第一次执行的时候，所以会执行 networkResponse = chain.proceed(networkRequest)
 @Override public Response proceed(Request request) throws IOException {
     return proceed(request, streamAllocation, httpCodec, connection);
 }
@@ -521,7 +588,7 @@ public Response proceed(Request request, StreamAllocation streamAllocation, Http
 
 当执行interceptors.get(index)的时候，这里获取到的Interceptor对象为ConnectInterceptor 对象，执行对应的方法
  @Override public Response intercept(Chain chain) throws IOException {
-	RealInterceptorChain realChain = (RealInterceptorChain) chain;
+    RealInterceptorChain realChain = (RealInterceptorChain) chain;
     //获取到Request对象,也即是获取到第三个拦截器中传递的Request对象
     Request request = realChain.request();
     //获取到StreamAllocation 对象，也即是第一个拦截器中构建的对象
@@ -538,8 +605,7 @@ public Response proceed(Request request, StreamAllocation streamAllocation, Http
 } 
 
 首先分析  HttpCodec httpCodec = streamAllocation.newStream(client, chain, doExtensiveHealthChecks);的实现
-public HttpCodec newStream(
-            OkHttpClient client, Interceptor.Chain chain, boolean doExtensiveHealthChecks) {
+public HttpCodec newStream(OkHttpClient client, Interceptor.Chain chain, boolean doExtensiveHealthChecks) {
         int connectTimeout = chain.connectTimeoutMillis();
         int readTimeout = chain.readTimeoutMillis();
         int writeTimeout = chain.writeTimeoutMillis();
@@ -644,7 +710,7 @@ private RealConnection findConnection(int connectTimeout, int readTimeout, int w
                 for (int i = 0, size = routes.size(); i < size; i++) {
                     Route route = routes.get(i);
                     Internal.instance.get(connectionPool, address, this, route);//从connectionPool中获取可用的连接
-					//如果获取到了可用的连接，标识 foundPooledConnection 已经找到了连接，将找到的连接赋值给 result ，break程序
+                    //如果获取到了可用的连接，标识 foundPooledConnection 已经找到了连接，将找到的连接赋值给 result ，break程序
                     if (connection != null) {
                         foundPooledConnection = true;
                         result = connection;
@@ -745,7 +811,7 @@ public boolean isEligible(Address address, @Nullable Route route) {
     if (address.url().host().equals(this.route().address().url().host())) {
       return true; // This connection is a perfect match.
     }
-	...
+    ...
     return true; // The caller's address can be carried by this connection.
 }
 可以看出复用的条件是host要为一样才能实现复用 
@@ -755,7 +821,7 @@ public boolean isEligible(Address address, @Nullable Route route) {
  //TODO 创建新的连接 ，创建一个RealConnection对象
 result = new RealConnection(connectionPool, selectedRoute);
 
-//TODO 执行连接
+//接着 执行连接
 // Do TCP + TLS handshakes. This is a blocking operation.
 result.connect(connectTimeout, readTimeout, writeTimeout, pingIntervalMillis,connectionRetryEnabled, call, eventListener);
  //连接操作
@@ -763,7 +829,7 @@ result.connect(connectTimeout, readTimeout, writeTimeout, pingIntervalMillis,con
       int pingIntervalMillis, boolean connectionRetryEnabled, Call call,
       EventListener eventListener) {
     if (protocol != null) throw new IllegalStateException("already connected");
-	...
+    ...
     //连接socket
     connectSocket(connectTimeout, readTimeout, call, eventListener);
     ...
@@ -779,11 +845,12 @@ private void connectSocket(int connectTimeout, int readTimeout, Call call,
     Proxy proxy = route.proxy();
     Address address = route.address();
 
-    //创建socket对象,这里会直接的创建一个Sokcet对象
+    //创建socket对象,这里会直接的创建一个Sokcet对象，通过 new Socket(proxy)的方式
     rawSocket = proxy.type() == Proxy.Type.DIRECT || proxy.type() == Proxy.Type.HTTP
         ? address.socketFactory().createSocket()
         : new Socket(proxy);
 	
+    //回调通知连接开始
     eventListener.connectStart(call, route.socketAddress(), proxy);
 
     //设置连接socket超时时间
@@ -864,7 +931,7 @@ public static Sink sink(Socket socket) throws IOException {
     Sink sink = sink(socket.getOutputStream(), timeout);
     return timeout.sink(sink);
 }
-可以看出最终是获取到socket中的OutputStream封装在Source对象中
+可以看出最终是获取到socket中的OutputStream封装在Sink对象中
 
 findConnection函数继续往下面执行，当执行到了这里
 synchronized (connectionPool) {
@@ -872,7 +939,7 @@ synchronized (connectionPool) {
     //TODO 加入连接池
     // Pool the connection.
     Internal.instance.put(connectionPool, result);
-	...
+    ...
 }
 
 最终的函数实现会进入到ConnectPool中对应的函数
@@ -887,7 +954,6 @@ void put(RealConnection connection) {
     connections.add(connection);
 }
 下面来分析下连接池中的清理操作: 连接池里面有一个线程是用来清理连接的,清理当一个连接在连接池中超过了最大的存活的时间之后，就会被清理掉
-
 cleanupRunning为一个标识     boolean cleanupRunning; 标识当前的清理线程是否正在运行
 
 //构建一个线程池 ,同时Util.threadFactory("OkHttp ConnectionPool", true) 后面的参数设置为true，代表他是一个守护线程
@@ -895,11 +961,14 @@ private static final Executor executor = new ThreadPoolExecutor(0 /* corePoolSiz
             Integer.MAX_VALUE /* maximumPoolSize */, 60L /* keepAliveTime */, TimeUnit.SECONDS,
             new SynchronousQueue<Runnable>(), Util.threadFactory("OkHttp ConnectionPool", true));
 
+嗯，这个清理的线程池跟异步任务执行的线程池配置是一样的,除了最后一个参数 Util.threadFactory("OkHttp ConnectionPool", true)			
+			
 public static ThreadFactory threadFactory(final String name, final boolean daemon) {
     return new ThreadFactory() {
       @Override public Thread newThread(Runnable runnable) {
         Thread result = new Thread(runnable, name);
-        //TODO 是否设置为守护线程 ,设置为守护线程化，当一个应用程序当没有任何的线程正在运行的化，此时守护线程会退出，如果不设置为守护线程的化，那么这个应用程序就不会退出
+        //TODO 是否设置为守护线程 ,设置为守护线程化，当一个应用程序当没有任何的线程正在运行的化，此时守护线程会退出，如果不设置为守护线程的化，
+        //那么这个应用程序就不会退出
         result.setDaemon(daemon);
         return result;
       }
@@ -912,7 +981,7 @@ private final int maxIdleConnections;
 //每个连接的最大存活时间
 private final long keepAliveDurationNs;
 
-//清理线程
+//清理线程 Runnable任务实现
 private final Runnable cleanupRunnable = new Runnable() {
         @Override
         public void run() {
@@ -944,6 +1013,7 @@ long cleanup(long now) {
 
         // Find either a connection to evict, or the time that the next eviction is due.
         synchronized (this) {
+            //遍历当前所有连接
             for (Iterator<RealConnection> i = connections.iterator(); i.hasNext(); ) {
                 RealConnection connection = i.next();
 
@@ -992,7 +1062,7 @@ long cleanup(long now) {
         return 0;
 }
 
-函数继续执行
+回到前面 函数继续执行
 public HttpCodec newStream(
             OkHttpClient client, Interceptor.Chain chain, boolean doExtensiveHealthChecks) {
         int connectTimeout = chain.connectTimeoutMillis();
@@ -1179,7 +1249,7 @@ responseBuilder = httpCodec.readResponseHeaders(false); 函数的实现为：
     }
 
     try {
-      //通过socket中的OutPutStream来获取返回的结果，这里读取状态栏,将读取的结果封装成一个StatusLine对象
+      //通过socket中的来获取返回的结果，这里读取状态栏,将读取的结果封装成一个StatusLine对象
       StatusLine statusLine = StatusLine.parse(readHeaderLine());
 
       //将读取的状态栏的结果，封装成Response.Builder对象
@@ -1215,6 +1285,13 @@ private String readHeaderLine() throws IOException {
     return line;
 }
 
+Response response = responseBuilder
+        .request(request)
+        .handshake(streamAllocation.connection().handshake())
+        .sentRequestAtMillis(sentRequestMillis)
+        .receivedResponseAtMillis(System.currentTimeMillis())
+        .build();
+
 可以看出最终是调用了 source 为 socket的InputStream的封装，所以一旦连接上，就可以获取返回的结果了,接下来就是解析返回的请求头了,之后封装成一个response对象返回
 
 继而回到了ConnectInterceptor 中的Intercept函数
@@ -1237,7 +1314,7 @@ private String readHeaderLine() throws IOException {
 发现他没有任何的处理，是直接的返回，所以又回到了另一个拦截器那
 @Override public Response intercept(Chain chain) throws IOException {
  .....
- //TODO 执行下一个拦截器
+    //TODO 执行下一个拦截器
     Response networkResponse = null;
     try {
       networkResponse = chain.proceed(networkRequest);
@@ -1328,7 +1405,7 @@ final InternalCache internalCache = new InternalCache() {
 Cache.this.put(response); 函数的实现
 @Nullable CacheRequest put(Response response) {
     ....
-	//最终使用了DiskLru来缓存文件的
+    //最终使用了DiskLru来缓存文件的
     Entry entry = new Entry(response);
     DiskLruCache.Editor editor = null;
     try {
@@ -1376,8 +1453,9 @@ Cache.this.put(response); 函数的实现
 ![结果显示](/uploads/Android启动流程二/okhttp_full_process.png)
 
 
+### 等待队列的执行
 ```java
-前面说过等待队列的执行
+前面说过等待的队列什么时候会执行，这里解决这个疑问
 try {
       client.dispatcher().executed(this);
       Response result = getResponseWithInterceptorChain();
@@ -1395,7 +1473,7 @@ try {
  * Used by {@code Call#execute} to signal completion.
  */
  void finished(RealCall call) {
-    finished(runningSyncCalls, call, false);
+    finished(runningSyncCalls, call, true);
  }
 
 private <T> void finished(Deque<T> calls, T call, boolean promoteCalls) {
@@ -1415,13 +1493,14 @@ private <T> void finished(Deque<T> calls, T call, boolean promoteCalls) {
     }
 }
 
-
-promoteCall()函数的实现为：
+由于 promoteCalls 为true，所以会执行 promoteCall() ,promoteCall()函数的实现为：
 private void promoteCalls() {
-        //TODO 检查 运行队列 与 等待队列
+        //如果当前正在运行的队列数量还是超过了最大的限制，直接返回
         if (runningAsyncCalls.size() >= maxRequests) return; // Already running max capacity.
+        //如果当前等待的队列为空，也直接返回
         if (readyAsyncCalls.isEmpty()) return; // No ready calls to promote.
 
+        //如果到了这里，就说明，正在运行的队列没有达到最大的限制，等待的队列也不为空，下面将等待队列的任务移出添加到运行的队列中
         for (Iterator<AsyncCall> i = readyAsyncCalls.iterator(); i.hasNext(); ) {
             AsyncCall call = i.next();
             //TODO  相同host的请求没有达到最大
@@ -1434,8 +1513,6 @@ private void promoteCalls() {
             if (runningAsyncCalls.size() >= maxRequests) return; // Reached max capacity.
         }
 }
-
-所以上面就是将等待队列中的任务转移到正在运行的队列中，同时运行这个任务的过程
 ```
 
  
