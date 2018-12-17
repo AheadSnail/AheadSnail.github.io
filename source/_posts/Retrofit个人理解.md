@@ -6,17 +6,23 @@ tags: [Android,OkHttp,Retrofit]
 description:  Hermes个人理解
 ---
 
-Retrofit个人理解
+### 概述
+
+> Retrofit个人理解
+
 <!--more-->
 
-简介
-```
-Retrofit做为一个目前java网络请求框架最牛逼的一个项目，网上关于他的介绍有很多，大体来说就是，通过他来执行网络请求，可以少写很多的代码。。支持数据的转换功能等
-Retrofit本质是对于OkHttp的再次封装，Retrofit的源码是比较少的，网络请求这一块还是由OkHttp来执行
-```
 
-****Retrofit简单的使用****
-===
+### 简介
+> Retrofit做为一个目前java网络请求框架最牛逼的一个项目，网上关于他的介绍有很多，大体来说就是，通过他来执行网络请求，可以少写很多的代码。。支持数据的转换功能等Retrofit本质是对于OkHttp的再次封装，Retrofit的源码是比较少的，网络请求这一块还是由OkHttp来执行
+
+### Retrofit简单的使用
+
+```gradle
+我们可以在项目的build.gradle 中简单的添加一句  implementation 'com.squareup.retrofit2:retrofit:(insert latest version)' 就可以将okhttp包含进来
+当然要网络请求，还要配置相应的网络权限  <uses-permission android:name="android.permission.INTERNET"/>
+```
+下面是提交一个网络请求
 ```java
 Retrofit retrofit = new Retrofit.Builder().baseUrl("https://api.github.com")
                                                   .addConverterFactory(GsonConverterFactory.create())
@@ -46,16 +52,14 @@ call.enqueue(new Callback<List<Contributor>>()
 执行的结果为：
 ![结果显示](/uploads/retrofit执行结果.png)
 
-****Retrofit源码分析****
-===
+### Retrofit源码分析
 ```java
-
 首先分析
 Retrofit retrofit = new Retrofit.Builder().baseUrl("https://api.github.com")
                                                   .addConverterFactory(GsonConverterFactory.create())
                                                   .build();
 												  
-构建Retrofit是使用构建者模式，所以这里首先要构建一个Builder对象，来完成默认参数的配置,这也是构建者默认的主要作用
+构建Retrofit是使用构建者模式，所以这里首先要构建一个Builder对象，来完成默认参数的配置,有选择的供使用者配置，这也是构建者默认的主要作用
 public Builder() {
     this(Platform.get());
 }												  
@@ -109,21 +113,22 @@ public Builder baseUrl(String baseUrl) {
    this.baseUrl = baseUrl; //将baseUrl封装成一个HttpUrl然后保存到Builder的成员变量baseUrl中
 }
 
-addConverterFactory(GsonConverterFactory.create())函数实现：
-首先看GsonConverterFactory.create()得到的是什么对象
+addConverterFactory(GsonConverterFactory.create())函数实现：首先看GsonConverterFactory.create()得到的是什么对象
 public static GsonConverterFactory create() {
     return create(new Gson());
 }
+
 public static GsonConverterFactory create(Gson gson) {
     if (gson == null) throw new NullPointerException("gson == null");
     return new GsonConverterFactory(gson);
 }
+
 private GsonConverterFactory(Gson gson) {
     this.gson = gson;
 }
-创建了一个GsonConverterFactory对象，这个对象里面保存了一个Gson对象
+所以针对 GsonConverterFactory.create() 实现，主要是创建了一个GsonConverterFactory对象，这个对象里面保存了一个Gson对象
       
-//添加转换器工厂，
+//之后执行addConverterFactory()  添加转换器工厂，下面是对应的函数实现
 public Builder addConverterFactory(Converter.Factory factory) {
     //添加到转换器集合中
     converterFactories.add(checkNotNull(factory, "factory == null"));
@@ -136,18 +141,18 @@ private final List<Converter.Factory> converterFactories = new ArrayList<>();
 
 最后执行.build();
 public Retrofit build() {
-	//baseUrl是必须要设置的,前面我们已经设置了
+    //baseUrl是必须要设置的,前面我们已经设置了
     if (baseUrl == null) {
         throw new IllegalStateException("Base URL required.");
     }
 
-    //如果callFactory为空，则构建一个，其本质为OkHttpClient 对象，因为OkHttpClient实现了Call.Factory接口,本质也是用他来执行网络请求的
+    //如果callFactory为空，则构建一个，默认为空，其本质为OkHttpClient 对象，因为OkHttpClient实现了Call.Factory接口,本质也是用他来执行网络请求的
     okhttp3.Call.Factory callFactory = this.callFactory;
     if (callFactory == null) {
         callFactory = new OkHttpClient();
     }
 
-    //如果没有设置callbackExecutor对象，则才能够platform中获取，这里为Android 所以这个值为 MainThreadExecutor 对象
+    //如果没有设置callbackExecutor对象，则从platform中获取，这里的platform 为 Android 所以这个值为 MainThreadExecutor 对象
     Executor callbackExecutor = this.callbackExecutor;
     if (callbackExecutor == null) {
         callbackExecutor = platform.defaultCallbackExecutor();
@@ -170,12 +175,13 @@ public Retrofit build() {
             unmodifiableList(callAdapterFactories), callbackExecutor, validateEagerly);
 }
 
-执行 platform.defaultCallbackExecutor(); 经我们前面介绍知道platform 对象为Android，所以会执行对应的函数 
+首先先看 执行 platform.defaultCallbackExecutor(); 经我们前面介绍知道platform 对象为Android，所以会执行对应的函数 
 public Executor defaultCallbackExecutor()
 {
     return new MainThreadExecutor();
 }
-//线程池
+
+//MainThreadExecutor 定义为 ,可以看出本质为一个 线程池
 static class MainThreadExecutor implements Executor
 {
     //主线程的Handler，主要是为了切换到主线程操作
@@ -188,9 +194,10 @@ static class MainThreadExecutor implements Executor
         handler.post(r);
     }
 }
-所以 platform.defaultCallbackExecutor()会得到一个MainThreadExecutor 对象，实现了Executor接口
+所以 platform.defaultCallbackExecutor()会得到一个MainThreadExecutor 对象，实现了Executor接口然后执行  
+callAdapterFactories.add(platform.defaultCallAdapterFactory(callbackExecutor)); 这里的platform为Android会,执行对应的函数实现,
+同时callbackExecutor为上面创建的MainThreadExecutor
 
-然后执行  callAdapterFactories.add(platform.defaultCallAdapterFactory(callbackExecutor)); 这里的platform为Android会,执行对应的函数实现,同时callbackExecutor为上面创建的MainThreadExecutor
 CallAdapter.Factory defaultCallAdapterFactory(@Nullable Executor callbackExecutor)
 {
     if (callbackExecutor == null)//callbackExecutor 为上面创建的MainThreadExecutor 所以不为空
@@ -199,6 +206,7 @@ CallAdapter.Factory defaultCallAdapterFactory(@Nullable Executor callbackExecuto
     }
     return new ExecutorCallAdapterFactory(callbackExecutor);
 }
+
 构建一个ExecutorCallAdapterFactory对象,之后再来分析这个类的作用
 final class ExecutorCallAdapterFactory extends CallAdapter.Factory
 {
@@ -210,19 +218,24 @@ final class ExecutorCallAdapterFactory extends CallAdapter.Factory
     {
         this.callbackExecutor = callbackExecutor;
     }
-	....
+    ...
 }
 所以最后当  callAdapterFactories.add(platform.defaultCallAdapterFactory(callbackExecutor));执行完毕之后，这个集合里面就会存在一个成员变量为ExecutorCallAdapterFactory对象
 
-执行
+之后构建一个集合,这个集合主要用来添加转化器，这里添加BuiltInConverters 对象,以及用户默认配置的转换器，这里我们配置了一个GsonConverterFactory对象
+List<Converter.Factory> converterFactories = new ArrayList<>(1 + this.converterFactories.size());
 converterFactories.add(new BuiltInConverters());
 converterFactories.addAll(this.converterFactories);
 
+BuiltInConverters类的定义
 final class BuiltInConverters extends Converter.Factory {
-	....
+   ...
 }
+
 构建一个BuiltInConverters 对象，添加到集合中,同时添加了我们上面创建的 GsonConverterFactory对象，所以这个集合有俩个成员变量
-最后执行  return new Retrofit(callFactory, baseUrl, unmodifiableList(converterFactories), unmodifiableList(callAdapterFactories), callbackExecutor, validateEagerly);
+最后执行
+return new Retrofit(callFactory, baseUrl, unmodifiableList(converterFactories), unmodifiableList(callAdapterFactories), callbackExecutor, validateEagerly);
+
 //Builder模式
 Retrofit(okhttp3.Call.Factory callFactory, HttpUrl baseUrl,
              List<Converter.Factory> converterFactories, List<CallAdapter.Factory>
@@ -242,7 +255,7 @@ Retrofit(okhttp3.Call.Factory callFactory, HttpUrl baseUrl,
 public <T> T create(final Class<T> service) {
     //必须是一个接口 而且当前的这个借口不存在其他接口的继承关系
     Utils.validateServiceInterface(service);
-	....
+    ...
     //采用动态代理的方式：这里采用动态代理是为了获取到接口上的注解的信息 使用动态代理，只是单纯的为了拿到这个method上所有的注解
     return (T) Proxy.newProxyInstance(service.getClassLoader(), new Class<?>[]{service},
         new InvocationHandler() {
@@ -279,8 +292,9 @@ public interface GitHub
     Call<List<Contributor>> contributors(@Path("owner") String owner, @Path("repo") String repo);
 }
 
-首先分析下这里为什么要创建一个动态代理对象，这里创建动态代理对象，主要是为了获取这个接口方法上面的注解参数类型，然后解析到这些注解的值，最后拼接成一个完整的url，这就是动态代理的好处
-所以当我们的代码这样调用的时候  Call<List<Contributor>> call = github.contributors("square", "retrofit"); 就会执行到动态代理对象的InvocationHandler 回调函数invoke里面
+首先分析下这里为什么要创建一个动态代理对象，这里创建动态代理对象，主要是为了获取这个接口方法上面的注解参数类型，然后解析到这些注解的值，
+最后拼接成一个完整的url，这就是动态代理的好处,所以当我们的代码这样调用的时候  Call<List<Contributor>> call = github.contributors("square", "retrofit");
+就会执行到动态代理对象的InvocationHandler 回调函数invoke里面
 
 当执行到   ServiceMethod<Object, Object> serviceMethod = (ServiceMethod<Object, Object>) loadServiceMethod(method);
 
@@ -313,7 +327,8 @@ this.retrofit = retrofit;
     this.methodAnnotations = method.getAnnotations();
     //获取到方法上面的参数类型的集合
     this.parameterTypes = method.getGenericParameterTypes();
-    //获取到方法参数枚举的集合 ，比如我们的参数注解为 @Path("owner") String owner, @Path("repo") String repo ，所以这个集合的内容，应该为 Path{"owner",fasle} Path{"repo",false} 注解含有默认的参数
+    //获取到方法参数枚举的集合 ，比如我们的参数注解为 @Path("owner") String owner, @Path("repo") String repo ，
+    //所以这个集合的内容，应该为 Path{"owner",fasle} Path{"repo",false} 注解含有默认的参数
     this.parameterAnnotationsArray = method.getParameterAnnotations();
 }
 之后执行.build()
@@ -340,7 +355,8 @@ public ServiceMethod build() {
     //构建一个存储结果的集合
     parameterHandlers = new ParameterHandler<?>[parameterCount];
     for (int p = 0; p < parameterCount; p++) {
-        //parameterTypes 为 参数类型的集合 由于我们的函数参数的为(@Path("owner") String owner, @Path("repo") String repo);，所以这里parameterTypes为俩个String.class
+        //parameterTypes 为 参数类型的集合 由于我们的函数参数的为(@Path("owner") String owner, @Path("repo") String repo);，
+        //所以这里parameterTypes为俩个String.class
         Type parameterType = parameterTypes[p];
         if (Utils.hasUnresolvableType(parameterType)) {
             throw parameterError(p, "Parameter type must not include a type variable or " +"wildcard: %s",parameterType);
@@ -380,9 +396,14 @@ private CallAdapter<T, R> createCallAdapter() {
     }
 }
 
-执行 retrofit.callAdapter(returnType, annotations);
+callAdapter 函数实现为：
+public CallAdapter<?, ?> callAdapter(Type returnType, Annotation[] annotations) {
+   return nextCallAdapter(null, returnType, annotations);
+}
+
+nextCallAdapter 函数实现为
 public CallAdapter<?, ?> nextCallAdapter(@Nullable CallAdapter.Factory skipPast, Type returnType, Annotation[] annotations) {
-	...
+    ...
     //默认skipPast 为null ,callAdapterFactories.indexOf 如果找不到会返回-1 所以一开始的时候，start为0
     int start = callAdapterFactories.indexOf(skipPast) + 1;
     for (int i = start, count = callAdapterFactories.size(); i < count; i++) {
@@ -395,7 +416,7 @@ public CallAdapter<?, ?> nextCallAdapter(@Nullable CallAdapter.Factory skipPast,
     }
 
     //如果到了就说明没有获取到,那就抛出一个异常
-	...
+    ...
     throw new IllegalArgumentException(builder.toString());
 }
 
@@ -427,11 +448,11 @@ public CallAdapter<?, ?> get(Type returnType, Annotation[] annotations, Retrofit
     };
 }
 
-所以执行 callAdapter = createCallAdapter();主要干的事情就是从集合里面找到对应的转换器，通过解析调用参数的返回值类型，得到真实的返回值类型，最后返回一个 匿名实现类回去
+所以执行 callAdapter = createCallAdapter();主要干的事情就是从集合里面找到对应的转换器，通过解析调用参数的返回值类型，得到真实的返回值类型，
+最后返回一个 匿名实现类回去,执行  responseType = callAdapter.responseType(); 这里的callAdapter为我们创建的匿名内部类，所以这里调用他的responseType()
+返回就会获取到他的responseType 这里值为 List<Contributor>
 
-执行  responseType = callAdapter.responseType(); 这里的callAdapter为我们创建的匿名内部类，所以这里调用他的responseType()返回就会获取到他的responseType 这里值为 List<Contributor>
-
-执行  responseConverter = createResponseConverter();
+之后执行  responseConverter = createResponseConverter();
 //创建返回结果的转换器
 private Converter<ResponseBody, T> createResponseConverter() {
     //获得当前方法上的所有的注解
@@ -443,8 +464,14 @@ private Converter<ResponseBody, T> createResponseConverter() {
     }
 } 
 
+responseBodyConverter 函数实现为,其中type为 responseType 对应当前的环境即为  List<Contributor> 类型
+public <T> Converter<ResponseBody, T> responseBodyConverter(Type type, Annotation[] annotations) {
+    return nextResponseBodyConverter(null, type, annotations);
+}
+ 
+nextResponseBodyConverter 函数实现为： 
 public <T> Converter<ResponseBody, T> nextResponseBodyConverter(@Nullable Converter.Factory skipPast, Type type, Annotation[] annotations) {
-	...
+    ...
     //skipPast 为空，所以start 开始为 0, 因为converterFactories.indexOf如果找不到会返回-1
     int start = converterFactories.indexOf(skipPast) + 1;
     //然后从converterFactories 集合遍历每一个转换器 ,这里有俩个，第一个是BuiltInConverters ，第二个为 GsonConverterFactory ，所以这里第一个为 BuiltInConverters
@@ -458,27 +485,27 @@ public <T> Converter<ResponseBody, T> nextResponseBodyConverter(@Nullable Conver
             return (Converter<ResponseBody, T>) converter;
         }
     }
-	...
+    ...
     throw new IllegalArgumentException(builder.toString());
 }
 
-这里会遍历converterFactories集合中的元素，然后调用对应的responseBodyConverter函数，因为我们这个集合里面的元素有 BuiltInConverters，GsonConverterFactory，所以会调用对应的函数实现
+这里会遍历converterFactories集合中的元素，然后调用对应的responseBodyConverter函数，因为我们这个集合里面的元素有 BuiltInConverters，GsonConverterFactory，
+所以会调用对应的函数实现,这里先分析下BuiltInConverters的函数实现：
 
-这里先分析下BuiltInConverters的函数实现：
 public Converter<ResponseBody, ?> responseBodyConverter(Type type, Annotation[] annotations, Retrofit retrofit) {
 if (type == ResponseBody.class) {
-    //TODO 如果有 Streaming 注解 对response的处理会不一样(以流的形式处理，如在下载大文件时候)
+      //TODO 如果有 Streaming 注解 对response的处理会不一样(以流的形式处理，如在下载大文件时候)
       return Utils.isAnnotationPresent(annotations, Streaming.class) ? StreamingResponseBodyConverter.INSTANCE : BufferingResponseBodyConverter.INSTANCE;
     }
-	//如果返回值的类型为Void
+    //如果返回值的类型为Void
     if (type == Void.class) {
-      return VoidResponseBodyConverter.INSTANCE;
-	}
-	return null;
+       return VoidResponseBodyConverter.INSTANCE;
+    }
+    return null;
 }
-所以BuiltInConverters 能处理的返回值类型的为ResponseBody类型，或者是Void类型，对于其他的类型直接返回null，由于我们的结果中有这样的判断if(converter != null)所以会过滤掉
-  
-接着分析 GsonConverterFactory 对应的函数实现：
+所以BuiltInConverters 能处理的返回值类型的为ResponseBody类型，或者是Void类型，对于其他的类型直接返回null，由于我们的结果中有这样的判断if(converter != null)
+所以会过滤掉,接着分析 GsonConverterFactory 对应的函数实现：
+
 @Override
 public Converter<ResponseBody, ?> responseBodyConverter(Type type, Annotation[] annotations, Retrofit retrofit) {
     //将响应ResponseBody转成其他类型(javabean)
@@ -487,7 +514,7 @@ public Converter<ResponseBody, ?> responseBodyConverter(Type type, Annotation[] 
 }
 可以看出最终会返回GsonResponseBodyConverter对象,所以对于执行 responseConverter = createResponseConverter();最终 responseConverter为 GsonResponseBodyConverter
 
-执行
+之后执行
 for (Annotation annotation : methodAnnotations) {
     parseMethodAnnotation(annotation);
 }
@@ -517,17 +544,16 @@ private void parseHttpMethodAndPath(String httpMethod, String value, boolean has
     //是否有body内容
     his.hasBody = hasBody;
 
-    //如果注解上面没有参数，就直接返回
+    //如果注解上面没有参数，就直接返回,对于当前的环境 value就为/repos/{owner}/{repo}/contributors?sort=desc
     if (value.isEmpty()) {
         return;
     }
 
-    //判断URL是否已经有 ?xxx=xxx 也即是当前的值中是否有参数设置了
+    //判断value是否已经有 ?xxx=xxx 也即是当前的值中是否有参数设置了
     // Get the relative URL path and existing query string, if present.
     int question = value.indexOf('?');
-    //如果question为-1，代表没有直接在注解上面传递参数
+    //如果question为-1，代表没有直接在注解上面传递参数,如果有就要判断这个值是否合法，不合法就要抛出异常
     if (question != -1 && question < value.length() - 1) {
-        //如果进来就代表有直接在注解上面设置参数
         //获取到参数的内容
         String queryParams = value.substring(question + 1);
         //判断是否合法,如果不合法就直接抛出异常
@@ -536,15 +562,17 @@ private void parseHttpMethodAndPath(String httpMethod, String value, boolean has
             throw methodError("URL query string \"%s\" must not have replace block. "+ "For dynamic query parameters use @Query.", queryParams);
         }
     }
-    //保存当前注解上的url  这里为 /repos/{owner}/{repo}/contributors?sort=desc
+    //保存当前注解上的value  这里为 /repos/{owner}/{repo}/contributors?sort=desc
     this.relativeUrl = value;  
-    //解析出地址中的参数 {xx} （?之前的）,也即是在注解上面的参数，后面用来拼接内容 如果当前的参数类型为 /repos/{owner}/{repo}/contributors ，这里的返回的内容为 owner,repo
+    //解析出地址中的参数 {xx} （?之前的）,也即是在注解上面的参数，后面用来拼接内容 如果当前的参数类型为 /repos/{owner}/{repo}/contributors ，
+    //这里的返回的内容为 owner,repo
     this.relativeUrlParamNames = parsePathParameters(value);
 }
 
 parsePathParameters(value);函数的实现为：
 static Set<String> parsePathParameters(String path) {
-//就是类似将这样的字符串 /repos/{owner}/{repo}/contributors 提取出  {  } 里面的内容，这里也即是返回 owner,repo集合
+    //PARAM_URL_REGEX 定义为 static final Pattern PARAM_URL_REGEX = Pattern.compile("\\{(" + PARAM + ")\\}");
+    //就是类似将这样的字符串 /repos/{owner}/{repo}/contributors 提取出  {  } 里面的内容，这里也即是返回 owner,repo集合
     Matcher m = PARAM_URL_REGEX.matcher(path);
     Set<String> patterns = new LinkedHashSet<>();
     while (m.find()) {
@@ -552,7 +580,9 @@ static Set<String> parsePathParameters(String path) {
     }
     return patterns;
 }
-当  this.relativeUrlParamNames = parsePathParameters(value); 执行完之后，this.relativeUrlParamNames 集合中含有元素 owner,repo,这里也即是获取到接下来要替换的参数name
+
+当  this.relativeUrlParamNames = parsePathParameters(value); 执行完之后，this.relativeUrlParamNames 集合中含有元素 owner,repo,
+这里也即是获取到接下来要替换的参数name
  
 接着执行 解析参数的注解内容中有这样的代码  parseParameter(p, parameterType, parameterAnnotations);
 //解析方法上面的参数的注解
@@ -605,7 +635,7 @@ private ParameterHandler<?> parseParameterAnnotation(int p, Type type, Annotatio
         //构建一个ParameterHandler.Path对象  Path注解中，还有一个默认的参数，encode 默认为false,所以这里也为false
         return new ParameterHandler.Path<>(name, converter, path.encoded());
 	}
-	....
+	...还有很多其他的类型 ，比如 PATH等
 }
 执行 retrofit.stringConverter(type, annotations);
 public <T> Converter<T, String> stringConverter(Type type, Annotation[] annotations) {
@@ -663,8 +693,8 @@ ServiceMethod(Builder<R, T> builder) {
     this.parameterHandlers = builder.parameterHandlers;
 }
 
-所以对于  ServiceMethod<Object, Object> serviceMethod = (ServiceMethod<Object, Object>) loadServiceMethod(method);所做的事情，就是解析调用函数的注解，获取到对应的内容，为后面
-拼接完整的url做了基础
+所以对于  ServiceMethod<Object, Object> serviceMethod = (ServiceMethod<Object, Object>) loadServiceMethod(method);所做的事情，就是解析调用函数的注解，
+获取到对应的内容，为后面拼接完整的url做了基础
 
 接着执行   OkHttpCall<Object> okHttpCall = new OkHttpCall<>(serviceMethod, args);
 OkHttpCall(ServiceMethod<T, ?> serviceMethod, @Nullable Object[] args) {
@@ -672,7 +702,7 @@ OkHttpCall(ServiceMethod<T, ?> serviceMethod, @Nullable Object[] args) {
     this.args = args;
 }
 
-执行 serviceMethod.adapt(okHttpCall);
+接着执行 serviceMethod.adapt(okHttpCall);
 
 T adapt(Call<R> call) { // call 为OkHttpCall 对象
     //这里的callAdapter对象为 ExecutorCallAdapterFactory 中调动get函数创建的匿名的内部类，所以会调用对应的函数 所以这边返回的对象为 ExecutorCallbackCall 对象
@@ -710,7 +740,7 @@ static final class ExecutorCallbackCall<T> implements Call<T>
         this.callbackExecutor = callbackExecutor;
         this.delegate = delegate;
     }
-	...	
+    ...	
 }
 
 所以当我们这样调用的时候 Call<List<Contributor>> call = github.contributors("square", "retrofit"); 返回的call即为 ExecutorCallbackCall对象
@@ -1065,6 +1095,6 @@ static class MainThreadExecutor implements Executor
 所以会执行handler.post(r); 利用主线程的Handler Looper对象，成功的将我们的线程从子线程切换到了主线程,
 之后执行 callback.onResponse(ExecutorCallbackCall.this, response); 也就回到了我们的代码里面
 
-所以可以看出来这个 ExecutorCallAdapterFactory 这个工厂其实也没有做什么事情，真正的网络请求，也是交给OkHttpCall 来执行，这个类主要做的事情，就是用来做线程切换逻辑，而真正做线程切换
-又交给了 MainThreadExecutor， MainThreadExecutor又利用主线程的Handler来完成切换
+所以可以看出来这个 ExecutorCallAdapterFactory 这个工厂其实也没有做什么事情，真正的网络请求，也是交给OkHttpCall 来执行，这个类主要做的事情，就是用来做线程切换逻辑，
+而真正做线程切换又交给了 MainThreadExecutor， MainThreadExecutor又利用主线程的Handler来完成切换
 ```
