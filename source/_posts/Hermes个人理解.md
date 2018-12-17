@@ -6,24 +6,28 @@ tags: [Android,Hermes,IPC]
 description:  Hermes个人理解
 ---
 
-Hermes个人理解
+### 概述
+
+> Hermes个人理解
+
 <!--more-->
 
-简介
-```
-Hermes 一套新颖巧妙易用的Android进程间通信IPC框架。
-Hermes是一套新颖巧妙易用的Android进程间通信IPC框架。这个框架使得你不用了解IPC机制就可以进行进程间通信，像调用本地函数一样调用其他进程的函数。
-```
+### 简介
+> Hermes 一套新颖巧妙易用的Android进程间通信IPC框架,这个框架可以使你不用了解IPC机制就可以进行进程间通信，像调用本地函数一样调用其他进程的函数。
 
-****Hermes简单的使用****
-===
-```java
 
+### Hermes简单的使用
 1. 首先在build.gradle文件中引入依赖
+```gradle
 dependencies {
     compile 'xiaofei.library:hermes:0.7.0'
 }
+```
+2.相应的Java代码的编写
+> 简单的介绍下调用的流程，也即是有俩个界面一个是MainActivity，在这个界面中完成了初始化以及register的操作，另一个界面DemoActivity为另一个进程的界面，在这个界面完成了连接的操作同时可以通过简单的调用拿到另一个进程的内容,下面是相应的代码
 
+```java
+//MainActivity 完成初始化，注册的操作
 public class MainActivity extends Activity
 {
 
@@ -51,12 +55,14 @@ public class MainActivity extends Activity
     }
 }
 
+//DemoActivity 为另一个进程的界面，这里完成连接的操作
 public class DemoActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_demo);
 
+        //首先要执行连接操作
         findViewById(R.id.get_user2).setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -66,7 +72,8 @@ public class DemoActivity extends Activity {
                 Hermes.connect(getApplicationContext(), HermesService.HermesService0.class);
             }
         });
-
+   
+        //之后获取到另一个进程的User信息,Toast显示出来
         findViewById(R.id.get_user).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -86,8 +93,9 @@ public class DemoActivity extends Activity {
         Hermes.disconnect(getApplicationContext());
     }
 }
-
+```
 清单文件的书写为：
+```xml
 <activity
     android:name=".MainActivity"
     android:label="@string/app_name">
@@ -105,18 +113,13 @@ public class DemoActivity extends Activity {
     android:label="@string/title_activity_demo"
     android:process=":h">
 </activity>
-
-简单的介绍下上面的内容，也即是有俩个界面一个是MainActivity，在这个界面中完成了初始化以及register的操作，另一个界面DemoActivity为另一个进程的界面，在这个界面完成了连接的操作
-同时可以通过简单的调用拿到另一个进程的内容
 ```
 
 Herms结果演示
 ![结果显示](/uploads/Herms结果演示.png)
 
-****Hermes源码分析****
-===
+### Hermes源码分析
 ```java
-
 首先分析 进程A执行初始化操作
 Hermes.init(this);
 
@@ -156,9 +159,10 @@ public class TypeCenter
 
     //用来存储要注册的类方法的信息，class 代表当前要注册的类，value为HashMap，String为当前方法的字符串比如 "getUser(java.lang.String)"这个是针对方法没有注解
     private final ConcurrentHashMap<Class<?>, ConcurrentHashMap<String, Method>> mRawMethods;
-	...
+    ...
 }
-可以看到TypeCenter里面还有一堆的集合，主要是用来缓存的，防止下次使用的时候再去获取，还有一些对应的获取class的类型，method等，用到的时候再来分析
+
+可以看到TypeCenter里面还有一堆的集合，主要是用来缓存的，防止下次使用的时候方便获取，还有一些对应的获取Class的类型，method等，用到的时候再来分析
 
 所以会执行到TypeCenter 对应的类  这个方法主要是完成 注册操作,填充注册的类，已经注册的类对应的方法的信息的集合
 public void register(Class<?> clazz)
@@ -170,6 +174,7 @@ public void register(Class<?> clazz)
     //填充要注册的类里面的方法信息
     registerMethod(clazz);
 }
+
 //注册class
 private void registerClass(Class<?> clazz)
 {
@@ -179,7 +184,7 @@ private void registerClass(Class<?> clazz)
     {
         //如果注解为空 ,则获取要注册类的 className
         String className = clazz.getName();
-        //如果mRawClasses 不存在className对应的key，则put一个否则不put
+        //如果mRawClasses 不存在className对应的key，则put一个
         mRawClasses.putIfAbsent(className, clazz);
     }
     else
@@ -190,8 +195,9 @@ private void registerClass(Class<?> clazz)
         mAnnotatedClasses.putIfAbsent(className, clazz);
     }
 }
-可以看到上面的进行的操作首先检测要注册的类是否有ClassId 注解,有就获取到注解的值，没有就获取当前class的字符串，然后存储到集合中，这个注解的意思就是相当于取一个别名的意思，比如
-我们可以在UserManager上面添加一个@ClassId("UserManagerA"),那么就是说这个UserManagerA 代表UserManger这个类
+
+可以看到上面的进行的操作首先检测要注册的类是否有ClassId 注解,有就获取到注解的值，没有就获取当前Class的字符串，然后存储到集合中，
+这个注解的意思就是相当于取一个别名的意思，比如我们可以在UserManager上面添加一个@ClassId("UserManagerA"),那么就是说这个UserManagerA 代表UserManger这个类
 
 我们在调用的时候是这样调用的  Hermes.register(UserManager.class); 我们来看看UserManager.class是什么样的
 @ClassId("UserManager")
@@ -223,9 +229,10 @@ public interface IUserManager {
     @MethodId("getUser")
     String getUser();
 }
-这里先介绍下为什么这个UserManger为什么实现一个IUserManager接口，是这样的，我们如果要想提供内容给别人调用，那么我就必须调用register函数，对于另一方调用的人来说，他只需要一个
-类似于IUserManager的接口，对于他是怎么样做到隐射的，这就需要注解ClassId了，还有MethodId,比如在IUserManager的上面的ClassId注解的内容为UserManager，另一个进程的UserManager的注解
-为UserManager,这俩个是不是就对应起来了，对于MethodId注解也是类似
+
+这里先介绍下为什么这个UserManger为什么实现一个IUserManager接口，是这样的，我们如果要想提供内容给别人调用，那么我就必须调用register函数，对于另一方调用的人来说，
+他只需要一个类似于IUserManager的接口，对于他是怎么样做到映射的，这就需要注解ClassId了，还有MethodId,比如在IUserManager的上面的ClassId注解的内容为UserManager，
+另一个进程的UserManager的注解为UserManager,这俩个是不是就对应起来了，对于MethodId注解也是类似
 
 接下来分析  registerMethod(clazz); 该方法完成填充要注册的类方法的信息
 private void registerMethod(Class<?> clazz)
@@ -267,7 +274,7 @@ private void registerMethod(Class<?> clazz)
 最终会执行到 ,这里的packageName为空
 public static void connectApp(Context context, String packageName, Class<? extends HermesService> service)
 {
-    //进程B也要执行Herms的初始化操作
+    //进程B也要执行Herms的初始化操作，也即是完成Context的赋值，注意这里是在另一个进程，俩个进程之间是互不相关的
     init(context);
 
     //进程B执行连接操作
@@ -276,7 +283,7 @@ public static void connectApp(Context context, String packageName, Class<? exten
 CHANNEL的定义为  private static final Channel CHANNEL = Channel.getInstance();这里先看看类的作用
 public class Channel
 {
-	...
+    ...
     //缓存的HashMap key为对应的要连接的服务，value为要连接的服务，连接成功返回的IBinder对象
     private final ConcurrentHashMap<Class<? extends HermesService>, IHermesService> mHermesServices = new ConcurrentHashMap<Class<? extends HermesService>, IHermesService>();
 
@@ -288,8 +295,7 @@ public class Channel
 
     //缓存的HashMap，缓存了要连接的服务类，value 为 当前的连接是否还可以用
     private final ConcurrentHashMap<Class<? extends HermesService>, Boolean> mBounds = new ConcurrentHashMap<Class<? extends HermesService>, Boolean>();
-	
-...
+    ...
 }
 Channel类主要是用来缓存一些连接的内容，比如缓存要连接的服务Class，对应的IBinder引用，缓存当前哪些是保持连接的，当前哪些是正在连接的等
 
@@ -300,7 +306,7 @@ public void bind(Context context, String packageName, Class<? extends HermesServ
     HermesServiceConnection connection;
     synchronized (this)
     {
-        //首先从缓存中查找，这个service是否已经连接过了,连接过了，或者连接过了，而且当前的连接可以用就直接返回
+        //首先从缓存中查找，这个service是否已经连接过了,连接过了，而且当前的连接可以用就直接返回
         if (getBound(service))
         {
             return;
@@ -337,6 +343,7 @@ public void bind(Context context, String packageName, Class<? extends HermesServ
     //连接服务,那么进程A对应的这个服务就会被启动起来
     context.bindService(intent, connection, Context.BIND_AUTO_CREATE);
 }
+
 ServiceConnection实现类为
 private class HermesServiceConnection implements ServiceConnection
 {
@@ -400,8 +407,9 @@ private class HermesServiceConnection implements ServiceConnection
         }
     }
 }
-当函数执行
-hermesService.register(mHermesServiceCallback, Process.myPid());
+
+当执行函数 hermesService.register(mHermesServiceCallback, Process.myPid());
+
 mHermesServiceCallback 本质为
 //进程B的注册函数回调,本身是一个IBinder
 private IHermesServiceCallback mHermesServiceCallback = new IHermesServiceCallback.Stub();
@@ -457,6 +465,9 @@ public abstract class HermesService extends Service {
 	public static class HermesService0 extends HermesService {}
 	...
 }
+
+这样 进程B的回调函数 就会保存到进程A的集合中    mCallbacks.put(pid, callback); 
+
 
 接着进程B执行  获取单例对象
 IUserManager userManager = Hermes.getInstance(IUserManager.class);
@@ -575,7 +586,7 @@ public class InstanceGettingSender extends Sender
     {
         super(service, object);
     }
-	...
+    ...
 }
 Sender的构造函数
 public Sender(Class<? extends HermesService> service, ObjectWrapper object)
@@ -604,7 +615,7 @@ for (int i = 0; i < length; ++i)
 程序继续执行 执行发送,
 Reply reply = sender.send(null, tmp);
 
-//根据方法名已经参数的列表,构建一个Reply对象
+//根据方法名以及参数的列表,构建一个Reply对象
 public synchronized final Reply send(Method method, Object[] parameters) throws HermesException
 {
     //赋值当前的时间戳
@@ -825,8 +836,8 @@ public Reply send(Class<? extends HermesService> service, Mail mail)
     }
 }
 
-所以对于进程B来说做了那么多事情，就是封装一些有用的信息，给进程A用来确定调用哪个类，哪个方法，传递了什么参数进来，因为最终要通过反射的方式来调用，所以这边做的无非就是将要反射用到的
-信息封装在一起，最终本质还是通过远程的IBinder引用来通信的
+所以对于进程B来说做了那么多事情，就是封装一些有用的信息，给进程A用来确定调用哪个类，哪个方法，传递了什么参数进来，因为最终要通过反射的方式来调用，
+所以这边做的无非就是将要反射用到的信息封装在一起，最终本质还是通过远程的IBinder引用来通信的
 
 所以就会调用到进程A对应的函数
 private final IHermesService.Stub mBinder = new IHermesService.Stub() {
@@ -1103,7 +1114,4 @@ public class HermesInvocationHandler implements InvocationHandler {
 Toast.makeText(getApplicationContext(), userManager.getUser(), Toast.LENGTH_SHORT).show();
 
 ```
-
-总结：对于Hermes 多进程的调用，只不过是使用了IPC的机制，对于一个存在进程A的对象来说，如果进程B要想获取到就要通过IPC的机制获取到远端的IBInder引用，对于进程B想要操作进程A的这个对象
-都是通过IBinder的机制来传递要修改的内容，另一端获取到了要修改的值，然后在利用反射的机制来修改当前进程的这个对象，对于返回当前进程的对象，虽然另一个进程确实得到了对象，但是这俩个
-对象没有任务的关联，对于这个进程的对象来说，只是一个封装了数据的bean，如果这个进程要修改这个对象的值，就要通过IPC的机制来做到
+总结：对于Hermes 多进程的调用，只不过是使用了IPC的机制，对于一个存在进程A的对象来说，如果进程B要想获取到就要通过IPC的机制获取到远端的IBInder引用，对于进程B想要操作进程A的这个对象都是通过IBinder的机制来传递要修改的内容，另一端获取到了要修改的值，然后在利用反射的机制来修改当前进程的这个对象，对于返回当前进程的对象，虽然另一个进程确实得到了对象，但是这俩个对象没有任务的关联，对于这个进程的对象来说，只是一个封装了数据的bean，如果这个进程要修改这个对象的值，就要通过IPC的机制来做到
