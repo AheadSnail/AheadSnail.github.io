@@ -1114,5 +1114,5 @@ public class HermesInvocationHandler implements InvocationHandler {
 Toast.makeText(getApplicationContext(), userManager.getUser(), Toast.LENGTH_SHORT).show();
 
 ```
-#### 总结：
+### 总结：
 > 对于Hermes 多进程的调用，只不过是使用了IPC的机制，对于一个存在进程A的对象来说，如果进程B要想获取到就要通过IPC的机制获取到远端的IBInder引用，对于进程B想要操作进程A的这个对象都是通过IBinder的机制来传递要修改的内容，另一端获取到了要修改的值，然后在利用反射的机制来修改当前进程的这个对象，对于返回当前进程的对象，虽然另一个进程确实得到了对象，但是这俩个对象没有任务的关联，对于这个进程的对象来说，只是一个封装了数据的bean，如果这个进程要修改这个对象的值，就要通过IPC的机制来做到
