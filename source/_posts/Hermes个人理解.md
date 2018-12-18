@@ -230,8 +230,8 @@ public interface IUserManager {
     String getUser();
 }
 
-这里先介绍下为什么这个UserManger为什么实现一个IUserManager接口，是这样的，我们如果要想提供内容给别人调用，那么我就必须调用register函数，对于另一方调用的人来说，
-他只需要一个类似于IUserManager的接口，对于他是怎么样做到映射的，这就需要注解ClassId了，还有MethodId,比如在IUserManager的上面的ClassId注解的内容为UserManager，
+这里先介绍下为什么这个UserManger为什么实现一个IUserManager接口，是这样的，我们如果要想提供内容给另一个进程调用，那我们就可以提供这个IUserManager接口文件给另一个进程
+对于他是怎么样做到映射的，这就需要注解ClassId了，还有MethodId,比如在IUserManager的上面的ClassId注解的内容为UserManager，
 另一个进程的UserManager的注解为UserManager,这俩个是不是就对应起来了，对于MethodId注解也是类似
 
 接下来分析  registerMethod(clazz); 该方法完成填充要注册的类方法的信息
@@ -241,7 +241,7 @@ private void registerMethod(Class<?> clazz)
     Method[] methods = clazz.getMethods();
     for (Method method : methods)
     {
-        //获取当前方法上面的MethodId注解
+        //获取当前方法上面的MethodId注解  对于当前的环境即为 getUser()方法
         MethodId methodId = method.getAnnotation(MethodId.class);
         if (methodId == null)  //如果注解为空
         {
@@ -280,11 +280,12 @@ public static void connectApp(Context context, String packageName, Class<? exten
     //进程B执行连接操作
     CHANNEL.bind(context.getApplicationContext(), packageName, service);
 }
+
 CHANNEL的定义为  private static final Channel CHANNEL = Channel.getInstance();这里先看看类的作用
 public class Channel
 {
     ...
-    //缓存的HashMap key为对应的要连接的服务，value为要连接的服务，连接成功返回的IBinder对象
+    //缓存的HashMap key为对应的要连接的服务，value为要连接的服务成功后返回的IBinder对象
     private final ConcurrentHashMap<Class<? extends HermesService>, IHermesService> mHermesServices = new ConcurrentHashMap<Class<? extends HermesService>, IHermesService>();
 
     //缓存的HashMap key为要连接的服务，value为连接的connection对象
@@ -920,7 +921,7 @@ public final Reply action(long methodInvocationTimeStamp, MethodWrapper methodWr
 因为当前的类为InstanceGettingReceiver对象，所以调用对应的函数
 @Override
 public void setMethod(MethodWrapper methodWrapper, ParameterWrapper[] parameterWrappers) throws HermesException
-    {
+{
         //将参数的列表集合.转成对应的参数列表类型集合
         int length = parameterWrappers.length;
         Class<?>[] parameterTypes = new Class<?>[length];
@@ -948,7 +949,7 @@ public void setMethod(MethodWrapper methodWrapper, ParameterWrapper[] parameterW
 执行 setParameters(methodInvocationTimeStamp, parameterWrappers);
 //将传递的ParameterWrapper对象数组，变成Object数组，至于为什么要获取到Object数组，是因为我们在反射的时候需要传递参数
 private void setParameters(long methodInvocationTimeStamp, ParameterWrapper[] parameterWrappers) throws HermesException
-    {
+{
         if (parameterWrappers == null)
         {
             mParameters = null;
@@ -1011,7 +1012,7 @@ protected Object invokeMethod() throws HermesException
         OBJECT_CENTER.putObject(getObjectTimeStamp(), object);
         return null;
     }
-	...
+    ...
 }
 
 返回结果之后  return new Reply(new ParameterWrapper(result)); 要注意 这里的Reply 是实现了Parcelable 接口的，要不然不能在IPC中传输
@@ -1046,20 +1047,22 @@ public Reply(ParameterWrapper parameterWrapper) {
     //错误信息为空
     mErrorMessage = null;
     mClass = new TypeWrapper(clazz);
-	...
+    ...
 }
 
-当上面执行了返回之后，这边就能得到这个Reply这个结果了，
+由于IPC的调用过程中，对于调用方来说，会阻塞等待，直到返回结果 ，而 远端的服务会运行在 bind线程池中，所以当上面执行了返回之后，这边就能得到这个Reply这个结果了，
 Reply reply = sender.send(null, tmp);
-判断是否是正常的执行，如果不是打印错误信息
+
+进程B 接着执行判断返回的结果是否是正常，如果不是打印错误信息
 if (reply != null && !reply.success())
 {
     Log.e(TAG,"Error occurs during getting instance. Error code: " + reply.getErrorCode());
     Log.e(TAG, "Error message: " + reply.getMessage());return null;
 }
 
-//在上面可以看到发送完之后，并没有用到返回的对象，而是通过代理的方式返回这个对象，这是为什么呢，因为这个对象在进程B中也不能用，而且进程B中要想调用
+//接着进程B  通过代理的方式返回一个虚拟的进程A的对象回去,这是为什么呢，因为这个对象在进程B中也不能用，而且进程B中要想调用
 //这个对象的方法也还要通过IPC的机制来通信，所以这边可以直接返回一个代理的对象，代理的对象又可以知道你下次要调用什么方法，这不是很好
+
 object.setType(ObjectWrapper.TYPE_OBJECT);
 return getProxy(service, object);
 

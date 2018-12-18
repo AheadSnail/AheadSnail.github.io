@@ -6,25 +6,28 @@ tags: [Android,EventBus]
 description:  EventBus个人理解
 ---
 
-EventBus个人理解
+### 概述
+
+> EventBus个人理解
+
 <!--more-->
 
-简介
-```
-当我们进行项目开发的时候，往往是需要应用程序的各组件、组件与后台线程间进行通信，比如在子线程中进行请求数据，当数据请求完毕后通过Handler或者是广播通知UI，
-而两个Fragment之家可以通过Listener进行通信等等。当我们的项目越来越复杂，使用Intent、Handler、Broadcast进行模块间通信、模块与后台线程进行通信时，代码量大，而且高度耦合。
-此时EventBus就可以很好的解决这个问题，这个框架目前在github上面的start数量已经达到了18k，可谓是一个大家都认同的牛逼的项目，所以我们就有必要去学习了解下人家的牛逼之处
-```
 
-****EventBus简单的使用****
-===
-```java
-1.首先我们需要在接收方法的类里面注册，对应的代码为  EventBus.getDefault().register(this);
+### 简介
+> 当我们进行项目开发的时候，往往是需要应用程序的各组件、组件与后台线程间进行通信，比如在子线程中进行请求数据，当数据请求完毕后通过Handler或者是广播通知UI，而两个Fragment之家可以通过Listener进行通信等等。当我们的项目越来越复杂，使用Intent、Handler、Broadcast进行模块间通信、模块与后台线程进行通信时，代码量大，而且高度耦合。此时EventBus就可以很好的解决这个问题，这个框架目前在github上面的start数量已经达到了18k，可谓是一个大家都认同的牛逼的项目，所以我们就有必要去学习了解下人家的牛逼之处
+
+### EventBus简单的使用
+```gradle
+首先在app目录下的build.gradle 中添加eventbus的依赖
+compile 'org.greenrobot:eventbus:3.0.0'
+```
+之后是java代码的编写,下面是大体的逻辑
+> 1.首先我们需要在接收方法的类里面注册，对应的代码为  EventBus.getDefault().register(this);
 2.如果当前不需要接收方法了就有必要，取消注册，要不然会造成内存泄漏 对应的代码为  EventBus.getDefault().unregister(this);	
-3.我们需要写一个函数用来响应接收，函数上面一定要有注解  @Subscribe(threadMode = ThreadMode.MAIN)，threadMode可以指定接受所处的线程，而且要注意这个接收的函数，只能有一个参数
-如果你有多个参数，就有必要封装成一个对象，再传这个对象既可
+3.我们需要写一个函数用来响应接收，函数上面一定要有注解  @Subscribe(threadMode = ThreadMode.MAIN)，threadMode可以指定接受所处的线程，而且要注意这个接收的函数，只能有一个参数如果你有多个参数，就有必要封装成一个对象，再传这个对象既可
 4.在发送的另一方只要 执行这样的代码 EventBus.getDefault().post(Object obj);，就可以根据要发送的Object的类型，找到可以接受的方法，完成接收
 
+```java
 下面是整体的demo
 public class MainActivity extends Activity
 {
@@ -83,8 +86,7 @@ public class SecondActivity extends Activity
 结果演示
 ![结果显示](/uploads/EventDemo执行结果.png)
 
-****EventBus源码分析****
-===
+### EventBus源码分析
 ```java
 我们这样采用默认的配置，也即是我们测试程序demo这样的默认配置来分析源码
 
@@ -96,6 +98,7 @@ private static final EventBusBuilder DEFAULT_BUILDER = new EventBusBuilder();
 public EventBus() {
     this(DEFAULT_BUILDER);
 }
+
 EventBus(EventBusBuilder builder) {
     logger = builder.getLogger();
     subscriptionsByEventType = new HashMap<>();
@@ -118,10 +121,11 @@ EventBus(EventBusBuilder builder) {
     eventInheritance = builder.eventInheritance;
     executorService = builder.executorService;
 }
+
 然后调用对应的register(this)函数
 public void register(Object subscriber) {
     Class<?> subscriberClass = subscriber.getClass();
-    //查找当前class 对应的 已经父类所有的含有Subscriber 注解的方法，返回List<SubscriberMethod>的封装
+    //查找当前class 对应的 以及父类所有含有Subscriber 注解的方法，返回List<SubscriberMethod>
     List<SubscriberMethod> subscriberMethods = subscriberMethodFinder.findSubscriberMethods(subscriberClass);
     synchronized (this) {
         //遍历集合
@@ -131,10 +135,11 @@ public void register(Object subscriber) {
     }
 }
 
-先来分析  List<SubscriberMethod> subscriberMethods = subscriberMethodFinder.findSubscriberMethods(subscriberClass);函数的实现为SubscriberMethodFinder 中的
+先来分析  List<SubscriberMethod> subscriberMethods = subscriberMethodFinder.findSubscriberMethods(subscriberClass);函数的实现为SubscriberMethodFinder
+中的方法，先来了解下这个类
 
 class SubscriberMethodFinder {
-...
+	...
 	//缓存key为对应的class ，value为对应的含有注解的方法的集合
 	private static final Map<Class<?>, List<SubscriberMethod>> METHOD_CACHE = new ConcurrentHashMap<>();
 
@@ -178,22 +183,31 @@ class SubscriberMethodFinder {
         return subscriberMethods;
 	}
   }
- ...
+   ...
 
-  根据上面的注释以及代码，可以看到首先会获取到当前注册对象的class类型，从缓存的集合中 METHOD_CACHE获取，如果获取不到，则新建一个，然后执行下面的代码
+  根据上面的注释以及代码，可以看到首先会获取到当前注册对象的Class类型，从缓存的集合中 METHOD_CACHE获取，如果获取不到，则执行下面的代码
   subscriberMethods = findUsingInfo(subscriberClass);
  
-  //根据class 找到对应的含有注解的集合
+    //根据class 找到对应的含有注解的集合
     private List<SubscriberMethod> findUsingInfo(Class<?> subscriberClass) {
 	
         //准备FindState,如果缓存中有就直接获取，返回这个缓存，如果没有，就新建一个
         FindState findState = prepareFindState();
         //初始化findState
         findState.initForSubscriber(subscriberClass);
+        //findState中的clazz 属性在 initForSubscriber 中完成了赋值操作,所以不会为空
         while (findState.clazz != null) {
-            ....
-            findUsingReflectionInSingleClass(findState);
-			..
+             findState.subscriberInfo = getSubscriberInfo(findState);
+             if (findState.subscriberInfo != null) {
+                SubscriberMethod[] array = findState.subscriberInfo.getSubscriberMethods();
+                for (SubscriberMethod subscriberMethod : array) {
+                    if (findState.checkAdd(subscriberMethod.method, subscriberMethod.eventType)) {
+                        findState.subscriberMethods.add(subscriberMethod);
+                    }
+                }
+            } else {
+                findUsingReflectionInSingleClass(findState);
+            }
             //检查父类的注解的情况
             findState.moveToSuperclass();
         }
@@ -202,7 +216,7 @@ class SubscriberMethodFinder {
     } 
 }
 
-//准备FindState,如果缓存中有就直接获取，返回这个缓存，如果没有，就新建一个
+//准备FindState,如果缓存中有就直接获取，返回这个缓存，如果没有，就新建一个,假设当前第一次使用，则不会从缓存中获取，直接构建一个 new FindState();
 private FindState prepareFindState() {
         synchronized (FIND_STATE_POOL) {
             for (int i = 0; i < POOL_SIZE; i++) {
@@ -229,32 +243,54 @@ static class FindState {
         boolean skipSuperClasses;
         SubscriberInfo subscriberInfo;
 
-        //初始化
+        //initForSubscriber函数 初始化
         void initForSubscriber(Class<?> subscriberClass) {
             this.subscriberClass = clazz = subscriberClass;
             skipSuperClasses = false;
             subscriberInfo = null;
         }
-...
+        ...
 }
 
-然后执行到  findUsingReflectionInSingleClass(findState);
-通过反射的方式获取
+之后执行 findState.subscriberInfo = getSubscriberInfo(findState);
+private SubscriberInfo getSubscriberInfo(FindState findState) {
+    //在执行 initForSubscriber 的时候 将这个 subscriberInfo = null; 所以这边默认会返回null
+    if (findState.subscriberInfo != null && findState.subscriberInfo.getSuperSubscriberInfo() != null) {
+          SubscriberInfo superclassInfo = findState.subscriberInfo.getSuperSubscriberInfo();
+          if (findState.clazz == superclassInfo.getSubscriberClass()) {
+                return superclassInfo;
+          }
+    }
+
+    //默认的情况下，subscriberInfoIndexes 为null的
+    if (subscriberInfoIndexes != null) {
+        for (SubscriberInfoIndex index : subscriberInfoIndexes) {
+             SubscriberInfo info = index.getSubscriberInfo(findState.clazz);
+             if (info != null) {
+                return info;
+            }
+        }
+    }
+    return null;
+}
+
+所以之后会执行到  findUsingReflectionInSingleClass(findState);
 private void findUsingReflectionInSingleClass(FindState findState) {
         Method[] methods;
         try {
-            // This is faster than getMethods, especially when subscribers are fat classes like Activities
+            // This is faster than getMethods, especially when subscribers are fat classes like Activities  获取到当前类的所有的方法
             methods = findState.clazz.getDeclaredMethods();
         } catch (Throwable th) {
             // Workaround for java.lang.NoClassDefFoundError, see https://github.com/greenrobot/EventBus/issues/149
             methods = findState.clazz.getMethods();
             findState.skipSuperClasses = true;
         }
-        //获取到所有的方法
+        //遍历集合
         for (Method method : methods) {
             int modifiers = method.getModifiers();
+            //访问权限的判断，只能是public 并且不能为static的, 不能为abstract
             if ((modifiers & Modifier.PUBLIC) != 0 && (modifiers & MODIFIERS_IGNORE) == 0) {
-                //获取到方法的参数类型
+                //获取到方法的参数类型集合
                 Class<?>[] parameterTypes = method.getParameterTypes();
                 //判断参数的个数，EventBus只支持一个参数
                 if (parameterTypes.length == 1) {
@@ -276,14 +312,39 @@ private void findUsingReflectionInSingleClass(FindState findState) {
                     throw new EventBusException("@Subscribe method " + methodName +
                             "must have exactly 1 parameter but has " + parameterTypes.length);
                 }
-            } else if (strictMethodVerification && method.isAnnotationPresent(Subscribe.class)) {
+            } else if (strictMethodVerification && method.isAnnotationPresent(Subscribe.class)) {//方法的访问权限非法
                 String methodName = method.getDeclaringClass().getName() + "." + method.getName();
                 throw new EventBusException(methodName +
                         " is a illegal @Subscribe method: must be public, non-static, and non-abstract");
             }
         }
 }
-上面的函数就是说获取当前要注册的类里面所有的方法，检查是否有Subscriber注解，如果有注解，就判断参数类型是否是只有一个，如果都满足则拼接成一个SubscriberMethod对象，添加到subscriberMethods	
+
+Subscribe 注解类的定义为 ,这里的threadMode 为他的一个值，可以设置线程的模式
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.METHOD})
+public @interface Subscribe {
+    ThreadMode threadMode() default ThreadMode.POSTING;
+
+    /**
+     * If true, delivers the most recent sticky event (posted with
+     * {@link EventBus#postSticky(Object)}) to this subscriber (if event available).
+     */
+    boolean sticky() default false;
+
+    /** Subscriber priority to influence the order of event delivery.
+     * Within the same delivery thread ({@link ThreadMode}), higher priority subscribers will receive events before
+     * others with a lower priority. The default priority is 0. Note: the priority does *NOT* affect the order of
+     * delivery among subscribers with different {@link ThreadMode}s! */
+    int priority() default 0;
+}
+
+所以对于上面的 subscribeAnnotation.threadMode(); 就是获取到这个注解的第一个值 subscribeAnnotation.priority(), subscribeAnnotation.sticky() 获取到后面的俩个值，之后再封装成
+SubscriberMethod 对象，添加到subscriberMethods 集合中
+
+上面的函数就是说获取当前要注册的类里面所有的方法，检查是否有Subscriber注解，如果有注解，就判断参数类型是否是只有一个，如果都满足则拼接成一个SubscriberMethod对象，
+添加到subscriberMethods	
 findState.subscriberMethods的本质为 final List<SubscriberMethod> subscriberMethods = new ArrayList<>();
 
 SubscriberMethod类的定义为
@@ -310,14 +371,15 @@ public class SubscriberMethod {
 ...
 }
 
-while循环继续执行  findState.moveToSuperclass();
+回到前面的findUsingInfo函数  while循环继续执行  findState.moveToSuperclass();
 //跳过父类的检查
 void moveToSuperclass() {
     if (skipSuperClasses) {
             clazz = null;
         } else {
-            //获取到父类的class
+            //获取到父类的class，原本是当前的类，这里覆盖成了父类
             clazz = clazz.getSuperclass();
+            //获取到父类的className
             String clazzName = clazz.getName();
             /** Skip system classes, this just degrades performance. */
             //简单的判断如果当前的class 是以java. 或者javax. 或者android.的跳过父类
@@ -326,12 +388,25 @@ void moveToSuperclass() {
         }
     }
 }
-这个函数的作用就是，我们不止需要检查我们当前的类，还需要去检查父类的情况，当然这个父类里面如果是系统的类，我们是没有必要去检查的，因为他们不可能有这个Subscriber注解的存在
 
-所以当while循环执行完毕之后，我们就获取到了当前类以及父类含有Subscriber注解情况的集合
-然后执行 
-//根据FindState 得到List<SubscriberMethod>集合
-return getMethodsAndRelease(findState);
+通过这个函数修改clazz 的值，判断父类是否要去检查这个注解，当然系统的类我们不需要去检查，因为他们不可能有这个Subscriber注解的存在，如果不需要就将改值赋值为null
+while (findState.clazz != null) {
+      findState.subscriberInfo = getSubscriberInfo(findState);
+      if (findState.subscriberInfo != null) {
+            SubscriberMethod[] array = findState.subscriberInfo.getSubscriberMethods();
+            for (SubscriberMethod subscriberMethod : array) {
+                 if (findState.checkAdd(subscriberMethod.method, subscriberMethod.eventType)) {
+                     findState.subscriberMethods.add(subscriberMethod);
+				 }
+           }
+      } else {
+         findUsingReflectionInSingleClass(findState);
+    }
+    //检查父类的注解的情况
+    findState.moveToSuperclass();
+}
+
+这样 当while循环执行完毕之后，我们就获取到了当前类以及父类含有Subscriber注解情况的集合,然后执行 return getMethodsAndRelease(findState);
 
 //根据FindState 得到List<SubscriberMethod>集合
 private List<SubscriberMethod> getMethodsAndRelease(FindState findState) {
@@ -352,8 +427,9 @@ private List<SubscriberMethod> getMethodsAndRelease(FindState findState) {
     return subscriberMethods;
 }
 
+
 最后执行
-//将当前的class 已经对应的list<SubscriberMethod>填充到缓存中,并返回这个集合
+//将当前的class 以及对应的list<SubscriberMethod>填充到缓存中,并返回这个集合,每一个的SubscriberMethod 对应的一个被Subscriber注解标记的方法信息的封装
 METHOD_CACHE.put(subscriberClass, subscriberMethods);
 return subscriberMethods;
 
@@ -365,7 +441,7 @@ public void register(Object subscriber) {
     synchronized (this) {
         //遍历集合
         for (SubscriberMethod subscriberMethod : subscriberMethods) {
-                subscribe(subscriber, subscriberMethod);
+             subscribe(subscriber, subscriberMethod);
         }
     }
 }
@@ -386,8 +462,7 @@ private void subscribe(Object subscriber, SubscriberMethod subscriberMethod) {
             subscriptionsByEventType.put(eventType, subscriptions);
         } else {
             if (subscriptions.contains(newSubscription)) {
-                throw new EventBusException("Subscriber " + subscriber.getClass() + " already registered to event "
-                        + eventType);
+                throw new EventBusException("Subscriber " + subscriber.getClass() + " already registered to event " + eventType);
             }
         }
         //获取到当前type对应的Subscription 集合，遍历集合中每一个元素的priority 跟当前的priority对比，重新的构建一个Subscription 集合
@@ -410,6 +485,7 @@ private void subscribe(Object subscriber, SubscriberMethod subscriberMethod) {
         subscribedEvents.add(eventType);
         ...
 }
+
 上面函数中几个map集合的定义为
 //缓存的集合 key为对应的post参数的类型，value为对应的class集合包含当前的post参数的类型，已经父类的接口
 private static final Map<Class<?>, List<Class<?>>> eventTypesCache = new HashMap<>();
@@ -421,8 +497,8 @@ private final Map<Class<?>, CopyOnWriteArrayList<Subscription>> subscriptionsByE
 private final Map<Object, List<Class<?>>> typesBySubscriber;
 
 
-总结下：其实register函数，目的就是为了维护几个集合，这几个集合里面存储了必要的信息，比如订阅者对象，订阅者类包含的所有的订阅函数的集合，订阅的参数等,目的就是为了下一步post的时候
-从对应的集合中能找到对应的值，然后根据反射调用对应的方法
+总结下：其实register函数，目的就是为了维护几个集合，这几个集合里面存储了必要的信息，比如订阅者对象，订阅者类包含的所有的订阅函数的集合，订阅的参数等,
+目的就是为了下一步post的时候,从对应的集合中能找到对应的值，然后根据反射调用对应的方法
 
 
 下面解析分析
@@ -884,8 +960,285 @@ private final static ExecutorService DEFAULT_EXECUTOR_SERVICE = Executors.newCac
 
 总结主线程切换到子线程是通过ExecutorService 提交一个任务的方式，来切换到子线程
 ```
+### 精简版EventBus
+```java
+使用的地方
+public class MainActivity extends AppCompatActivity
+{
 
-总结：EventBus的巧妙之处就是那几个集合存储的内容，当post事件发生的时候，可以根据这几个集合的内容找到对应的函数，还有订阅者对象，然后利用反射的方式来调用，主线程的切换是通过
-主线程的Handler方式来做到的，子线程的切换是通过ExecutorService的方式来切换的
+    @Override
+    protected void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        EventBus.getInstance().register(this);
+    }
+
+    public void click(View view)
+    {
+        startActivity(new Intent(MainActivity.this,SecondActivity.class));
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void testMessage(String info)
+    {
+        Toast.makeText(MainActivity.this,info,Toast.LENGTH_SHORT).show();
+    }
+}
+
+public class SecondActivity extends AppCompatActivity
+{
+    @Override
+    protected void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_second);
+
+        findViewById(R.id.but).setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                new Thread()
+                {
+                    @Override
+                    public void run()
+                    {
+                        super.run();
+                        EventBus.getInstance().post("hello From EventBus");
+                    }
+                }.start();
+            }
+        });
+    }
+}
+
+
+Subscribe 注解的定义，这里就只能切换线程
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface Subscribe
+{
+    ThreadMode threadMode() default ThreadMode.POSTING;
+}
+
+public class SubscriberMethod
+{
+    //参数的类型
+    private Class<?> type;
+
+    //当前含有这个注解的方法
+    private Method method;
+
+    //线程的优先级情况
+    private ThreadMode threadMode;
+
+    public SubscriberMethod(Class<?> type, Method method, ThreadMode threadMode)
+    {
+        this.type = type;
+        this.method = method;
+        this.threadMode = threadMode;
+    }
+
+
+    public Class<?> getType()
+    {
+        return type;
+    }
+
+    public Method getMethod()
+    {
+        return method;
+    }
+
+    public ThreadMode getThreadMode()
+    {
+        return threadMode;
+    }
+}
+
+public class EventBus
+{
+    private static final EventBus ourInstance = new EventBus();
+
+    private final static ExecutorService DEFAULT_EXECUTOR_SERVICE = Executors.newCachedThreadPool();
+
+    //主线程的Handler对象
+    private Handler mMainHandler = new Handler(Looper.getMainLooper());
+
+    //总表  post(一个对象)
+    private Map<Object, List<SubscriberMethod>> cacheMap;
+
+    public static EventBus getInstance()
+    {
+        return ourInstance;
+    }
+
+    private EventBus()
+    {
+        cacheMap = new HashMap<>();
+    }
+
+    /**
+     * 注册
+     * @param subscriber
+     */
+    public void register(Object subscriber) {
+        List<SubscriberMethod> subscriberMethods = cacheMap.get(subscriber);
+        if(subscriberMethods == null)
+        {
+            subscriberMethods = new ArrayList<>();
+
+            Class<?> clazz = subscriber.getClass();
+            while(clazz != null)
+            {
+                //获取到当前clazz对应的含有注解的Method封装
+                getSubsciberMethods(subscriberMethods,clazz);
+                clazz = clazz.getSuperclass();
+                String clazzName = clazz.getName();
+                /** Skip system classes, this just degrades performance. */
+                //简单的判断如果当前的class 是以java. 或者javax. 或者android.的跳过父类
+                if (clazzName.startsWith("java.") || clazzName.startsWith("javax.") || clazzName.startsWith("android.")) {
+                    clazz = null;
+                }
+            }
+            cacheMap.put(subscriber,subscriberMethods);
+        }
+    }
+
+    /**
+     * 获取clazz对应的含有Subscriber注解的方法的封装
+     * @param subscriberMethods
+     * @param clazz
+     */
+    private void getSubsciberMethods(List<SubscriberMethod> subscriberMethods,Class<?> clazz){
+        Method[] methods = clazz.getDeclaredMethods();
+        //获取到所有的方法
+        for (Method method : methods)
+        {
+            //获取到方法的参数类型
+            Class<?>[] parameterTypes = method.getParameterTypes();
+            //当前的方法含有Subscribe注解
+            Subscribe subscribe = method.getAnnotation(Subscribe.class);
+            if (subscribe != null)
+            {
+                //判断参数的个数，EventBus只支持一个参数
+                if (parameterTypes.length == 1)
+                {
+                    ThreadMode threadMode = subscribe.threadMode();
+                    //然后构建一个SubsciberMethod对象，然后添加到subscriberMethods 集合中
+                    subscriberMethods.add(new SubscriberMethod(parameterTypes[0], method, threadMode));
+                }
+                else
+                {
+                    throw new IllegalArgumentException("只支持一个参数");
+                }
+            }
+        }
+    }
+
+    /**
+     * 传递事件
+     * @param event
+     */
+    public void post(final Object event){
+        Class<?> eventClazz = event.getClass();
+        Iterator<Map.Entry<Object, List<SubscriberMethod>>> iterator = cacheMap.entrySet().iterator();
+        while(iterator.hasNext())
+        {
+            final Map.Entry<Object, List<SubscriberMethod>> entry = iterator.next();
+            List<SubscriberMethod> subscriberMethods = entry.getValue();
+            for(int i = 0 ;i<subscriberMethods.size();i++)
+            {
+                final SubscriberMethod subscriberMethod = subscriberMethods.get(i);
+                //找到了对应的type
+                if(subscriberMethod.getType().isAssignableFrom(eventClazz))
+                {
+                    //判断是否在主线程 Looper.myLooper(); 获取到当前线程的looper跟主线程的looper对比既可知道是否在主线程
+                    boolean isMainThread = Looper.getMainLooper() == Looper.myLooper();
+                    switch (subscriberMethod.getThreadMode())
+                    {
+                        case MAIN:
+                            if (isMainThread)
+                            {
+                                //俩个都是在主线程直接调用
+                                try
+                                {
+                                    subscriberMethod.getMethod().invoke(entry.getKey(),event);
+                                }
+                                catch (Exception e)
+                                {
+                                    e.printStackTrace();
+                                }
+                            }
+                            else
+                            {
+                                //要切换到主线程，直接使用Handler既可以，只是这个Handler要持有主线程的Looper对象
+                                mMainHandler.post(new Runnable()
+                                {
+                                    @Override
+                                    public void run()
+                                    {
+                                        try
+                                        {
+                                            subscriberMethod.getMethod().invoke(entry.getKey(),event);
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                });
+                            }
+                            break;
+
+                        case BACKGROUND:
+                            if (isMainThread)
+                            {
+                                //切换到子线程
+                                DEFAULT_EXECUTOR_SERVICE.execute(new Runnable()
+                                {
+                                    @Override
+                                    public void run()
+                                    {
+                                        try
+                                        {
+                                            subscriberMethod.getMethod().invoke(entry.getKey(),event);
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                });
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    subscriberMethod.getMethod().invoke(entry.getKey(),event);
+                                }
+                                catch (Exception e)
+                                {
+                                    e.printStackTrace();
+                                }
+                            }
+                            break;
+                    }
+                    return;
+                }
+            }
+
+        }
+    }
+}
+```
+结果演示
+![结果显示](/uploads/EventBus精简版.png)
+
+### 总结：
+> EventBus的巧妙之处就是那几个集合存储的内容，当post事件发生的时候，可以根据这几个集合的内容找到对应的函数，还有订阅者对象，然后利用反射的方式来调用，主线程的切换是通过主线程的Handler方式来做到的，子线程的切换是通过ExecutorService的方式来切换的
 
 
