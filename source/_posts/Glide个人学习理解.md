@@ -6,30 +6,30 @@ tags: [Android,Glide]
 description:  Glide个人学习理解
 ---
 
-Glide个人学习理解
+### 概述
+
+> Glide个人学习理解
+
 <!--more-->
 
-简介
-```
-Glide源码众多，自然没有办法做到每一个都去详细的了解。。这里只是大致的分析他的大致流程，这里的分析大致会分为下面的三个点来
-
+### 简介
+> Glide源码众多，自然没有办法做到每一个都去详细的了解。。这里只是大致的分析他的大致流程，这里的分析大致会分为下面的三个点来
 1.Glide 内存缓存机制
 2.Glide 生命周期机制
 3.Glide 注册机的机制
 
-```
- ****Glide内存缓存机制****
- ===
+
+### Glide内存缓存机制
 ```java
-Glide中的内存缓存分为活动缓存还有内存缓存，对应的类为ActiveResources,LruResourceCache
-我们先看看他们在Glide中是怎么样使用的，在Engine中有这样的代码
+Glide中的内存缓存分为活动缓存还有内存缓存，对应的类为ActiveResources,LruResourceCache,我们先看看他们在Glide中是怎么样获取到一个资源的，下面的代码是在Engine中
+
     //构建一个key ，利用EngineKey来构建一个key，如果宽高不一样的化，这里会得到俩个不一样的key
     EngineKey key = keyFactory.buildKey(model, signature, width, height, transformations, resourceClass, transcodeClass, options);
 
     //首先从活动的缓存中获取
     EngineResource<?> active = loadFromActiveResources(key, isMemoryCacheable);
     if (active != null) {
-      //如果从活动资源中获取到了这个资源，Juin直接通过资源准备好了，return   DataSource.MEMORY_CACHE 标识当前的这个资源是来自内存缓存中
+      //如果从活动资源中获取到了这个资源，就直接回调资源准备好了，return   DataSource.MEMORY_CACHE 标识当前的这个资源是来自内存缓存中
       cb.onResourceReady(active, DataSource.MEMORY_CACHE);
       if (VERBOSE_IS_LOGGABLE) {
         logWithTimeAndKey("Loaded resource from active resources", startTime, key);
@@ -62,6 +62,20 @@ Glide中的内存缓存分为活动缓存还有内存缓存，对应的类为Act
     }
     return active;
   }
+  
+  //EngineResource acquire 函数的实现
+  void acquire() {
+    //如果当前资源以及回收过了一次
+    if (isRecycled) {
+      throw new IllegalStateException("Cannot acquire a recycled resource");
+    }
+    //如果不是主线程的化
+    if (!Looper.getMainLooper().equals(Looper.myLooper())) {
+      throw new IllegalThreadStateException("Must call acquire on the main thread");
+    }
+    //引用计数加一的操作
+    ++acquired;
+  }
 
   //从内存缓存中获取资源， isMemoryCacheable 标识，是否允许内存缓存
   private EngineResource<?> loadFromCache(Key key, boolean isMemoryCacheable) {
@@ -80,19 +94,51 @@ Glide中的内存缓存分为活动缓存还有内存缓存，对应的类为Act
     }
     return cached;
   }
-
-  Glide 里面的Resource采用的是引用技术的方式，使用这个对象，就会让这个引用计数加一，如果不用了响应的就会让这个引用计数减一，如果引用计数达到了0，就代表这个资源要被释放了
-  上面的大致流程为：首先从活动缓存中获取，如果获取到了，就返回这个资源的引用，同时让这个资源的引用计数加一处理，如果从活动缓存中没有获取到，就会尝试的从内存缓存中获取
-  如果获取到了，就会将这个引用资源从内存缓存中移除，然后添加到了活动缓存中，同时资源的引用计数加一处理，至于为什么要从内存缓存中移除大致是因为Glide的内存缓存是采用Lru算法的
-  是有一个最大的缓存大小的，而活动缓存是采用HashMap来存储的，如果不从内存缓存移除的化，就会导致活动缓存存在一个对象的引用，内存缓存也存在一个对象的引用，如果此时内存缓存因为
-  Lru算法的机制导致这个对象刚好要被销毁，此时活动的缓存的这个对象，你刚好在屏幕上展示，这就会出现问题。。。而且为了防止Lru算法的问题 活动缓存他使用的是HashMap来存储活动缓存
-  同时这个HashMap存储的是虚引用的形式 final Map<Key, ResourceWeakReference> activeEngineResources = new HashMap<>();
   
-  ActivityResource中添加一个资源是调用下面的这种形式
-   //资源引用
+  //getEngineResourceFromCache 函数实现
+  private EngineResource<?> getEngineResourceFromCache(Key key) {
+    //从内存缓存中移除这个key对应的 资源，为什么要移除呢，防止当从内存缓存中获取到了之后，添加到了活动缓存，由于内存缓存采用的是Lru算法
+    //当内存缓存满的时候Lru 算法会最近没有使用的资源移除，如果是使用同一个对象的化，内存缓存移除之后，活动缓存的这个引用就会存在问题
+    Resource<?> cached = cache.remove(key);
+
+    final EngineResource<?> result;
+    //如果获取到的资源为空。返回一个空的EngineResoutce对象
+    if (cached == null) {
+      result = null;
+    } else if (cached instanceof EngineResource) {//如果不为空
+      // Save an object allocation if we've cached an EngineResource (the typical case).
+      result = (EngineResource<?>) cached;
+    } else {
+        //构建一个EngienResouece对象，返回
+      result = new EngineResource<>(cached, true /*isMemoryCacheable*/, true /*isRecyclable*/);
+    }
+    return result;
+  }
+  
+  
+  //当从内存缓存中获取到之后，添加到活动的缓存中，同时这个对象引用次数加一
+  if (cached != null) {
+      //如果从内存缓存中获取到了，标识这个资源的引用加一
+      cached.acquire();
+      //然后添加到活动缓存中，这就是为什么要从内存缓存中移除了
+      activeResources.activate(key, cached);
+  }
+  
+
+  Glide 里面的Resource采用的是引用技术的方式，使用这个对象，就会让这个引用计数加一，如果不用了相应的就会让这个引用计数减一，如果引用计数达到了0，就代表这个资源要被释
+  放了上面的大致流程为：首先从活动缓存中获取，如果获取到了，就返回这个资源的引用，同时让这个资源的引用计数加一处理，如果从活动缓存中没有获取到，就会尝试的从内存缓存
+  中获取如果获取到了，就会将这个引用资源从内存缓存中移除，然后添加到了活动缓存中，同时资源的引用计数加一处理，至于为什么要从内存缓存中移除大致是因为Glide的内存缓存是
+  采用Lru算法的是有一个最大的缓存大小的，而活动缓存是采用HashMap来存储的，如果不从内存缓存移除的化，就会导致活动缓存存在一个对象的引用，内存缓存也存在一个对象的引用，
+  如果此时内存缓存因为Lru算法的机制导致这个对象刚好要被销毁，此时活动的缓存的这个对象，你刚好在屏幕上展示，这就会出现问题。。。而且为了防止Lru算法的问题 
+  活动缓存他使用的是HashMap来存储活动缓存同时这个HashMap存储的是虚引用的形式 final Map<Key, ResourceWeakReference> activeEngineResources = new HashMap<>();
+  
+  接着分析 ActivityResource中添加一个资源是怎么样的
+  
+  //资源引用
   void activate(Key key, EngineResource<?> resource) {
-    //将这个资源构成一个WeakReference对象，注意这里传递了 getReferenceQueue() ，大体的作用就是当你这个虚引用被资源回收掉了，这个被回收的对象会添加到ReferenceQueue中
-    //这样我们查看这个ReferenceQueue中有没有内容就可以知道哪个对象被回收了，这样我们可以将这个引用从我们的HashMap中移除，防止内存泄漏
+    //将这个资源构成一个WeakReference对象，注意这里传递了 getReferenceQueue() ，大体的作用就是当你这个虚引用被资源回收掉了，
+    //这个被回收的对象会添加到ReferenceQueue中这样我们查看这个ReferenceQueue中有没有内容就可以知道哪个对象被回收了，
+    //这样我们可以将这个引用从我们的HashMap中移除，防止内存泄漏
     ResourceWeakReference toPut =
         new ResourceWeakReference(
             key,
@@ -108,6 +154,16 @@ Glide中的内存缓存分为活动缓存还有内存缓存，对应的类为Act
     }
   }
  
+  //ResourceWeakReference 类的定义为
+  @VisibleForTesting
+  static final class ResourceWeakReference extends WeakReference<EngineResource<?>> {
+    @SuppressWarnings("WeakerAccess") @Synthetic final Key key;
+    @SuppressWarnings("WeakerAccess") @Synthetic final boolean isCacheable;
+
+    @Nullable @SuppressWarnings("WeakerAccess") @Synthetic Resource<?> resource;
+    ...
+  }
+ 
   //ReferenceQueue对象，可以用来监听虚引用被回收的过程，就是说当你的虚引用的对象被回收的时候，会添加到这个队列里面，所以你可以获取到这个被回收
   //掉的虚引用，然后从map里面清除这个对象
   private ReferenceQueue<EngineResource<?>> getReferenceQueue() {
@@ -119,7 +175,7 @@ Glide中的内存缓存分为活动缓存还有内存缓存，对应的类为Act
         @Override
         public void run() {
           Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
-		  //查找是否有对象被清理了
+          //查找是否有对象被清理了
           cleanReferenceQueue();
         }
       }, "glide-active-resources");
@@ -129,12 +185,15 @@ Glide中的内存缓存分为活动缓存还有内存缓存，对应的类为Act
     return resourceReferenceQueue;
   }
   
-  //清除WeakReference引用对象
+  所以上面的逻辑就是当添加一个资源到活动缓存的时候，会构建一个WeakReference对象，然后存储到Map, 同时构建WeakReference对象的时候，指定了ReferenceQueue，
+  这样当WeakReference由于内存不足导致被回收的时候，会先添加到这个ReferenceQueue队列中，这样通过检查这个队列是否有内容，就可以知道是否有资源被释放了，
+  如果是第一次添加的时候，同时会启动一个线程用于监控这个ReferenceQueue中是否有内容，下面是这个线程的关键实现
+  
   @SuppressWarnings("WeakerAccess")
   @Synthetic void cleanReferenceQueue() {
     while (!isShutdown) {
       try {
-          //获取到当前已经被释放到的虚引用,如果获取到的这个引用不为空，就代表这个对象被销毁了
+        //获取到当前已经被释放到的虚引用,如果获取到的这个引用不为空，就代表这个对象被销毁了,首先从这个ReferenceQueue队列中移除这个元素,注意此时并没有从Map集合中移除
         ResourceWeakReference ref = (ResourceWeakReference) resourceReferenceQueue.remove();
         //然后通过handler来发送消息，通知当前的虚引用已经被移除了，可以从map里面移除了
         mainHandler.obtainMessage(MSG_CLEAN_REF, ref).sendToTarget();
@@ -151,7 +210,7 @@ Glide中的内存缓存分为活动缓存还有内存缓存，对应的类为Act
     }
   }
   
-   //用来接收被移除的通知，接收到之后从活动缓存的map中移除掉
+  //用来接收被移除的通知，接收到之后从活动缓存的map中移除掉
   private final Handler mainHandler = new Handler(Looper.getMainLooper(), new Callback() {
     @Override
     public boolean handleMessage(Message msg) {
@@ -197,9 +256,22 @@ Glide中的内存缓存分为活动缓存还有内存缓存，对应的类为Act
       resourceRecycler.recycle(resource);
     }
   }
-    
-  如果内存缓存由于Lru算法导致移除的化，会怎么样呢，这样	
-  //当资源从 Lru内存缓存中移除的回调,当达到了最多的lru算法内存的时候，就会移除
+  
+  //deactivate 函数的实现   从内存缓冲中移除这个对象
+  void deactivate(Key key) {
+    //直接从map中移除对应key的value
+    ResourceWeakReference removed = activeEngineResources.remove(key);
+    if (removed != null) {
+      removed.reset();
+    }
+  }
+  
+  这里才是将当前的资源从活动缓存的Map中移除出去，移除出去的时候再判断下是否可以缓存到内存缓存中，如果可以添加到内存缓存中，这里跟上面内存缓存中找到资源之后要先从
+  内存缓存中移除出去，然后再添加到活动缓存中一样，这里在监控到活动缓存资源被释放的时候，在添加到内存缓存之前，也要先从活动缓存中移除出去，都是为了防止俩个引用指向同一个对象
+
+  如果内存缓存由于Lru算法导致移除的化，会怎么样呢，
+  
+  //当资源从 Lru内存缓存中移除的回调,当达到了最多的lru算法内存的时候，就会移除,相应的就会触发 onItemEvicted 回调
   @Override
   protected void onItemEvicted(@NonNull Key key, @Nullable Resource<?> item) {
     if (listener != null && item != null) {
@@ -219,7 +291,7 @@ Glide中的内存缓存分为活动缓存还有内存缓存，对应的类为Act
   //回收资源
   void recycle(Resource<?> resource) {
     Util.assertMainThread();
-    //如果当前正在回收,那就利用handler，handler可以做到相当于是一个队列的形式存在
+    //如果当前正在回收,那就利用handler，handler可以做到相当于是一个队列的形式存在,当前发送的消息，会默认在后面
     if (isRecycling) {
       // If a resource has sub-resources, releasing a sub resource can cause it's parent to be
       // synchronously
@@ -252,6 +324,9 @@ Glide中的内存缓存分为活动缓存还有内存缓存，对应的类为Act
       resource.recycle();
     }
   }
+  
+  所以当内存缓存的资源由于LRU算法导致资源被移除的时候，并不会再次的添加到活动缓存中，而是会直接的进行移除的操作，在移除之前会判断当前是否正在进行移除操作，如果是
+  通过handler，消息队列实现一种队列的效果，如果当前没有正在进行移除，直接进行移除，移除的时候，就是将资源的引用减一处理，如果达到了0，就代表可以回收了
   
   接下来分析下EngineResouce的引用计数的实现
   当获取到一个资源的时候，会调用acquire函数,标记当前的引用计数加一
@@ -326,15 +401,13 @@ Glide中的内存缓存分为活动缓存还有内存缓存，对应的类为Act
     }
   }
   
-  总结下，当Glide要加载资源的时候，首先会去活动缓存中查找，如果查找到了，就会直接返回，并让这个引用加一处理，如果没有查找到，就会去内存缓存中查找，如果查找到了要从内存缓存中
-  移除这个对象，然后添加到活动缓存，同时这个资源的引用计数要加一处理，如果是新的资源就会去网络或者磁盘中获取到，当获取成功的时候，就会添加到活动缓存中，活动缓存是采用HashMap的实现
-  存储的是虚引用，由于采用了ReferenceQueue所以可以知道哪些对象由于被回收，从而进行从HashMap中移除这个对象，然后回调执行onResourceReleased 回调，会将这个资源添加到内存缓存中，
-  内存缓存使用了Lru算法，所以会有到达内存最大值的情况，此时会执行移除操作，回调执行onResourceRemoved函数，然后使用resourceRecycler 来执行回收，当然这个资源如果引用计数不为0的化
-  是不会被回收
-  
+  总结下，当Glide要加载资源的时候，首先会去活动缓存中查找，如果查找到了，就会直接返回，并让这个引用加一处理，如果没有查找到，就会去内存缓存中查找，
+  如果查找到了要从内存缓存中移除这个对象，然后添加到活动缓存，同时这个资源的引用计数要加一处理，如果是新的资源就会去网络或者磁盘中获取到，当获取成功的时候，
+  就会添加到活动缓存中，活动缓存是采用HashMap的实现存储的是虚引用，由于采用了ReferenceQueue所以可以知道哪些对象由于被回收，从而进行从HashMap中移除这个对象，
+  然后回调执行onResourceReleased 回调，会将这个资源添加到内存缓存中，内存缓存使用了Lru算法，所以会有到达内存最大值的情况，此时会执行移除操作，
+  回调执行onResourceRemoved函数，然后使用resourceRecycler 来执行回收，当然这个资源如果引用计数不为0的化是不会被回收
 ```
- ****Glide 生命周期机制****
- ===
+### Glide 生命周期机制
 ```java
 首先查看Glide中调用with的时候，干了什么事情
 //获取到RequestManager对象
@@ -383,8 +456,8 @@ Glide中的内存缓存分为活动缓存还有内存缓存，对应的类为Act
     return applicationManager;
   }
   
-  对于传递进来的context 对象是Application 或者不是在主线程中调用这个with 则直接构建一个RequestManager对象，并返回。。并没有管理Fragment的操作，所以这样会导致他的生命周期
-  为整个应用程序的生命周期。。所以不推荐这样使用
+  对于传递进来的context 对象是Application 或者不是在主线程中调用这个with 则直接构建一个RequestManager对象，并返回。。并没有管理Fragment的操作，
+  所以这样会导致他的生命周期为整个应用程序的生命周期。。所以不推荐这样使用
   
   如果是正常的使用就会进入里面
    if (context instanceof FragmentActivity) {
@@ -461,7 +534,12 @@ Glide中的内存缓存分为活动缓存还有内存缓存，对应的类为Act
     return current;
   }
 
-Handler接收到了  ID_REMOVE_FRAGMENT_MANAGER消息的实现
+  //pendingRequestManagerFragments 集合的定义 主要是为了防止重复的创建RequestManagerFragment
+  @SuppressWarnings("deprecation")
+  @VisibleForTesting
+  final Map<android.app.FragmentManager, RequestManagerFragment> pendingRequestManagerFragments = new HashMap<>();
+  
+当 Handler接收到了  ID_REMOVE_FRAGMENT_MANAGER消息的实现，
 case ID_REMOVE_FRAGMENT_MANAGER://如果收到了这个消息，说明创建的Fragment肯定已经添加到了FragmentManager中，所以这里可以从临时集合中移除了
     android.app.FragmentManager fm = (android.app.FragmentManager) message.obj;
     key = fm;
@@ -469,9 +547,11 @@ case ID_REMOVE_FRAGMENT_MANAGER://如果收到了这个消息，说明创建的F
     removed = pendingRequestManagerFragments.remove(fm);
 break;
 
-    构建RequestManagerFragment对象的时候
+    当执行 构建RequestManagerFragment对象的时候
     RequestManagerFragment current = new RequestManagerFragment();
-	 public RequestManagerFragment() {
+	
+    RequestManagerFragment 类构造函数的执行
+    public RequestManagerFragment() {
         this(new ActivityFragmentLifecycle());
     }
 	
@@ -485,10 +565,38 @@ break;
         this.lifecycle = lifecycle;
     }
 	
-    //构建一个RequestManager对象,同时将在RequestManagerFragment中创建的lifecycle对象传递过去
-    requestManager = factory.build(glide, current.getGlideLifecycle(), current.getRequestManagerTreeNode(), context);
+    到这里大概的总结下：以刚才传递过来的Context为Activity实例来说，首先会尝试的根据当前Activity中的FragmengManager判断是否当前已经添加过RequestManagerFragment对象
+    如果已经添加过就直接返回，如果没有添加过，就构建一个RequestManagerFragment对象，由于FragmentManager添加一个Fragment内部是通过Handler的形式，也即是异步的存在
+    为了防止重复的添加所以这里先将当前构建的Fragment添加到了这个临时的集合中，同时发送了一个消息到主线程的Handler里面，这样当这条消息被处理的时候，那么这个Fragment
+    肯定已经添加成功，同时构建Fragment的时候，构造函数中生成了一个lifecycle 成员
 	
-    RequestManager(
+   再次回到这里
+   private RequestManager fragmentGet(@NonNull Context context,
+      @NonNull android.app.FragmentManager fm,
+      @Nullable android.app.Fragment parentHint,
+      boolean isParentVisible) {
+    //获取到RequestManagerFragment对象
+    RequestManagerFragment current = getRequestManagerFragment(fm, parentHint, isParentVisible);
+	
+    //获取到RequestManagerFragment中的RequestManager对象,
+    RequestManager requestManager = current.getRequestManager();
+    //第一次获取肯定为空
+    if (requestManager == null) {
+      // TODO(b/27524013): Factor out this Glide.get() call.
+      Glide glide = Glide.get(context);
+      //则利用工厂factory 构建一个RequestManager对象
+      requestManager = factory.build(glide, current.getGlideLifecycle(), current.getRequestManagerTreeNode(), context);
+      //给RequestManagerFragment设置RequestManager对象
+      current.setRequestManager(requestManager);
+    }
+    //返回RequestManager对象
+    return requestManager;
+  }
+  
+  //由于第一次构建的时候RequestManager 对象为空,则会执行下面的代码，这里传递了当前Fragment中的lifecycle 成员
+  requestManager = factory.build(glide, current.getGlideLifecycle(), current.getRequestManagerTreeNode(), context);
+	
+  RequestManager(
       Glide glide,
       Lifecycle lifecycle,
       RequestManagerTreeNode treeNode,
@@ -509,7 +617,14 @@ break;
     lifecycle.addListener(connectivityMonitor);
 }
 
-对于 lifecycle.addListener()，就会执行到ActivityFragmentLifecycle 中对应的函数
+RequestManager 实现了LifecycleListener 接口
+public class RequestManager implements LifecycleListener
+{
+    ...
+}
+
+当执行到 lifecycle.addListener(this)，就会执行到ActivityFragmentLifecycle 中对应的函数
+
   @Override
   public void addListener(@NonNull LifecycleListener listener) {
     lifecycleListeners.add(listener);
@@ -522,45 +637,43 @@ break;
     }
   }
 
- 其中的lifecycleListeners为一个集合，用来存储回调 定义为 
+  其中的lifecycleListeners为一个集合，用来存储回调 定义为 
   //声明周期管理的接口集合
   private final Set<LifecycleListener> lifecycleListeners = Collections.newSetFromMap(new WeakHashMap<LifecycleListener, Boolean>());
   
-  所以当我们创建的RequestManagerFragment接受到了onStart(),onStop()生命周期回调的时候
+  之后执行 lifecycle.addListener(connectivityMonitor);,这里的 connectivityMonitor 对象会在RequestManager构造函数中完成创建，实质为DefaultConnectivityMonitor对象
+  final class DefaultConnectivityMonitor implements ConnectivityMonitor {
+	...
+  }
+  
+  而DefaultConnectivityMonitor 又是继承自LifecycleListener 接口
+  public interface ConnectivityMonitor extends LifecycleListener {
+	...
+  }
+  
+  其实这个connectivityMonitor 是为了检测网络的，会在合适的时机点动态的注册监听网络的广播，在合适的时机点销毁注册监听网络的广播,这样这个lifecycle 中就有俩个成员了
+  
+
+  之后当我们创建的RequestManagerFragment接受到了onStart()的时候,我们来看看做了什么操作
   @Override
   public void onStart() {
     super.onStart();
     //传递生命周期
     lifecycle.onStart();
   }
-
-  @Override
-  public void onStop() {
-    super.onStop();
-    //传递生命周期
-    lifecycle.onStop();
-  }  
-  
+ 
   lifecycle.onStart(); 就会执行到ActivityLifeCycle中的onStart()函数
   //接受到了RequestManagerFragment的生命周期的回调
   void onStart() {
     //标识已经开始
     isStarted = true;
+    //遍历添加到这个集合的接口回调onStart
     for (LifecycleListener lifecycleListener : Util.getSnapshot(lifecycleListeners)) {
       lifecycleListener.onStart();
     }
   }
-
-  lifecycle.onStop();  就会执行到ActivityLifeCycle中的onStop()函数
-  //接受到了RequestManagerFragment的生命周期的回调
-  void onStop() {
-    isStarted = false;
-    for (LifecycleListener lifecycleListener : Util.getSnapshot(lifecycleListeners)) {
-      lifecycleListener.onStop();
-    }
-  }
   
-  这样就会执行到RequestManager中对应的生命周期，用来执行请求的执行
+  这样就会执行到RequestManager中对应的生命周期
   /**
    *
    * 因为RequestManager是有添加到创建的RequestManagerFragment中的ActivityLifecycle集合中的，所以RequestManager是可以响应到生命周期的回调的
@@ -570,8 +683,59 @@ break;
   public void onStart() {
     //恢复请求的执行
     resumeRequests();
-    //然后转发给targetTracker ，相当于targetTracker也受到了RequestManagerFragment的生命周期的管理
+    //然后转发给targetTracker ，相当于targetTracker也受到了RequestManagerFragment的生命周期的管理,这里先不分析targetTracker.onStart的实现
     targetTracker.onStart();
+  }
+  
+  由于DefaultConnectivityMonitor 也是可以接受到这个回调的，看看做了什么操作
+  
+  //网络监听器收到了RequestManagerFragment的生命周期的回调,动态注册网络监听
+  @Override
+  public void onStart() {
+    register();
+  }
+
+  //注册网络监听
+  private void register() {
+    //如果已经注册过，直接返回
+    if (isRegistered) {
+      return;
+    }
+
+    //判断当前网络是否可用
+    // Initialize isConnected.
+    isConnected = isConnected(context);
+    try {
+      // See #1405
+      //动态注册广播
+      context.registerReceiver(connectivityReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+      //标识已经注册过
+      isRegistered = true;
+    } catch (SecurityException e) {
+      // See #1417, registering the receiver can throw SecurityException.
+      if (Log.isLoggable(TAG, Log.WARN)) {
+        Log.w(TAG, "Failed to register", e);
+      }
+    }
+  }
+  
+  所以 DefaultConnectivityMonitor 会在接收到 onStart生命周期的时候，动态的注册网络的监听
+  
+  //当RequestManagerFragment 执行到了onStop生命周期的时候，看看做了什么处理
+  @Override
+  public void onStop() {
+    super.onStop();
+    //传递生命周期
+    lifecycle.onStop();
+  }  
+
+  lifecycle.onStop();  就会执行到ActivityLifeCycle中的onStop()函数
+  //接受到了RequestManagerFragment的生命周期的回调
+  void onStop() {
+    isStarted = false;
+    for (LifecycleListener lifecycleListener : Util.getSnapshot(lifecycleListeners)) {
+      lifecycleListener.onStop();
+    }
   }
   
   /**
@@ -585,27 +749,46 @@ break;
     targetTracker.onStop();
   }
   
-  //网络监听器收到了RequestManagerFragment的生命周期的回调,动态注册网络监听
-  @Override
-  public void onStart() {
-    register();
-  }
-
-  // //网络监听器收到了RequestManagerFragment的生命周期的回调,注销网络监听
+  //同理当网络监听器收到了RequestManagerFragment的生命周期的回调,注销网络监听
   @Override
   public void onStop() {
     unregister();
   }
   
-  我们在构建一个请求的时候会将构建的请求添加给RequestManager来管理,具体的代码实现为 
-  //先从RequestManager中移除这个targer
-  requestManager.clear(target);
-  //给target设置Reuqest,实际是获取到Target中的View，将request作为一个tag设置到view上，绑定起来
-  target.setRequest(request);
-  //将当前的请求交给RequestManager来处理
-  requestManager.track(target, request);
+  //注销网络监听
+  private void unregister() {
+    if (!isRegistered) {
+      return;
+    }
+    context.unregisterReceiver(connectivityReceiver);
+    isRegistered = false;
+  }
+  
+  接下来分析 下 targetTracker.onStart， targetTracker.onStop(); 的函数实现,在分析这个之前，先要了解下请求是怎么样添加的
+  
+  当我们这样使用的时候 Glide.with(this).load("https://ps.ssl.qhimg.com/sdmt/89_135_100/t01418930ed0ec37af3.jpg").into(iv);，最后一步into最终会执行到RequestBuilder中
+  
+  //构建一个ViewTarget 对象
+  private <Y extends Target<TranscodeType>> Y into(@NonNull Y target, @Nullable RequestListener<TranscodeType> targetListener, @NonNull RequestOptions options) {
+    ...
+    //构建request对象 ,如果没有设置errorBuilder的化，返回的是一个SingleReuqest对象
+    Request request = buildRequest(target, targetListener, options);
+	
+    //获取到当前target中 ImageView 绑定的Request对象,如果之前有绑定的化，就获得一个不为空的，否则获得一个空的对象
+    Request previous = target.getRequest();
+    ...
+    //先从RequestManager中移除这个targer
+    requestManager.clear(target);
+    //给target设置Reuqest,实际是获取到Target中的View，将request作为一个tag设置到view上，绑定起来
+    target.setRequest(request);
+    //将当前的请求交给RequestManager来处理
+    requestManager.track(target, request);
 
-  就会调用到RequestManager中对应的track 函数
+    //同时返回这个target对象
+    return target;
+  }
+  
+  当执行到 requestManager.track(target, request)的时候 就会调用到RequestManager中对应的track 函数
   void track(@NonNull Target<?> target, @NonNull Request request) {
     //将当前的target交给targetTracker， 的targets 集合中保存,也即是设置关联
     targetTracker.track(target);
@@ -613,20 +796,26 @@ break;
     requestTracker.runRequest(request);
   }
   
-  这里有俩个成员变量   
+  这里有俩个成员变量,先分析TargetTracker 的定义
   //构建一个TargetTracker对象，本身实现了LifecycleListener
   private final TargetTracker targetTracker = new TargetTracker();
-  new RequestTracker(),//构建一个RequestTracker对象，由他管理Request的执行
   
-  targetTracker.track(target)函数实现为
+TargetTracker类的定义为  
+public final class TargetTracker implements LifecycleListener {
   //targets为一个集合用来存储Target 对象，而且也是受生命周期的监听的
   private final Set<Target<?>> targets = Collections.newSetFromMap(new WeakHashMap<Target<?>, Boolean>());
+  ...
+}
+
+  所以当执行到 targetTracker.track(target)函数的时候
   //将当前的target添加到targets集合中，受到生命周期的回调
   public void track(@NonNull Target<?> target) {
     targets.add(target);
   }
+
+  下面看看requestTracker 是什么东西，他的初始化是直接通过 new RequestTracker(),//构建一个RequestTracker对象，由他管理Request的执行
   
-  requestTracker.runRequest(request);函数实现为
+  所以当执行到 requestTracker.runRequest(request);的时候
   //运行一个Request
   public void runRequest(@NonNull Request request) {
     //首先将当前的request添加到集合中
@@ -647,8 +836,8 @@ break;
   //还没有开始的请求集合
   private final List<Request> pendingRequests = new ArrayList<>();
   
-  先总结下创建Request的过程，当创建一个Request的时候，会添加到RequestManager中，RequestManager中又有俩个成员变量，一个是RequestTracker用来真正的管理Request，还有一个为TargetTracker
-  用来存储当前的Target对象
+  先总结下创建Request的过程，当创建一个Request的时候，会添加到RequestManager中，RequestManager中又有俩个成员变量，一个是RequestTracker用来真正的管理Request，
+  还有一个为TargetTracker 用来存储当前的Target对象,这个对象主要用来在请求开始的时候，可以执行点动画什么的回调
   
   当我们的RequestManager接收到了生命周期的回调的时候
     public void onStart() {
@@ -658,7 +847,8 @@ break;
     targetTracker.onStart();
   }
   
-   public void resumeRequests() {
+  resumeRequests() 函数的实现
+  public void resumeRequests() {
     Util.assertMainThread();
     //利用requestTracker来执行恢复所有的请求
     requestTracker.resumeRequests();
@@ -689,6 +879,53 @@ break;
   public void onStart() {
     for (Target<?> target : Util.getSnapshot(targets)) {
       target.onStart();
+    }
+  }
+  
+  //而 target 大多数情况下为ImageViewTarget 对象，所以会执行到对应的函数
+  //Target 实现了 LifecycleListener ，所以受到了生命周期的管理，这里主要是用来执行动画，比如在onStart的时候如果有设置动画的化，就执行动画
+  @Override
+  public void onStart() {
+    if (animatable != null) {
+      animatable.start();
+    }
+  }
+
+  //Target 实现了 LifecycleListener ，所以受到了生命周期的管理，这里主要是用来执行动画，比如在onStart的时候如果有设置动画的化，就停止动画
+  @Override
+  public void onStop() {
+    if (animatable != null) {
+      animatable.stop();
+    }
+  }
+  
+  当RequestManager收到了onStop生命周期回调的时候会触发
+  @Override
+  public void onStop() {
+    pauseRequests();
+    //然后转发给targetTracker ，相当于targetTracker也受到了RequestManagerFragment的生命周期的管理
+    targetTracker.onStop();
+  }
+  
+  pauseRequests 函数的实现为
+  public void pauseRequests() {
+    Util.assertMainThread();
+    requestTracker.pauseRequests();
+  }
+  
+  /** pauseRequests 函数实现
+   * Stops any in progress requests.
+   *
+   * 暂停请求
+   */
+  public void pauseRequests() {
+    isPaused = true;
+    for (Request request : Util.getSnapshot(requests)) {
+       //如果当前请求正在运行，暂停请求，然后添加到pendingRequests 集合中
+      if (request.isRunning()) {
+        request.pause();
+        pendingRequests.add(request);
+      }
     }
   }
   
@@ -725,24 +962,53 @@ break;
     }
   };
   
-  总结下Glide的生命周期的管理，一个Activity对应一个RequestMangerFragment，一个RequestMangerFragment对应一个RequestManager对象，对应一个ActivityLifeCycle对象,对应一个RequestTracker对象
-  对应一个TargetTracker对象,RequestManger中实现了LifeCyecle接口，还有DefaultConnectivityMonitor 实现了LifeCycle接口,并且将自己添加到了ActivityLifeCycle中的集合中，当RequestMangerFragmenet
-  接受到了onStart的生命周期的回调的时候，就会执行ActivityLifeCycle中的onStart函数，onStart函数中就会遍历执行集合中的每一个回调，依次传递过去，所以RequstManager收到了onStart的回调
-  在onStart的函数中，会利用RequestTracker执行真正的请求的执行，会利用TargerTracker执行动画等,DefaultConnectivityMonitor 接受到了onStart回调，就会执行动态的注册网络的监听,
-  对于RequetMangerFragment onStop的时候,流程是一样的，结果就是会利用RequestTracker在暂停网络的请求，利用TargetTracker执行动画的停止，移除DefaultConnectivityMonitor 的动态注册广播
+  总结下Glide的生命周期的管理，一个Activity对应一个RequestMangerFragment，一个RequestMangerFragment对应一个RequestManager对象，对应一个ActivityLifeCycle对象,
+  对应一个RequestTracker对象,对应一个TargetTracker对象,RequestManger中实现了LifeCyecle接口，还有DefaultConnectivityMonitor 实现了LifeCycle接口,
+  并且将自己添加到了ActivityLifeCycle中的集合中，当RequestMangerFragmenet接受到了onStart的生命周期的回调的时候，就会执行ActivityLifeCycle中的onStart函数，
+  onStart函数中就会遍历执行集合中的每一个回调，依次传递过去，所以RequstManager收到了onStart的回调,在onStart的函数中，会利用RequestTracker执行真正的请求的执行，
+  会利用TargerTracker执行动画等,DefaultConnectivityMonitor 接受到了onStart回调，就会执行动态的注册网络的监听,对于RequetMangerFragment onStop的时候,流程是一样的，
+  结果就是会利用RequestTracker在暂停网络的请求，利用TargetTracker执行动画的停止，移除DefaultConnectivityMonitor 的动态注册广播,所以直接可以收到生命周期通知的是
+  RequestManager,DefaultConnectivityMonitor，而 TargetTracker,RequestTracker 是间接的触发
 ```
- ****Glide注册机的机制****
- ===
+### Glide注册机的机制
 ```java
 我们在使用Glide的时候，这样使用   Glide.with(this).load("https://ps.ssl.qhimg.com/sdmt/89_135_100/t01418930ed0ec37af3.jpg").into(iv);对应的函数声明为
- public RequestBuilder<Drawable> load(@Nullable String string) ，当然还有其他的形式，比如 public RequestBuilder<Drawable> load(@Nullable Bitmap bitmap) 
- public RequestBuilder<Drawable> load(@Nullable Uri uri),public RequestBuilder<Drawable> load(@Nullable File file)...也即是说我们可以在load的参数里面可以传很多的类型
- Glide存在一个注册机，他在这个注册机里面预先注册了很多的model 对应的解析器，所以当在使用的时候就会根据传递进来的参数，获取到对应的解析器，完成对应的处理，源码体现在
+ public RequestBuilder<Drawable> load(@Nullable String string) ，当然还有其他的形式，比如 
+ public RequestBuilder<Drawable> load(@Nullable Bitmap bitmap) 
+ public RequestBuilder<Drawable> load(@Nullable Uri uri)
+ public RequestBuilder<Drawable> load(@Nullable File file)
+ ...也即是说我们可以在load的参数里面可以传很多的类型
+ Glide存在一个注册机，他在这个注册机里面预先注册了很多的model 对应的解析器，所以当在使用的时候就会根据传递进来的参数，获取到对应的解析器，完成对应的处理
  Glide的初始化的时候，就有这样的代码
  
- //构建注册类里面含有多个注册的集合
- registry = new Registry();
- registry.register(new DefaultImageHeaderParser());
+Glide(
+      @NonNull Context context,
+      @NonNull Engine engine,
+      @NonNull MemoryCache memoryCache,
+      @NonNull BitmapPool bitmapPool,
+      @NonNull ArrayPool arrayPool,
+      @NonNull RequestManagerRetriever requestManagerRetriever,
+      @NonNull ConnectivityMonitorFactory connectivityMonitorFactory,
+      int logLevel,
+      @NonNull RequestOptions defaultRequestOptions,
+      @NonNull Map<Class<?>, TransitionOptions<?, ?>> defaultTransitionOptions) {
+    this.engine = engine;
+    this.bitmapPool = bitmapPool;
+    this.arrayPool = arrayPool;
+    this.memoryCache = memoryCache;
+    this.requestManagerRetriever = requestManagerRetriever;
+    this.connectivityMonitorFactory = connectivityMonitorFactory;
+
+    DecodeFormat decodeFormat = defaultRequestOptions.getOptions().get(Downsampler.DECODE_FORMAT);
+    bitmapPreFiller = new BitmapPreFiller(memoryCache, bitmapPool, decodeFormat);
+
+    final Resources resources = context.getResources();
+
+    //构建注册类里面含有多个注册的集合
+    registry = new Registry();
+    registry.register(new DefaultImageHeaderParser());
+    ....
+}
  
  Registry的构造函数实现为
  public Registry() {
@@ -916,15 +1182,126 @@ private RequestBuilder<TranscodeType> loadGeneric(@Nullable Object model) {
 //将传递进来的target 构建request对象 ,如果没有设置errorBuilder的化，返回的是一个SingleReuqest对象 
 Request request = buildRequest(target, targetListener, options);
 
-当Request请求开始执行的时候
-会执行到  onSizeReady(overrideWidth, overrideHeight); 在这个函数中，会执行Engine的load函数，如果从活动缓存中还有内存缓存中都没有获取到的化，就会执行下面的代码
+当Request请求开始执行的时候,会由RequestTracker 触发对应的request 的begin函数，也即是触发到了SingleReuqest 中的begion函数
+@Override
+public void begin() {
+    ...
+	//状态默认为WAITING_FOR_SIZE
+    status = Status.WAITING_FOR_SIZE;
+    //判断宽高是否合法
+    if (Util.isValidDimensions(overrideWidth, overrideHeight)) {
+        //如果合法
+      onSizeReady(overrideWidth, overrideHeight);
+    } else {
+       //如果不合法，就获取宽高,同时设置了回调 如果获取成功了回调执行 onSizeReady
+      target.getSize(this);
+    }
+    ...
+}
+
+会执行到  onSizeReady(overrideWidth, overrideHeight); 在这个函数中，会执行Engine的load函数，
+@Override
+public void onSizeReady(int width, int height) {
+   ...
+   //通过engine来加载
+    loadStatus = engine.load(
+        glideContext,
+        model,
+        requestOptions.getSignature(),
+        this.width,
+        this.height,
+        requestOptions.getResourceClass(),
+        transcodeClass,
+        priority,
+        requestOptions.getDiskCacheStrategy(),
+        requestOptions.getTransformations(),
+        requestOptions.isTransformationRequired(),
+        requestOptions.isScaleOnlyOrNoTransform(),
+        requestOptions.getOptions(),
+        requestOptions.isMemoryCacheable(),
+        requestOptions.getUseUnlimitedSourceGeneratorsPool(),
+        requestOptions.getUseAnimationPool(),
+        requestOptions.getOnlyRetrieveFromCache(),
+        this);
+   ...		
+}
+
+engine 中的lode 函数 会先从活动缓存中还有内存缓存中尝试的获取这个资源，如果没有获取到的化，就会执行
+public <R> LoadStatus load(....){
+   ...
+   //如果到了这里，就要参加一个新的EngineJob对象了
+   EngineJob<R> engineJob =
+        engineJobFactory.build(
+            key,
+            isMemoryCacheable,
+            useUnlimitedSourceExecutorPool,
+            useAnimationPool,
+            onlyRetrieveFromCache);
+
+    //创建一个DecoerJob对象
+    DecodeJob<R> decodeJob =
+        decodeJobFactory.build(
+            glideContext,
+            model,
+            key,
+            signature,
+            width,
+            height,
+            resourceClass,
+            transcodeClass,
+            priority,
+            diskCacheStrategy,
+            transformations,
+            isTransformationRequired,
+            isScaleOnlyOrNoTransform,
+            onlyRetrieveFromCache,
+            options,
+            engineJob);
+
+    //将当前创建的EngineJob对象添加到集合中
+    jobs.put(key, engineJob);
+    //添加资源请求的回调
+    engineJob.addCallback(cb);
+    //交给线程池执行，DecodeJob本身实现了Runnable接口 所以可以执行到decodeJob run方法
+    engineJob.start(decodeJob);	
+    ...
+}
+
 //添加资源请求的回调
 engineJob.addCallback(cb);
 //交给线程池执行，DecodeJob本身实现了Runnable接口 所以可以执行到decodeJob run方法
 engineJob.start(decodeJob);
 
-在DecoderJob中的run方法中会执行
-runWrapped();
+//start函数的调用
+public void start(DecodeJob<R> decodeJob) {
+   this.decodeJob = decodeJob;
+   GlideExecutor executor = decodeJob.willDecodeFromCache() ? diskCacheExecutor : getActiveSourceExecutor();
+   //execute ，也即是获取到ExecutorService 然后执行之心execute 所以会执行到decodeJob 的run方法
+   executor.execute(decodeJob);
+}
+
+由于 decodeJob本身实现了Runnable接口 所以可以执行到decodeJob run方法，而run方法会执行runWrapped()函数
+//run方法的执行，因为设计到了io的操作，所以要交给子线程的方式来执行
+  @Override
+  public void run() {
+    // This should be much more fine grained, but since Java's thread pool implementation silently
+    // swallows all otherwise fatal exceptions, this will at least make it obvious to developers
+    // that something is failing.
+    GlideTrace.beginSectionFormat("DecodeJob#run(model=%s)", model);
+    // Methods in the try statement can invalidate currentFetcher, so set a local variable here to
+    // ensure that the fetcher is cleaned up either way.
+    DataFetcher<?> localFetcher = currentFetcher;
+    try {
+        //如果当前被取消了，直接返回
+      if (isCancelled) {
+        notifyFailed();
+        return;
+      }
+      //执行
+      runWrapped();
+    } catch (Throwable t) {
+    ...
+}
 //执行
 private void runWrapped() {
     switch (runReason) {
@@ -946,7 +1323,7 @@ private void runWrapped() {
         throw new IllegalStateException("Unrecognized run reason: " + runReason);
     }
 }
-因为一开始状态为INITIALIZE ，所以这里返回的currentGenerator对象为 ResourceCacheGenerator
+因为一开始状态为INITIALIZE ，所以这里返回的currentGenerator对象为 ResourceCacheGenerator,之后执行runGenerators()
  //执行生成器
   private void runGenerators() {
     currentThread = Thread.currentThread();
@@ -1390,7 +1767,8 @@ private static final class ByteBufferFetcher implements DataFetcher<ByteBuffer> 
  至此知道了是怎么样来加载获取到数据的，其他的也是一样的
 
  总结，我们解析 获取一个资源的时候，会首先去内存缓存中查找，如果没有查找到则会构建一个EncoderJob，已经DecoderJob对象，在DecoderJob中会依次去ResourceCacheGenerator，
- DataCacheGenerator，中获取，对应的都为磁盘缓存，如果还是没有获取到，就会从SourceGenerator 获取，从网络上获取，代码体现为
+ DataCacheGenerator，中获取，对应的都为磁盘缓存，区别在key不同， DataCacheGenerator 为原始的key,ResourceCacheGenerator包含了目标宽高转换之后的key
+ 如果还是没有获取到，就会从SourceGenerator 获取，从网络上获取，代码体现为
  while (!isCancelled && currentGenerator != null && !(isStarted = currentGenerator.startNext())) {
     //如果到了这里，说明还没有找到，那么说明在磁盘缓存中没有存在，那么获取下一个状态
     stage = getNextStage(stage);
