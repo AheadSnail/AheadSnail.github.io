@@ -1499,4 +1499,8 @@ ANR的检测，可以通过Choreographer.getInstance().postFrameCallback()的方
 FPS 的检测，也是通过 Choreographer.getInstance().postFrameCallback(),事实的监听 onFrame()函数，由于监听的是FPS，所以一定要有界面的绘制操作，所以又通过getViewTreeObserver().addOnDrawListener这样当有界面绘制的时候就会回调执行onDraw函数，标识isDrawing 为true，标识当前发生了界面的绘制，这样在 onFrame回调的时候就可以执行收集数据了，这里收集的时长为2分钟
 Application 的启动耗时检测，首先通过静态代码块，来执行ActivityThread Handler 中Callback 的时候就可以做为Application 的启动时间了，也即是静态代码块执行的时候就可以做为Application的启动时间，对于Application的终止时间，是通过动态代理第一次接收到 msg.what == LAUNCH_ACTIVITY || msg.what == CREATE_SERVICE || msg.what == RECEIVER的时候就可以做为Application的终止时间统计第一个界面的耗时SplashActivity跟统计Activity耗时是一样原理，这样long betweenCost = firstActivityStart - Hacker.sApplicationCreateEndTime; 就可以算出Application启动之后到第一个界面启动的中间时间了,当然总的花费时间可以通过 long allCost = activityEndTime - Hacker.sApplicationCreateBeginTime;
 
+### 参考资料
+1. [Android动态编译技术:Plugin Transform Javassist操作Class文件](https://blog.csdn.net/yulong0809/article/details/77752098)
+2. [Android ASM自动埋点方案实践](https://www.jianshu.com/p/9039a3e46dbc)
+3. [Matrix 介绍](https://github.com/Tencent/matrix#matrix_cn)
 
