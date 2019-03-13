@@ -124,12 +124,12 @@ public class ApplicationLifeObserver implements Application.ActivityLifecycleCal
     ...
 }
 
-可以看到 ApplicationLifeObserver 是一个单例，首次构建的时候就调用 application.registerActivityLifecycleCallbacks(this) 这样当前应用Activity的生命周期都可以监控到,对于其他地方
-需要监听到生命周期的只要注册一个监听就可以了，所以提供了register,unregister 函数， 当收到了生命周期的时候，就相应的执行分发，比如onActivityCreated 函数实现,其实ApplicationLifeObserver
-还有一个非常重要的方法就是可以事实的检测到当前应用是否在前台，具体是怎么做到的呢，就是在 onActivityResumed，onActivityPaused中做的处理,比如当回调了onActivityResumed那么当前应用肯定
-在前台，当时当回调执行了 onActivityPaused 的时候并没有立刻的将 mIsForeground 改为false，而是通过 Handler 延迟执行 600毫秒检测 onActivityResumed 是否执行了，因为当回调了就会将mIsPaused
-置为false，那么延迟handler执行的时候也不会满足条件 if (mIsForeground && mIsPaused) 也就不会将 mIsForeground = false; 这个可能会有点误判，比如当前Activity在启动的时候做了耗时的操作，但是
-整体来说并没有多大的影响
+可以看到 ApplicationLifeObserver 是一个单例，首次构建的时候就调用 application.registerActivityLifecycleCallbacks(this) 这样当前应用Activity的生命周期都可以监控
+到对于其他地方需要监听到生命周期的只要注册一个监听就可以了，所以提供了register,unregister 函数， 当收到了生命周期的时候，就相应的执行分发，比如onActivityCreated
+函数实现,其实ApplicationLifeObserver 还有一个非常重要的方法就是可以实时的检测到当前应用是否在前台，具体是怎么做到的呢，就是在 onActivityResumed，onActivityPaused
+中做的处理,比如当回调了onActivityResumed那么当前应用肯定在前台，当时当回调执行了 onActivityPaused 的时候并没有立刻的将 mIsForeground 改为false，而是通过 Handler
+延迟执行 600毫秒检测 onActivityResumed 是否执行了，因为当回调了就会将mIsPaused置为false，那么延迟handler执行的时候也不会满足条件 if (mIsForeground && mIsPaused) 
+也就不会将 mIsForeground = false; 这个可能会有点误判，比如当前Activity在启动的时候做了耗时的操作，但是整体来说并没有多大的影响
 ```
 
 接着 是函数的统计耗时 MethodBeat
@@ -324,9 +324,11 @@ public class HackCallback implements Handler.Callback {
         return mOriginalCallback.handleMessage(msg);
     }
 }
-所以通过hook Handler的 Callback函数，我们可以知道进程创建的终止时间这里的判断是根据当前应用程序 创建的第一个 Activity,Service,Receiver的时机点做为当前Application创建的终止时间点
-并且通过接受 ENTER_ANIMATION_COMPLETE 函数，可以知道当前Activity 是否创建完成，对于类中的 i(),0(),at()函数是哪里调用的呢,这是通过自定义插件的方式来调用的，具体在matrix-gradle-plugin
-工程中 通过Transform提供的api可以遍历所有文件，但是要实现Transform的遍历操作，得通过Gradle插件来实现，关于Gradle插件的知识可以看相关博客
+
+所以通过hook Handler的 Callback函数，我们可以知道进程创建的终止时间这里的判断是根据当前应用程序 创建的第一个 Activity,Service,Receiver的时机点做为当前Application
+创建的终止时间点,而对于Application的开始时间点也是比较简单的，就是当静态代码块执行的时候，就做为Application的开始时间,并且通过接受 ENTER_ANIMATION_COMPLETE 函数，
+可以知道当前Activity 动画是否执行完成，对于类中的 i(),0(),at()函数是哪里调用的呢,这是通过自定义插件的方式来调用的，具体在matrix-gradle-plugin工程中,通过Transform
+提供的api可以遍历所有文件，但是要实现Transform的遍历操作，得通过Gradle插件来实现，关于Gradle插件的知识可以看相关博客
 
 class MatrixPlugin implements Plugin<Project> {
     private static final String TAG = "Matrix.MatrixPlugin"
