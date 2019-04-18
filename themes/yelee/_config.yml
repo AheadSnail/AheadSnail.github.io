@@ -89,7 +89,7 @@ disqus:
 
 duoshuo: 
   on: true
-  domain: xch168
+  domain: AheadSnail
   # 是否开启多说评论，http://duoshuo.com/create-site/
   # 使用上面网址登陆你的多说，然后创建站点，在 domain 中填入你设定的域名前半部分
   # http://<要填的部分>.duoshuo.com (domain只填上<>里的内容，不要填整个网址)
@@ -100,9 +100,16 @@ youyan:
   # 是否开启友言评论，http://www.uyan.cc/index.php
   # id 中填写你的友言用户数字ID，注册后进入后台管理即可查看
   # 友言服务在 Web 环境下运行，普通本地环境无法查看，请部署后在线上测试。
-
-
+  
 # >>> Style Customisation 样式自定义 <<<
+
+gitalk: 
+  enable: true
+  client_id: 2b5915e1620df1e45589
+  client_secret: d13245a86242f2820ba29d6884f2c938bd94e033
+  repo: AheadSnail.github.io
+  owner: AheadSnail
+  admin: AheadSnail
 
 # Background | 背景
 ## "5": show images form bg-1.jpg to bg-5.jpg in `/yelee/source/background/`
