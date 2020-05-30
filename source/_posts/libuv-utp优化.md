@@ -582,6 +582,12 @@ void utp_set_ack_pkt_send_finish(void *data){
 
 
 
+### 参考链接
+1. [libuv](https://github.com/libuv/libuv)
+2. [libutp](https://github.com/bittorrent/libutp)
+3. [TCP/UDP的接收缓冲区和发送缓冲区](https://blog.csdn.net/weixin_36465540/article/details/105008406)
+4. [libutp源码简析](http://www.calvinneo.com/2017/12/05/libutp%E6%BA%90%E7%A0%81%E7%AE%80%E6%9E%90/)
+
 
 
 
