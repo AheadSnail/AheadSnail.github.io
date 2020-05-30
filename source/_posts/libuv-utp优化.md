@@ -14,8 +14,7 @@ description:  libuv+utp优化
 
 ### 简介
 
-之前在Aria2开源项目上强制改成项目想要的效果，在它原本的基础上实现了utp，nat打洞，udp ReusePORT，bt跟http多线程下载 最终导致项目不够稳定，结果就是项目还没上线就直接重写，现在重写了
-3个多月，已经大体实现，这里整理下 最新遇到的libuv与utp结合的问题
+之前在Aria2开源项目上强制改成项目想要的效果，在它原本的基础上实现了utp，nat打洞，udp ReusePORT，bt跟http多线程下载 最终导致项目不够稳定，结果就是项目还没上线就直接重写，现在重写了3个多月，已经大体实现，这里整理下 最新遇到的libuv与utp结合的问题
 
 关于libuv的介绍，可以查看这个链接
 https://github.com/libuv/libuv
