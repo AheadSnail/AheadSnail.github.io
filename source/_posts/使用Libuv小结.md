@@ -28,15 +28,11 @@ libuv是一个支持多平台的异步IO库。它主要是为了node.js而开发
 
 
 ### libuv是使用C标准写的
-原本打算整个项目使用C++11标准使用智能指针的方式来写，这样可以减少内存泄露的问题，而且可以使用C++11中的异常等的新特性，由于libuv使用了C标准，所以导致接口的回调部分都要用C的方式,
-虽然尽量使用new,delete来代替malloc,free，但是相比智能指针还是存在很多不安全的地方，而且我们知道在C中是不存在异常的方式，是否执行成功都是通过返回值的方式来代替的，更此次的是有些
-地方直接使用assert的方式，一旦assert不通过，就直接程序崩溃
+原本打算整个项目使用C++11标准使用智能指针的方式来写，这样可以减少内存泄露的问题，而且可以使用C++11中的异常等的新特性，由于libuv使用了C标准，所以导致接口的回调部分都要用C的方式,虽然尽量使用new,delete来代替malloc,free，但是相比智能指针还是存在很多不安全的地方，而且我们知道在C中是不存在异常的方式，是否执行成功都是通过返回值的方式来代替的，更此次的是有些地方直接使用assert的方式，一旦assert不通过，就直接程序崩溃
 
 
 ### tcp的接收新连接是共用一个loop的
-我们之前项目是使用Aria2的单线程版本强制改成多线程的方式而且加了很多的支持，导致很不稳定，我们重写的目的也就是要达到稳定，所以我们的方案是对于每一个连接都是一个新的线程，不管是tcp
-还是udp，每个线程里面都有一个loop，每个线程的变量尽量的做到线程独有，这样就会稳定的多，但是原本libuv的tcp默认accept是共用一个looper的，其实这个问题，官网上也有人提出，下面是修改的方案
-
+我们之前项目是使用Aria2的单线程版本强制改成多线程的方式而且加了很多的支持，导致很不稳定，我们重写的目的也就是要达到稳定，所以我们的方案是对于每一个连接都是一个新的线程，不管是tcp还是udp，每个线程里面都有一个loop，每个线程的变量尽量的做到线程独有，这样就会稳定的多，但是原本libuv的tcp默认accept是共用一个looper的，其实这个问题，官网上也有人提出，下面是修改的方案
 
 ```C
 //记得在socket不需要后，调用uv_close。如果你不需要接受连接，你甚至可以在uv_listen的回调函数中调用uv_close
@@ -273,13 +269,7 @@ int uv__stream_open(uv_stream_t* stream, int fd, int flags) {
 
 
 ```
-大致就是先调用原本的libuv,accept的操作，获取到对应的fd,此时是共用一个loop的，原后通过创建一个管道，管道的一端自己保留，另一端传给另一个线程，另一个线程在自己的线程里面创建
-当前线程的loop，然后创建uv_pipe_t 事件，设置关联我们传递进来的管道的另一端，并且设置监听事件，之后，主线程往这个管道写内容，写的内容可以随便，那么这个线程就可以收到这个事件
-那么就会触发pipe_on_new_connection 回调，在这个回调函数里面我们利用当前线程的Loop对象 创建一个 UVSocketCore 对象，然后调用acceptPipe完成转换，其实内部也是通过调用uv_accept
-方式来完成转换的,而uv_accept 其实也没做什么，其实就是将原本tcp的fd转到我们新的UVSocketCore里面,stream->io_watcher.fd = fd; 就是最根本实现,这里还要注意的一点就是当转换完成之后
-我们要让这个线程退出，而loop不能销毁，因为这个loop后续要放到另一个线程里面完成后续的通信，所以我们要调用uv_stop(q->loop);这个内部就是退出事件循环，而不会清理资源,那么下一个线程
-可以继续使用这个looper
-
+大致就是先调用原本的libuv,accept的操作，获取到对应的fd,此时是共用一个loop的，原后通过创建一个管道，管道的一端自己保留，另一端传给另一个线程，另一个线程在自己的线程里面创建当前线程的loop，然后创建uv_pipe_t 事件，设置关联我们传递进来的管道的另一端，并且设置监听事件，之后，主线程往这个管道写内容，写的内容可以随便，那么这个线程就可以收到这个事件那么就会触发pipe_on_new_connection 回调，在这个回调函数里面我们利用当前线程的Loop对象 创建一个 UVSocketCore 对象，然后调用acceptPipe完成转换，其实内部也是通过调用uv_accept方式来完成转换的,而uv_accept 其实也没做什么，其实就是将原本tcp的fd转到我们新的UVSocketCore里面,stream->io_watcher.fd = fd; 就是最根本实现,这里还要注意的一点就是当转换完成之后我们要让这个线程退出，而loop不能销毁，因为这个loop后续要放到另一个线程里面完成后续的通信，所以我们要调用uv_stop(q->loop);这个内部就是退出事件循环，而不会清理资源,那么下一个线程可以继续使用这个looper
 
 ###  udp处理完数据的时候，每次返回值都为0
 ```C
@@ -361,8 +351,7 @@ static void uv__udp_recvmsg(uv_udp_t* handle) {
       && handle->recv_cb != NULL);
 }
 ```
-我们通过 man 2 recvmsg 查看函数的介绍，通过介绍我们可以知道如果当前没有数据可以读取，比如出现了 EAGAIN 或者 EWOULDBLOCK错误，就会返回 -1，而且处理的回调函数返回值为0
-handle->recv_cb(handle, 0, &buf, NULL, 0);正常来说，对于recvmsg 返回值为0代表正在关闭
+我们通过 man 2 recvmsg 查看函数的介绍，通过介绍我们可以知道如果当前没有数据可以读取，比如出现了 EAGAIN 或者 EWOULDBLOCK错误，就会返回 -1，而且处理的回调函数返回值为0handle->recv_cb(handle, 0, &buf, NULL, 0);正常来说，对于recvmsg 返回值为0代表正在关闭
 ![结果显示](/uploads/libuv优化/recvmsg.png)
 
 
@@ -505,13 +494,11 @@ static void uv__udp_sendmsg(uv_udp_t* handle) {
     uv__io_feed(handle->loop, &handle->io_watcher);
   }
 }
-
-可以发现tcp是一个发完就处理完成的回调，而udp是一个循环，直到发到缓冲区满才停止发送
 ```
+可以发现tcp是一个发完就处理完成的回调，而udp是一个循环，直到发到缓冲区满才停止发送
 
 ### 退出的时候如何正确的清理释放资源
-其实关于libuv的文档已经官方的demo，甚至网上的资料都非常的少，甚至官方的demo写的都很不规范，比如一大堆的资源没有清理，内存没有释放，我发现这个问题还是在模拟android上面频繁的
-点击暂停恢复的时候出现的，下面是对应的代码模拟
+其实关于libuv的文档已经官方的demo，甚至网上的资料都非常的少，甚至官方的demo写的都很不规范，比如一大堆的资源没有清理，内存没有释放，我发现这个问题还是在模拟android上面频繁的点击暂停恢复的时候出现的，下面是对应的代码模拟
 ```C
 while(true){
 #ifdef CLIENT
@@ -526,9 +513,7 @@ while(true){
 ```
 下面出现的错误，
 ![结果显示](/uploads/libuv优化/文件描述符.png)
-要想查看linux下面能支持的最大文件描述符的数量，可以执行 ulimit -n 的命令输出，我当前的电脑是显示为1024个，出现了这个问题说明肯定是资源释放的问题，要想查看当前进程打开的文件描述符
-可以使用 lsof -p 进程号 得到当前进程的所有打开的文件描述符，通过查看发现是libuv的释放有问题,libuv的释放函数为 uv_loop_close
-
+要想查看linux下面能支持的最大文件描述符的数量，可以执行 ulimit -n 的命令输出，我当前的电脑是显示为1024个，出现了这个问题说明肯定是资源释放的问题，要想查看当前进程打开的文件描述符可以使用 lsof -p 进程号 得到当前进程的所有打开的文件描述符，通过查看发现是libuv的释放有问题,libuv的释放函数为 uv_loop_close
 ```C
 int uv_loop_close(uv_loop_t* loop) {
   QUEUE* q;
@@ -538,8 +523,8 @@ int uv_loop_close(uv_loop_t* loop) {
 #endif
 
   if (uv__has_active_reqs(loop)){
-	  //printf("uv_loop_close uv__has_active_reqs \n");
-	  return UV_EBUSY;
+	//printf("uv_loop_close uv__has_active_reqs \n");
+	return UV_EBUSY;
   }
 
   QUEUE_FOREACH(q, &loop->handle_queue) {
@@ -602,13 +587,13 @@ void uv__loop_close(uv_loop_t* loop) {
   loop->nwatchers = 0;
 }
 ```
-通过上面可以发现释放最重要的函数为 uv__loop_close 函数，在之前还有俩个判断，如果满足了前面俩个判断就不会执行到uv__loop_close，前面俩个判断的意思是如果当前含有正在执行的request，或者
-还有正在执行的Handle数量不为0，那就会执行return，导致这次的释放操作，并没有执行到，故导致资源的泄露，还有如果是下面的这样写也会有问题
+通过上面可以发现释放最重要的函数为 uv_loop_close 函数，在之前还有俩个判断，如果满足了前面俩个判断就不会执行到uv_loop_close，前面俩个判断的意思是如果当前含有正在执行的request，或者还有正在执行的Handle数量不为0，那就会执行return，导致这次的释放操作，并没有执行到，故导致资源的泄露，还有如果是下面的这样写也会有问题
 ```C
 uv_close((uv_handle_t*) time_handle_.get(), NULL);
 uv_loop_close(uvSocketCore_->getUvLoop().get());
-
+```
 在调用uv_close方法的时候，并不会立马将当前的handle移除出去，而是要等到下一次的轮询才会移除，下面是代码的实现
+```C
 void uv_close(uv_handle_t* handle, uv_close_cb close_cb) {
   assert(!uv__is_closing(handle));
 
@@ -797,10 +782,7 @@ int uv_run(uv_loop_t* loop, uv_run_mode mode) {
   return r;
 }
 ```
-其实整个libuv就是个无限循环，内部使用了epoll来监听对应的事件，而我们的关闭操作的处理是在uv__run_closing_handles函数触发的,在这个函数里面执行了 QUEUE_REMOVE(&handle->handle_queue);
-才移除出去，所以如果你在调用了stop方法后立马调用close方法也是不会清理的，也即是一定要等到他自动的终止，而不能有任何的干扰操作,这样写也是有目的，因为像tcp或者udp是支持异步写操作的
-用户提供的写请求，如果当前不能写的话，是会立马返回，libuv内部通过监听可写的事件，当可写事件再次触发，他内部会自动的帮你发送出去，所以内部难免会积累一下要写的内容，所以当你要退出的
-时候，就要完成这些的清理操作，防止内存泄露，比如udp的关闭操作,内部在移除handle之前会先调用下面的函数，将当前的写请求都释放，回调回去
+其实整个libuv就是个无限循环，内部使用了epoll来监听对应的事件，而我们的关闭操作的处理是在uv__run_closing_handles函数触发的,在这个函数里面执行了QUEUE_REMOVE(&handle->handle_queue);才移除出去，所以如果你在调用了stop方法后立马调用close方法也是不会清理的，也即是一定要等到他自动的终止，而不能有任何的干扰操作,这样写也是有目的，因为像tcp或者udp是支持异步写操作的用户提供的写请求，如果当前不能写的话，是会立马返回，libuv内部通过监听可写的事件，当可写事件再次触发，他内部会自动的帮你发送出去，所以内部难免会积累一下要写的内容，所以当你要退出的时候，就要完成这些的清理操作，防止内存泄露，比如udp的关闭操作,内部在移除handle之前会先调用下面的函数，将当前的写请求都释放，回调回去
 ```C
 void uv__udp_finish_close(uv_udp_t* handle) {
   uv_udp_send_t* req;
@@ -829,11 +811,7 @@ void uv__udp_finish_close(uv_udp_t* handle) {
   /* but _do not_ touch close_cb */
 }
 ```
-根据前面的分析，既然我们不能中断libuv的退出操作，那么程序中就不能使用异常，其实我们在线程中使用libuv，其实我们的代码都是跑在libuv的回调事件中的，如果我们在它的回调里面抛出了一个异常
-那么就不能按照libuv的原本的逻辑执行退出会导致更严重的问题，可能你会想到发生异常退出的时候，后续再次执行uv_run函数，让他自动的终止，不好意思，这是不可能实现的，下面是分析
-比如udp当数据发送完成之后，会执行uv__udp_run_completed函数，在这个函数的一开始就会执行  assert(!(handle->flags & UV_HANDLE_UDP_PROCESSING));操作，然后设置这个flag
-handle->flags |= UV_HANDLE_UDP_PROCESSING;，在程序的后面执行  handle->flags &= ~UV_HANDLE_UDP_PROCESSING;将这个变量重置回去,
-假设 我们在执行   req->send_cb(req, req->status);回调函数里面抛出了异常，导致没有重置会这个flag，那么下次重新进来的时候，就会直接导致闪退，因为 assert(!(handle->flags & UV_HANDLE_UDP_PROCESSING));
+根据前面的分析，既然我们不能中断libuv的退出操作，那么程序中就不能使用异常，其实我们在线程中使用libuv，其实我们的代码都是跑在libuv的回调事件中的，如果我们在它的回调里面抛出了一个异常那么就不能按照libuv的原本的逻辑执行退出会导致更严重的问题，可能你会想到发生异常退出的时候，后续再次执行uv_run函数，让他自动的终止，不好意思，这是不可能实现的，下面是分析比如udp当数据发送完成之后，会执行uv__udp_run_completed函数，在这个函数的一开始就会执行  assert(!(handle->flags & UV_HANDLE_UDP_PROCESSING));操作，然后设置这个flaghandle->flags |= UV_HANDLE_UDP_PROCESSING;，在程序的后面执行  handle->flags &= ~UV_HANDLE_UDP_PROCESSING;将这个变量重置回去,假设 我们在执行   req->send_cb(req, req->status);回调函数里面抛出了异常，导致没有重置会这个flag，那么下次重新进来的时候，就会直接导致闪退，因为 assert(!(handle->flags & UV_HANDLE_UDP_PROCESSING));
 ```C
 static void uv__udp_run_completed(uv_udp_t* handle) {
   uv_udp_send_t* req;
@@ -884,10 +862,7 @@ static void uv__udp_run_completed(uv_udp_t* handle) {
   handle->flags &= ~UV_HANDLE_UDP_PROCESSING;
 }
 ```
-所以最后面，我们的项目由原本使用异常的项目变成了一个无异常的项目，代替的实现就是通过返回值的方式来实现，在知乎各种关于C++是否使用异常好像存在很大的争议，我的观点就是使用异常代码简单清晰
-如果使用返回值，代码将变得冗余，啰嗦，比如在多层函数里面，最里面的那层函数发生了错误，你就得一层一层的返回，每一层都要检查上一层的函数调用是否出现了问题，不管怎么样，项目里面去掉了
-异常，也做到了libuv的正常清理操作
-
+所以最后面，我们的项目由原本使用异常的项目变成了一个无异常的项目，代替的实现就是通过返回值的方式来实现，在知乎各种关于C++是否使用异常好像存在很大的争议，我的观点就是使用异常代码简单清晰,如果使用返回值，代码将变得冗余，啰嗦，比如在多层函数里面，最里面的那层函数发生了错误，你就得一层一层的返回，每一层都要检查上一层的函数调用是否出现了问题，不管怎么样，项目里面去掉了异常，也做到了libuv的正常清理操作
 
 ### libuv线程间的通信问题
 在看libuv源码的时候，发现了他内部一种线程间的通信机制，使用了uv_async_t，下面是代码的实现
@@ -1097,13 +1072,8 @@ UV_UNUSED(static int cmpxchgi(int* ptr, int oldval, int newval)) {
   return __sync_val_compare_and_swap(ptr, oldval, newval);
 #endif
 }
-
-其实上面的这几个函数都是为了保证一次的有效传输，他是怎么保证的呢，首先使用了 volatile大体的检查pending 是否为0，然后使用cmpxchgi也即是使用cpu的加锁指令，这其实就是java的自旋锁
-的实现，将这个值改为1，代表当前正在占用，然后执行发送函数，发送完之后，再次调用cmpxchgi将他改为2代表我们处理完成了，那什么时候重置回去呢，也即当这次处理完的时候，
-调用了uv__async_spin 函数，这个函数的内部使用了无限循环保证后续不能再次进入，当它退出的时候，比如为0，或者2的时候就可以退出，代表当前这次传输处理完成，
-那么下次就可以继续发送了，所以就导致了一个问题，如果有俩个线程同时往一个线程的 发送数据的时候，就会导致同时只能处理一个，而另一个直接被抛弃了，导致消息的丢失
 ```
-
+其实上面的这几个函数都是为了保证一次的有效传输，他是怎么保证的呢，首先使用了 volatile大体的检查pending 是否为0，然后使用cmpxchgi也即是使用cpu的加锁指令，这其实就是java的自旋锁的实现，将这个值改为1，代表当前正在占用，然后执行发送函数，发送完之后，再次调用cmpxchgi将他改为2代表我们处理完成了，那什么时候重置回去呢，也即当这次处理完的时候，调用了uv__async_spin 函数，这个函数的内部使用了无限循环保证后续不能再次进入，当它退出的时候，比如为0，或者2的时候就可以退出，代表当前这次传输处理完成，那么下次就可以继续发送了，所以就导致了一个问题，如果有俩个线程同时往一个线程的 发送数据的时候，就会导致同时只能处理一个，而另一个直接被抛弃了，导致消息的丢失
 
 
 
