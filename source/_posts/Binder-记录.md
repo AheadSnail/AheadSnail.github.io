@@ -18,9 +18,7 @@ description:  Binder 记录
 
 ### Binder整体认识
 ![结果显示](/uploads/Binder源码分析/1.png)
-每个Android的进程，只能运行在自己进程所拥有的虚拟地址空间。对应一个4GB的虚拟地址空间，其中3GB是用户空间，1GB是内核空间，当然内核空间的大小是可以通过参数配置调整的。
-对于用户空间，不同进程之间彼此是不能共享的，而内核空间却是可共享的。Client进程向Server进程通信，恰恰是利用进程间可共享的内核内存空间来完成底层通信工作的，
-Client端与Server端进程往往采用ioctl等方法跟内核空间的驱动进行交互。
+每个Android的进程，只能运行在自己进程所拥有的虚拟地址空间。对应一个4GB的虚拟地址空间，其中3GB是用户空间，1GB是内核空间，当然内核空间的大小是可以通过参数配置调整的。对于用户空间，不同进程之间彼此是不能共享的，而内核空间却是可共享的。Client进程向Server进程通信，恰恰是利用进程间可共享的内核内存空间来完成底层通信工作的，Client端与Server端进程往往采用ioctl等方法跟内核空间的驱动进行交互。
 
 
 ### 调用 fd = open_driver("/dev/binder") 的作用
@@ -29,16 +27,10 @@ open_driver函数，也不会多次的创建，内不会根据当前的进程的
 
 
 ### service_manager 特殊的service
-service_manager 本身做为一个service的存在，内部用来管理当前系统的service的添加查找操作，在系统启动的时候，创建，service_manager Android进程间通信（IPC）机制Binder守护进程对象
-也就是下面全局的对象保存的是 service_manager 这个进程的binder_node对象，而且获取引用对象的时候，service_manager 对应的引用为0，其他的则要得到对应的引用值
-static struct binder_node *binder_context_mgr_node;
-static uid_t binder_context_mgr_uid = -1;
+service_manager 本身做为一个service的存在，内部用来管理当前系统的service的添加查找操作，在系统启动的时候，创建，service_manager Android进程间通信（IPC）机制Binder守护进程对象，也就是下面全局的对象保存的是 service_manager 这个进程的binder_node对象，而且获取引用对象的时候，service_manager 对应的引用为0，其他的则要得到对应的引用值static struct binder_node *binder_context_mgr_node ,static uid_t binder_context_mgr_uid = -1;
   
-
 ### 数据结构的传递和解析 
-在调用 BBbinder或者BpBinder的transact函数的时候，会先将数据最先构成 flat_binder_object 对象，这个对象用来存储Binder对象，之后会再次封装成 binder_transaction_data 对象，
-最终再封装成 binder_write_read ，在Linux 内核会首先将数据拷贝到内核中，解析的过程为封装的逆过程
-
+在调用 BBbinder或者BpBinder的transact函数的时候，会先将数据最先构成 flat_binder_object 对象，这个对象用来存储Binder对象，之后会再次封装成 binder_transaction_data 对象，最终再封装成 binder_write_read ，在Linux 内核会首先将数据拷贝到内核中，解析的过程为封装的逆过程
 
 ### Binder内部的原理
 每一个binder_proc 都有todo，wait队列，每次执行  res = ioctl(bs->fd, BINDER_WRITE_READ, &bwr);内部都会判断当前todo队列或者transaction队列是否为空，如果为空，则会处于挂起状态，等待唤醒,对于addService来说，由于handle传递的是0，所以操作的是service_manager对应的binder_proc
@@ -325,14 +317,9 @@ err_no_ref:
 }
 
 ```
-首先从当前的binder_proc中获取到 fp->handle 对应的引用节点，由于我们在addService的时候，有将节点保存到目标 binder_proce中的binder_ref节点，所以这里一定能找到，因为当前的proce
-也就是service_manager对应的binder_proce,查找的函数上面可见 node = binder_get_node_from_ref(proc, fp->handle,fp->hdr.type == BINDER_TYPE_HANDLE, &src_rdata);
+首先从当前的binder_proc中获取到 fp->handle 对应的引用节点，由于我们在addService的时候，有将节点保存到目标 binder_proce中的binder_ref节点，所以这里一定能找到，因为当前的proce,也就是service_manager对应的binder_proce,查找的函数上面可见 node = binder_get_node_from_ref(proc, fp->handle,fp->hdr.type == BINDER_TYPE_HANDLE, &src_rdata);
 
-
-这里要注意 node = ref->node; 也即是得到的是引用节点里面的实体binder节点,然后判断 if (node->proc == target_proc)也即是判断当前的target_proc是否就为当前binder实体所拥有的对象
-由于当前是客户端进程，所以不满足 会执行 ret = binder_inc_ref_for_node(target_proc, node,fp->hdr.type == BINDER_TYPE_HANDLE,NULL, &dest_rdata);
-前面已经分析过了，这里会再创建一个引用，同时将 fp->handle = dest_rdata.desc; 所以客户端得到的是另外一个引用
-
+这里要注意 node = ref->node; 也即是得到的是引用节点里面的实体binder节点,然后判断 if (node->proc == target_proc)也即是判断当前的target_proc是否就为当前binder实体所拥有的对象,由于当前是客户端进程，所以不满足 会执行 ret = binder_inc_ref_for_node(target_proc, node,fp->hdr.type == BINDER_TYPE_HANDLE,NULL, &dest_rdata);前面已经分析过了，这里会再创建一个引用，同时将 fp->handle = dest_rdata.desc; 所以客户端得到的是另外一个引用
 
 ### 客户端拿到引用之后的调用过程
 ```C
@@ -410,11 +397,7 @@ static struct binder_node *binder_get_node_refs_for_txn(struct binder_node *node
 }
 
 ```
-这样就为procp 赋值了，也就是为target_proc 赋值了，也就是当前实体所拥有的真正的binder_proc对象，后续的操作就是类似的添加事物到todo队列，激活真实的service，为了得到服务端一个回应
-内核也会将事物添加到目标线程的 transaction_stack的头部，这样服务端回应的时候，就可以从transaction_stack 中取出这个事物，根据这个事物的from字段的值，得到对应的target_proc，也就可以
-创建事物t添加到target_proc中的todo队列，同时唤醒客户端线程，这里也为了能得到一个客户端响应，在唤醒的线程中，内核会将todo队列的事物移除，同时将这个事物添加到 transaction_stack的头部
-客户端得到结果之后，也会根据transaction_stack中的from给对方一个回应的确定
-
+这样就为procp 赋值了，也就是为target_proc 赋值了，也就是当前实体所拥有的真正的binder_proc对象，后续的操作就是类似的添加事物到todo队列，激活真实的service，为了得到服务端一个回应内核也会将事物添加到目标线程的 transaction_stack的头部，这样服务端回应的时候，就可以从transaction_stack 中取出这个事物，根据这个事物的from字段的值，得到对应的target_proc，也就可以创建事物t添加到target_proc中的todo队列，同时唤醒客户端线程，这里也为了能得到一个客户端响应，在唤醒的线程中，内核会将todo队列的事物移除，同时将这个事物添加到 transaction_stack的头部客户端得到结果之后，也会根据transaction_stack中的from给对方一个回应的确定
 
 ### 客户端调用是阻塞调用
 客户端的一般调用流程
