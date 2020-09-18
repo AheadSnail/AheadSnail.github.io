@@ -22,9 +22,7 @@ description:  Binder 记录
 
 
 ### 调用 fd = open_driver("/dev/binder") 的作用
-使用open函数，打开/dev/binder/得到当前进程对应的文件描述符，然后将当前进程对应的 binder_proc 对象保存到 filp->private_data = proc;这样后续就能方便的取出，如果同一个进程里面多次调用
-open_driver函数，也不会多次的创建，内不会根据当前的进程的pid在全局的 binder_procs中进行查找
-
+使用open函数，打开/dev/binder/得到当前进程对应的文件描述符，然后将当前进程对应的 binder_proc 对象保存到 filp->private_data = proc;这样后续就能方便的取出，如果同一个进程里面多次调用,open_driver函数，也不会多次的创建，内不会根据当前的进程的pid在全局的 binder_procs中进行查找
 
 ### service_manager 特殊的service
 service_manager 本身做为一个service的存在，内部用来管理当前系统的service的添加查找操作，在系统启动的时候，创建，service_manager Android进程间通信（IPC）机制Binder守护进程对象，也就是下面全局的对象保存的是 service_manager 这个进程的binder_node对象，而且获取引用对象的时候，service_manager 对应的引用为0，其他的则要得到对应的引用值static struct binder_node *binder_context_mgr_node ,static uid_t binder_context_mgr_uid = -1;
@@ -34,6 +32,153 @@ service_manager 本身做为一个service的存在，内部用来管理当前系
 
 ### Binder内部的原理
 每一个binder_proc 都有todo，wait队列，每次执行  res = ioctl(bs->fd, BINDER_WRITE_READ, &bwr);内部都会判断当前todo队列或者transaction队列是否为空，如果为空，则会处于挂起状态，等待唤醒,对于addService来说，由于handle传递的是0，所以操作的是service_manager对应的binder_proc
+```C
+先看内部阻塞的实现，当执行  res = ioctl(bs->fd, BINDER_WRITE_READ, &bwr);的时候会调用到 static long binder_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
+内部会根据传递进来的cmd执行对应的操作，由于这里是 BINDER_WRITE_READ ，这个也是binder最重要的命令了,就会执行到
+static long binder_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
+{
+	int ret;
+	struct binder_proc *proc = filp->private_data;
+	struct binder_thread *thread;
+	unsigned int size = _IOC_SIZE(cmd);
+	...
+	thread = binder_get_thread(proc);
+	if (thread == NULL) {
+		ret = -ENOMEM;
+		goto err;
+	}
+
+	switch (cmd) {
+	case BINDER_WRITE_READ:
+		ret = binder_ioctl_write_read(filp, cmd, arg, thread);
+		if (ret)
+			goto err;
+		break;
+	}
+	...
+}
+static int binder_ioctl_write_read(struct file *filp,
+				unsigned int cmd, unsigned long arg,
+				struct binder_thread *thread)
+{
+	int ret = 0;
+	struct binder_proc *proc = filp->private_data;
+	unsigned int size = _IOC_SIZE(cmd);
+	void __user *ubuf = (void __user *)arg;
+	struct binder_write_read bwr;
+	...
+	if (bwr.write_size > 0) {
+		ret = binder_thread_write(proc, thread,
+					  bwr.write_buffer,
+					  bwr.write_size,
+					  &bwr.write_consumed);
+		trace_binder_write_done(ret);
+		if (ret < 0) {
+			bwr.read_consumed = 0;
+			if (copy_to_user(ubuf, &bwr, sizeof(bwr)))
+				ret = -EFAULT;
+			goto out;
+		}
+	}
+	if (bwr.read_size > 0) {
+		ret = binder_thread_read(proc, thread, bwr.read_buffer,
+					 bwr.read_size,
+					 &bwr.read_consumed,
+					 filp->f_flags & O_NONBLOCK);
+		trace_binder_read_done(ret);
+		binder_inner_proc_lock(proc);
+		if (!binder_worklist_empty_ilocked(&proc->todo))
+			binder_wakeup_proc_ilocked(proc);
+		binder_inner_proc_unlock(proc);
+		if (ret < 0) {
+			if (copy_to_user(ubuf, &bwr, sizeof(bwr)))
+				ret = -EFAULT;
+			goto out;
+		}
+	}
+	...
+	if (copy_to_user(ubuf, &bwr, sizeof(bwr))) {
+		ret = -EFAULT;
+		goto out;
+	}
+out:
+	return ret;
+}
+内部会将传递过来的数据，拷贝到内核中，之后判断当前是否需要写操作，当写操作执行完毕之后，判断当前是否有必要执行读操作，也就是 binder_thread_read 函数
+static int binder_thread_read(struct binder_proc *proc,
+			      struct binder_thread *thread,
+			      binder_uintptr_t binder_buffer, size_t size,
+			      binder_size_t *consumed, int non_block)
+{
+	void __user *buffer = (void __user *)(uintptr_t)binder_buffer;
+	void __user *ptr = buffer + *consumed;
+	void __user *end = buffer + size;
+
+	int ret = 0;
+	int wait_for_proc_work;
+
+	...
+
+	//判断当前是否需要等待，也就是判断当前的binder_thread的 transaction_stack 队列释放为空，或者都todo队列为空，则wait_for_proc_work 就为false,意思为要等待操作
+	trace_binder_wait_for_work(wait_for_proc_work,!!thread->transaction_stack, !binder_worklist_empty(proc, &thread->todo));
+	if (wait_for_proc_work) {
+		if (!(thread->looper & (BINDER_LOOPER_STATE_REGISTERED |
+					BINDER_LOOPER_STATE_ENTERED))) {
+			binder_user_error("%d:%d ERROR: Thread waiting for process work before calling BC_REGISTER_LOOPER or BC_ENTER_LOOPER (state %x)\n",
+				proc->pid, thread->pid, thread->looper);
+			wait_event_interruptible(binder_user_error_wait,
+						 binder_stop_on_user_error < 2);
+		}
+		binder_set_nice(proc->default_priority);
+	}
+
+	if (non_block) {
+		if (!binder_has_work(thread, wait_for_proc_work))
+			ret = -EAGAIN;
+	} else {
+		ret = binder_wait_for_work(thread, wait_for_proc_work);
+	}
+
+	thread->looper &= ~BINDER_LOOPER_STATE_WAITING;
+
+	if (ret)
+		return ret;
+	...
+}
+如果当前需要等待则 wait_for_proc_work就为false，那么 执行binder_wait_for_work(thread, wait_for_proc_work);函数就会处于挂起状态
+static int binder_wait_for_work(struct binder_thread *thread,
+				bool do_proc_work)
+{
+	DEFINE_WAIT(wait);
+	struct binder_proc *proc = thread->proc;
+	int ret = 0;
+
+	freezer_do_not_count();
+	binder_inner_proc_lock(proc);
+	for (;;) {
+		prepare_to_wait(&thread->wait, &wait, TASK_INTERRUPTIBLE);
+		if (binder_has_work_ilocked(thread, do_proc_work))
+			break;
+		if (do_proc_work)
+			list_add(&thread->waiting_thread_node,
+				 &proc->waiting_threads);
+		binder_inner_proc_unlock(proc);
+		schedule();
+		binder_inner_proc_lock(proc);
+		list_del_init(&thread->waiting_thread_node);
+		if (signal_pending(current)) {
+			ret = -ERESTARTSYS;
+			break;
+		}
+	}
+	finish_wait(&thread->wait, &wait);
+	binder_inner_proc_unlock(proc);
+	freezer_count();
+
+	return ret;
+}
+```
+接着看怎么样往目标的todo队列添加的实现
 ```C
 target_node = binder_context_mgr_node;
 target_proc = target_node->proc;
