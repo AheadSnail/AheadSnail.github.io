@@ -126,8 +126,8 @@ MMKV::doAppendDataWithKey(const MMBuffer &data, const MMBuffer &keyData, bool is
     if (!hasEnoughSize || !isFileValid()) {
         return make_pair(false, KeyValueHolder());
     }
-	...
-	try {
+    ...
+    try {
         //首先写key
         if (isKeyEncoded) {
             m_output->writeRawData(keyData);
@@ -217,24 +217,15 @@ constexpr uint32_t ItemSizeHolderSize = 4;
 bool MMKV::doFullWriteBack(pair<MMBuffer, size_t> preparedData, AESCrypt *newCrypter) {
     auto ptr = (uint8_t *) m_file->getMemory();
     auto totalSize = preparedData.second;//第一次进来也为 4
-	
-	...
-
-	//接着创建一个CodedOutputData 对象，这个对象主要用来完成数据的写
+    ...
+    //接着创建一个CodedOutputData 对象，这个对象主要用来完成数据的写
     delete m_output;
     m_output = new CodedOutputData(ptr + Fixed32Size, m_file->getFileSize() - Fixed32Size);
-	
-	...
-    
-	memmoveDictionary(*m_dic, m_output, ptr, encrypter, totalSize);
-    
-
+    ...
+    memmoveDictionary(*m_dic, m_output, ptr, encrypter, totalSize);
     m_actualSize = totalSize;
-    
-	...
-	
-	recaculateCRCDigestWithIV(nullptr);
-    
+    ...
+    recaculateCRCDigestWithIV(nullptr);
     m_hasFullWriteback = true;
     // make sure lastConfirmedMetaInfo is saved
     sync(MMKV_SYNC);
@@ -263,9 +254,7 @@ memmoveDictionary(MMKVMap &dic, CodedOutputData *output, uint8_t *ptr, AESCrypt 
     auto originOutputPtr = output->curWritePointer();
     // make space to hold the fake size of dictionary's serialization result  
     auto writePtr = originOutputPtr + ItemSizeHolderSize;
-  
-	...
-	
+    ...
     // hold the fake size of dictionary's serialization result  持有字典序列化结果的假大小
     output->writeRawVarint32(ItemSizeHolder);
     auto writtenSize = static_cast<size_t>(writePtr - originOutputPtr);
@@ -440,8 +429,8 @@ MMKV::doAppendDataWithKey(const MMBuffer &data, const MMBuffer &keyData, bool is
     if (!hasEnoughSize || !isFileValid()) {
         return make_pair(false, KeyValueHolder());
     }
-	...
-	try {
+    ...
+    try {
         //首先写key
         if (isKeyEncoded) {
             m_output->writeRawData(keyData);
@@ -479,9 +468,9 @@ MMKV::doAppendDataWithKey(const MMBuffer &data, const MMBuffer &keyData, bool is
  * @param value
  */
 void CodedOutputData::writeData(const MMBuffer &value) {
-	//写当前value1的长度
+    //写当前value1的长度
     this->writeRawVarint32((int32_t) value.length());
-	//写value
+    //写value
     this->writeRawData(value);
 }
 /**
@@ -532,8 +521,8 @@ void MMKV::updateCRCDigest(const uint8_t *ptr, size_t length) {
 
 bool MMKV::setDataForKey(MMBuffer &&data, MMKVKey_t key, bool isDataHolder){
     ...
-	if (!ret.first) {
-	    return false;
+    if (!ret.first) {
+       return false;
     }
     m_dic->emplace(key, std::move(ret.second));
 }
@@ -542,7 +531,7 @@ bool MMKV::setDataForKey(MMBuffer &&data, MMKVKey_t key, bool isDataHolder){
 回到前面构造 mmkv对象的时候
 ```java
 MMKV::MMKV(const string &mmapID, int size, MMKVMode mode, string *cryptKey, string *rootPath){
-	...
+    ...
     loadFromFile();
 }
 执行 loadFromFile
