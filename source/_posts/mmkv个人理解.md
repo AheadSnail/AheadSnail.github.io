@@ -250,7 +250,7 @@ constexpr uint32_t LittleEdian32Size = 4;
 
 static void
 memmoveDictionary(MMKVMap &dic, CodedOutputData *output, uint8_t *ptr, AESCrypt *encrypter, size_t totalSize) {
-	//获取当前写的位置
+    //获取当前写的位置
     auto originOutputPtr = output->curWritePointer();
     // make space to hold the fake size of dictionary's serialization result  
     auto writePtr = originOutputPtr + ItemSizeHolderSize;
