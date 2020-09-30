@@ -19,16 +19,16 @@ MMKV 是微信于 2018 年 9 月 20 日开源的一个 K-V 存储库，它与 Sh
 SharedPreferences每次写一次数据的时候，都会把整个内存的数据写到文件里面,下面是写文件的基本逻辑
 ```java
 private void writeToFile(MemoryCommitResult mcr, boolean isFromSyncCommit) {
-	...
-	if (!backupFileExists) {
+    ...
+    if (!backupFileExists) {
         if (!mFile.renameTo(mBackupFile)) {
-            return;
+           return;
         }
     } else {
         mFile.delete();
     }
-	...
-	FileOutputStream str = createFileOutputStream(mFile);
+    ...
+    FileOutputStream str = createFileOutputStream(mFile);
     ...
     XmlUtils.writeMapXml(mcr.mapToWriteToDisk, str);
     writeTime = System.currentTimeMillis();
@@ -36,9 +36,9 @@ private void writeToFile(MemoryCommitResult mcr, boolean isFromSyncCommit) {
     fsyncTime = System.currentTimeMillis();
     str.close();
 	
-	// Writing was successful, delete the backup file if there is one.
+    // Writing was successful, delete the backup file if there is one.
     mBackupFile.delete();
-	...
+    ...
 }
 SharedPreferences的容错机制是通过备份文件实现的，对于当前修改的数据，当要写到文件的时候，会将原本文件的内容重命名为back.file，保存的是当前修改之前的内容，之后将当前修改的内容，重新写到
 目标文件，如果写成功了，就会把back.file移除，如果失败了，因为有back.file也可以找到之前的内容,但是这个方法每次当调用commit或者apply的时候都会执行一次，如果当前只需要修改一个值，那么也需要将整个文件的
