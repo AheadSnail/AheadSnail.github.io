@@ -63,13 +63,12 @@ CallConstructors
 
 ```java
  soinfo* do_dlopen(const char* name, int flags, const Android_dlextinfo* extinfo) {
- ...
+   ...
    soinfo* si = find_library(name, flags, extinfo);
    if (si != NULL) {
-     si->CallConstructors();
+       si->CallConstructors();
    }
    return si;
- ...
  }
 CallConstructors 函数会调用 SO 的首先调用所有依赖的 SO 的 soinfo 的 CallConstructors 函数，接着调用自己的 soinfo 成员变量 init 和 看 init_array 指定的函数，这两个变量在在解析 dynamic section 时赋值。
 
@@ -355,8 +354,7 @@ Java_com_example_androidelf_MainActivity_stringFromJNI( JNIEnv* env,jobject thiz
 
 在这里重点解释这个解密函数：
 首先看到的是getLibAddr()这个函数：在介绍这个函数之前首先了解一个内存映射问题：
-和Linux一样，Android提供了基于/proc的“伪文件”系统来作为查看用户进程内存映像的接口(cat /proc/pid/maps)。可以说，这是Android系统内核层开放给用户层关于进程内存信息的一扇窗户。
-通过它，我们可以查看到当前进程空间的内存映射情况，模块加载情况以及虚拟地址和内存读写执行（rwxp）属性等。
+和Linux一样，Android提供了基于/proc的“伪文件”系统来作为查看用户进程内存映像的接口(cat /proc/pid/maps)。可以说，这是Android系统内核层开放给用户层关于进程内存信息的一扇窗户。通过它，我们可以查看到当前进程空间的内存映射情况，模块加载情况以及虚拟地址和内存读写执行（rwxp）属性等。
 ![结果显示](/uploads/so加密/进程下面打开的文件描述符.png)
 
 因为根据前面加载so的流程可以知道，其实也是调用open函数打开一个文件，所以肯定可以这里面找到
@@ -365,7 +363,7 @@ Java_com_example_androidelf_MainActivity_stringFromJNI( JNIEnv* env,jobject thiz
 
 解密时，需要保证解密函数在so加载时被调用，那函数声明为：init_getString __attribute__((constructor))。(也可以使用c++构造器实现， 其本质也是用attribute实现)
 解密流程：
-1)  动态链接器通过call_array调用init_getString
+>1)  动态链接器通过call_array调用init_getString
 2)  Init_getString首先调用getLibAddr方法，得到so文件在内存中的起始地址
 3)  读取前52字节，即ELF头。通过 e_flags 获得.textdemo内存加载地址，ehdr.e_entry获取.mytext大小和所在内存块
 4)  修改.textdemo 所在内存块的读写权限
