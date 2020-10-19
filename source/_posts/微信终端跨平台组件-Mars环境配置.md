@@ -140,33 +140,33 @@ set(SELF_LIBS_OUT ${CMAKE_SYSTEM_NAME}.out)
 #如果是Android环境下的编译
 if(ANDROID)
 
-	#找到系统的log，libz库
+    #找到系统的log，libz库
     find_library(log-lib log)
     find_library(z-lib z)
 
-	#该指令的作用主要是指定要链接的库文件的路径，该指令有时候不一定需要。因为find_package和find_library指令可以得到库文件的绝对路径。
-	#不过你自己写的动态库文件放在自己新建的目录下时，可以用该指令指定该目录的路径以便工程能够找到。
+    #该指令的作用主要是指定要链接的库文件的路径，该指令有时候不一定需要。因为find_package和find_library指令可以得到库文件的绝对路径。
+    #不过你自己写的动态库文件放在自己新建的目录下时，可以用该指令指定该目录的路径以便工程能够找到。
     link_directories(app baseevent log sdt stn comm boost zstd)
 
     # marsxlog 首先编译的 marsxlog.so所以这里要设置编译的so的名字
     set(SELF_LIB_NAME marsxlog)
 
-	#file可以用来搜索符合的cc编译文件, 其实这里的文件都是Android对应的接口文件,其他的内容都是库的内容，与平台无关
+    #file可以用来搜索符合的cc编译文件, 其实这里的文件都是Android对应的接口文件,其他的内容都是库的内容，与平台无关
     file(GLOB SELF_SRC_FILES libraries/mars_android_sdk/jni/JNI_OnLoad.cc
             libraries/mars_xlog_sdk/jni/import.cc)
 	
-	#首先将上面搜索出来的文件，编译 该指令的主要作用就是将指定的源文件生成链接文件，然后添加到工程中去
+    #首先将上面搜索出来的文件，编译 该指令的主要作用就是将指定的源文件生成链接文件，然后添加到工程中去
     add_library(${SELF_LIB_NAME} SHARED ${SELF_SRC_FILES})
     install(TARGETS ${SELF_LIB_NAME} LIBRARY DESTINATION ${SELF_LIBS_OUT} ARCHIVE DESTINATION ${SELF_LIBS_OUT})
 
-	#设置连接的参数
+    #设置连接的参数
     get_filename_component(EXPORT_XLOG_EXP_FILE libraries/mars_android_sdk/jni/export.exp ABSOLUTE)
     set(SELF_XLOG_LINKER_FLAG "-Wl,--gc-sections -Wl,--version-script='${EXPORT_XLOG_EXP_FILE}'") 
     if(ANDROID_ABI STREQUAL "x86_64" OR ANDROID_ABI STREQUAL "x86")
         set(SELF_XLOG_LINKER_FLAG "-Wl,--gc-sections -Wl,--version-script='${EXPORT_XLOG_EXP_FILE}' -Wl,--no-warn-shared-textrel") 
     endif()
 	
-	#之后将执行连接操作，因为这个库要使用到很多其他模块的内容，所以这里要将其他模块的内容，链接起来
+    #之后将执行连接操作，因为这个库要使用到很多其他模块的内容，所以这里要将其他模块的内容，链接起来
     target_link_libraries(${SELF_LIB_NAME} "${SELF_XLOG_LINKER_FLAG}"
                             xlog
                             mars-boost
@@ -178,13 +178,13 @@ if(ANDROID)
     #　测试..............                        
     message( WARNING  "test ..................")
  	
-	#接下来是 编译 marsstn
+    #接下来是 编译 marsstn
     set(SELF_LIB_NAME marsstn)
 
-	#file可以用来搜索符合的cc编译文件
+    #file可以用来搜索符合的cc编译文件
     file(GLOB SELF_SRC_FILES libraries/mars_android_sdk/jni/*.cc)
 
-	# 该指令的主要作用就是将指定的源文件生成链接文件，然后添加到工程中去。该指令常用的语法如下：
+    # 该指令的主要作用就是将指定的源文件生成链接文件，然后添加到工程中去。该指令常用的语法如下：
     add_library(${SELF_LIB_NAME} SHARED ${SELF_SRC_FILES})
 
     install(TARGETS ${SELF_LIB_NAME} LIBRARY DESTINATION ${SELF_LIBS_OUT} ARCHIVE DESTINATION ${SELF_LIBS_OUT})
@@ -194,14 +194,14 @@ if(NOT MSVC)
     set(CMAKE_FIND_LIBRARY_PREFIXES "lib")
     set(CMAKE_FIND_LIBRARY_SUFFIXES ".so" ".a")
 endif()
-	#找到openssl路径下面的对应的.a文件，对于这里就是 libssl.a和libcrypto.a 这里要注意的是找的时候要合适的平台来查找
+    #找到openssl路径下面的对应的.a文件，对于这里就是 libssl.a和libcrypto.a 这里要注意的是找的时候要合适的平台来查找
     find_library(CRYPT_LIB crypto PATHS openssl/openssl_lib_android/${ANDROID_ABI} NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
     find_library(SSL_LIB ssl PATHS openssl/openssl_lib_android/${ANDROID_ABI} NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
 
-	#测试
+    #测试
     message( WARNING  "test 1231..................")
 
-	#之后将执行连接操作，因为这个库要使用到很多其他模块的内容，所以这里要将其他模块的内容，链接起来
+    #之后将执行连接操作，因为这个库要使用到很多其他模块的内容，所以这里要将其他模块的内容，链接起来
     target_link_libraries(${SELF_LIB_NAME} "-Wl,--gc-sections"
                         ${log-lib}
                         stn
@@ -269,27 +269,27 @@ if(MSVC)
     include_directories(../comm/windows/zlib)
     
 elseif(ANDROID)
-	#查找log下的 Android的脚本文件
+    #查找log下的 Android的脚本文件
     file(GLOB SELF_ANDROID_SRC_FILES RELATIVE ${PROJECT_SOURCE_DIR}
             ../comm/xlogger/xloggerbase.c
             ../comm/xlogger/xlogger.cc
             jni/*.cc
             ../mk_template/JNI_OnLoad.cpp)
         
-	#将查找到的内容，添加到 SELF_SRC_FILES
+    #将查找到的内容，添加到 SELF_SRC_FILES
     list(APPEND SELF_SRC_FILES ${SELF_ANDROID_SRC_FILES})
 	
     get_filename_component(EXPORT_EXP_FILE jni/export.exp ABSOLUTE)
     set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--version-script=${EXPORT_EXP_FILE}")
     
-	#指定要依赖的模块
+    #指定要依赖的模块
     link_directories(../comm)
     link_libraries(comm)
     
     #1，link_libraries用在add_executable之前，target_link_libraries用在add_executable之后
-	#link_libraries用来链接静态库，target_link_libraries用来链接导入库，即按照header file + .lib + .dll方式隐式调用动态库的.lib库
+    #link_libraries用来链接静态库，target_link_libraries用来链接导入库，即按照header file + .lib + .dll方式隐式调用动态库的.lib库
     
-	#指定要依赖的模块
+    #指定要依赖的模块
     link_directories(../boost)
     link_libraries(mars-boost)	
 
