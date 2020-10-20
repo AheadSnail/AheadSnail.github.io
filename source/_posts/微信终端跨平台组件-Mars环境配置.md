@@ -618,6 +618,53 @@ target_link_libraries(marlog "${SELF_XLOG_LINKER_FLAG}"
 AndroidStudio下面每个函数都方便查看和跳转，没有出现不能识别的错误
 ![结果显示](/uploads/Mars/AndroidStudio识别成功.png)
 
+### 补个坑
+最开始我使用的是github上面master分支上的代码，后面在程序运行的时候，发现很多函数找不到，比如
+```java
+#ifdef ANDROID
+DEFINE_FIND_STATIC_METHOD(KPlatformCommC2Java_startAlarm, KPlatformCommC2Java, "startAlarm", "(III)Z")
+bool startAlarm(int type, int64_t id, int after) {
+    xverbose_function();
+    
+    if (coroutine::isCoroutine())
+        return coroutine::MessageInvoke(boost::bind(&startAlarm, type, id, after));
+    
+    VarCache* cacheInstance = VarCache::Singleton();
+    ScopeJEnv scopeJEnv(cacheInstance->GetJvm());
+    JNIEnv* env = scopeJEnv.GetEnv();
+    jboolean ret = JNU_CallStaticMethodByMethodInfo(env, KPlatformCommC2Java_startAlarm, (jint)type, (jint)id, (jint)after).z;
+    xdebug2(TSF"id= %0, after= %1, type= %2, ret= %3", id, after, type, (bool)ret);
+    return (bool)ret;
+}
+
+/**
+* 启动定时器
+* @param id
+* @param after
+* @return
+*/
+public static boolean startAlarm(final int id, final int after) {
+    if (null==context){
+       return false;
+    }
+
+    try {
+        return Alarm.start(id, after, context);
+    }
+    catch (Exception e) {
+       e.printStackTrace();
+    }
+    return false;
+}
+
+可以看到JNI的想要的对应的方法签名跟Java是不一样的，当然类似的并不止一个函数，解决这个问题，我们可以使用github上面 tag 为 1.3.0的，对于我们的工程来说，只要简单的替换掉里面的文件
+既可，对已 CmakeList并不需要改动,这里还要注意，对应的Android代码也应该跟natice层为同一版本，要不然又会出现类似上面的问题
+
+```
+最终的结果
+![结果显示](/uploads/Mars/实现可调试.png)
+
+
 
 ### 参考链接
 1. [Tencent/mars](https://github.com/Tencent/mars#android_cn)
