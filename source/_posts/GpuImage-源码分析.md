@@ -163,9 +163,9 @@ int main()
     float vertices[] = {
         // positions           // texture coords
         -1.0f, -1.0f, 0.0f,    0.0f, 0.0f, //图像的左下角
-        1.0f, -1.0f, 0.0f,    1.0f, 0.0f, //图像的右下角
+        1.0f,  -1.0f, 0.0f,    1.0f, 0.0f, //图像的右下角
         -1.0f,  1.0f, 0.0f,    0.0f, 1.0f, //图像的左下角
-        1.0f,  1.0f, 0.0f,    1.0f, 1.0f  //图像的右上角
+        1.0f,   1.0f, 0.0f,    1.0f, 1.0f  //图像的右上角
     };
 	
     unsigned int VBO, VAO;
