@@ -553,6 +553,22 @@ public void onPreviewFrame(final byte[] data, final int width, final int height)
     }
 ```
 
+### 总结
+总体而言，这个项目还是非常不错的，非常有参考，学习的意义,虽然有点小瑕疵，但不足以掩盖他的牛逼，尤其是他支持的各种各样的特效处理
+
+
+### 参考链接
+1. [android-gpuimage](https://github.com/cats-oss/android-gpuimage)
+2. [android GLSurfaceView渲染模式](https://blog.csdn.net/bzlj2912009596/article/details/78348750)
+3. [Android Camera2 简介](https://www.jianshu.com/p/23e8789fbc10)
+4. [GLSL 内建函数](https://www.cnblogs.com/kex1n/p/3941765.html)
+5. [OpenGL 之 GPUImage 源码分析](https://mp.weixin.qq.com/s/Xc0r6PsxrT-dJ_W4-K7V0Q)
+5. [LearnOpenGL](https://learnopengl-cn.github.io/)
+
+
+
+
+
 
 
 
