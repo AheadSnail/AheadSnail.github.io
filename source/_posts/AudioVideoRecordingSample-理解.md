@@ -22,124 +22,122 @@ description:  AudioVideoRecordingSample 理解
 ```java
 
 public final class CameraGLView extends GLSurfaceView {
-	...
-	public CameraGLView(final Context context, final AttributeSet attrs, final int defStyle) {
-		super(context, attrs);
-		if (DEBUG) Log.v(TAG, "CameraGLView:");
-		//创建一个渲染的对象
-		mRenderer = new CameraSurfaceRenderer(this);
-		//设置 EGL 上下文的版本号
-		setEGLContextClientVersion(2);	// GLES 2.0, API >= 8
-		//将渲染对象跟 GLSurfaceView关联起来
-		setRenderer(mRenderer);
-	}
+    ...
+    public CameraGLView(final Context context, final AttributeSet attrs, final int defStyle) {
+        super(context, attrs);
+        if (DEBUG) Log.v(TAG, "CameraGLView:");
+        //创建一个渲染的对象
+        mRenderer = new CameraSurfaceRenderer(this);
+        //设置 EGL 上下文的版本号
+        setEGLContextClientVersion(2);	// GLES 2.0, API >= 8
+        //将渲染对象跟 GLSurfaceView关联起来
+        setRenderer(mRenderer);
+    }
 	
-	/**
-	 * GLSurfaceViewのRenderer  GLSurfaceView真正用于显示的 对象，要实现 GLSurfaceView.Renderer接口
-	 */
-	private static final class CameraSurfaceRenderer implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvailableListener {	// API >
-		...
-		public CameraSurfaceRenderer(final CameraGLView parent) {
-			if (DEBUG) Log.v(TAG, "CameraSurfaceRenderer:");
-			mWeakParent = new WeakReference<CameraGLView>(parent);
-			//创建一个单位矩阵
-			Matrix.setIdentityM(mMvpMatrix, 0);
-		}
+    /**
+     * GLSurfaceViewのRenderer  GLSurfaceView真正用于显示的 对象，要实现 GLSurfaceView.Renderer接口
+    */
+    private static final class CameraSurfaceRenderer implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvailableListener {	// API >
+        ...
+        public CameraSurfaceRenderer(final CameraGLView parent) {
+            if (DEBUG) Log.v(TAG, "CameraSurfaceRenderer:");
+            mWeakParent = new WeakReference<CameraGLView>(parent);
+            //创建一个单位矩阵
+            Matrix.setIdentityM(mMvpMatrix, 0);
+        }
 	
-		/**
-		 * 当 GLSurfaceView 回调执行 onSurfaceCreated 的时候，
-		 */
-		@Override
-		public void onSurfaceCreated(final GL10 unused, final EGLConfig config) {
-			// This renderer required OES_EGL_image_external extension  内部会检查当前 EGL 是否支持  OES_EGL_image_external 纹理，如果不支持抛出异常
-			final String extensions = GLES20.glGetString(GLES20.GL_EXTENSIONS);	// API >= 8
-			if (DEBUG) Log.i(TAG, "onSurfaceCreated:Gl extensions: " + extensions);
-			if (!extensions.contains("OES_EGL_image_external"))
-				throw new RuntimeException("This system does not support OES_EGL_image_external.");
+        /**
+        * 当 GLSurfaceView 回调执行 onSurfaceCreated 的时候，
+        */
+        @Override
+        public void onSurfaceCreated(final GL10 unused, final EGLConfig config) {
+            // This renderer required OES_EGL_image_external extension  内部会检查当前 EGL 是否支持  OES_EGL_image_external 纹理，如果不支持抛出异常
+            final String extensions = GLES20.glGetString(GLES20.GL_EXTENSIONS);	// API >= 8
+            if (DEBUG) Log.i(TAG, "onSurfaceCreated:Gl extensions: " + extensions);
+            if (!extensions.contains("OES_EGL_image_external"))
+                throw new RuntimeException("This system does not support OES_EGL_image_external.");
 
-			// create textur ID 创建 OES_EGL_image_external 对应的纹理对象
-			hTex = GLDrawer2D.initTex();
-			// create SurfaceTexture with texture ID.  根据 OES_EGL_image_external 创建的纹理，再次封装成 SurfaceTexture,设置数据发生改变的回调
-			mSTexture = new SurfaceTexture(hTex);
-			mSTexture.setOnFrameAvailableListener(this);
+            // create textur ID 创建 OES_EGL_image_external 对应的纹理对象
+            hTex = GLDrawer2D.initTex();
+            // create SurfaceTexture with texture ID.  根据 OES_EGL_image_external 创建的纹理，再次封装成 SurfaceTexture,设置数据发生改变的回调
+            mSTexture = new SurfaceTexture(hTex);
+            mSTexture.setOnFrameAvailableListener(this);
 
-			// clear screen with yellow color so that you can see rendering rectangle
-			GLES20.glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
-			final CameraGLView parent = mWeakParent.get();
-			if (parent != null) {
-				parent.mHasSurface = true;
-			}
-			// create object for preview display 创建一个对象用于渲染显示 GLSL的内容
-			mDrawer = new GLDrawer2D();
-			mDrawer.setMatrix(mMvpMatrix, 0);
-		}
+            // clear screen with yellow color so that you can see rendering rectangle
+            GLES20.glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
+            final CameraGLView parent = mWeakParent.get();
+            if (parent != null) {
+                parent.mHasSurface = true;
+            }
+            // create object for preview display 创建一个对象用于渲染显示 GLSL的内容
+            mDrawer = new GLDrawer2D();
+            mDrawer.setMatrix(mMvpMatrix, 0);
+        }
 
-		/**
-		 * 当界面发生改变的时候
-		 */
-		@Override
-		public void onSurfaceChanged(final GL10 unused, final int width, final int height) {
-			if (DEBUG) Log.v(TAG, String.format("onSurfaceChanged:(%d,%d)", width, height));
-			// if at least with or height is zero, initialization of this view is still progress.
-			if ((width == 0) || (height == 0)) return;
-			//预览的视图大小发生改变的时候，改变视图的显示
-			updateViewport();
-			//重新设置预览的大小,开启预览
-			final CameraGLView parent = mWeakParent.get();
-			if (parent != null) {
-				parent.startPreview(width, height);
-			}
-		}
+        /**
+        * 当界面发生改变的时候
+        */
+        @Override
+        public void onSurfaceChanged(final GL10 unused, final int width, final int height) {
+            if (DEBUG) Log.v(TAG, String.format("onSurfaceChanged:(%d,%d)", width, height));
+            // if at least with or height is zero, initialization of this view is still progress.
+            if ((width == 0) || (height == 0)) return;
+            //预览的视图大小发生改变的时候，改变视图的显示
+            updateViewport();
+            //重新设置预览的大小,开启预览
+            final CameraGLView parent = mWeakParent.get();
+            if (parent != null) {
+                parent.startPreview(width, height);
+            }
+        }
 		
-		//用来标识数据是否发生了变化
-		private volatile boolean requesrUpdateTex = false;
-		private boolean flip = true;
-		/**
-		 * drawing to GLSurface  GLSurfaceView 执行绘制的回调函数
-		 *
-		 */
-		@Override
-		public void onDrawFrame(final GL10 unused) {
-			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-			//如果数据发生了变化
-			if (requesrUpdateTex) {
-				requesrUpdateTex = false;
-				mSTexture.updateTexImage();
-				mSTexture.getTransformMatrix(mStMatrix);
-			}
-			//执行绘制操作
-			mDrawer.draw(hTex, mStMatrix);
-			//执行编码操作
-			flip = !flip;
-			if (flip) {	// ~30fps
-				//加锁
-				synchronized (this) {
-					if (mVideoEncoder != null) {
-						//通知界面发生了改变，可以编码当前的画面了
-						mVideoEncoder.frameAvailableSoon(mStMatrix, mMvpMatrix);
-					}
-				}
-			}
-		}
+        //用来标识数据是否发生了变化
+        private volatile boolean requesrUpdateTex = false;
+        private boolean flip = true;
+        /**
+        * drawing to GLSurface  GLSurfaceView 执行绘制的回调函数
+        *
+        */
+        @Override
+        public void onDrawFrame(final GL10 unused) {
+            GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+            //如果数据发生了变化
+            if (requesrUpdateTex) {
+                requesrUpdateTex = false;
+                mSTexture.updateTexImage();
+                mSTexture.getTransformMatrix(mStMatrix);
+            }
+            //执行绘制操作
+            mDrawer.draw(hTex, mStMatrix);
+            //执行编码操作
+            flip = !flip;
+            if (flip) {	// ~30fps
+                //加锁
+                synchronized (this) {
+                    if (mVideoEncoder != null) {
+                        //通知界面发生了改变，可以编码当前的画面了
+                        mVideoEncoder.frameAvailableSoon(mStMatrix, mMvpMatrix);
+                    }
+                }
+            }
+        }
 
-		/**
-		 * 数据发生改变的回调
-		 * @param st
-		 */
-		@Override
-		public void onFrameAvailable(final SurfaceTexture st) {
-			//标识 相机的界面已经发生了更新了
-			requesrUpdateTex = true;
-		}
-		...
-	}
+        /**
+         * 数据发生改变的回调
+         * @param st
+         */
+        @Override
+        public void onFrameAvailable(final SurfaceTexture st) {
+            //标识 相机的界面已经发生了更新了
+            requesrUpdateTex = true;
+        }
+        ...
+    }
 }
-
 
 可以看到这个  CameraGLView 继承自 GLSurfaceView，而且设置了 对应的Render对象，那么主要的操作就在 Render接口那几个方法了,首先是 onSurfaceCreated的时候，
 执行了 hTex = GLDrawer2D.initTex();这个对象是 OES_EGL_image_external 纹理对象，这个纹理可以将YUV的数据直接转成RBGA，接着使用了SurfaceTexture进行封装
 设置数据的监听回调 mSTexture.setOnFrameAvailableListener(this); 接着创建 mDrawer = new GLDrawer2D(); 这是 一个用来执行渲染的对象,这个后面再来看
-
 在 onSurfaceChanged 方法中 会执行 parent.startPreview(width, height); 开启相机线程
 
 
