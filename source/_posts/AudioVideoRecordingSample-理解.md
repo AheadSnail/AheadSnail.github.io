@@ -16,7 +16,7 @@ description:  AudioVideoRecordingSample 理解
 
 > 跟上一篇文章一样，AudioVideoRecordingSample 也是音视频项目里面 一个非常有学习，有参考意义的项目，此项目的侧重点在于Android音视频相关API的使用，尤其是在录制和编码方面，该项目能够将Camera采集的视频和音频内容编码成一个Mp4文件，其中用到了MediaCodec做编码，用到了MediaMuxer将音频和视频混合，这样的一个完整示例对于掌握Android上音视频相关API帮忙非常大，而且项目的性能远高于 GpuImage，所以接下来就大概的看下此项目 [AudioVideoRecordingSample Github地址](https://github.com/saki4510t/AudioVideoRecordingSample)
 
-### 获取视频数据
+### 预览显示
 
 预览画面的显示控件是 CameraGLView
 ```java
