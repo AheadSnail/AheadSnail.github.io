@@ -6,12 +6,6 @@ tags: [Android,NDK,Mars]
 description:  微信终端跨平台组件 Mars环境配置
 ---
 
-### 概述
-
-> 微信终端跨平台组件 Mars环境配置
-
-<!--more-->
-
 ### 简介
 首先看看关于Mars的介绍
 > Mars 是微信官方的终端基础组件, 是一个业务性无关,平台性无关 使用C++ 编写的基础组件。目前已接入微信 Android、iOS、Mac、Windows、WP、UWP 等客户端。
@@ -99,7 +93,7 @@ so所在的位置
 由于我们编译的是Android下面的so，所以我们也无法直接在linux下面直接运行这个so,所以我们接下来就是要配置到AndroidStudio中，当然这次Linux的编译可以用来收集编译的信息，比如我们查看整体是怎么样编译的，对应的编译脚本是怎么样的，只有理解清楚，我们才能在AndroidStudio中执行编译，对应不理解的地方，比如参数什么的，我们可以在 CmakeList的 message来输出，能更好的理解编译的脚本
 
 ### 脚本执行的过程
-```MakeFile
+```java
 cmake_minimum_required (VERSION 3.6)
 
 #设置变量
@@ -221,7 +215,7 @@ endif()
 
 接着我们随便看一个子目录下面的模块是怎么样编译的，比如这里选择 add_subdirectory(log xlog)
 
-```MakeFile
+```java
 cmake_minimum_required (VERSION 3.6)
 
 #设置变量
@@ -416,7 +410,7 @@ endmacro()
 
 ### AndroidStudio下面的配置
 这里就不区分模块了，这里直接将每个模块要真正参与编译的内容，查找出来，直接编译，下面的是编译maxlog的配置
-```MakeFile
+```java
 cmake_minimum_required(VERSION 3.6)
 
 set(PATH_TO_MEDIACORE ${CMAKE_SOURCE_DIR}/mars)

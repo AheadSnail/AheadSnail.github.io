@@ -5,13 +5,6 @@ date: 2020-09-17 11:13:45
 tags: [Binder,Android]
 description:  Binder 记录
 ---
-
-### 概述
-
-> 记录下 这俩天关于Binder学习的疑点
-
-<!--more-->
-
 ### 简介
 这俩天看了Android Binder的原理，这里主要记录下个人对于Binder的疑点,参考的内容是来自 老罗关于Binder的一系列的文章分析，下面是文章的地址 https://blog.csdn.net/luoshengyang/article/details/6618363 这篇文章只是在记录一下我个人的理解
 
@@ -32,7 +25,7 @@ service_manager 本身做为一个service的存在，内部用来管理当前系
 
 ### Binder内部的原理
 每一个binder_proc 都有todo，wait队列，每次执行  res = ioctl(bs->fd, BINDER_WRITE_READ, &bwr);内部都会判断当前todo队列或者transaction队列是否为空，如果为空，则会处于挂起状态，等待唤醒,对于addService来说，由于handle传递的是0，所以操作的是service_manager对应的binder_proc
-```C
+```java
 先看内部阻塞的实现，当执行  res = ioctl(bs->fd, BINDER_WRITE_READ, &bwr);的时候会调用到 static long binder_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 内部会根据传递进来的cmd执行对应的操作，由于这里是 BINDER_WRITE_READ ，这个也是binder最重要的命令了,就会执行到
 static long binder_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
@@ -179,7 +172,7 @@ static int binder_wait_for_work(struct binder_thread *thread,
 }
 ```
 接着看怎么样往目标的todo队列添加的实现
-```C
+```java
 target_node = binder_context_mgr_node;
 target_proc = target_node->proc;
 target_list = &target_proc->todo;
@@ -215,7 +208,7 @@ target_thread = in_reply_to->from;
 
 ### service的实例对象保存在当前进程对应的binder_proc,其他的都为引用
 在binder_transaction中 当传输的为Binder实体的时候，type为 BINDER_TYPE_BINDER
-```C
+```java
 node = binder_get_node(proc, fp->binder);
 if (!node) {
     node = binder_new_node(proc, fp);
@@ -246,7 +239,7 @@ static struct binder_node *binder_get_node_ilocked(struct binder_proc *proc,bind
 ```
 > 现在，由于要把这个Binder实体MediaPlayerService交给target_proc，也就是Service Manager来管理，也就是说Service Manager要引用这个MediaPlayerService了，于是通过 binder_inc_ref_for_node 为MediaPlayerService创建一个引用，并且通过binder_inc_ref来增加这个引用计数，防止这个引用还在使用过程当中就被销毁。注意，到了这里的时候，t->buffer中的flat_binder_obj的type已经改为BINDER_TYPE_HANDLE，handle已经改为ref->desc，跟原来不一样了，因为这个flat_binder_obj是最终是要传给Service Manager的，而Service Manager只能够通过句柄值来引用这个Binder实体。
 
-```C
+```java
 ret = binder_inc_ref_for_node(target_proc, node,fp->hdr.type == BINDER_TYPE_BINDER,&thread->todo, &rdata);
 
 static int binder_inc_ref_for_node(struct binder_proc *proc,
@@ -315,7 +308,7 @@ static struct binder_ref *binder_get_ref_for_node_olocked(
 }
 ```
 上面的过程做的就是创建一个 binder_ref 对象，这个代表的是当前引用的binder_node节点,然后保存到 target_proc中的 binder_ref 节点下面，本身是一颗红黑树结构，代表当前进程所引用的binder实体,下面是 binder_ref 的结构体定义,注意 binder_ref 中的 proc 赋值为当前所拥有它的binder_proce，在这里也就是service_manager对象,而node为binder的实体对象
-```C
+```java
 struct binder_ref {
 	/* Lookups needed: */
 	/*   node + proc => ref (transaction) */
@@ -467,7 +460,7 @@ err_no_ref:
 这里要注意 node = ref->node; 也即是得到的是引用节点里面的实体binder节点,然后判断 if (node->proc == target_proc)也即是判断当前的target_proc是否就为当前binder实体所拥有的对象,由于当前是客户端进程，所以不满足 会执行 ret = binder_inc_ref_for_node(target_proc, node,fp->hdr.type == BINDER_TYPE_HANDLE,NULL, &dest_rdata);前面已经分析过了，这里会再创建一个引用，同时将 fp->handle = dest_rdata.desc; 所以客户端得到的是另外一个引用
 
 ### 客户端拿到引用之后的调用过程
-```C
+```java
 if (tr->target.handle) {
 	struct binder_ref *ref;
 	binder_proc_lock(proc);
@@ -546,7 +539,7 @@ static struct binder_node *binder_get_node_refs_for_txn(struct binder_node *node
 
 ### 客户端调用是阻塞调用
 客户端的一般调用流程
-```C
+```java
 public IBinder getService(String name) throws RemoteException {
 	Parcel data = Parcel.obtain();
 	Parcel reply = Parcel.obtain();
@@ -661,7 +654,7 @@ finish:
 而内部的 talkWithDriver() 函数 会有执行  ioctl(mProcess->mDriverFD, BINDER_WRITE_READ, &bwr)根据前面的分析可以知道，这个函数是会阻塞线程的，所以在没得到对方的回应之前，就会挂起线程
 
 ### 服务端的调用是在Binder线程中的
-```C
+```java
 ProcessState::self()->startThreadPool();//看名字，启动Process的线程池？
 IPCThreadState::self()->joinThreadPool();//将自己加入到刚才的线程池？
 
@@ -714,7 +707,7 @@ status_t IPCThreadState::getAndExecuteCommand()
 可以看到内部又是通过调用 talkWithDriver 得到结果的，结果的处理是executeCommand来执行分发的，内部就会调用服务端的方法了，这里就不看了
 
 ### Android的服务是在哪里调用这俩句的
-```C
+```java
 也就是Android进程启动的时候，也即是 ActivityManagerService中的startProcessLocked方法，内部会完成进程的启动
 class AppRuntime : public AndroidRuntime
 {

@@ -5,13 +5,6 @@ date: 2020-09-26 19:12:37
 tags: [mmkv,Android,SharedPreferences]
 description:  mmkv个人理解
 ---
-
-### 概述
-
-> 记录下 这俩天关于mmkv学习记录
-
-<!--more-->
-
 ### 简介
 MMKV 是微信于 2018 年 9 月 20 日开源的一个 K-V 存储库，它与 SharedPreferences 相似，但又在更高的效率下解决了其不支持跨进程读写等弊端。主要介绍下SharedPreferences的缺点以及mmkv的应对策略,github地址为 https://github.com/Tencent/MMKV/blob/master/readme_cn.md
 
@@ -802,7 +795,7 @@ m_sequence 这个变量可以用来做同步操作，当俩个进程对应的这
 ![结果显示](/uploads/mmkv/文件锁.png)
 可以看出当只有双方都是共享方式的时候，才不会阻塞，对于其他的模式都是阻塞的，通过mmkv关于多进程锁的介绍可以知道，文件锁是不支持重入，也不支持读写锁升级/降级，接下来介绍下怎么实现这些特性,首先看下基本的数据结构
 
-```C++
+```java
 首先看下mmkv对象中持有跟锁有关的对象
 //锁对象,这个代表的是当前进程的锁对象，因为一个mmkv对应的是一个java的一个特定name对应的 SharedPreferences对象，所以一个进程里面，多个线程也是需要同步的，那么就可以使用这个锁
 mmkv::ThreadLock *m_lock;
@@ -987,7 +980,7 @@ m_sharedProcessLock(new InterProcessLock(m_fileLock, SharedLockType)) //进程�
 m_exclusiveProcessLock(new InterProcessLock(m_fileLock, ExclusiveLockType)) //进程间的锁
 	
 我们先看加锁的操作
-```C++
+```java
 //加锁操作
 bool FileLock::doLock(LockType lockType, bool wait) {
     if (!isFileLockValid()) {
@@ -1081,7 +1074,7 @@ bool FileLock::platformLock(LockType lockType, bool wait, bool unLockFirstIfNeed
 后续释放了之后，再去获取的化，是阻塞的
 ```
 解锁操作
-```C++
+```java
 /**
  * 解锁操作
  * @param lockType
@@ -1162,7 +1155,7 @@ bool MMKV::setDataForKey(MMBuffer &&data, MMKVKey_t key, bool isDataHolder) {
 >事实上 MMKV 在内存增长之前，会先尝试通过内存重整来腾出空间，重整后还不够空间才申请新的内存。所以内存增长可以跟内存重整一样处理。至于新的内存大小，可以通过查询文件大小来获得，无需在 mmap 内存另外存放。
 
 其实每次在添加数据，修改数据，或者删除数据之前，都会调用下面的这个方法，来完成数据的校验，下面也就是多进程的同步实现了
-```C++
+```java
 /**
  * 检查数据
  */

@@ -5,13 +5,6 @@ date: 2020-09-29 09:09:32
 tags: [Android,ELF,SO]
 description:  在native层为.so文件进行加固
 ---
-
-### 概述
-
-> 在native层为.so文件进行加固
-
-<!--more-->
-
 ### 简介
 Android 系统安全愈发重要，像传统pc安全的可执行文件加固一样，应用加固是Android系统安全中非常重要的一环。目前Android 应用加固可以分为dex加固和Native加固，Native 加固的保护对象为 Native 层的 SO 文件，使用加壳、反调试、混淆、VM 等手段增加SO文件的反编译难度。目前最主流的 SO 文件保护方案还是加壳技术,本篇主要用来记录下native层加密
 
@@ -235,7 +228,7 @@ Java_com_example_androidelf_MainActivity_encoder(JNIEnv *env, jobject thiz) {
 }
 ```
 加密流程：
-1)  从so文件头读取section偏移shoff、shnum和shstrtab
+> 1)  从so文件头读取section偏移shoff、shnum和shstrtab
 2)  读取shstrtab中的字符串，存放在str空间中
 3)  从shoff位置开始读取section header, 存放在shdr
 4)  通过shdr -> sh_name 在str字符串中索引，与.mytext进行字符串比较，如果不匹配，继续读取

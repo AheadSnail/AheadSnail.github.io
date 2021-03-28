@@ -5,10 +5,6 @@ date: 2017-12-21 21:14:25
 tags: [Android,IBinder,IPC]
 description:  Android IBinder机制理解
 ---
-
- Android IBinder机制理解
-<!--more-->
-
 什么是IPC机制
 ```
 （1）IPC是Inter-Process Communication的缩写，含义为进程间通信或者跨进程通信，是指两个进程之间进行数据交换的过程。

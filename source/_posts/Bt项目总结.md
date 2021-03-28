@@ -6,12 +6,6 @@ tags: [bt]
 description:  Bt项目总结
 ---
 
-### 概述
-
-> Bt项目总结
-
-<!--more-->
-
 ### 简介
 Bt项目已经完成的差不多了，后续的功能也陆陆续续的加上去了，整体是不会有多大的变化，趁此来总结下，以免后续忘了，先来看看整体的方案
 ![结果显示](/uploads/Bt项目总结/Bt项目总结.png)
@@ -54,7 +48,7 @@ https://github.com/chenshuo/muduo
 1.线程间通信
 > 不管是libuv还是muduo都有类似的线程间通信，不过libuv的线程间通信会有一个问题，他为了实现同一时刻只能处理一个任务，而且这个任务在处理的时候，不会被打扰中断，内部会抛弃同时触发的其他的任务，内部是使用pipe管道来实现的，在项目中我是通过任务队列加锁的方式来实现的，然后由当前线程的定时器来触发检查这个任务队列，也可以做到将当前的操作转到当前线程来执行，只是可能会存在一定的延时，毕竟是由定时器来触发的，而 muduo的线程间通信
 
-```C
+```java
 首先也是定义一个集合用来保存当前需要在当前线程中触发的操作
 typedef std::function<void()> Functor;
 std::vector<Functor> pendingFunctors_;
@@ -145,7 +139,7 @@ void EventLoop::loop()
 > 所以相比我们当前的做法来说，muduo做的更加优雅，如果我们想实现这个功能，就可以使用libuv原本的线程间通信，然后加上当前的任务队列也可以实现一样的效果，这样就可以巧妙的使用这个操作比如多个线程都往当前线程的任务队列添加任务，然后每个线程都通过这个libuv线程间通信，虽然只能同一时刻处理一个请求，但是没关系，反正可以确保会有一个操作会触发，之后就转到了当前的线程就可以执行之前多个线程添加的任务队列了，或许这才是libuv线程间通信的正确使用方式
 
 2.定时器
-```C
+```java
 接下来看看libuv中的定时器跟muduo定时器的差别，先看libuv的实现，下面是关键的插入时间的实现
 
 HEAP_EXPORT(void heap_insert(struct heap* heap,
@@ -295,7 +289,7 @@ ActiveTimerSet cancelingTimers_;
 ```
 
 3.缓冲区
-```C
+```java
 关于缓冲区方面来说的话，由于要实现高性能，所以对于异步操作来说的话，使用缓冲区是非常有必要的，让上层不用关心数据有没有发送完成，
 libuv是没有提供自己的缓冲区的，不管是在tcp还是udp方面，所以现看看muduo关于缓冲区的实现
 
@@ -441,7 +435,7 @@ int PeerBtInteraction::processBtMessage(const unsigned char *buff, size_t length
 ```
 
 4.信号处理
-```C
+```java
 在多线程时代，signal 的语义更为复杂，信号分为俩类，发送给某一线程，发送给进程中的任一线程，还要考虑掩码对信号的屏蔽等，特别是在signal handle中不能
 调用任何Pthreads函数，不能通过condition variable来通知其他的线程，所以在muduo 中这样写到 在多线程程序中，使用 signal的第一原则是不要使用signal
 
@@ -489,7 +483,7 @@ BtManager::BtManager()
 ```
 
 内存检测
-```C
+```java
 内存检测方面通过不断的暂停，恢复下载来模拟更多的操作，也为了更好的暴露问题,比如闪退，资源清理等，实际看起来确实挺有用的
 while(true){
 	if(index == 200){

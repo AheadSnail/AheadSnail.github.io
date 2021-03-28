@@ -2,15 +2,9 @@
 layout: pager
 title: grafika-理解
 date: 2021-01-07 11:21:30
-tags:
+tags: [Android,grafika,音视频]
 description:  阅读 grafika 源码 ，记录下个人对grafika 的理解 
 ---
-
-### 概述
-
-> grafika 理解
-
-<!--more-->
 
 ### 简介
 
@@ -422,6 +416,7 @@ if (index < 0) {
 ```
 
 - DoubleDecodeActivity
+
 ```java
 这是一个界面俩个窗口进行播放视频的demo，内部使用的是俩个TextureView 来进行画面的预览展示，这个demo主要想用来展示 比如横竖屏切换的时候保留SurfaceTexture
 后续直接使用的目的，首先在成员函数中使用静态变量来保存对象
@@ -525,7 +520,8 @@ public void recreateView(TextureView view) {
 因为渲染子线程其实一直都在执行，所以下次重新创建的时候，直接调用setSurfaceTexture关联上就能显示出内容了
 ```
 
-- HardwareScalerActivi
+- HardwareScalerActivity
+
 ```java
 这个demo是通过绘制一个旋转的三角形，一个四周移动的正放形，和一个边框 然后在不同的宽高大小的情况下渲染过程,画面的预览使用了SurfaceView设置监听，
 然后在surfaceCreated的时候，初始化变量，创建渲染子线程RenderThread，同时设置了Choreographer.getInstance().postFrameCallback(this);
@@ -757,8 +753,8 @@ private static final String VERTEX_SHADER =
 只要记住 OpenGL的坐标原点是左下角的就可以理解为什么要做这样的设置
 ```
 
-
 - MultiSurfaceActivity
+
 ```java
 MultiSurfaceActivity 是一个采用了三个SurfaceView来显示画面数据的，下面是对应的SurfaceView的排列方式,大致就是 setZOrderMediaOverlay和setZOrderOnTop调用了
     
@@ -786,8 +782,8 @@ mSurfaceView3.setZOrderOnTop(true);
 就可以利用我们Android的绘制方式简单方便的绘制出来了,当然绘制出来后，别忘了设置  surface.unlockCanvasAndPost(canvas); 将内容渲染出来
 ```
 
-
 - PlayMovieSurfaceActivity
+
 ```java
 其实也是一个播放视频demo 跟第一个demo很像，不过这个demo的预览数据是使用 SurfaceView，而第一个是使用TextureView的方式,下面简单的介绍下不同点，
 像文中的介绍说的是SurfaceViw来进行绘制的话，效率会更高,因为内部本身一个Surface，而TextureView的话，是要自己创建一个Surface
@@ -826,8 +822,8 @@ layout.setAspectRatio((double) width / height);
 </com.example.grafika.AspectFrameLayout>
 ```
 
-
 - RecordFBOActivity
+
 ```java
 RecordFBOActivity 是一个展示使用了三种方式来进行录制视频的效率，一种是通过绘制俩次的方式，就是一次绘制到预览控件上面，一次绘制到MediaCodec的InputSurface上面，
 第二种是使用 GLSL3 的方式，通过调用 glBlitFramebuffer来拷贝数据，第三种是通过 FBO的方式，下面依次介绍下,由于这个demo里面的内容跟前面绘制彩色三角形很相似，
@@ -929,6 +925,7 @@ mWindowSurface.makeCurrent();
 ```
 
 - ScreenRecordActivity
+
 ```java
 ScreenRecordActivity 是一个集成自播放器的demo 实现的屏幕录制的demo，关于播放的部分这里就不细看，主要介绍下 屏幕录制的实现，
 可以实现 MediaProjectionManager来实现，其实也有一套的流程的,
@@ -1033,6 +1030,7 @@ encoderCallback = new MediaCodec.Callback() {
 ```
 
 - CameraCaptureActivity
+
 ```java
 CameraCaptureActivity 是一个使用摄像头来录制视频，画面的预览使用 GLSurfaceView 也就是预览画面是在另一个线程，然后视频的编码又是在另一个线程中，
 同时还可以支持设置滤镜的效果，比如黑白，边缘等效果
@@ -1176,6 +1174,7 @@ private void prepareEncoder(EGLContext sharedContext, int width, int height, int
 ```
 
 - TextureViewGLActivity
+
 ```java
 TextureViewGLActivity 是一个简单的demo，是使用TextureView来显示绘制的画面，然后在渲染子线程里面通过获取Surface获取到对应Canvas，
 然后通过java的方式来绘制的操作，跟TextureViewCanvasActivity 是非常相似的，不同的地方是在销毁的方式上
@@ -1295,6 +1294,7 @@ if (!sReleaseInCallback) {
 ```
 
 - TextureFromCameraActivity
+
 ```java
 TextureFromCameraActivity 是一个使用了前置摄像头来捕获像素数据，然后提供了旋转，放大画面，放到或者缩小画面的内容，还可以响应手指的移动，
 手指到哪里画面也会跟着动，相机的预览显示就不看了，看下是怎么样实现 旋转等操作的

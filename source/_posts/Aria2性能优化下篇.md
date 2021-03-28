@@ -6,17 +6,12 @@ tags: [Android,NDK,Aria2]
 description:  Aria2性能优化下篇
 ---
 
-### 概述
-
-> Aria2性能优化下篇
-
-<!--more-->
-
 ### 简介
 前篇文章分析了下Aria2 出现cpu爆满的情况，最主要的区别是换成了utp之后，包的大小变小了，由原本tcp的64k变成了utp的1k，加上utp有丢包重传的机制，导致下载相同数据的时候，utp包的数量为tcp的200倍，加上原本这个框架为epoll机制，当有数据到来的时候，epoll就没有机会休眠，换成utp之后，epoll触发的概率就大了很多，在网络不好的情况下，epoll基本没有超时的机会，导致一直循环，所以cpu爆满又因为 原本为单线程的方式，处理数据又慢，所以最先想到的就是多线程的方式，既然cpu没有时间休息，我们可以让主线程每个轮休都让它休息，然后任务交给子线程来处理，这样就可以做到cpu可以减低任务又处理的快
 
+
 下面分析下要解决的问题：
-1.更改当前的架构思维
+> 1.更改当前的架构思维
 2.Bt只有一个端口，udp方式监听这个端口只能得到一个socketfd，那么一个socketfd在多线程中怎么解决
 3.utp并不是线程安全的
 
@@ -28,7 +23,7 @@ Linux 高性能编程中有一个Reactor 模式
 https://blog.csdn.net/analogous_love/article/details/53319815
 也即是主线程创建epoll用于监听socketfd是否有事件到来，如果有就交给子线程来处理，所以我们的主线程可以这样写
 
-```C
+```java
 //引擎开始运行 这边参数为true
 int DownloadEngine::run(bool oneshot)
 {
@@ -105,7 +100,7 @@ void DownloadEngine::executeCommand(std::deque<std::unique_ptr<Command>>& comman
 其实对于这个问题，如果是单个socketfd来说的话，处理起来是很复杂的，很容易发生数据的混乱，比如同时发送，同时接收数据等，所以换个思路，我们是否可以通过监听一个udp的端口得到多个socketfd而这个其实linux 在3.9之后就有选项支持的,既是创建socketfd的时候通过设置 SO_REUSEPORT ，下面是关于介绍 https://lwn.net/Articles/542629/
 
 下面是具体的demo ,首先是服务端的代码实现
-```C
+```java
 #include<sys/types.h> 
 #include<sys/socket.h> 
 #include<unistd.h> 
@@ -218,7 +213,7 @@ int main(int argc, char **argv){
 }
 ```
 接下来是客户端的代码实现
-```C
+```java
 #include<sys/types.h> 
 #include<sys/socket.h> 
 #include<unistd.h> 
@@ -308,7 +303,7 @@ int main(int argc, char **argv) {
 libutp线程不安全，utp.cpp中有很多全局数据，例如_global_stats, g_rst_infos, g_utp_sockets。因此不建议在多线程程序中使用，如果使用的话，在API使用前加锁进行同步,注意这里加锁不能加在utp的回调函数里面，一般我们主动调用的函数都要加锁，但是utp的回调函数不用加锁，因为很多回调函数都是因为我们主动调用触发的，重复的加锁，会造成死锁,单个utp锁的就不展示了，我们要考虑的是多个utp锁的实现，这样锁的粒度会更小，utp库里面有一个utp_context 对象，内部维护了一个utpSocket集合，所以我们可以尝试的给每个线程创建一个utp_context 对象，在这个对象里面在设置对应的锁
 
 服务端的代码实现
-```C
+```java
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -614,7 +609,7 @@ int main(int argc, char *argv[])
 对于Bt这部分来说，我准备开启三个线程，也即是要创建三个utp_context 对象，创建3个sockfd,这里要注意这里要维护俩个集合，一个是关于utp_context 的集合，一个是关于socketfd的集合比如，客户端随机的获取到一个utp_context 对象，创建utp_socket ，执行连接的操作，对于客户端来说，下次接收数据的时候，怎么样找到这个utp_context 对象，所以要维护这个集合关于第二个集合是这样的  当使用了SO_REUSEPORT  属性之后，客户端随便使用一个socketfd用于发送消息，但是对于消息的接收，是随机的，也即是消息的到来并不是客户端的这个socketfd，所以要维护这个集合
 
 关于utp_context 的集合
-```C
+```java
 /*
  * GlobalUtpMapping.h
  *
@@ -734,7 +729,7 @@ utp_context* GlobalUtpMapping::getRandomUtpContext(){
 
 关于socketfd 的集合
 
-```C
+```java
 #ifndef ARIA2LIBANDROIDPROJECT_UTPCONTEXTUSERDATA_H
 #define ARIA2LIBANDROIDPROJECT_UTPCONTEXTUSERDATA_H
 

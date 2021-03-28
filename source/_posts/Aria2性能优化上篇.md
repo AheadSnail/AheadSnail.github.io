@@ -6,12 +6,6 @@ tags: [Android,NDK,Aria2]
 description:  Aria2性能优化上篇
 ---
 
-### 概述
-
-> Aria2性能优化上篇
-
-<!--more-->
-
 ### 简介
 > 最近俩个多月都在研究Aria2性能方面的问题，这里是Aria2的开源地址 https://github.com/aria2/aria2，
 原本的Aria2是tcp的协议，我们在原本的基础上，添加了utp的支持，这里是utp的开源地址，https://github.com/bittorrent/libutp
@@ -38,7 +32,7 @@ utp包的大小
 
 ### 代码分析
 首先看整体的框架
-```C
+```java
 error_code::Value main(int argc, char** argv)
 {
   error_code::Value exitStatus = error_code::FINISHED;
@@ -61,7 +55,7 @@ error_code::Value MultiUrlRequestInfo::execute()
 }
 ```
 这里关键是这个run方法
-```C
+```java
 //引擎开始运行 这边参数为true
 int DownloadEngine::run(bool oneshot)
 {
@@ -104,7 +98,7 @@ int DownloadEngine::run(bool oneshot)
 }
 ```
 首先大概的讲解下Aria2的框架，Aria2是单线程模式，但是可以做到单cpu 时间片的效果， 内部通过执行一个一个的command来实现，其中有俩个command数组，一个是commands_为普通的command,比如请求，下载类似的，还有一种为routineCommands_ 常规的command，也即是用来执行一些比较重要的command，比如进度保存的command等，而且每个command是有分状态的，这些状态的改变是通过epoll来改变的，Epoll通过监听对应的事件，来改变command的状态，然后决定是否要执行对应的command，当然常规的command是每次都要执行的
-```C
+```java
 //引擎等待数据
 void DownloadEngine::waitData()
 {
@@ -168,7 +162,7 @@ virtual void processEvents(int events)
 }
 ```
 上面大体的思路是这样的，每次都会执行waitData来判断是否有数据到来，判断数据到来内部的实现是通过Epoll机制来实现的，这里EpollEventPoll 的逻辑是通过监听这些事件,实时的判断是否有数据的变更，如果有相应的事件到来，就改变command对应的状态,当然如果没有相应的事件到来，epoll是有设置超时时间的，所以当没有时间到来的时候，这个线程是可以休息的但是当有时间到来的时候，则会立刻的处理对应的事件,比如有数据到来当前command的状态就会变为 command_->setStatusActive();,接下来继续看
-```C
+```java
 //判断是否达到了刷新界面的时间，constexpr auto A2_DELTA_MILLIS = std::chrono::milliseconds(10);
 if (lastRefresh_.difference(global::wallclock()) + A2_DELTA_MILLIS >= refreshInterval_) {
     //刷新的间隔为1秒
@@ -188,9 +182,7 @@ executeCommand(routineCommands_, Command::STATUS_ALL);
 ```
 
 ### 结果
-这个框架采用单线程的方式来处理，内部通过epoll来处理，当没有数据到来则通过epoll设置的超时时间，来休眠当前的线程，如果有数据到来则立刻处理
-再回到我们前面引进utp之后性能为什么会变的这么差，前面分析过utp发包的总量为tcp发包总量的200倍，也即是epoll触发有数据到会更多，从而cpu少了更多的休眠时间，导致这个while循环一直
-循环导致cpu很高，也即是说引进utp的程序，在网络不好的情况下，可以简单的类比为下面的情况
+这个框架采用单线程的方式来处理，内部通过epoll来处理，当没有数据到来则通过epoll设置的超时时间，来休眠当前的线程，如果有数据到来则立刻处理，再回到我们前面引进utp之后性能为什么会变的这么差，前面分析过utp发包的总量为tcp发包总量的200倍，也即是epoll触发有数据到会更多，从而cpu少了更多的休眠时间，导致这个while循环一直循环导致cpu很高，也即是说引进utp的程序，在网络不好的情况下，可以简单的类比为下面的情况
 while(1){
   ....
 }

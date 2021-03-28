@@ -5,13 +5,6 @@ date: 2020-12-16 11:03:16
 tags: [Android,GpuImage,音视频]
 description:  阅读 GpuImage 有感
 ---
-
-### 概述
-
-> 阅读 GpuImage 有感
-
-<!--more-->
-
 ### 简介
 
 GPUImage 毫无疑问是音视频项目里面必读工程了，它的侧重点在于渲染方面。有些公司的招聘要求上可能都会写明熟悉GPUImage ，重要性可见一斑。通过阅读 GPUImage 的源码，能够让你掌握 OpenGL 的渲染以及渲染链的搭建，同时工程里面很多特效 Shader 代码，通过阅读和实践这些 Shader 代码，能够让你掌握初步的 Shader 编写能力。比如常见的滤镜效果，在 GPUImage 就有现成的代码例子，掌握常见滤镜效果的代码编写。本篇文章简单记录下个人的理解,项目的地址为[GpuImage Github地址](https://github.com/cats-oss/android-gpuimage)
@@ -111,7 +104,7 @@ public static final float TEXTURE_COORD_NO_ROTATION[] = {
 而我们知道OpenGL中纹理坐标为 0到1之间，而且正常的纹理坐标的原点在左下角，类似下面的这张图
 ```
 ![结果显示](/uploads/GPUImage/纹理坐标.png)
-```C++
+```java
 而我们的计算机坐标原点是在左上角的，所以我们就需要做变换，也要以左上角为原点得到正确的纹理坐标，要不然以 默认的纹理坐标TEXTURE_COORD_NO_ROTATION 来显示的话，
 会跟正确的图像倒置过来的效果为了更好的理解，写个简单的demo来验证下
 
@@ -285,7 +278,7 @@ awesomeface.png 原图显示的样子
 ![结果显示](/uploads/GPUImage/结果1.png)
 可以看出是跟原图是倒置过来的,接下来试一下 以左上角为原点的纹理坐标
 
-```C++
+```java
 //由于 计算机的坐标系跟 纹理的坐标系是相反的，所以我们可以用 按照左上角为下标原点,这俩者的效果就是翻转过来的样子，接下来我们使用以左上角为原点得到的纹理坐标
 float vertices1[] = {
     // positions          // texture coords
@@ -298,7 +291,7 @@ float vertices1[] = {
 ![结果显示](/uploads/GPUImage/结果2.png)
 可以看出我们的原图正确的显示过来了，
 
-```C++
+```java
 //水平镜像的效果  , 就是将 x 坐标的值由1变为0,0变为1 ，就跟镜子一样，因为改变x轴的坐标，这个变换是我们以上一个坐标(vertices1)变换过来的
 float vertices2[] = {
     // positions          // texture coords
@@ -310,7 +303,7 @@ float vertices2[] = {
 ```
 ![结果显示](/uploads/GPUImage/结果3.png)
 可以看出我们的图片跟上一个图片做了镜像的处理，所以执行水平的变换，改变的是x坐标，能得到镜像的效果，
-```C++
+```java
 //垂直镜像的效果 ，就是倒置过来了，因为改变了y轴的坐标,这变换也是在上一个坐标((vertices1) 变换过来的
 float vertices3[] = {
     // positions          // texture coords
@@ -323,7 +316,7 @@ float vertices3[] = {
 ![结果显示](/uploads/GPUImage/结果四.png)
 可以看出我们的图片倒置过来了，通过改变y的坐标实现的效果
 
-```C++
+```java
 继续回到项目中 GPUImage中，在GPUImage中默认的纹理坐标是以左上角为远点的，下面是默认的纹理坐标
 public static final float TEXTURE_NO_ROTATION[] = {
     0.0f, 1.0f,
@@ -357,7 +350,7 @@ public static final float TEXTURE_COORD_NO_ROTATION[] = {
 
 ### 性能问题
 在使用GPUImage的时候，发现开启摄像机过了一会手机就会发烫，下面分析下性能问题
-```C++
+```java
 首先在 Camera2Loader中在获取到预览数据的时候，这里首先要执行一次数据的变换 image.generateNV21Data(),这里加上打印的时间
 setOnImageAvailableListener({ reader ->
     //如果为空，从这个 setOnImageAvailableListener lambda中局部返回
@@ -408,7 +401,7 @@ public void onPreviewFrame(final byte[] data, final int width, final int height)
 ![结果显示](/uploads/GPUImage/YUV转成RGB的消耗.png)
 可以看出俩者的时间大致在10-11毫秒,而我们的相机正常是30帧的话，每一帧的时间只有33毫秒，假设在数据的转换上就耗费了11毫秒，那么剩下的时间根本就不多了，这还是只是转换，绘制根本还没执行而且由于这个数据的转换是在CPU上进行的，转换操作都是计算，所以导致CPU繁忙，所以会发烫，改进的话，我们在C++一层创建一个  GL_TEXTURE_EXTERNAL_OES Android特有的纹理对象，这个可以直接将YUV的数据转成RGB的纹理接受过来，而且是在GPU上
 
-```C++
+```java
 在 GPUImageFilterGroup 中，在处理多个滤镜效果的时候，内部的做法是通过创建多个帧缓冲对象 FBO，每个特效对应一个帧缓冲对象，
     public void onOutputSizeChanged(final int width, final int height) {
         super.onOutputSizeChanged(width, height);
@@ -503,7 +496,7 @@ public void onPreviewFrame(final byte[] data, final int width, final int height)
 ### 体验问题
 1.GPUImage在切换前置摄像头的时候，会倒置过来，所以还要做垂直的变换操作
 2.在切换的过程中会看到原摄像机的内容，就是还没有执行正常处理，比如旋转的角度，倒置处理之后的画面，这是由于 GPUImageRenderer 中 glTextureId 保存的是摄像机原本的画面内容并不是处理完之后，比如旋转，倒置后的结果
-```C++
+```java
 	public void onPreviewFrame(final byte[] data, final int width, final int height) {
         //创建预览界面内存大小
         if (glRgbBuffer == null) {
