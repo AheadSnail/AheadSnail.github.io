@@ -4,7 +4,7 @@
 
 <head><meta name="generator" content="Hexo 3.9.0">
     <meta charset="utf-8">
-    <meta name="keywords" content="Lame库编译 以及最新版NDK改动, AheadSnail&#39;s blog">
+    <meta name="keywords" content="guestbook, AheadSnail&#39;s blog">
     <meta name="description" content>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>Lame库编译 以及最新版NDK改动 | AheadSnail&#39;s blog</title>
+    <title>guestbook | AheadSnail&#39;s blog</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -331,12 +331,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/8.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/23.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">Lame库编译 以及最新版NDK改动</h1>
+                    <h1 class="description center-align post-title">guestbook</h1>
                 </div>
             </div>
         </div>
@@ -450,21 +450,9 @@
             <div class="row tag-cate">
                 <div class="col s7">
                     
-                    <div class="article-tag">
-                        
-                            <a href="/tags/Android/">
-                                <span class="chip bg-color">Android</span>
-                            </a>
-                        
-                            <a href="/tags/NDK/">
-                                <span class="chip bg-color">NDK</span>
-                            </a>
-                        
-                            <a href="/tags/Lame/">
-                                <span class="chip bg-color">Lame</span>
-                            </a>
-                        
-                    </div>
+                          <div class="article-tag">
+                            <span class="chip bg-color">无标签</span>
+                          </div>
                     
                 </div>
                 <div class="col s5 right-align">
@@ -476,7 +464,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2018-07-21
+                    2021-03-28
                 </div>
                 
 
@@ -497,395 +485,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><blockquote>
-<p>Lame库编译 以及最新版NDK改动</p>
-</blockquote>
-<a id="more"></a>
-<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><blockquote>
-<p>LAME 是最好的MP3编码器，编码高品质MP3的最好也是唯一的选择。LAME本身是控制台程序，需要加外壳程序才比较容易使用，也可以在别的软件(比如EAC)中间调用。是一款出色的MP3压缩程序，它使用了独创的人体听音心理学模型和声学模型，改变了人们对MP3高音发哑、低音发破的音质的印象。 总结来说也就是可以用来压缩原始流，也即是pcm的数据，转为mp3<br>官网地址  ： <a href="http://lame.sourceforge.net/" target="_blank" rel="noopener">http://lame.sourceforge.net/</a></p>
-</blockquote>
-<h3 id="NDK改动"><a href="#NDK改动" class="headerlink" title="NDK改动"></a>NDK改动</h3><blockquote>
-<p>这俩天在使用Android 目前最新版本的NDK也就是 NDK-R17B 编译Lame库,原本这个库是非常的简单编译的，如果是在NDkR15b之前，但是在NdkR15之后，就有所改动了，下面分别使用ndkR14b 以及NdkR17b</p>
-</blockquote>
-<p>NDK R14b 编译脚本</p>
-<pre class=" language-bash"><code class="language-bash"><span class="token shebang important">#!/bin/bash</span>
-ANDROID_HOME<span class="token operator">=</span>/home/yuhui/workSpace/android-ndk-r14b
-TOOLCHAIN<span class="token operator">=</span><span class="token variable">$ANDROID_HOME</span>/toolchain
-PATH<span class="token operator">=</span><span class="token variable">$TOOLCHAIN</span>/bin:<span class="token variable">$PATH</span>
-HOST<span class="token operator">=</span>arm-linux-androideabi
-PREFIX<span class="token operator">=</span><span class="token variable">$ANDROID_HOME</span>/usr/local
-LOCAL_DIR<span class="token operator">=</span><span class="token variable">$ANDROID_HOME</span>/usr/local
-DEST<span class="token operator">=</span><span class="token variable">$ANDROID_HOME</span>/usr/local
-CC<span class="token operator">=</span><span class="token string">"<span class="token variable">$HOST</span>-gcc -march=armv7-a"</span>
-CXX<span class="token operator">=</span><span class="token variable">$HOST</span>-g++
-LDFLAGS<span class="token operator">=</span><span class="token string">"-L<span class="token variable">$DEST</span>/lib -march=armv7-a"</span>
-CPPFLAGS<span class="token operator">=</span><span class="token string">"-I<span class="token variable">$DEST</span>/include -march=armv7-a"</span>
-CXXFLAGS<span class="token operator">=</span><span class="token variable">$CFLAGS</span>
-
-<span class="token comment" spellcheck="true"># c-ares library build</span>
-  PKG_CONFIG_PATH<span class="token operator">=</span><span class="token variable">$PREFIX</span>/lib/pkgconfig/ LD_LIBRARY_PATH<span class="token operator">=</span><span class="token variable">$PREFIX</span>/lib/ ./configure --host<span class="token operator">=</span><span class="token variable">$HOST</span> --build<span class="token operator">=</span><span class="token variable"><span class="token variable">`</span>dpkg-architecture -qDEB_BUILD_GNU_TYPE<span class="token variable">`</span></span>
---prefix<span class="token operator">=</span><span class="token variable">$PREFIX</span>  --enable-static --disable-shared --disable-frontend 
-
-  <span class="token function">make</span>
-  <span class="token function">make</span> <span class="token function">install</span>
-
-<span class="token keyword">echo</span> <span class="token string">"build lame complete!"</span>
-</code></pre>
-<p>发现正常的编译成功，可以生成目标文件<br><img src="/uploads/Lame/Lame生成结果.png" alt="结果显示"><br>项目结构显示<br><img src="/uploads/Lame/Lame项目结构.png" alt="结果显示"></p>
-<p>Mp3Encoder.cpp内容</p>
-<pre class=" language-C++"><code class="language-C++">#include "Mp3Encoder.h"
-int Mp3Encoder::Init(const char *pcmFilePath, const char *mp3FilePath, int sampleRate, int channels, int bitRate)
-{
-    int ret = 0;
-    pcmFile = fopen(pcmFilePath,"rb");
-    if(pcmFile == NULL)
-    {
-        ret = -1;
-        return ret;
-    }
-
-    mp3File = fopen(mp3FilePath,"wb");
-    if(mp3File == NULL)
-    {
-        ret = -2;
-        return ret;
-    }
-    //初始化lame 得到
-    lameClient = lame_init();
-    if(lameClient == NULL)
-    {
-        ret = -3;
-        return ret;
-    }
-    //设置对应的参数
-    lame_set_in_samplerate(lameClient,sampleRate);
-    lame_set_out_samplerate(lameClient,sampleRate);
-    lame_set_num_channels(lameClient,channels);
-    lame_set_brate(lameClient,bitRate/1000);
-    lame_init_params(lameClient);
-    return ret;
-}
-void Mp3Encoder::Encoder() {
-    //每次读取一段bufferSize大小的pcm数据buffer，然后再编码该buffer，但是在编码buffer之前得把该buffer的左右声道分开
-    //再送入Lame编码器，最终将编码之后的数据写入到Mp3文件中
-    int bufferSize = 1024 * 256;
-    //分配内存空间,分配一个大小为bufferSize/2 数量的 short数组
-    short * buffer = new short[bufferSize/2];
-    short * leftBuffer = new short[bufferSize/4];
-    short * rightBuffer = new short[bufferSize/4];
-
-    //用来存储编码之后的内容
-    unsigned char * mp3_buffer = new unsigned char[bufferSize];
-    size_t readBufferSize = 0;
-    //读取pcm的数据，这里是每次读取2个字节，读取数量为bufferSize/2,short所以每次读取2个字节
-    while((readBufferSize = fread(buffer,2,bufferSize/2,pcmFile)) > 0)
-    {
-        //左右声道分开
-        for(int i = 0;i<readBufferSize;i++)
-        {
-            if(i % 2 == 0)
-            {
-                leftBuffer[i/2] = buffer[i];
-            }else{
-                rightBuffer[i/2] = buffer[i];
-            }
-        }
-
-        //编码
-        size_t wroteSize = lame_encode_buffer(lameClient,leftBuffer,rightBuffer,readBufferSize/2,mp3_buffer,bufferSize);
-        //写文件内容
-        fwrite(mp3_buffer,1,wroteSize,mp3File);
-    }
-
-    //释放内存
-    delete[] buffer;
-    delete[] leftBuffer;
-    delete[] rightBuffer;
-    delete[] mp3_buffer;
-}
-
-Mp3Encoder::Mp3Encoder()
-{
-
-}
-
-Mp3Encoder::~Mp3Encoder()
-{
-    if(pcmFile)
-    {
-        fclose(pcmFile);
-        pcmFile = NULL;
-    }
-    if(mp3File)
-    {
-        fclose(mp3File);
-        mp3File = NULL;
-    }
-    if(lameClient)
-    {
-        lame_close(lameClient);
-        lameClient = NULL;
-    }
-}
-
-void Mp3Encoder::Destory() {
-    if(pcmFile)
-    {
-        fclose(pcmFile);
-        pcmFile = NULL;
-    }
-    if(mp3File)
-    {
-        fclose(mp3File);
-        mp3File = NULL;
-    }
-    if(lameClient)
-    {
-        lame_close(lameClient);
-        lameClient = NULL;
-    }
-}
-
-Mp3Encoder.h内容
-
-#ifndef LAMEMP3ENCODER_MP3ENCODER_H
-#define LAMEMP3ENCODER_MP3ENCODER_H
-
-#include <cstdio>
-#include <lame/lame.h>
-
-class Mp3Encoder
-{
-private:
-    FILE* pcmFile;
-    FILE* mp3File;
-    lame_t lameClient;
-
-public:
-    Mp3Encoder();
-    ~Mp3Encoder();
-    int Init(const char * pcmFilePath,const char * mp3FilePath,int sampleRate,int channels,int bitRate);
-    void Destory();
-    void Encoder();
-};
-
-#endif //LAMEMP3ENCODER_MP3ENCODER_H
-
-native-lib.cpp文件内容
-
-#include <jni.h>
-#include "com_example_administrator_lamemp3encoder_Mp3Encoder.h"
-#include "Mp3Encoder.h"
-
-Mp3Encoder * encoder;
-
-
-JNIEXPORT jint JNICALL Java_com_example_administrator_lamemp3encoder_Mp3Encoder_init
-        (JNIEnv * env, jobject obj, jstring pcmFilePath, jint audioChannels, jint bitRate, jint sampleRate, jstring mp3FilePath)
-{
-    const char * pcmPath = env->GetStringUTFChars(pcmFilePath,NULL);
-    const char * mp3Path = env->GetStringUTFChars(mp3FilePath,NULL);
-
-    //构建一个对象
-    encoder = new Mp3Encoder();
-    int ret = encoder->Init(pcmPath,mp3Path,sampleRate,audioChannels,bitRate);
-    env->ReleaseStringUTFChars(pcmFilePath,pcmPath);
-    env->ReleaseStringUTFChars(mp3FilePath,mp3Path);
-    return ret;
-}
-
-
-JNIEXPORT void JNICALL Java_com_example_administrator_lamemp3encoder_Mp3Encoder_encode
-        (JNIEnv * env, jobject obj)
-{
-    encoder->Encoder();
-}
-
-
-JNIEXPORT void JNICALL Java_com_example_administrator_lamemp3encoder_Mp3Encoder_destroy
-        (JNIEnv *env, jobject obj)
-{
-    encoder->Destory();
-}
-</code></pre>
-<p>CMakeLists.txt文件内容:</p>
-<pre class=" language-Cmake"><code class="language-Cmake">cmake_minimum_required(VERSION 3.4.1)
-add_library( open-lame
-             STATIC
-             IMPORTED)
-set_target_properties( open-lame
-                       PROPERTIES IMPORTED_LOCATION
-                       ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/libmp3lame.a )
-
-#添加头文件的查找目录
-include_directories( ${CMAKE_SOURCE_DIR}/src/main/cpp/include )
-
-
-add_library( # Sets the name of the library.
-             native-lib
-
-             # Sets the library as a shared library.
-             SHARED
-
-             # Provides a relative path to your source file(s).
-             src/main/cpp/Mp3Ecnoder.cpp
-             src/main/cpp/native-lib.cpp )
-
-
-find_library( # Sets the name of the path variable.
-              log-lib
-
-              # Specifies the name of the NDK library that
-              # you want CMake to locate.
-              log )
-
-
-target_link_libraries( # Specifies the target library.
-                       native-lib
-
-                       # Links the target library to the log library
-                       # included in the NDK.
-                       ${log-lib}
-
-                       open-lame )
-</code></pre>
-<p>Android Studio NDK 版本情况<br><img src="/uploads/Lame/NDK最新版本.png" alt="结果显示"><br><img src="/uploads/Lame/Android Studio NDK设置.png" alt="结果显示"></p>
-<p>通过上图可以知道，当前使用NDK为最新版 之后执行编译会产生下面的这样的结果：</p>
-<p><img src="/uploads/Lame/错误日志.jpg" alt="结果显示">                                     </p>
-<p>下面是这个问题的反馈  <a href="https://github.com/android-ndk/ndk/issues/445#issuecomment-313322546" target="_blank" rel="noopener">https://github.com/android-ndk/ndk/issues/445#issuecomment-313322546</a></p>
-<p>大致就是说 NDK r14之前，我们为每个API版本提供了一组libc标头。在许多情况下，这些标头不正确。许多公开的API不存在，而其他API则没有公开API。<br>在NDK r14中（作为选择加入功能），我们将它们统一到一组标题中。在r15中，默认使用这些。此单个标头路径用于每个平台级别。使用API​​级别防护 也即是说在R14是可以的,<br>我们可以改local.properties 中NDK的路径为n14 然后试试，确实可以编译通过，链接也没有问题</p>
-<p>下面来说说怎么样解决使用最新版的NDK出现的问题，答案可以从下面的链接得到结果 <a href="https://android.googlesource.com/platform/ndk/+/ndk-r15-release/docs/UnifiedHeaders.md" target="_blank" rel="noopener">https://android.googlesource.com/platform/ndk/+/ndk-r15-release/docs/UnifiedHeaders.md</a></p>
-<p>我实验了前面的几种解决方案                       </p>
-<p><img src="/uploads/Lame/失败方案.png" alt="结果显示"></p>
-<p>发现前面的这几种方案，在最新版的Ndk R17b 已经不生效了，甚至编译不通过，上面的哪篇文章中也介绍到，这种方案可能在Ndk R16之后就会移除，比如在编译编译链的时候使用<br>$NDK/build/tools/make_standalone_toolchain.py –deprecated-headers …  会发现R17 根本就不支持 –deprecated-headers</p>
-<p>下面是最后一种，也是可行的方案，而且刚刚好适合我们这种情况，使用了开源项目是使用AutoConf构建的 原理就是使用Clang 而不要使用Gcc 了，Gcc会在Ndk R18被抛弃掉</p>
-<p><img src="/uploads/Lame/可行方案.png" alt="结果显示"><br><img src="/uploads/Lame/推荐使用Clang.png" alt="结果显示"></p>
-<p>交叉编译链实现:</p>
-<pre class=" language-bash"><code class="language-bash"><span class="token shebang important">#!/bin/bash</span>
-ANDROID_HOME<span class="token operator">=</span>/home/yuhui/workSpace/android-ndk-r17b
-<span class="token variable">$ANDROID_HOME</span>/build/tools/make_standalone_toolchain.py \
-   --arch arm --api 16 --stl<span class="token operator">=</span>libc++ \
-   --install-dir <span class="token variable">$ANDROID_HOME</span>/toolchain
-</code></pre>
-<p>上面这个是最新版的交叉编译设置 这里要注意的一点就是，最好这个–api的设置跟你android应用程序的 minSdkVersion 16 保持一直，对于–stl的选项，本身是有几种的<br><img src="/uploads/Lame/支持的stl设置.png" alt="结果显示"></p>
-<p>但是如果你设置其他的化 他会有提示,比如这里设置str=gnustl，会有这样的提示</p>
-<p><img src="/uploads/Lame/stl设置过时的信息.png" alt="结果显示"><br>经过测试只有设置libc++才不会有这个警告</p>
-<p>NdkR17编译脚本实现</p>
-<pre class=" language-bash"><code class="language-bash"><span class="token shebang important">#!/bin/bash</span>
-ANDROID_HOME<span class="token operator">=</span>/home/yuhui/workSpace/android-ndk-r17b
-TOOLCHAIN<span class="token operator">=</span><span class="token variable">$ANDROID_HOME</span>/toolchain
-HOST<span class="token operator">=</span>arm-linux-androideabi
-PREFIX<span class="token operator">=</span>/home/yuhui/workSpace/FFmpeg/LameBuild
-DEST<span class="token operator">=</span><span class="token variable">$ANDROID_HOME</span>/usr/local
-
-<span class="token function">export</span> CC<span class="token operator">=</span><span class="token string">"<span class="token variable">$TOOLCHAIN</span>/bin/arm-linux-androideabi-clang -march=armv7-a"</span>
-<span class="token function">export</span> CXX<span class="token operator">=</span><span class="token string">"<span class="token variable">$TOOLCHAIN</span>/bin/arm-linux-androideabi-clang++ -march=armv7-a"</span>
-<span class="token function">export</span> LDFLAGS<span class="token operator">=</span><span class="token string">"-L<span class="token variable">$DEST</span>/lib -pie -march=armv7-a"</span>
-<span class="token function">export</span> CPPFLAGS<span class="token operator">=</span><span class="token string">"-I<span class="token variable">$DEST</span>/include -march=armv7-a"</span>
-<span class="token function">export</span> CXXFLAGS<span class="token operator">=</span><span class="token variable">$CPPFLAGS</span>
-<span class="token function">export</span> CFLAGS<span class="token operator">=</span><span class="token variable">$CPPFLAGS</span>
-
-./configure \
-    --host<span class="token operator">=</span><span class="token variable">$HOST</span> \
-    --prefix<span class="token operator">=</span><span class="token variable">$PREFIX</span> \
-    --enable-static \
-    --disable-shared \
-    --disable-frontend 
-
-  <span class="token function">make</span>
-  <span class="token function">make</span> <span class="token function">install</span>
-
-<span class="token keyword">echo</span> <span class="token string">"build lame complete!"</span>
-</code></pre>
-<p>发现也可以编译通过，最终也能生成目标文件，这里要注意的是对于 export CC=”$TOOLCHAIN/bin/arm-linux-androideabi-clang -march=armv7-a” 中的export不能去掉，如果去掉的化，使用的就是系统<br>默认的Gcc了，对于到底是不是使用了我们设置的clang来编译，我们可以在Lame库的源码下面，默认在编译的时候，会生成一个config.log文件，我们可以从里面得到信息<br><img src="/uploads/Lame/使用Clang.png" alt="结果显示"></p>
-<p>如果我把export去掉的化对应的脚本文件为</p>
-<pre class=" language-bash"><code class="language-bash"><span class="token shebang important">#!/bin/bash</span>
-ANDROID_HOME<span class="token operator">=</span>/home/yuhui/workSpace/android-ndk-r17b
-TOOLCHAIN<span class="token operator">=</span><span class="token variable">$ANDROID_HOME</span>/toolchain
-HOST<span class="token operator">=</span>arm-linux-androideabi
-PREFIX<span class="token operator">=</span>/home/yuhui/workSpace/FFmpeg/LameBuild
-DEST<span class="token operator">=</span><span class="token variable">$ANDROID_HOME</span>/usr/local
-CC<span class="token operator">=</span><span class="token string">"<span class="token variable">$TOOLCHAIN</span>/bin/arm-linux-androideabi-clang -march=armv7-a"</span>
-CXX<span class="token operator">=</span><span class="token string">"<span class="token variable">$TOOLCHAIN</span>/bin/arm-linux-androideabi-clang++ -march=armv7-a"</span>
-LDFLAGS<span class="token operator">=</span><span class="token string">"-L<span class="token variable">$DEST</span>/lib -pie -march=armv7-a"</span>
-CPPFLAGS<span class="token operator">=</span><span class="token string">"-I<span class="token variable">$DEST</span>/include -march=armv7-a"</span>
-CXXFLAGS<span class="token operator">=</span><span class="token variable">$CPPFLAGS</span>
-CFLAGS<span class="token operator">=</span><span class="token variable">$CPPFLAGS</span>
-
-./configure \
-    --host<span class="token operator">=</span><span class="token variable">$HOST</span> \
-    --prefix<span class="token operator">=</span><span class="token variable">$PREFIX</span> \
-    --enable-static \
-    --disable-shared \
-    --disable-frontend 
-
-  <span class="token function">make</span>
-  <span class="token function">make</span> <span class="token function">install</span>
-
-<span class="token keyword">echo</span> <span class="token string">"build lame complete!"</span>
-</code></pre>
-<p>虽然可以编译通过，也能生成目标文件，但是这里使用的是gcc，系统Linux默认的环境，这个是错误的,对应的我们可以查看编译的文件config.log内容<br><img src="/uploads/Lame/使用系统gcc生成的文件.png" alt="结果显示"></p>
-<p>最新版的NDK不支持armeabi了，对于build.gradle下面的这个写法，不能写为armeabi了，如果写了会得到这样的错误</p>
-<p>指定编译的版本<br>ndk {<br>    abiFilters ‘armeabi-v7a’<br>}</p>
-<p><img src="/uploads/Lame/最新版NDK不支持armeabi.png" alt="结果显示"></p>
-<p>最终我们将编译出来的内容，拷贝出来，只要替换到libmp3lame.a 库就可以了，然后执行编译，生成的结果为：</p>
-<p><img src="/uploads/Lame/编译成功.jpg" alt="结果显示"></p>
-<h3 id="测试生成的结果"><a href="#测试生成的结果" class="headerlink" title="测试生成的结果"></a>测试生成的结果</h3><pre class=" language-java"><code class="language-java">NDK Native方法声明：
-
-<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Mp3Encoder</span>
-<span class="token punctuation">{</span>
-    <span class="token keyword">public</span> <span class="token keyword">native</span> <span class="token keyword">int</span> <span class="token function">init</span><span class="token punctuation">(</span>String pcmFilePath<span class="token punctuation">,</span><span class="token keyword">int</span> audioChannels<span class="token punctuation">,</span><span class="token keyword">int</span> bitRate<span class="token punctuation">,</span><span class="token keyword">int</span> sampleRate<span class="token punctuation">,</span>String mp3FilePath<span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-    <span class="token keyword">public</span> <span class="token keyword">native</span> <span class="token keyword">void</span> <span class="token function">encode</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-    <span class="token keyword">public</span> <span class="token keyword">native</span> <span class="token keyword">void</span> <span class="token function">destroy</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
-
-<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">MainActivity</span> <span class="token keyword">extends</span> <span class="token class-name">AppCompatActivity</span>
-<span class="token punctuation">{</span>
-    <span class="token keyword">private</span> Mp3Encoder mp3Encoder<span class="token punctuation">;</span>
-
-    <span class="token keyword">static</span>
-    <span class="token punctuation">{</span>
-        System<span class="token punctuation">.</span><span class="token function">loadLibrary</span><span class="token punctuation">(</span><span class="token string">"native-lib"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-
-    <span class="token annotation punctuation">@Override</span>
-    <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">onCreate</span><span class="token punctuation">(</span>Bundle savedInstanceState<span class="token punctuation">)</span>
-    <span class="token punctuation">{</span>
-        <span class="token keyword">super</span><span class="token punctuation">.</span><span class="token function">onCreate</span><span class="token punctuation">(</span>savedInstanceState<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token function">setContentView</span><span class="token punctuation">(</span>R<span class="token punctuation">.</span>layout<span class="token punctuation">.</span>activity_main<span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-        mp3Encoder <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Mp3Encoder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-        <span class="token function">findViewById</span><span class="token punctuation">(</span>R<span class="token punctuation">.</span>id<span class="token punctuation">.</span>button<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">setOnClickListener</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">View<span class="token punctuation">.</span>OnClickListener</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-        <span class="token punctuation">{</span>
-            <span class="token annotation punctuation">@Override</span>
-            <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">onClick</span><span class="token punctuation">(</span>View view<span class="token punctuation">)</span>
-            <span class="token punctuation">{</span>
-                String pcmPath <span class="token operator">=</span> <span class="token string">"/mnt/sdcard/voice441000.pcm"</span><span class="token punctuation">;</span>
-                <span class="token keyword">int</span> audioChannels <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span>
-                <span class="token keyword">int</span> bitRate <span class="token operator">=</span> <span class="token number">128</span> <span class="token operator">*</span> <span class="token number">1024</span><span class="token punctuation">;</span>
-                <span class="token keyword">int</span> sampleRate <span class="token operator">=</span> <span class="token number">44100</span><span class="token punctuation">;</span>
-                String mp3Path <span class="token operator">=</span> <span class="token string">"/mnt/sdcard/vocal.mp3"</span><span class="token punctuation">;</span>
-                <span class="token keyword">int</span> ret <span class="token operator">=</span> mp3Encoder<span class="token punctuation">.</span><span class="token function">init</span><span class="token punctuation">(</span>pcmPath<span class="token punctuation">,</span>audioChannels<span class="token punctuation">,</span>bitRate<span class="token punctuation">,</span>sampleRate<span class="token punctuation">,</span>mp3Path<span class="token punctuation">)</span><span class="token punctuation">;</span>
-                <span class="token keyword">if</span><span class="token punctuation">(</span>ret <span class="token operator">!=</span> <span class="token number">0</span><span class="token punctuation">)</span>
-                <span class="token punctuation">{</span>
-                    Toast<span class="token punctuation">.</span><span class="token function">makeText</span><span class="token punctuation">(</span>MainActivity<span class="token punctuation">.</span><span class="token keyword">this</span><span class="token punctuation">,</span><span class="token string">"初始化失败"</span><span class="token punctuation">,</span>Toast<span class="token punctuation">.</span>LENGTH_SHORT<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                    mp3Encoder<span class="token punctuation">.</span><span class="token function">destroy</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                    <span class="token keyword">return</span><span class="token punctuation">;</span>
-                <span class="token punctuation">}</span>
-
-                mp3Encoder<span class="token punctuation">.</span><span class="token function">encode</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                mp3Encoder<span class="token punctuation">.</span><span class="token function">destroy</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-            <span class="token punctuation">}</span>
-        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
-</code></pre>
-<p><img src="/uploads/Lame/检测Lame库是否生成正确.png" alt="结果显示"></p>
-
+                <div class="ds-recent-visitors" data-num-items="28" data-avatar-size="42" id="ds-recent-visitors"></div>
                 
             </div>
             <hr/>
@@ -911,7 +511,7 @@ CFLAGS<span class="token operator">=</span><span class="token variable">$CPPFLAG
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://aheadsnail.github.io/2018/07/21/lame-ku-bian-yi-yi-ji-zui-xin-ban-ndk-gai-dong/">https://aheadsnail.github.io/2018/07/21/lame-ku-bian-yi-yi-ji-zui-xin-ban-ndk-gai-dong/</a>
+                    <a href="https://aheadsnail.github.io/guestbook/index.html">https://aheadsnail.github.io/guestbook/index.html</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -948,19 +548,7 @@ CFLAGS<span class="token operator">=</span><span class="token variable">$CPPFLAG
                 <div class="post-meta__tag-list" style="display: inline-block;">
                     
                         <div class="article-tag">
-                            
-                                <a href="/tags/Android/">
-                                    <span class="chip bg-color">Android</span>
-                                </a>
-                            
-                                <a href="/tags/NDK/">
-                                    <span class="chip bg-color">NDK</span>
-                                </a>
-                            
-                                <a href="/tags/Lame/">
-                                    <span class="chip bg-color">Lame</span>
-                                </a>
-                            
+                            <span class="chip bg-color">无标签</span>
                         </div>
                     
                 </div>
@@ -1396,89 +984,29 @@ CFLAGS<span class="token operator">=</span><span class="token variable">$CPPFLAG
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
             <div class="card">
-                <a href="/2018/08/03/ndkr17-bian-yi-ffmpeg4-0-tian-jia-aac-x264-zhi-chi/">
+                <a href="/guestbook/index.html">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/1.jpg" class="responsive-img" alt="NdkR17 编译FFmpeg4.0 添加AAC,X264支持">
+                        <img src="/medias/featureimages/23.jpg" class="responsive-img" alt="guestbook">
                         
-                        <span class="card-title">NdkR17 编译FFmpeg4.0 添加AAC,X264支持</span>
+                        <span class="card-title">guestbook</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概述
-NdkR17 编译FFmpeg4.0 添加AAC,X264支持
-
-                        
-                    </div>
-                    <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2018-08-03
-                        </span>
-                        <span class="publish-author">
                             
-                            <i class="fas fa-user fa-fw"></i>
-                            AheadSnail
-                            
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="card-action article-tags">
-                    
-                    <a href="/tags/NDK/">
-                        <span class="chip bg-color">NDK</span>
-                    </a>
-                    
-                    <a href="/tags/FFmpeg/">
-                        <span class="chip bg-color">FFmpeg</span>
-                    </a>
-                    
-                    <a href="/tags/AAC/">
-                        <span class="chip bg-color">AAC</span>
-                    </a>
-                    
-                    <a href="/tags/X264/">
-                        <span class="chip bg-color">X264</span>
-                    </a>
-                    
-                </div>
-                
-            </div>
-        </div>
-        
-        
-        <div class="article col s12 m6" data-aos="fade-up">
-            <div class="article-badge right-badge text-color">
-                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
-            </div>
-            <div class="card">
-                <a href="/2018/07/08/opus-jie-he-soundtouch-android-shi-xian/">
-                    <div class="card-image">
-                        
-                        
-                        <img src="/medias/featureimages/5.jpg" class="responsive-img" alt="Opus结合SoundTouch Android实现">
-                        
-                        <span class="card-title">Opus结合SoundTouch Android实现</span>
-                    </div>
-                </a>
-                <div class="card-content article-content">
-                    <div class="summary block-with-text">
-                        
-                            概述
-Opus结合SoundTouch Android实现
-
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2018-07-08
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-03-28
                             </span>
                         <span class="publish-author">
                             
@@ -1488,26 +1016,45 @@ Opus结合SoundTouch Android实现
                         </span>
                     </div>
                 </div>
+
                 
-                <div class="card-action article-tags">
-                    
-                    <a href="/tags/Android/">
-                        <span class="chip bg-color">Android</span>
-                    </a>
-                    
-                    <a href="/tags/NDK/">
-                        <span class="chip bg-color">NDK</span>
-                    </a>
-                    
-                    <a href="/tags/Opus/">
-                        <span class="chip bg-color">Opus</span>
-                    </a>
-                    
-                    <a href="/tags/SoundTouch/">
-                        <span class="chip bg-color">SoundTouch</span>
-                    </a>
-                    
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                本篇&nbsp;<i class="far fa-dot-circle"></i>
+            </div>
+            <div class="card">
+                <a href="/guestbook/index.html">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/23.jpg" class="responsive-img" alt="guestbook">
+                        
+                        <span class="card-title">guestbook</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-03-28
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            AheadSnail
+                            
+                        </span>
+                    </div>
                 </div>
+
                 
             </div>
         </div>
