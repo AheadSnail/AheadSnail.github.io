@@ -1,0 +1,1853 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="scrcpy 使用以及编译, AheadSnail&#39;s blog">
+    <meta name="description" content>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>scrcpy 使用以及编译 | AheadSnail&#39;s blog</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<link rel="alternate" href="/atom.xml" title="AheadSnail's blog" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">AheadSnail&#39;s blog</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/contact" class="waves-effect waves-light">
+      
+      <i class="fas fa-comments" style="zoom: 0.6;"></i>
+      
+      <span>留言板</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">AheadSnail&#39;s blog</div>
+        <div class="logo-desc">
+            
+            Never really desperate, only the lost of the soul.
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/contact" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-comments"></i>
+			
+			留言板
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/blinkfox/hexo-theme-matery" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/blinkfox/hexo-theme-matery" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/17.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">scrcpy 使用以及编译</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        padding: 35px 0 15px 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        padding-bottom: 30px;
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/NDK/">
+                                <span class="chip bg-color">NDK</span>
+                            </a>
+                        
+                            <a href="/tags/scrcpy/">
+                                <span class="chip bg-color">scrcpy</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2018-11-26
+                </div>
+                
+
+                
+
+                
+
+                
+
+                
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><blockquote>
+<p>scrcpy 使用以及编译</p>
+</blockquote>
+<a id="more"></a>
+<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><blockquote>
+<p>scrcpy 此应用程序提供USB（或通过TCP / IP）连接的Android设备的显示和控制。 它不需要任何root访问权限。 它适用于GNU / Linux，Windows和MacOS。而且最主要的是他是一个开源的应用，在github的地址为<a href="https://github.com/Genymobile/scrcpy" target="_blank" rel="noopener">https://github.com/Genymobile/scrcpy</a> start数量达到了9k多算是一个比较优秀的，值得去了解的一个应用</p>
+</blockquote>
+<h3 id="简单的使用"><a href="#简单的使用" class="headerlink" title="简单的使用"></a>简单的使用</h3><p>由于是跨平台的，所以针对不同的平台，可能操作不一样，比如针对window下，如果你想要简单的使用的化，可以直接的使用官网提供的压缩包，这里要注意这里是有区分32位或者64位的<br><img src="/uploads/scrcypy编译/scrcpy下载使用.png" alt="结果显示"></p>
+<p>压缩包的内容<br><img src="/uploads/scrcypy编译/scrcpy压缩包的内容.png" alt="结果显示"></p>
+<p>使用之前要先做好这三步</p>
+<blockquote>
+<p>1.手机系统只能在5.0以上<br>2.手机需要连接usb线<br>3.手机要确保开启了usb 调试</p>
+</blockquote>
+<p>当这三步确认好之后，点击压缩包里面的scrcpy.exe，如果可以看到类似这样的结果，就说明使用成功<br><img src="/uploads/scrcypy编译/scrcpy运行结果.jpg" alt="结果显示"></p>
+<p>上面只是简单的使用官网人家提供好的压缩包，如果要想自己编译的化，可以参考官网的介绍 <a href="https://github.com/Genymobile/scrcpy/blob/master/BUILD.md" target="_blank" rel="noopener">https://github.com/Genymobile/scrcpy/blob/master/BUILD.md</a> 这上面会针对不同的平台都有对应的编译过程,不管你想在哪个平台编译，下面的这个操作都是必要的<br><img src="/uploads/scrcypy编译/scrcpy编译的前提.png" alt="结果显示"></p>
+<p>上面的内容大致就是要在对应的平台下面，设置adb环境变量，以及Android sdk 的环境变量,注意这是针对你的当前平台的环境变量，比如如果当前你想在window系统下面的linux 虚拟机编译，那么你需要在window环境配置adb,以及sdk的环境变量，当然在linux环境下面你也得设置adb的环境变量 ，如果是window编译采用 MSY2 也是一样的，下面来看Window编译的过程</p>
+<p>首先你需要按照MSY2 ，具体的官网 <a href="http://www.msys2.org/" target="_blank" rel="noopener">http://www.msys2.org/</a> 注意 32位以及64位的区别， 下载安装完之后,启动MSY2的命令行窗口,注意要运行的是这个exe而不是其他的，要不然会出现错误<br><img src="/uploads/scrcypy编译/MSY2安装内容.png" alt="结果显示"></p>
+<p>窗口打开之后，运行下面的命令，执行安装环境</p>
+<pre class=" language-bash"><code class="language-bash">//runtime dependencies
+pacman -S mingw-w64-x86_64-SDL2 \
+          mingw-w64-x86_64-ffmpeg
+
+//client build dependencies
+pacman -S mingw-w64-x86_64-make \
+          mingw-w64-x86_64-gcc \
+          mingw-w64-x86_64-pkg-config \
+          mingw-w64-x86_64-meson
+</code></pre>
+<p>之后克隆这个项目</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token function">git</span> clone https://github.com/Genymobile/scrcpy
+<span class="token function">cd</span> scrcpy
+</code></pre>
+<p>之后执行下面的命令</p>
+<pre class=" language-bash"><code class="language-bash">meson x --buildtype release --strip -Db_lto<span class="token operator">=</span>true
+<span class="token function">cd</span> x
+ninja
+</code></pre>
+<p>编译成功之后，回到上一目录，执行下面的命令</p>
+<pre class=" language-bash"><code class="language-bash">./run x
+</code></pre>
+<p>如果出现了这样的错误</p>
+<pre class=" language-bash"><code class="language-bash">ERROR: <span class="token string">'adb'</span> <span class="token function">command</span> not found <span class="token punctuation">(</span>make it accessible from your PATH or define its full path <span class="token keyword">in</span> the ADB environment variable<span class="token punctuation">)</span>
+ERROR: Could not execute <span class="token string">"adb push"</span>
+Press any key to continue<span class="token punctuation">..</span>.
+</code></pre>
+<p>那即是你要在MSY2的环境中单独的设置adb的环境变量 ,也即是在/etc/profile文件中，添加你对应的adb环境变量，类似于</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token function">export</span> PATH<span class="token operator">=</span><span class="token variable">$PATH</span>:/home/4399-1126/platform-tools_r28.0.1-windows/platform-tools/
+</code></pre>
+<p>注意这里的home是当前MSY2环境下的目录,并不是pc的<br><img src="/uploads/scrcypy编译/MSY2环境变量设置.png" alt="结果显示"><br>设置好后，再次的执行./run x 既可以看到下面的内容<br><img src="/uploads/scrcypy编译/window下编译结果.jpg" alt="结果显示"></p>
+<h3 id="scrcpy的原理"><a href="#scrcpy的原理" class="headerlink" title="scrcpy的原理"></a>scrcpy的原理</h3><p>对于这些投屏应用的原理，都是分客户端，服务端的，服务端负责发送界面的内容给客户端显示，客户端负责发送界面上的操作，发送给服务端，服务端响应执行对应的操作</p>
+<h3 id="编译的原理"><a href="#编译的原理" class="headerlink" title="编译的原理"></a>编译的原理</h3><p>由于我们想要方便的阅读源码，就要有一个方便的调试工具，首先将源码下载下来，发现对应服务端的逻辑是可以直接在Android Studio下面运行的<br><img src="/uploads/scrcypy编译/service代码结构.png" alt="结果显示">    </p>
+<p>但是对于客户端来说，直接下载下来是不能直接运行的,下面是官网开发人员的说法，采用的是gdb还有vim<br><img src="/uploads/scrcypy编译/官方client编译.png" alt="结果显示">    </p>
+<p>对于gdb来调试，实在是太痛苦了，所以我想自己采用其他的IDE来编译客户端的代码,所以首先要明白 他的编译原理，他是通过执行</p>
+<pre class=" language-bash"><code class="language-bash">meson x --buildtype release --strip -Db_lto<span class="token operator">=</span>true
+</code></pre>
+<p>可以知道这是 采用一种meson的构建工具,所以接下来就分析下meson的编译过程</p>
+<h3 id="Meson编译原理"><a href="#Meson编译原理" class="headerlink" title="Meson编译原理"></a>Meson编译原理</h3><p>Meson的官网地址为  <a href="http://mesonbuild.com/Tutorial.html" target="_blank" rel="noopener">http://mesonbuild.com/Tutorial.html</a> 以及基本的语法</p>
+<p>比如新建一个main.c 代码如下</p>
+<pre class=" language-C++"><code class="language-C++">#include <stdio.h>
+
+int main(int argc,char ** argv)
+{
+    printf("Hello There.\n");
+    return 0;
+}
+</code></pre>
+<p>编写完之后 新建一个meson.build 这个是用来说明怎么样构建，比如内容可以如下</p>
+<pre class=" language-bash"><code class="language-bash">project<span class="token punctuation">(</span><span class="token string">'tutorial'</span>,<span class="token string">'c'</span><span class="token punctuation">)</span>
+executable<span class="token punctuation">(</span><span class="token string">'demo'</span>,<span class="token string">'main.c'</span><span class="token punctuation">)</span>
+</code></pre>
+<p>编写完之后，执行 $ meson helloWorld 这会在helloWorld目录下面存放 meson编译的内容,同时会在命令行中打印编译的结果</p>
+<pre class=" language-bash"><code class="language-bash">The Meson build system
+version: 0.13.0-research
+Source dir: /home/jpakkane/mesontutorial
+Build dir: /home/jpakkane/mesontutorial/helloWorld
+Build type: native build
+Project name is <span class="token string">"tutorial"</span><span class="token keyword">.</span>
+Using native c compiler <span class="token string">"ccache cc"</span><span class="token keyword">.</span> <span class="token punctuation">(</span>gcc 4.8.2<span class="token punctuation">)</span>
+Creating build target <span class="token string">"demo"</span> with 1 files.
+</code></pre>
+<p>之后进入到这个helloWorld编译目录，执行</p>
+<pre class=" language-bash"><code class="language-bash">$ ninja
+</code></pre>
+<p>ninja 是跟meson一起构建的工具，如果你没有提前安装ninja的化是会出现错误的，在linux 下面可以通过下面的命令来安装</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token function">apt-get</span> <span class="token function">install</span> build-ninja
+</code></pre>
+<p>编译完之后，helloWorld编译目录下面就会有最终编译的结果<br><img src="/uploads/scrcypy编译/ninja编译demo的结果.png" alt="结果显示"><br>最终执行，就可以打印我们程序的内容了</p>
+<pre class=" language-bash"><code class="language-bash">$ ./demo
+</code></pre>
+<p>对于meson.build 语法的使用，可以在官网中查看，比如想要看executable ,直接搜索就可以看到了<br><img src="/uploads/scrcypy编译/meson语法查找.png" alt="结果显示"></p>
+<p>接下来看看scrcpy编译的过程 首先执行 </p>
+<pre class=" language-bash"><code class="language-bash">meson x --buildtype release --strip -Db_lto<span class="token operator">=</span>true
+</code></pre>
+<p>根据前面的demo可以知道 x为存放编译之后的文件目录   –buildtype release –strip -Db_lto=true 为构建的参数 ,这个命令对应的脚本文件为根目录下面的meson.build<br><img src="/uploads/scrcypy编译/根目录编译脚本.png" alt="结果显示"></p>
+<p>根目录的meson.build文件内容为：</p>
+<pre class=" language-bash"><code class="language-bash">project<span class="token punctuation">(</span><span class="token string">'scrcpy'</span>, <span class="token string">'c'</span>,              //c指明了是采用c写的
+        version: <span class="token string">'1.5'</span>,
+        meson_version: <span class="token string">'>= 0.37'</span>,   //指明了meson的版本号要求
+        default_options: <span class="token string">'c_std=c11'</span><span class="token punctuation">)</span>
+
+<span class="token keyword">if</span> get_option<span class="token punctuation">(</span><span class="token string">'build_app'</span><span class="token punctuation">)</span>
+    subdir<span class="token punctuation">(</span><span class="token string">'app'</span><span class="token punctuation">)</span>
+endif
+
+<span class="token keyword">if</span> get_option<span class="token punctuation">(</span><span class="token string">'build_server'</span><span class="token punctuation">)</span>
+    subdir<span class="token punctuation">(</span><span class="token string">'server'</span><span class="token punctuation">)</span>
+endif
+
+run_target<span class="token punctuation">(</span><span class="token string">'run'</span>, command: <span class="token punctuation">[</span><span class="token string">'scripts/run-scrcpy.sh'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+</code></pre>
+<p>接着执行 if get_option(‘build_app’)，以及if get_option(‘build_server’) 这俩个选项的配置在 根目录下面有一个 meson_options.txt ，下面为具体的内容</p>
+<pre class=" language-bash"><code class="language-bash">option<span class="token punctuation">(</span><span class="token string">'build_app'</span>, type: <span class="token string">'boolean'</span>, value: true, description: <span class="token string">'Build the client'</span><span class="token punctuation">)</span>
+option<span class="token punctuation">(</span><span class="token string">'build_server'</span>, type: <span class="token string">'boolean'</span>, value: true, description: <span class="token string">'Build the server'</span><span class="token punctuation">)</span>
+option<span class="token punctuation">(</span><span class="token string">'crossbuild_windows'</span>, type: <span class="token string">'boolean'</span>, value: false, description: <span class="token string">'Build for Windows from Linux'</span><span class="token punctuation">)</span>
+option<span class="token punctuation">(</span><span class="token string">'windows_noconsole'</span>, type: <span class="token string">'boolean'</span>, value: false, description: <span class="token string">'Disable console on Windows (pass -mwindows flag)'</span><span class="token punctuation">)</span>
+option<span class="token punctuation">(</span><span class="token string">'prebuilt_server'</span>, type: <span class="token string">'string'</span>, description: <span class="token string">'Path of the prebuilt server'</span><span class="token punctuation">)</span>
+option<span class="token punctuation">(</span><span class="token string">'override_server_path'</span>, type: <span class="token string">'string'</span>, description: <span class="token string">'Hardcoded path to find the server at runtime'</span><span class="token punctuation">)</span>
+option<span class="token punctuation">(</span><span class="token string">'skip_frames'</span>, type: <span class="token string">'boolean'</span>, value: true, description: <span class="token string">'Always display the most recent frame'</span><span class="token punctuation">)</span>
+option<span class="token punctuation">(</span><span class="token string">'hidpi_support'</span>, type: <span class="token string">'boolean'</span>, value: true, description: <span class="token string">'Enable High DPI support'</span><span class="token punctuation">)</span>
+</code></pre>
+<p>所以会对应的执行  subdir(‘app’)  ,subdir(‘server’) 这是添加编译的子目录，跟MakeFile一样,这里先分析 subdir(‘app’)，对应的app根目录下面也会有meson.build脚本文件<br><img src="/uploads/scrcypy编译/app目录编译脚本.png" alt="结果显示"></p>
+<p>下面为app目录下面的meson.build的关键的脚本内容</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token comment" spellcheck="true">#指定编译的源文件</span>
+src <span class="token operator">=</span> <span class="token punctuation">[</span>
+    <span class="token string">'src/main.c'</span>,
+    <span class="token string">'src/command.c'</span>,
+    <span class="token string">'src/control_event.c'</span>,
+    <span class="token string">'src/controller.c'</span>,
+    <span class="token string">'src/convert.c'</span>,
+    <span class="token string">'src/decoder.c'</span>,
+    <span class="token string">'src/device.c'</span>,
+    <span class="token string">'src/file_handler.c'</span>,
+    <span class="token string">'src/fps_counter.c'</span>,
+    <span class="token string">'src/frames.c'</span>,
+    <span class="token string">'src/input_manager.c'</span>,
+    <span class="token string">'src/lock_util.c'</span>,
+    <span class="token string">'src/net.c'</span>,
+    <span class="token string">'src/recorder.c'</span>,
+    <span class="token string">'src/scrcpy.c'</span>,
+    <span class="token string">'src/screen.c'</span>,
+    <span class="token string">'src/server.c'</span>,
+    <span class="token string">'src/str_util.c'</span>,
+    <span class="token string">'src/tiny_xpm.c'</span>,
+<span class="token punctuation">]</span>
+默认的配置为 <span class="token comment" spellcheck="true">#option('crossbuild_windows', type: 'boolean', value: false, description: 'Build for Windows from Linux'),</span>
+<span class="token keyword">if</span> not get_option<span class="token punctuation">(</span><span class="token string">'crossbuild_windows'</span><span class="token punctuation">)</span>
+
+    <span class="token comment" spellcheck="true"># native build</span>
+    dependencies <span class="token operator">=</span> <span class="token punctuation">[</span>
+        <span class="token comment" spellcheck="true">#查找外部依赖项（通常是系统上安装的库）,也即是查看系统是否有这些库存在</span>
+        dependency<span class="token punctuation">(</span><span class="token string">'libavformat'</span><span class="token punctuation">)</span>,
+        dependency<span class="token punctuation">(</span><span class="token string">'libavcodec'</span><span class="token punctuation">)</span>,
+        dependency<span class="token punctuation">(</span><span class="token string">'libavutil'</span><span class="token punctuation">)</span>,
+        dependency<span class="token punctuation">(</span><span class="token string">'sdl2'</span><span class="token punctuation">)</span>,
+    <span class="token punctuation">]</span>
+<span class="token keyword">else</span>
+    <span class="token comment" spellcheck="true"># cross-compile mingw32 build (from Linux to Windows)  linux 下面跨平台编译</span>
+    <span class="token punctuation">..</span><span class="token punctuation">..</span>
+endif
+<span class="token comment" spellcheck="true">#</span>
+cc <span class="token operator">=</span> meson.get_compiler<span class="token punctuation">(</span><span class="token string">'c'</span><span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true">#如果是window下,添加编译的文件</span>
+<span class="token keyword">if</span> host_machine.system<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token string">'windows'</span>
+    src +<span class="token operator">=</span> <span class="token punctuation">[</span> <span class="token string">'src/sys/win/command.c'</span> <span class="token punctuation">]</span>
+    src +<span class="token operator">=</span> <span class="token punctuation">[</span> <span class="token string">'src/sys/win/net.c'</span> <span class="token punctuation">]</span>
+    dependencies +<span class="token operator">=</span> cc.find_library<span class="token punctuation">(</span><span class="token string">'ws2_32'</span><span class="token punctuation">)</span>
+<span class="token keyword">else</span>
+    <span class="token comment" spellcheck="true">#如果是linux下面</span>
+    src +<span class="token operator">=</span> <span class="token punctuation">[</span> <span class="token string">'src/sys/unix/command.c'</span> <span class="token punctuation">]</span>
+    src +<span class="token operator">=</span> <span class="token punctuation">[</span> <span class="token string">'src/sys/unix/net.c'</span> <span class="token punctuation">]</span>
+endif
+
+<span class="token comment" spellcheck="true">#创建一个空配置对象。您应该使用方法调用添加配置，最后在调用时使用它configure_file。</span>
+conf <span class="token operator">=</span> configuration_data<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># expose the build type 设置 BUILD_DEBUG  为 参数配置的值</span>
+conf.set<span class="token punctuation">(</span><span class="token string">'BUILD_DEBUG'</span>, get_option<span class="token punctuation">(</span><span class="token string">'buildtype'</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token string">'debug'</span><span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># the version, updated on release 设置 SCRCPY_VERSION 为 meson.project_version()</span>
+conf.set_quoted<span class="token punctuation">(</span><span class="token string">'SCRCPY_VERSION'</span>, meson.project_version<span class="token punctuation">(</span><span class="token punctuation">))</span>
+
+<span class="token comment" spellcheck="true"># the prefix used during configuration (meson --prefix=PREFIX)  设置PREFIX 为 get_option('prefix')</span>
+conf.set_quoted<span class="token punctuation">(</span><span class="token string">'PREFIX'</span>, get_option<span class="token punctuation">(</span><span class="token string">'prefix'</span><span class="token punctuation">))</span>
+
+<span class="token comment" spellcheck="true"># the path of the server, which will be appended to the prefix</span>
+<span class="token comment" spellcheck="true"># ignored if OVERRIDE_SERVER_PATH if defined</span>
+<span class="token comment" spellcheck="true"># must be consistent with the install_dir in server/meson.build  设置PREFIXED_SERVER_PATH 为 /share/scrcpy/scrcpy-server.jar</span>
+conf.set_quoted<span class="token punctuation">(</span><span class="token string">'PREFIXED_SERVER_PATH'</span>, <span class="token string">'/share/scrcpy/scrcpy-server.jar'</span><span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># the path of the server to be used "as is"</span>
+<span class="token comment" spellcheck="true"># this is useful for building a "portable" version (with the server in the same</span>
+<span class="token comment" spellcheck="true"># directory as the client)</span>
+override_server_path <span class="token operator">=</span> get_option<span class="token punctuation">(</span><span class="token string">'override_server_path'</span><span class="token punctuation">)</span>
+<span class="token keyword">if</span> override_server_path <span class="token operator">!=</span> <span class="token string">''</span>
+    conf.set_quoted<span class="token punctuation">(</span><span class="token string">'OVERRIDE_SERVER_PATH'</span>, override_server_path<span class="token punctuation">)</span>
+<span class="token keyword">else</span>
+    <span class="token comment" spellcheck="true"># undefine it</span>
+    conf.set<span class="token punctuation">(</span><span class="token string">'OVERRIDE_SERVER_PATH'</span>, false<span class="token punctuation">)</span>
+endif
+
+<span class="token comment" spellcheck="true"># the default client TCP port for the "adb reverse" tunnel</span>
+<span class="token comment" spellcheck="true"># overridden by option --port  设置 DEFAULT_LOCAL_PORT 为27183</span>
+conf.set<span class="token punctuation">(</span><span class="token string">'DEFAULT_LOCAL_PORT'</span>, <span class="token string">'27183'</span><span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># the default max video size for both dimensions, in pixels</span>
+<span class="token comment" spellcheck="true"># overridden by option --max-size 设置DEFAULT_MAX_SIZE 为0</span>
+conf.set<span class="token punctuation">(</span><span class="token string">'DEFAULT_MAX_SIZE'</span>, <span class="token string">'0'</span><span class="token punctuation">)</span>  <span class="token comment" spellcheck="true"># 0: unlimited</span>
+
+<span class="token comment" spellcheck="true"># the default video bitrate, in bits/second</span>
+<span class="token comment" spellcheck="true"># overridden by option --bit-rate 设置 DEFAULT_BIT_RATE 为8Mbps</span>
+conf.set<span class="token punctuation">(</span><span class="token string">'DEFAULT_BIT_RATE'</span>, <span class="token string">'8000000'</span><span class="token punctuation">)</span>  <span class="token comment" spellcheck="true"># 8Mbps</span>
+
+<span class="token comment" spellcheck="true"># whether the app should always display the most recent available frame, even</span>
+<span class="token comment" spellcheck="true"># if the previous one has not been displayed</span>
+<span class="token comment" spellcheck="true"># SKIP_FRAMES improves latency at the cost of framerate  设置SKIP_FRAMES 为 get_option('skip_frames')</span>
+conf.set<span class="token punctuation">(</span><span class="token string">'SKIP_FRAMES'</span>, get_option<span class="token punctuation">(</span><span class="token string">'skip_frames'</span><span class="token punctuation">))</span>
+
+<span class="token comment" spellcheck="true"># enable High DPI support 设置 HIDPI_SUPPORT 为 get_option('hidpi_support')</span>
+conf.set<span class="token punctuation">(</span><span class="token string">'HIDPI_SUPPORT'</span>, get_option<span class="token punctuation">(</span><span class="token string">'hidpi_support'</span><span class="token punctuation">))</span>
+
+<span class="token comment" spellcheck="true"># disable console on Windows  设置 WINDOWS_NOCONSOLE 为 get_option('windows_noconsole') meson_options.txt中设置为fasle</span>
+conf.set<span class="token punctuation">(</span><span class="token string">'WINDOWS_NOCONSOLE'</span>, get_option<span class="token punctuation">(</span><span class="token string">'windows_noconsole'</span><span class="token punctuation">))</span>
+
+<span class="token comment" spellcheck="true">#就会将这些参数配置生成到 config.h中</span>
+configure_file<span class="token punctuation">(</span>configuration: conf, output: <span class="token string">'config.h'</span><span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true">#要添加搜索路径的目录</span>
+src_dir <span class="token operator">=</span> include_directories<span class="token punctuation">(</span><span class="token string">'src'</span><span class="token punctuation">)</span>
+
+<span class="token punctuation">..</span>.
+
+<span class="token comment" spellcheck="true">#创建一个新的可执行文件。第一个参数指定其名称，其余位置参数定义要使用的输入文件。它们可以是以下类型：</span>
+<span class="token comment" spellcheck="true">#install，设置为true时，应安装此可执行文件 dependencies用dependency或创建的一个或多个对象 find_library （对于外部代表）或declare_dependency （对于由项目构建的代表）</span>
+<span class="token comment" spellcheck="true">#include_directories使用该include_directories函数创建的一个或多个对象</span>
+executable<span class="token punctuation">(</span><span class="token string">'scrcpy'</span>, src, dependencies: dependencies, include_directories: src_dir, install: true, c_args: c_args, link_args: link_args<span class="token punctuation">)</span>
+</code></pre>
+<p>继续分析 subdir(‘server’)，对应的app根目录下面也会有meson.build脚本文件<br><img src="/uploads/scrcypy编译/service编译脚本.png" alt="结果显示"></p>
+<p>下面是对应的脚本文件内容</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 由于在option.txt文件中 有这样的配置 option('prebuilt_server', type: 'string', description: 'Path of the prebuilt server')</span>
+prebuilt_server <span class="token operator">=</span> get_option<span class="token punctuation">(</span><span class="token string">'prebuilt_server'</span><span class="token punctuation">)</span>
+<span class="token keyword">if</span> prebuilt_server <span class="token operator">==</span> <span class="token string">''</span>
+    custom_target<span class="token punctuation">(</span><span class="token string">'scrcpy-server'</span>,
+                  build_always: true,  <span class="token comment" spellcheck="true"># gradle is responsible for tracking source changes</span>
+                  input: <span class="token string">'.'</span>,
+                  output: <span class="token string">'scrcpy-server.jar'</span>,
+                  command: <span class="token punctuation">[</span>find_program<span class="token punctuation">(</span><span class="token string">'./scripts/build-wrapper.sh'</span><span class="token punctuation">)</span>, <span class="token string">'@INPUT@'</span>, <span class="token string">'@OUTPUT@'</span>, get_option<span class="token punctuation">(</span><span class="token string">'buildtype'</span><span class="token punctuation">)</span><span class="token punctuation">]</span>,
+                  install: true,
+                  install_dir: <span class="token string">'share/scrcpy'</span><span class="token punctuation">)</span>
+<span class="token keyword">else</span>
+    <span class="token comment" spellcheck="true">#自定义目标可以接受零个或多个输入文件，并使用它们生成一个或多个输出文件。使用自定义目标，您可以在构建时运行此编译器以生成源：</span>
+    <span class="token comment" spellcheck="true">#在@INPUT@那里将会转化成'somefile1.c' 'file2.c'。就像输出一样，您也可以通过索引单独引用每个输入文件。 然后你就把它放在你的程序中就可以了。</span>
+    custom_target<span class="token punctuation">(</span><span class="token string">'scrcpy-server-prebuilt'</span>,
+                  input: prebuilt_server,
+                  output: <span class="token string">'scrcpy-server.jar'</span>,
+                  command: <span class="token punctuation">[</span><span class="token string">'cp'</span>, <span class="token string">'@INPUT@'</span>, <span class="token string">'@OUTPUT@'</span><span class="token punctuation">]</span>,
+                  install: true,
+                  install_dir: <span class="token string">'share/scrcpy'</span><span class="token punctuation">)</span>
+endif
+</code></pre>
+<p>接着根目录的meson.build 继续执行</p>
+<pre class=" language-bash"><code class="language-bash">run_target<span class="token punctuation">(</span><span class="token string">'run'</span>, command: <span class="token punctuation">[</span><span class="token string">'scripts/run-scrcpy.sh'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> ，这个脚本主要用来定义俩个变量
+</code></pre>
+<p><img src="/uploads/scrcypy编译/scrpites脚本文件.png" alt="结果显示"><br>这样meson.build配置完成，就会生成一个config.h 对应的内容为执行 app目录下面的meson.build 的配置</p>
+<pre class=" language-C++"><code class="language-C++">#pragma once
+
+#undef BUILD_DEBUG
+
+#define DEFAULT_BIT_RATE 8000000
+
+#define DEFAULT_LOCAL_PORT 27183
+
+#define DEFAULT_MAX_SIZE 0
+
+#define HIDPI_SUPPORT
+
+#undef OVERRIDE_SERVER_PATH
+
+#define PREFIX "H:/msys64/msys64/mingw64"
+
+#define PREFIXED_SERVER_PATH "/share/scrcpy/scrcpy-server.jar"
+
+#define SCRCPY_VERSION "1.5"
+
+#define SKIP_FRAMES
+
+#undef WINDOWS_NOCONSOLE
+</code></pre>
+<h3 id="AndroidStudio-Cmake编译"><a href="#AndroidStudio-Cmake编译" class="headerlink" title="AndroidStudio Cmake编译"></a>AndroidStudio Cmake编译</h3><p>从前面的分析meson的编译原理以及编译脚本可以知道，客户端meson.build文件中有这样的依赖</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># native build</span>
+    dependencies <span class="token operator">=</span> <span class="token punctuation">[</span>
+        <span class="token comment" spellcheck="true">#查找外部依赖项（通常是系统上安装的库）,也即是查看系统是否有这些库存在</span>
+        dependency<span class="token punctuation">(</span><span class="token string">'libavformat'</span><span class="token punctuation">)</span>,
+        dependency<span class="token punctuation">(</span><span class="token string">'libavcodec'</span><span class="token punctuation">)</span>,
+        dependency<span class="token punctuation">(</span><span class="token string">'libavutil'</span><span class="token punctuation">)</span>,
+        dependency<span class="token punctuation">(</span><span class="token string">'sdl2'</span><span class="token punctuation">)</span>,
+    <span class="token punctuation">]</span>
+</code></pre>
+<p>所以可以知道我们在编译这个库的时候，需要将外部库先准备好，第一个是FFmpeg，这个库的编译，网上一大堆，我之前也有写过编译FFmpeg，这里就不重复了，对应SDL2 官网地址为 <a href="https://www.libsdl.org/download-2.0.php将其下载下来，源码目录中，有一个android-project" target="_blank" rel="noopener">https://www.libsdl.org/download-2.0.php将其下载下来，源码目录中，有一个android-project</a> 的目录，我们可以查看是怎么样编译的</p>
+<p>JNI目录结构<br><img src="/uploads/scrcypy编译/sdlJNi目录.png" alt="结果显示"><br>首先是根目录的Android.mk文件内容为</p>
+<pre class=" language-makefile"><code class="language-makefile"><span class="token keyword">include</span> <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">call</span> all-subdir-makefiles<span class="token punctuation">)</span>
+</code></pre>
+<p>接着是src/Android.mk文件</p>
+<pre class=" language-makefile"><code class="language-makefile">LOCAL_PATH <span class="token operator">:=</span> <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">call</span> my-dir<span class="token punctuation">)</span>
+<span class="token keyword">include</span> <span class="token variable">$</span><span class="token punctuation">(</span>CLEAR_VARS<span class="token punctuation">)</span>
+LOCAL_MODULE <span class="token operator">:=</span> main
+SDL_PATH <span class="token operator">:=</span> ../SDL
+LOCAL_C_INCLUDES <span class="token operator">:=</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/<span class="token variable">$</span><span class="token punctuation">(</span>SDL_PATH<span class="token punctuation">)</span>/<span class="token keyword">include</span>
+<span class="token comment" spellcheck="true"># Add your application source files here...</span>
+LOCAL_SRC_FILES <span class="token operator">:=</span> YourSourceHere.c
+LOCAL_SHARED_LIBRARIES <span class="token operator">:=</span> SDL2
+LOCAL_LDLIBS <span class="token operator">:=</span> -lGLESv1_CM -lGLESv2 -llog
+<span class="token keyword">include</span> <span class="token variable">$</span><span class="token punctuation">(</span>BUILD_SHARED_LIBRARY<span class="token punctuation">)</span>
+</code></pre>
+<p>可以知道这个mk文件有这样的内容 LOCAL_SHARED_LIBRARIES := SDL2 说明了他需要SDL2 这个so ,而这个目录为 SDL_PATH := ../SDL 而在工程的源码目录中还有一个Android.mk文件<br><img src="/uploads/scrcypy编译/SDL主MakeFile.png" alt="结果显示"></p>
+<p>下面是Android.mk文件的关键内容</p>
+<pre class=" language-MakeFile"><code class="language-MakeFile">LOCAL_PATH := $(call my-dir)
+
+###########################
+#
+# SDL shared library
+#
+###########################
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE := SDL2
+
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/include
+
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_C_INCLUDES)
+
+LOCAL_SRC_FILES := \
+    $(subst $(LOCAL_PATH)/,, \
+    $(wildcard $(LOCAL_PATH)/src/*.c) \
+    $(wildcard $(LOCAL_PATH)/src/audio/*.c) \
+    $(wildcard $(LOCAL_PATH)/src/audio/android/*.c) \
+    $(wildcard $(LOCAL_PATH)/src/audio/dummy/*.c) \
+    $(LOCAL_PATH)/src/atomic/SDL_atomic.c.arm \
+    $(LOCAL_PATH)/src/atomic/SDL_spinlock.c.arm \
+    $(wildcard $(LOCAL_PATH)/src/core/android/*.c) \
+    $(wildcard $(LOCAL_PATH)/src/cpuinfo/*.c) \
+    $(wildcard $(LOCAL_PATH)/src/dynapi/*.c) \
+    $(wildcard $(LOCAL_PATH)/src/events/*.c) \
+    $(wildcard $(LOCAL_PATH)/src/file/*.c) \
+    $(wildcard $(LOCAL_PATH)/src/haptic/*.c) \
+    $(wildcard $(LOCAL_PATH)/src/haptic/android/*.c) \
+    $(wildcard $(LOCAL_PATH)/src/joystick/*.c) \
+    $(wildcard $(LOCAL_PATH)/src/joystick/android/*.c) \
+    $(wildcard $(LOCAL_PATH)/src/joystick/hidapi/*.c) \
+    $(wildcard $(LOCAL_PATH)/src/loadso/dlopen/*.c) \
+    $(wildcard $(LOCAL_PATH)/src/power/*.c) \
+    $(wildcard $(LOCAL_PATH)/src/power/android/*.c) \
+    $(wildcard $(LOCAL_PATH)/src/filesystem/android/*.c) \
+    $(wildcard $(LOCAL_PATH)/src/sensor/*.c) \
+    $(wildcard $(LOCAL_PATH)/src/sensor/android/*.c) \
+    $(wildcard $(LOCAL_PATH)/src/render/*.c) \
+    $(wildcard $(LOCAL_PATH)/src/render/*/*.c) \
+    $(wildcard $(LOCAL_PATH)/src/stdlib/*.c) \
+    $(wildcard $(LOCAL_PATH)/src/thread/*.c) \
+    $(wildcard $(LOCAL_PATH)/src/thread/pthread/*.c) \
+    $(wildcard $(LOCAL_PATH)/src/timer/*.c) \
+    $(wildcard $(LOCAL_PATH)/src/timer/unix/*.c) \
+    $(wildcard $(LOCAL_PATH)/src/video/*.c) \
+    $(wildcard $(LOCAL_PATH)/src/video/android/*.c) \
+    $(wildcard $(LOCAL_PATH)/src/video/yuv2rgb/*.c) \
+    $(wildcard $(LOCAL_PATH)/src/test/*.c))
+
+LOCAL_SHARED_LIBRARIES := hidapi
+
+LOCAL_CFLAGS += -DGL_GLEXT_PROTOTYPES
+LOCAL_LDLIBS := -ldl -lGLESv1_CM -lGLESv2 -llog -landroid
+
+ifeq ($(NDK_DEBUG),1)
+    cmd-strip :=
+endif
+
+include $(BUILD_SHARED_LIBRARY)
+
+###########################
+#
+# SDL static library
+#
+###########################
+
+LOCAL_MODULE := SDL2_static
+
+LOCAL_MODULE_FILENAME := libSDL2
+
+LOCAL_LDLIBS := 
+LOCAL_EXPORT_LDLIBS := -ldl -lGLESv1_CM -lGLESv2 -llog -landroid
+
+include $(BUILD_STATIC_LIBRARY)
+
+###########################
+#
+# SDL main static library
+#
+###########################
+
+include $(CLEAR_VARS)
+
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/include
+
+LOCAL_MODULE := SDL2_main
+
+LOCAL_MODULE_FILENAME := libSDL2main
+
+include $(BUILD_STATIC_LIBRARY)
+
+###########################
+#
+# hidapi library
+#
+###########################
+
+include $(CLEAR_VARS)
+
+LOCAL_CPPFLAGS += -std=c++11
+
+LOCAL_SRC_FILES := src/hidapi/android/hid.cpp
+
+LOCAL_MODULE := libhidapi
+LOCAL_LDLIBS := -llog
+
+include $(BUILD_SHARED_LIBRARY)
+</code></pre>
+<p>从这个MakeFile可以知道，如果我们单纯的想编译出SDL2.so的化，可以去掉 SDL2_main,SDL2_static 这俩个库，剩下的就是要编译的Makefile文件了,之后会编译出俩个so，一个为hidapi，一个为SDL2</p>
+<p>外部库准备好了，接下来就是源码的编译了,下面是源码的目录结构<br><img src="/uploads/scrcypy编译/scrcpyAndroidStudio编译结构.png" alt="结果显示"> </p>
+<p>首先是build.gradle的配置</p>
+<pre class=" language-gradle"><code class="language-gradle">//指定编译的版本
+ndk {
+    abiFilters 'armeabi-v7a'
+}
+
+//指定外部so的路径
+sourceSets{
+    main{
+        jniLibs.srcDirs=['src/main/cpp/libs']
+    }
+}
+//采用CmakeList编译
+externalNativeBuild {
+    cmake {
+        path "CMakeLists.txt"
+    }
+}
+</code></pre>
+<p>CMakeLists.txt的内容为</p>
+<pre class=" language-Cmake"><code class="language-Cmake">cmake_minimum_required(VERSION 3.4.1)
+
+#添加头文件的查找目录
+include_directories(${CMAKE_SOURCE_DIR}/src/main/cpp/include
+                    ${CMAKE_SOURCE_DIR}/src/main/cpp/include/SDL2
+                    ${CMAKE_SOURCE_DIR}/src/main/cpp/src )
+
+
+#libavcodec
+add_library( libavcodec
+        SHARED
+        IMPORTED)
+
+set_target_properties( libavcodec
+PROPERTIES IMPORTED_LOCATION
+${CMAKE_SOURCE_DIR}/src/main/cpp/libs/${ANDROID_ABI}/libavcodec.so )
+
+#libavformat
+add_library( libavformat
+        SHARED
+        IMPORTED)
+
+set_target_properties( libavformat
+        PROPERTIES IMPORTED_LOCATION
+        ${CMAKE_SOURCE_DIR}/src/main/cpp/libs/${ANDROID_ABI}/libavformat.so )
+
+
+#libavutil
+add_library( libavutil
+        SHARED
+        IMPORTED)
+
+set_target_properties( libavutil
+        PROPERTIES IMPORTED_LOCATION
+        ${CMAKE_SOURCE_DIR}/src/main/cpp/libs/${ANDROID_ABI}/libavutil.so )
+
+
+#SDL2
+add_library( libSDL2
+        SHARED
+        IMPORTED)
+
+set_target_properties( libSDL2
+        PROPERTIES IMPORTED_LOCATION
+        ${CMAKE_SOURCE_DIR}/src/main/cpp/libs/${ANDROID_ABI}/libSDL2.so )
+
+#SDL2 辅助库
+add_library( libhidapi
+        SHARED
+        IMPORTED)
+
+set_target_properties( libhidapi
+        PROPERTIES IMPORTED_LOCATION
+        ${CMAKE_SOURCE_DIR}/src/main/cpp/libs/${ANDROID_ABI}/libhidapi.so )
+
+
+#设置变量 自定义变量使用SET(OBJ_NAME xxxx)，使用时${OBJ_NAME}
+set(My_ARIC_SRC ${CMAKE_SOURCE_DIR}/src/main/cpp/src)
+#message( WARNING  "${My_ARIC_SRC}")
+
+set(scraptSrc
+        ${My_ARIC_SRC}/main.c
+        ${My_ARIC_SRC}/command.c
+        ${My_ARIC_SRC}/control_event.c
+        ${My_ARIC_SRC}/controller.c
+        ${My_ARIC_SRC}/convert.c
+        ${My_ARIC_SRC}/decoder.c
+        ${My_ARIC_SRC}/device.c
+        ${My_ARIC_SRC}/file_handler.c
+        ${My_ARIC_SRC}/fps_counter.c
+        ${My_ARIC_SRC}/frames.c
+        ${My_ARIC_SRC}/input_manager.c
+        ${My_ARIC_SRC}/lock_util.c
+        ${My_ARIC_SRC}/net.c
+        ${My_ARIC_SRC}/recorder.c
+        ${My_ARIC_SRC}/scrcpy.c
+        ${My_ARIC_SRC}/screen.c
+        ${My_ARIC_SRC}/server.c
+        ${My_ARIC_SRC}/sys/unix/command.c
+        ${My_ARIC_SRC}/sys/unix/net.c
+        ${My_ARIC_SRC}/str_util.c
+        ${My_ARIC_SRC}/tiny_xpm.c )
+
+add_library( # Sets the name of the library.
+        native-lib
+
+        # Sets the library as a shared library.
+        SHARED
+
+        ${CMAKE_SOURCE_DIR}/src/main/cpp/scrapyClient.cpp
+
+        # Provides a relative path to your source file(s).
+        ${scraptSrc} )
+
+
+find_library( # Sets the name of the path variable.
+        log-lib
+
+        # Specifies the name of the NDK library that
+        # you want CMake to locate.
+        log )
+
+target_link_libraries( # Specifies the target library.
+        native-lib
+
+        libavcodec
+        libavformat
+        libavutil
+        libSDL2
+        libhidapi
+
+        ${log-lib} )
+</code></pre>
+<p>scrcpy编译结果<br><img src="/uploads/scrcypy编译/scrcpy编译完成.png" alt="结果显示"><br>scrcpy 调试<br><img src="/uploads/scrcypy编译/scrcpyAndroid编译可调试.png" alt="结果显示"></p>
+<h3 id="手机并不具备Adb命令"><a href="#手机并不具备Adb命令" class="headerlink" title="手机并不具备Adb命令"></a>手机并不具备Adb命令</h3><blockquote>
+<p>通过上面的配置，这样我们看代码就很方便了，但是在运行代码的时候确会出现问题，由于他内部是通过执行adb命令，而我们的手机根本就没有adb。所以我又换在了linux下面编译</p>
+</blockquote>
+<h3 id="Ubuntu18-04-编译"><a href="#Ubuntu18-04-编译" class="headerlink" title="Ubuntu18.04 编译"></a>Ubuntu18.04 编译</h3><p>前面说过，不管在什么平台下面编译，首先要配置sdk, adb的环境变量<br><img src="/uploads/scrcypy编译/linux adb 环境变量配置.png" alt="结果显示"></p>
+<p>首先这里有一个问题很重要，就是我的Ubuntu是放在虚拟机里面的，而我手机是连接在PC上面的，有一个这样的疑问就是在虚拟机下面可以通过adb 连接到手机？，答案是可以的<br>具体可以参考 <a href="https://blog.csdn.net/u013372900/article/details/54862712" target="_blank" rel="noopener">https://blog.csdn.net/u013372900/article/details/54862712</a> </p>
+<p>配置之后的结果为<br><img src="/uploads/scrcypy编译/虚拟机abd隐射.png" alt="结果显示"></p>
+<p>接着执行下面的命令，按照对应的环境变量</p>
+<pre class=" language-bash"><code class="language-bash">//runtime dependencies
+<span class="token function">sudo</span> apt <span class="token function">install</span> ffmpeg libsdl2-2.0.0
+
+//client build dependencies
+<span class="token function">sudo</span> apt <span class="token function">install</span> <span class="token function">make</span> gcc pkg-config meson ninja-build \
+                 libavcodec-dev libavformat-dev libavutil-dev \
+                 libsdl2-dev
+
+//server build dependencies
+<span class="token function">sudo</span> apt <span class="token function">install</span> openjdk-8-jdk
+</code></pre>
+<p>之后就是克隆scrcpy项目，然后执行编译，跟window下面编译的命令是一样的，这里就不不重复<br><img src="/uploads/scrcypy编译/ubuntu 编译结果.jpg" alt="结果显示"><br>linux 下面的Eclipse For C++ 是非常方便的一款开发C/C++的工具，而且可以识别含有MakeFile的工程<br><img src="/uploads/scrcypy编译/Eclipse添加MakeFile项目.jpg" alt="结果显示"></p>
+<p>由于这个工程是采用meson构建的，所以我们需要自己写MakeFile文件，关于meson的编译过程前面已经分析过了，所以针对的写MakeFile文件也不会难</p>
+<p>对应的MakeFile文件目录为<br><img src="/uploads/scrcypy编译/MakeFile的文件目录.png" alt="结果显示"></p>
+<p>下面是该MakeFile文件的内容</p>
+<pre class=" language-makefile"><code class="language-makefile">OBJS     <span class="token operator">=</span> src/main.o src/command.o src/control_event.o src/controller.o src/convert.o src/decoder.o \
+src/device.o src/file_handler.o src/fps_counter.o src/frames.o src/input_manager.o src/lock_util.o \
+src/net.o src/recorder.o src/scrcpy.o src/screen.o src/server.o src/str_util.o src/tiny_xpm.o \
+src/sys/unix/command.o src/sys/unix/net.o
+
+CFLAGS   <span class="token operator">=</span> -I src/ -I/usr/<span class="token keyword">include</span>/x86_64-linux-gnu -I/usr/<span class="token keyword">include</span>/SDL2 -flto -fdiagnostics-color<span class="token operator">=</span>always -pipe -D_FILE_OFFSET_BITS<span class="token operator">=</span>64 -Wall -Winvalid-pch -std<span class="token operator">=</span>c11 -g3 -O0 -D_REENTRANT
+
+CC       <span class="token operator">=</span> gcc
+
+LDFLAGS <span class="token operator">+=</span> -flto -Wl,--no-undefined -Wl,--as-needed -Wl,-O1 -Wl,--start-group -lavformat -lavcodec -lavutil -lSDL2 -Wl,--end-group
+
+<span class="token symbol">all</span><span class="token punctuation">:</span> scrcpyClient
+
+
+<span class="token comment" spellcheck="true">#gcc foo.c -L /home/justin/lib -lfoo -o foo</span>
+
+<span class="token symbol">scrcpyClient</span><span class="token punctuation">:</span> <span class="token variable">$</span><span class="token punctuation">(</span>OBJS<span class="token punctuation">)</span>
+    <span class="token variable">$</span><span class="token punctuation">(</span>CC<span class="token punctuation">)</span> <span class="token variable">$</span><span class="token punctuation">(</span>CFLAGS<span class="token punctuation">)</span> -o scrcpyClient <span class="token variable">$</span><span class="token punctuation">(</span>OBJS<span class="token punctuation">)</span> <span class="token variable">$</span><span class="token punctuation">(</span>LDFLAGS<span class="token punctuation">)</span>
+
+
+<span class="token symbol">clean</span><span class="token punctuation">:</span>
+    rm -f src/*.o src/sys/unix/*.o scrcpyClient
+
+<span class="token symbol">anyway</span><span class="token punctuation">:</span> clean all
+<span class="token builtin">.PHONY</span><span class="token punctuation">:</span> clean all anyway
+</code></pre>
+<p>之后执行make 如果可以生成 scrcpyClient ，就代表没有问题了，然后再通过Eclipse 通过MakeFile的方式导入这个项目<br><img src="/uploads/scrcypy编译/Eclipse调试代码.png" alt="结果显示"></p>
+<p>至此我们可以开心的看代码了，接下来一篇会介绍scrcpy的原理</p>
+
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">AheadSnail</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://aheadsnail.github.io/2018/11/26/scrcpy-shi-yong-yi-ji-bian-yi/">https://aheadsnail.github.io/2018/11/26/scrcpy-shi-yong-yi-ji-bian-yi/</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">AheadSnail</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/NDK/">
+                                    <span class="chip bg-color">NDK</span>
+                                </a>
+                            
+                                <a href="/tags/scrcpy/">
+                                    <span class="chip bg-color">scrcpy</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2018/12/01/scrcpy-yuan-ma-fen-xi/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/7.jpg" class="responsive-img" alt="scrcpy 源码分析">
+                        
+                        <span class="card-title">scrcpy 源码分析</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            概述
+scrcpy 源码分析
+
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2018-12-01
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            AheadSnail
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/NDK/">
+                        <span class="chip bg-color">NDK</span>
+                    </a>
+                    
+                    <a href="/tags/scrcpy/">
+                        <span class="chip bg-color">scrcpy</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2018/11/16/aria2-tian-jia-natpmp-upnp-xie-yi-zhi-chi/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/22.jpg" class="responsive-img" alt="Aria2 添加 natpmp,upnp 协议支持">
+                        
+                        <span class="card-title">Aria2 添加 natpmp,upnp 协议支持</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            概述
+Aria2 添加 natpmp,upnp 协议支持
+
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2018-11-16
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            AheadSnail
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Aria2/">
+                        <span class="chip bg-color">Aria2</span>
+                    </a>
+                    
+                    <a href="/tags/NDK/">
+                        <span class="chip bg-color">NDK</span>
+                    </a>
+                    
+                    <a href="/tags/natpmp/">
+                        <span class="chip bg-color">natpmp</span>
+                    </a>
+                    
+                    <a href="/tags/upnp/">
+                        <span class="chip bg-color">upnp</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="503838841"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='random'
+                   preload='auto'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 0px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2019-2021</span>
+            
+            <span id="year">2019</span>
+            <a href="/about" target="_blank">AheadSnail</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/blinkfox" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:1181062873@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=1181062873" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 1181062873" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    <!--腾讯兔小巢-->
+    
+    
+
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>

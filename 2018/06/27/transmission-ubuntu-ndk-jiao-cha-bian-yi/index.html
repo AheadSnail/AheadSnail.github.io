@@ -1,0 +1,1839 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="Transmission Ubuntu NDK 交叉编译, AheadSnail&#39;s blog">
+    <meta name="description" content>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>Transmission Ubuntu NDK 交叉编译 | AheadSnail&#39;s blog</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<link rel="alternate" href="/atom.xml" title="AheadSnail's blog" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">AheadSnail&#39;s blog</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/contact" class="waves-effect waves-light">
+      
+      <i class="fas fa-comments" style="zoom: 0.6;"></i>
+      
+      <span>留言板</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">AheadSnail&#39;s blog</div>
+        <div class="logo-desc">
+            
+            Never really desperate, only the lost of the soul.
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/contact" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-comments"></i>
+			
+			留言板
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/blinkfox/hexo-theme-matery" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/blinkfox/hexo-theme-matery" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/8.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">Transmission Ubuntu NDK 交叉编译</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        padding: 35px 0 15px 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        padding-bottom: 30px;
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Android/">
+                                <span class="chip bg-color">Android</span>
+                            </a>
+                        
+                            <a href="/tags/NDK/">
+                                <span class="chip bg-color">NDK</span>
+                            </a>
+                        
+                            <a href="/tags/Transmission/">
+                                <span class="chip bg-color">Transmission</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2018-06-27
+                </div>
+                
+
+                
+
+                
+
+                
+
+                
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><blockquote>
+<p>Transmission Ubuntu NDK 交叉编译</p>
+</blockquote>
+<a id="more"></a>
+<h3 id="什么是Transmission"><a href="#什么是Transmission" class="headerlink" title="什么是Transmission?"></a>什么是Transmission?</h3><blockquote>
+<p>Transmission是一种BitTorrent客户端，特点是一个跨平台的后端和其上的简洁的用户界面。Transmission以MIT许可证和GNU通用公共许可证双许可证授权，因此是一款自由软件<br>优点是<br>开源跨平台，由社区志愿者开发<br>绝无各种广告及浏览器工具栏插件等<br>完全免费，绝无收费高级版与免费基础版等区别<br>数据加密、损坏修复<br>来源交换 (支持Bittorrent、Ares、迅雷、Vuze和μTorrent等等)<br>硬件资源消耗极低，甚至比某些命令行BT工具都要低<br>可以选择种子中要下载的文件<br>支持encryption、web界面、远程控制、磁力链接、DHT、uTP、uPnP、NAT-PMP<br>支持目录监控、全局或单一速度限制<br>制作种子、快速继续<br>黑名单，可以按时升级(资料来自PeerGuardian和PeerBlock)<br>单一监听端口、带宽计划、整理(过滤)<br>HTTPS tracker支持以及tracker编辑功能支持<br>IPv6支持<br>对应不同平台有着特定的图形用户界面。</p>
+</blockquote>
+<h3 id="为什么要研究Transmission？"><a href="#为什么要研究Transmission？" class="headerlink" title="为什么要研究Transmission？"></a>为什么要研究Transmission？</h3><blockquote>
+<p>为什么要研究这个东西，是因为之前搞的Aria2 p2p下载，后面在测试的时候发现了一个很重大的问题，就是内网之间不支持连接，这样内网之间的用户也就无法贡献速度，原来Aria2采用的是<br>TCP连接，而Transmission 支持utp的协议，也即是 udp的一种，udp是支持在内网连接的，下面是这俩中穿透的原理<br>至于为什么要用UDP，这是由于UDP的某些特性。UDP通信需要先绑定本地机器的端口，完成后就可以从这个端口收发数据，至于从哪里收，发到哪里，可以在收发数据的时候再决定，<br>这也就意味着我可以用这一个端口同时和多个对象通信，只要我收发数据的时候指定不同的对象即可。当本地机器用UDP向英特网上的某个服务器发送数据的时候，<br>这个映射不但能用来和这个服务器进行数据交互，也能用来接收其他主机发来的数据。NAT穿透就是本地主机向公网上的某台服务器发送数据，这时服务器就可以获得NAT对这台主机的映射，<br>在之前举得例子中就是55.66.77.88:5000这个地址。由于NAT会将55.66.77.88:5000收到的数据转发至本地主机，所以公网上的其他机器可以从服务器获取到55.66.77.88:5000这个网络地址，<br>然后通过这个网络地址向私网下的机器发出数据。<br>而至于为什么不用TCP，也是由于TCP的某些特性。TCP通信的步骤与UDP不同，它需要先在两个对象之间建立一个专用通道，再用这个通道收发数据。也就是说外人无法插手。<br>这样一来，虽然其他机器可以通过服务器获取到NAT的映射对象，也没办法利用它向私网下的机器发出数据。</p>
+</blockquote>
+<h3 id="Transmission-ubuntu-编译"><a href="#Transmission-ubuntu-编译" class="headerlink" title="Transmission ubuntu 编译"></a>Transmission ubuntu 编译</h3><blockquote>
+<p>官网 <a href="https://transmissionbt.com/" target="_blank" rel="noopener">https://transmissionbt.com/</a><br>transmission编译 <a href="https://github.com/transmission/transmission/wiki/Building-Transmission" target="_blank" rel="noopener">https://github.com/transmission/transmission/wiki/Building-Transmission</a></p>
+</blockquote>
+<pre class=" language-bash"><code class="language-bash">1.首先在ubuntu 执行下面的命令，用来安装一些依赖 
+<span class="token function">sudo</span> <span class="token function">apt-get</span> <span class="token function">install</span> build-essential automake autoconf libtool pkg-config intltool libcurl4-openssl-dev libglib2.0-dev libevent-dev libminiupnpc-dev libgtk-3-dev libappindicator3-dev
+
+2.下载安装libevent库,当然你也可以下载最新的libevent库
+<span class="token function">cd</span> /var/tmp
+$ <span class="token function">wget</span> https://github.com/downloads/libevent/libevent/libevent-2.0.18-stable.tar.gz
+$ <span class="token function">tar</span> xzf libevent-2.0.18-stable.tar.gz
+$ <span class="token function">cd</span> libevent-2.0.18-stable
+$ CFLAGS<span class="token operator">=</span><span class="token string">"-Os -march=native"</span> ./configure <span class="token operator">&amp;&amp;</span> <span class="token function">make</span>
+
+3. 下载安装Transmission，当然你可以下载Tramsmission最新的版本
+<span class="token function">cd</span> /var/tmp
+$ <span class="token function">wget</span> http://download-origin.transmissionbt.com/files/transmission-2.51.tar.bz2
+$ <span class="token function">tar</span> xjf transmission-2.51.tar.bz2
+$ <span class="token function">cd</span> transmission-2.51
+CFLAGS<span class="token operator">=</span><span class="token string">"-Os -march=native"</span> ./configure <span class="token operator">&amp;&amp;</span> <span class="token function">make</span> <span class="token operator">&amp;&amp;</span> checkinstall
+</code></pre>
+<p>如果正常没有错误的化，是这样的<br><img src="/uploads/Transmision 交叉编译/ubuntu编译.png" alt="结果显示"></p>
+<p>生成的结果：<br><img src="/uploads/Transmision 交叉编译/ubuntu生成的文件.png" alt="结果显示"></p>
+<h3 id="Transmission-NDK-交叉编译"><a href="#Transmission-NDK-交叉编译" class="headerlink" title="Transmission NDK 交叉编译"></a>Transmission NDK 交叉编译</h3><blockquote>
+<p>如果采用交叉编译的化，就要自己生成这些依赖库，这里需要手动的编译的库文件有libcurl ,libevent openssl,所以要提前下载好这些文件，对应的我们编译都是采用最新版本的库<br>libevent 最新库的下载地址  <a href="https://github.com/libevent/libevent/releases/download/release-2.1.8-stable/libevent-2.1.8-stable.tar.gz" target="_blank" rel="noopener">https://github.com/libevent/libevent/releases/download/release-2.1.8-stable/libevent-2.1.8-stable.tar.gz</a><br>openssl 最新库的下载地址  <a href="https://www.openssl.org/source/openssl-1.0.2o.tar.gz" target="_blank" rel="noopener">https://www.openssl.org/source/openssl-1.0.2o.tar.gz</a><br>curl  最新库的下载地址    <a href="https://curl.haxx.se/download/curl-7.60.0.tar.gz" target="_blank" rel="noopener">https://curl.haxx.se/download/curl-7.60.0.tar.gz</a><br>transmission 最新的下载地址  <a href="https://raw.githubusercontent.com/transmission/transmission-releases/master/transmission-2.94.tar.xz" target="_blank" rel="noopener">https://raw.githubusercontent.com/transmission/transmission-releases/master/transmission-2.94.tar.xz</a></p>
+</blockquote>
+<h4 id="编译openssl"><a href="#编译openssl" class="headerlink" title="编译openssl"></a>编译openssl</h4><p>下面是编译的脚本文件</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token shebang important">#!/bin/sh</span>
+OPENSSL_SOURCE<span class="token operator">=</span><span class="token string">"openssl-1.0.2m"</span>
+FAT<span class="token operator">=</span><span class="token string">"TS-Android"</span>
+
+SCRATCH<span class="token operator">=</span><span class="token string">"scratch"</span>
+<span class="token comment" spellcheck="true"># must be an absolute path</span>
+THIN<span class="token operator">=</span><span class="token variable"><span class="token variable">`</span><span class="token function">pwd</span><span class="token variable">`</span></span>/<span class="token string">"thin"</span>
+NDK<span class="token operator">=</span><span class="token string">"/home/yuhui/workSpace/android-ndk-r10e"</span>
+SYSROOT_PREFIX<span class="token operator">=</span><span class="token string">"<span class="token variable">$NDK</span>/platforms/android-16/arch-"</span>
+
+build_openssl<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    ARCH<span class="token operator">=</span><span class="token variable">$1</span>
+    PLATFROM<span class="token operator">=</span><span class="token variable">$2</span>
+    <span class="token keyword">if</span> <span class="token punctuation">[</span> <span class="token variable">$ARCH</span> <span class="token operator">=</span> <span class="token string">"arm64"</span> <span class="token punctuation">]</span>
+    <span class="token keyword">then</span>
+        ACT_ARCH<span class="token operator">=</span><span class="token string">"aarch64"</span>
+    <span class="token keyword">else</span>
+        ACT_ARCH<span class="token operator">=</span><span class="token variable">$ARCH</span>
+    <span class="token keyword">fi</span>
+    <span class="token keyword">if</span> <span class="token punctuation">[</span> -z <span class="token variable">$PLATFROM</span> <span class="token punctuation">]</span>
+    <span class="token keyword">then</span>
+        PLATFROM<span class="token operator">=</span>linux-androideabi
+    <span class="token keyword">fi</span>
+    SYSROOT<span class="token operator">=</span><span class="token variable">${SYSROOT_PREFIX}</span><span class="token variable">${ARCH}</span>
+    <span class="token function">export</span> CC<span class="token operator">=</span><span class="token string">"<span class="token variable">$NDK</span>/toolchains/<span class="token variable">${ACT_ARCH}</span>-<span class="token variable">${PLATFROM}</span>-4.9/prebuilt/linux-x86_64/bin/<span class="token variable">${ACT_ARCH}</span>-<span class="token variable">${PLATFROM}</span>-gcc --sysroot=<span class="token variable">${SYSROOT}</span>"</span>
+    CWD<span class="token operator">=</span><span class="token variable"><span class="token variable">`</span><span class="token function">pwd</span><span class="token variable">`</span></span>
+
+    <span class="token keyword">echo</span> <span class="token string">"building openssl for <span class="token variable">$ARCH</span>..."</span>
+    <span class="token comment" spellcheck="true">#mkdir -p "$SCRATCH/$ARCH"</span>
+    <span class="token function">cd</span> <span class="token string">"<span class="token variable">$CWD</span>/<span class="token variable">$OPENSSL_SOURCE</span>"</span>
+    <span class="token function">export</span> CFLGAS<span class="token operator">=</span><span class="token string">"-I<span class="token variable">$SYSROOT</span>/usr/include -I<span class="token variable">$CWD</span>/<span class="token variable">$OPENSSL_SOURCE</span>"</span>
+    <span class="token function">export</span> LDFLAGS<span class="token operator">=</span><span class="token string">"-L<span class="token variable">$SYSROOT</span>/usr/lib"</span>
+    <span class="token variable">$CWD</span>/<span class="token variable">$OPENSSL_SOURCE</span>/Configure android \
+        --prefix<span class="token operator">=</span><span class="token variable">$THIN</span>/<span class="token variable">$ARCH</span> <span class="token comment" spellcheck="true">#\ </span>
+    <span class="token comment" spellcheck="true">#    --cross-compile-prefix=${ACT_ARCH}-${PLATFROM}</span>
+    <span class="token function">make</span> <span class="token function">install</span>
+<span class="token punctuation">}</span>
+
+build_openssl <span class="token string">"arm"</span>
+<span class="token keyword">echo</span> <span class="token string">"build openssl success"</span>
+<span class="token keyword">exit</span> 1
+</code></pre>
+<p>这里需要注意的是,如果GCC 不是这样指定的化，会出现 error: C compiler cannot create executables的错误 ,sysroot 也即是指定环境的意思<br>export CC=”$NDK/toolchains/${ACT_ARCH}-${PLATFROM}-4.9/prebuilt/linux-x86_64/bin/${ACT_ARCH}-${PLATFROM}-gcc –sysroot=${SYSROOT}”</p>
+<p>下面是介绍为什么要这样写的原因  这个一般是跟ndk相关的错误,某些头文件或者obj文件找不到。可以编写个简单的hello world源文件测试</p>
+<pre class=" language-C++"><code class="language-C++">#include 
+int main() { 
+printf("Hello world."); 
+return 0; 
+} 
+
+使用ndk中的编译器进行编译,如
+
+export $ANDROID_NDK=/home/longjing/tools/Android/android-ndk-r15c 
+$ANDROID_NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-linux-androideabi-gcc test.c 
+编译果然报错,找不到头文件
+
+../test.c:16:19: fatal error: stdio.h: No such file or directory 
+#include 
+^ 
+compilation terminated. 
+既然是测试文件,那干脆就去掉include语句,再删除printf语句,重新编译看下结果
+
+//#include 
+int main() { 
+//printf("Hello world."); 
+return 0; 
+} 
+这下就告诉你obj文件找不到了
+
+/home/longjing/tools/Android/android-ndk-r15c/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/../lib/gcc/arm-linux-androideabi/4.9.x/../../../../arm-linux-androideabi/bin/ld: error: cannot open crtbegin_dynamic.o: No such file or directory 
+/home/longjing/tools/Android/android-ndk-r15c/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/../lib/gcc/arm-linux-androideabi/4.9.x/../../../../arm-linux-androideabi/bin/ld: error: cannot open crtend_android.o: No such file or directory 
+/home/longjing/tools/Android/android-ndk-r15c/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/../lib/gcc/arm-linux-androideabi/4.9.x/../../../../arm-linux-androideabi/bin/ld: error: cannot find -lc 
+/home/longjing/tools/Android/android-ndk-r15c/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/../lib/gcc/arm-linux-androideabi/4.9.x/../../../../arm-linux-androideabi/bin/ld: error: cannot find -ldl 
+collect2: error: ld returned 1 exit status 
+使用find命令在ndk目录下搜索下crtend_android.o文件
+
+cd /home/longjing/tools/Android/android-ndk-r15c 
+find . -iname crtend_android.o
+</code></pre>
+<p><img src="/uploads/Transmision 交叉编译/c canot create.jpg" alt="结果显示"></p>
+<pre><code>可以看到,obj文件都是存在的。那么怎么解决呢?既然找不到,那就给你个路径
+$ANDROID_NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-linux-androideabi-gcc test.c --sysroot=$ANDROID_NDK/platforms/android-9/arch-arm 
+最后重新编译,错误消失了。
+</code></pre><p><img src="/uploads/Transmision 交叉编译/test编译成功.png" alt="结果显示"></p>
+<pre><code>通过上面的脚本文件可以知道，我们的编译成功之后存放的目录为/thin/arm/ 目录下，如果这个目录就会存放编译产生的文件，其中lib目录如果有下面的俩个红色的就代表成功了，
+至于这里这么多是因为没有再次的编译了，这是全部编译成功产生的文件
+</code></pre><p><img src="/uploads/Transmision 交叉编译/openssl编译结果.png" alt="结果显示"></p>
+<h4 id="编译libevent"><a href="#编译libevent" class="headerlink" title="编译libevent"></a>编译libevent</h4><p>下面是编译的脚本文件</p>
+<pre class=" language-bash"><code class="language-bash">LIBEVENT_SOURCE<span class="token operator">=</span><span class="token string">"libevent-2.1.8-stable"</span>
+FAT<span class="token operator">=</span><span class="token string">"TS-Android"</span>
+SCRATCH<span class="token operator">=</span><span class="token string">"scratch"</span>
+<span class="token comment" spellcheck="true"># must be an absolute path</span>
+THIN<span class="token operator">=</span><span class="token variable"><span class="token variable">`</span><span class="token function">pwd</span><span class="token variable">`</span></span>/<span class="token string">"thin"</span>
+NDK<span class="token operator">=</span><span class="token string">"/home/yuhui/workSpace/android-ndk-r10e"</span>
+SYSROOT_PREFIX<span class="token operator">=</span><span class="token string">"<span class="token variable">$NDK</span>/platforms/android-16/arch-"</span>
+
+build_libevent<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    ARCH<span class="token operator">=</span><span class="token string">"<span class="token variable">$1</span>"</span>
+    PLATFROM<span class="token operator">=</span><span class="token string">"<span class="token variable">$2</span>"</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">[</span> -z <span class="token variable">$PLATFROM</span> <span class="token punctuation">]</span>
+    <span class="token keyword">then</span>
+        PLATFROM<span class="token operator">=</span><span class="token string">"linux-androideabi"</span>
+    <span class="token keyword">fi</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">[</span> <span class="token variable">$ARCH</span> <span class="token operator">=</span> <span class="token string">"arm64"</span> <span class="token punctuation">]</span>
+    <span class="token keyword">then</span>
+        PLATFROM<span class="token operator">=</span><span class="token string">"linux-android"</span>
+        ACT_ARCH<span class="token operator">=</span><span class="token string">"aarch64"</span>
+    <span class="token keyword">else</span>
+        ACT_ARCH<span class="token operator">=</span><span class="token variable">$ARCH</span>
+    <span class="token keyword">fi</span>
+
+    SYSROOT<span class="token operator">=</span><span class="token variable">${SYSROOT_PREFIX}</span><span class="token variable">${ARCH}</span>
+    CC<span class="token operator">=</span><span class="token string">"<span class="token variable">$NDK</span>/toolchains/<span class="token variable">${ACT_ARCH}</span>-<span class="token variable">${PLATFROM}</span>-4.9/prebuilt/linux-x86_64/bin/<span class="token variable">${ACT_ARCH}</span>-<span class="token variable">${PLATFROM}</span>-gcc --sysroot=<span class="token variable">${SYSROOT}</span>"</span>
+
+    <span class="token function">export</span> CC<span class="token operator">=</span><span class="token string">"<span class="token variable">$CC</span>"</span>
+
+    CWD<span class="token operator">=</span><span class="token variable"><span class="token variable">`</span><span class="token function">pwd</span><span class="token variable">`</span></span>
+
+    <span class="token keyword">echo</span> <span class="token string">"building curl for <span class="token variable">$ARCH</span>..."</span>
+    <span class="token function">mkdir</span> -p <span class="token string">"<span class="token variable">$SCRATCH</span>/<span class="token variable">$ARCH</span>-libevent"</span>
+    <span class="token function">cd</span> <span class="token string">"<span class="token variable">$SCRATCH</span>/<span class="token variable">$ARCH</span>-libevent"</span>
+
+    <span class="token comment" spellcheck="true">#最新的libevent 需要使用到openssl，所以要引进对应的头文件，以及知道连接的库的地址</span>
+    CFLAGS<span class="token operator">=</span><span class="token string">"-I<span class="token variable">${SYSROOT_PREFIX}</span><span class="token variable">${ARCH}</span>/usr/include -I<span class="token variable">${THIN}</span>/<span class="token variable">$ARCH</span>/include"</span>
+    LDFLAGS<span class="token operator">=</span><span class="token string">"-L<span class="token variable">${SYSROOT_PREFIX}</span><span class="token variable">${ARCH}</span>/usr/lib -L<span class="token variable">${THIN}</span>/<span class="token variable">$ARCH</span>/lib"</span>
+
+    <span class="token function">export</span> LDFLAGS<span class="token operator">=</span><span class="token string">"<span class="token variable">$LDFLAGS</span>"</span>
+
+    <span class="token function">export</span> CFLAGS<span class="token operator">=</span><span class="token string">"<span class="token variable">$CFLAGS</span>"</span>
+    <span class="token variable">$CWD</span>/<span class="token variable">$LIBEVENT_SOURCE</span>/configure --host<span class="token operator">=</span><span class="token variable">$ACT_ARCH</span>-<span class="token variable">$PLATFROM</span> \
+        --prefix<span class="token operator">=</span><span class="token variable">$THIN</span>/<span class="token variable">$ARCH</span>
+    <span class="token function">make</span> <span class="token function">install</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>这里要注意的，这里一定要使用ndkr11以下的版本，要不然会出现找不到arc4random_addrandom 之类的错误，这主要是因为ndkr11以上，有对这个函数最修改 下面分别在对应的r10e ，r14b中查询这个函数</p>
+<p>r10e 查询的结果为：<br><img src="/uploads/Transmision 交叉编译/arc4andomR10查询结果.png" alt="结果显示"></p>
+<p>r14b中查询的结果为：<br><img src="/uploads/Transmision 交叉编译/arc4r14b查询结果.png" alt="结果显示"></p>
+<p>可以看到俩者是有区别的，更加详细的信息可以查询<br>arc4random_addrandom的改动 <a href="https://github.com/android-ndk/ndk/issues/48" target="_blank" rel="noopener">https://github.com/android-ndk/ndk/issues/48</a></p>
+<p>所以这里要使用ndkr11以下的版本来编译，要不然会编译不过</p>
+<p>通过上面的脚本文件可以知道，我们的编译成功之后存放的目录为/thin/arm/ 目录下，如果这个目录就会存放编译产生的文件，其中lib目录如果有下面的俩个红色的就代表成功了，<br>至于这里这么多是因为没有再次的编译了，这是全部编译成功产生的文件</p>
+<p><img src="/uploads/Transmision 交叉编译/libevent编译结果.png" alt="结果显示"></p>
+<h4 id="编译curl"><a href="#编译curl" class="headerlink" title="编译curl"></a>编译curl</h4><p>下面是编译的脚本文件</p>
+<pre class=" language-bash"><code class="language-bash">CURL_SOURCE<span class="token operator">=</span><span class="token string">"curl-7.60.0"</span>
+FAT<span class="token operator">=</span><span class="token string">"TS-Android"</span>
+SCRATCH<span class="token operator">=</span><span class="token string">"scratch"</span>
+<span class="token comment" spellcheck="true"># must be an absolute path</span>
+THIN<span class="token operator">=</span><span class="token variable"><span class="token variable">`</span><span class="token function">pwd</span><span class="token variable">`</span></span>/<span class="token string">"thin"</span>
+NDK<span class="token operator">=</span><span class="token string">"/home/yuhui/workSpace/android-ndk-r10e"</span>
+SYSROOT_PREFIX<span class="token operator">=</span><span class="token string">"<span class="token variable">$NDK</span>/platforms/android-16/arch-"</span>
+
+build_Curl<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    ARCH<span class="token operator">=</span><span class="token string">"<span class="token variable">$1</span>"</span>
+    PLATFROM<span class="token operator">=</span><span class="token string">"<span class="token variable">$2</span>"</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">[</span> -z <span class="token variable">$PLATFROM</span> <span class="token punctuation">]</span>
+    <span class="token keyword">then</span>
+        PLATFROM<span class="token operator">=</span><span class="token string">"linux-androideabi"</span>
+    <span class="token keyword">fi</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">[</span> <span class="token variable">$ARCH</span> <span class="token operator">=</span> <span class="token string">"arm64"</span> <span class="token punctuation">]</span>
+    <span class="token keyword">then</span>
+        PLATFROM<span class="token operator">=</span><span class="token string">"linux-android"</span>
+        ACT_ARCH<span class="token operator">=</span><span class="token string">"aarch64"</span>
+    <span class="token keyword">else</span>
+        ACT_ARCH<span class="token operator">=</span><span class="token variable">$ARCH</span>
+    <span class="token keyword">fi</span>
+
+    SYSROOT<span class="token operator">=</span><span class="token variable">${SYSROOT_PREFIX}</span><span class="token variable">${ARCH}</span>
+    CC<span class="token operator">=</span><span class="token string">"<span class="token variable">$NDK</span>/toolchains/<span class="token variable">${ACT_ARCH}</span>-<span class="token variable">${PLATFROM}</span>-4.9/prebuilt/linux-x86_64/bin/<span class="token variable">${ACT_ARCH}</span>-<span class="token variable">${PLATFROM}</span>-gcc --sysroot=<span class="token variable">${SYSROOT}</span>"</span>
+
+    <span class="token function">export</span> CC<span class="token operator">=</span><span class="token string">"<span class="token variable">$CC</span>"</span>
+
+    CWD<span class="token operator">=</span><span class="token variable"><span class="token variable">`</span><span class="token function">pwd</span><span class="token variable">`</span></span>
+
+    <span class="token keyword">echo</span> <span class="token string">"building curl for <span class="token variable">$ARCH</span>..."</span>
+    <span class="token function">mkdir</span> -p <span class="token string">"<span class="token variable">$SCRATCH</span>/<span class="token variable">$ARCH</span>-curl"</span>
+    <span class="token function">cd</span> <span class="token string">"<span class="token variable">$SCRATCH</span>/<span class="token variable">$ARCH</span>-curl"</span>
+    CFLAGS<span class="token operator">=</span><span class="token string">"-I<span class="token variable">${SYSROOT_PREFIX}</span><span class="token variable">${ARCH}</span>/usr/include"</span>
+    <span class="token comment" spellcheck="true">#-Din_addr_t=uint32_t 的意思是说给  in_addr_t 赋值</span>
+    <span class="token function">export</span> CFLAGS<span class="token operator">=</span><span class="token string">"<span class="token variable">$CFLAGS</span> -Din_addr_t=uint32_t"</span>
+    <span class="token variable">$CWD</span>/<span class="token variable">$CURL_SOURCE</span>/configure --host<span class="token operator">=</span><span class="token variable">$ACT_ARCH</span>-<span class="token variable">$PLATFROM</span> \
+        --with-ssl \
+        --prefix<span class="token operator">=</span><span class="token variable">$THIN</span>/<span class="token variable">$ARCH</span>
+    <span class="token function">make</span> <span class="token function">install</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>执行这个函数,传递的参数为arm</p>
+<pre class=" language-bash"><code class="language-bash">build_Curl <span class="token string">"arm"</span>
+<span class="token keyword">echo</span> <span class="token string">"build Curl success"</span>
+<span class="token keyword">exit</span> 1
+</code></pre>
+<p>通过上面的脚本文件可以知道，我们的编译成功之后存放的目录为/thin/arm/ 目录下，如果这个目录就会存放编译产生的文件，其中lib目录如果有下面的俩个红色的就代表成功了，<br>至于这里这么多是因为没有再次的编译了，这是全部编译成功产生的文件</p>
+<p><img src="/uploads/Transmision 交叉编译/curl编译结果.png" alt="结果显示"></p>
+<p>最终这三个库编译出来的内容为<br><img src="/uploads/Transmision 交叉编译/外部依赖库编译结果.png" alt="结果显示"></p>
+<h4 id="编译-transmission2-9-4"><a href="#编译-transmission2-9-4" class="headerlink" title="编译 transmission2.9.4"></a>编译 transmission2.9.4</h4><p>下面是编译的脚本文件</p>
+<pre class=" language-bash"><code class="language-bash">SOURCE<span class="token operator">=</span><span class="token string">"transmission-2.94"</span>
+FAT<span class="token operator">=</span><span class="token string">"TS-Android"</span>
+SCRATCH<span class="token operator">=</span><span class="token string">"scratch"</span>
+<span class="token comment" spellcheck="true"># must be an absolute path</span>
+THIN<span class="token operator">=</span><span class="token variable"><span class="token variable">`</span><span class="token function">pwd</span><span class="token variable">`</span></span>/<span class="token string">"thin"</span>
+
+NDK<span class="token operator">=</span><span class="token string">"/home/yuhui/workSpace/android-ndk-r10e"</span>
+
+SYSROOT_PREFIX<span class="token operator">=</span><span class="token string">"<span class="token variable">$NDK</span>/platforms/android-16/arch-"</span>
+
+<span class="token comment" spellcheck="true">#配置transmission的选项</span>
+CONFIGURE_FLAGS<span class="token operator">=</span><span class="token string">"--enable-largefile --enable-utp --enable-lightweight --build=x86_64-unknown-linux-gnu"</span>
+
+<span class="token comment" spellcheck="true">#指定编译的类型</span>
+ARCHS<span class="token operator">=</span><span class="token string">"arm"</span>
+
+<span class="token comment" spellcheck="true">#给COMPILE 赋值，所以下面的 if [ "$COMPILE" ]就会进去</span>
+COMPILE<span class="token operator">=</span><span class="token string">"y"</span>
+<span class="token comment" spellcheck="true">#跟上面是一样的</span>
+<span class="token comment" spellcheck="true">#LIPO="y"</span>
+
+DEPLOYMENT_TARGET<span class="token operator">=</span><span class="token string">"6.0"</span>
+
+NEED_RECONFIGURE<span class="token operator">=</span>yes
+<span class="token keyword">if</span> <span class="token punctuation">[</span> <span class="token string">"<span class="token variable">$COMPILE</span>"</span> <span class="token punctuation">]</span>
+<span class="token keyword">then</span>
+    CWD<span class="token operator">=</span><span class="token variable"><span class="token variable">`</span><span class="token function">pwd</span><span class="token variable">`</span></span>
+    <span class="token keyword">for</span> ARCH <span class="token keyword">in</span> <span class="token variable">$ARCHS</span>
+    <span class="token keyword">do</span>
+        ACT_ARCH<span class="token operator">=</span><span class="token variable">$ARCH</span>
+        PLATFROM<span class="token operator">=</span><span class="token string">"linux-androideabi"</span>
+        <span class="token keyword">if</span> <span class="token punctuation">[</span> <span class="token variable">$ARCH</span> <span class="token operator">=</span> <span class="token string">"arm64"</span> <span class="token punctuation">]</span>
+        <span class="token keyword">then</span>
+            ACT_ARCH<span class="token operator">=</span><span class="token string">"aarch64"</span>
+            PLATFROM<span class="token operator">=</span><span class="token string">"linux-android"</span>
+        <span class="token keyword">fi</span>
+
+        <span class="token keyword">echo</span> <span class="token string">"building <span class="token variable">$ARCH</span>..."</span>
+        <span class="token function">mkdir</span> -p <span class="token string">"<span class="token variable">$SCRATCH</span>/<span class="token variable">$ARCH</span>"</span>
+        <span class="token function">cd</span> <span class="token string">"<span class="token variable">$SCRATCH</span>/<span class="token variable">$ARCH</span>"</span>
+
+        //指定include的位置
+        CFLAGS<span class="token operator">=</span><span class="token string">"-I<span class="token variable">${SYSROOT_PREFIX}</span><span class="token variable">${ARCH}</span>/usr/include -I<span class="token variable">${THIN}</span>/<span class="token variable">$ARCH</span>/include"</span>
+
+        <span class="token function">export</span> LIBCURL_CFLAGS<span class="token operator">=</span><span class="token string">"-I<span class="token variable">${THIN}</span>/<span class="token variable">$ARCH</span>/include"</span>
+        <span class="token function">export</span> LIBCURL_LIBS<span class="token operator">=</span><span class="token string">"-L<span class="token variable">${THIN}</span>/<span class="token variable">$ARCH</span>/lib"</span>
+        <span class="token function">export</span> LIBEVENT_CFLAGS<span class="token operator">=</span><span class="token string">"-I<span class="token variable">${THIN}</span>/<span class="token variable">$ARCH</span>/include"</span>
+        <span class="token function">export</span> LIBEVENT_LIBS<span class="token operator">=</span><span class="token string">"-L<span class="token variable">${THIN}</span>/<span class="token variable">$ARCH</span>/lib"</span>
+
+        <span class="token comment" spellcheck="true">#我们需要链接上面我们编译出来的外部库</span>
+        <span class="token function">export</span> LIBS<span class="token operator">=</span><span class="token string">"-lcrypto -levent -lssl -lcurl"</span>
+        <span class="token function">export</span> PATH<span class="token operator">=</span><span class="token variable">$PATH</span><span class="token keyword">:</span><span class="token string">"<span class="token variable">$NDK</span>/toolchains/<span class="token variable">${ACT_ARCH}</span>-<span class="token variable">${PLATFROM}</span>-4.9/prebuilt/linux-x86_64/bin/"</span>
+
+        SYSROOT<span class="token operator">=</span><span class="token variable">${SYSROOT_PREFIX}</span><span class="token variable">${ARCH}</span>
+
+        <span class="token comment" spellcheck="true">#指定gcc ，注意后面的 --sysroot=${SYSROOT} 不能忘记</span>
+        CC<span class="token operator">=</span><span class="token string">"<span class="token variable">$NDK</span>/toolchains/<span class="token variable">${ACT_ARCH}</span>-<span class="token variable">${PLATFROM}</span>-4.9/prebuilt/linux-x86_64/bin/<span class="token variable">${ACT_ARCH}</span>-<span class="token variable">${PLATFROM}</span>-gcc --sysroot=<span class="token variable">${SYSROOT}</span>"</span>
+        <span class="token function">export</span> CC<span class="token operator">=</span><span class="token string">"<span class="token variable">${CC}</span>"</span>
+        CXXFLAGS<span class="token operator">=</span><span class="token string">"<span class="token variable">$CFLAGS</span>"</span>
+
+        <span class="token comment" spellcheck="true">#指定连接的库</span>
+        LDFLAGS<span class="token operator">=</span><span class="token string">"-L<span class="token variable">${SYSROOT_PREFIX}</span><span class="token variable">${ARCH}</span>/usr/lib -L<span class="token variable">${THIN}</span>/<span class="token variable">$ARCH</span>/lib"</span>
+
+        <span class="token comment" spellcheck="true">#注意的点</span>
+        <span class="token function">export</span> CFLAGS<span class="token operator">=</span><span class="token string">"<span class="token variable">$CFLAGS</span> -Din_addr_t=uint32_t  -D__android__  -Din_port_t=uint16_t"</span>
+        <span class="token function">export</span> CXXFLAGS<span class="token operator">=</span><span class="token string">"<span class="token variable">$CFLAGS</span>"</span>
+        <span class="token function">export</span> LDFLAGS<span class="token operator">=</span><span class="token string">"<span class="token variable">$LDFLAGS</span>"</span>
+
+    <span class="token comment" spellcheck="true">#echo "configure message for $THIN/$ARCH"</span>
+
+        <span class="token keyword">if</span> <span class="token punctuation">[</span> <span class="token variable">$NEED_RECONFIGURE</span> <span class="token operator">=</span> <span class="token string">"yes"</span> <span class="token punctuation">]</span>
+        <span class="token keyword">then</span>
+        <span class="token variable">$CWD</span>/<span class="token variable">$SOURCE</span>/configure \
+                <span class="token variable">$CONFIGURE_FLAGS</span> \
+                --host<span class="token operator">=</span>arm-linux-androideabi \
+                --prefix<span class="token operator">=</span><span class="token variable">$THIN</span>/<span class="token variable">$ARCH</span> <span class="token operator">||</span> <span class="token keyword">exit</span> 1<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">#--prefix=$THIN/$ARCH 指定文件生成的目录在 thin/arm/下</span>
+        <span class="token keyword">fi</span>
+        <span class="token function">make</span> clean<span class="token punctuation">;</span>
+        <span class="token function">make</span> <span class="token punctuation">;</span> <span class="token function">make</span> <span class="token function">install</span> <span class="token operator">||</span> <span class="token keyword">exit</span> 1
+        <span class="token function">cd</span> <span class="token variable">$CWD</span>
+    <span class="token keyword">done</span>
+<span class="token keyword">fi</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">[</span> <span class="token string">"<span class="token variable">$LIPO</span>"</span> <span class="token punctuation">]</span>
+<span class="token keyword">then</span>
+    <span class="token keyword">echo</span> <span class="token string">"building fat binaries..."</span>
+    <span class="token function">mkdir</span> -p <span class="token variable">$FAT</span>/lib
+    <span class="token keyword">set</span> - <span class="token variable">$ARCHS</span>
+    CWD<span class="token operator">=</span><span class="token variable"><span class="token variable">`</span><span class="token function">pwd</span><span class="token variable">`</span></span>
+    <span class="token function">cd</span> <span class="token variable">$THIN</span>/<span class="token variable">$1</span>/lib
+    <span class="token keyword">for</span> LIB <span class="token keyword">in</span> *.a
+    <span class="token keyword">do</span>
+        <span class="token function">cd</span> <span class="token variable">$CWD</span>
+        <span class="token keyword">echo</span> lipo -create <span class="token variable"><span class="token variable">`</span><span class="token function">find</span> $THIN -name $LIB<span class="token variable">`</span></span> -output <span class="token variable">$FAT</span>/lib/<span class="token variable">$LIB</span> 1<span class="token operator">></span><span class="token operator">&amp;</span>2
+        lipo -create <span class="token variable"><span class="token variable">`</span><span class="token function">find</span> $THIN -name $LIB<span class="token variable">`</span></span> -output <span class="token variable">$FAT</span>/lib/<span class="token variable">$LIB</span> <span class="token operator">||</span> <span class="token keyword">exit</span> 1
+    <span class="token keyword">done</span>
+
+    <span class="token function">cd</span> <span class="token variable">$CWD</span>
+    <span class="token function">cp</span> -rf <span class="token variable">$THIN</span>/<span class="token variable">$1</span>/include <span class="token variable">$FAT</span>
+<span class="token keyword">fi</span>
+
+<span class="token keyword">echo</span> Done
+</code></pre>
+<p>在上面的脚本中有这样的一句 export CFLAGS=”$CFLAGS -Din_addr_t=uint32_t  -D<strong>android</strong>  -Din_port_t=uint16_t”，后面的-Din_addr_t=uint32_t  -D<strong>android</strong>  -Din_port_t=uint16_t<br>的意思是给in_addr_t ,in_port_t 赋值，定义<strong>android</strong> 这样的宏，可以看出来，我们要对应的修改代码，原本也是transimssion的官网介绍默认是不支持android的，也即是android的编译要自己做一些<br>修改，</p>
+<h3 id="源码对应的修改内容"><a href="#源码对应的修改内容" class="headerlink" title="源码对应的修改内容"></a>源码对应的修改内容</h3><h4 id="miniwget-c文件"><a href="#miniwget-c文件" class="headerlink" title="miniwget.c文件"></a>miniwget.c文件</h4><p>third-party\miniupnp\miniwget.c文件 修改的内容为：</p>
+<pre class=" language-C++"><code class="language-C++">#if defined(__sun) || defined(sun) || defined(__android__)
+#define MIN(x,y) (((x)<(y))?(x):(y))
+#endif
+</code></pre>
+<h4 id="variant-c"><a href="#variant-c" class="headerlink" title="variant.c"></a>variant.c</h4><p>libtransmission目录下的variant.c 修改的内容为：</p>
+<pre class=" language-C++"><code class="language-C++">#ifndef __android__
+#include <locale.h> /* setlocale() */
+#endif
+
+static void
+use_numeric_locale (struct locale_context * context,
+                    const char            * locale_name)
+{
+#ifdef HAVE_USELOCALE
+
+  context->new_locale = newlocale (LC_NUMERIC_MASK, locale_name, NULL);
+  context->old_locale = uselocale (context->new_locale);
+
+#else
+
+#if defined (HAVE__CONFIGTHREADLOCALE) && defined (_ENABLE_PER_THREAD_LOCALE)
+  context->old_thread_config = _configthreadlocale (_ENABLE_PER_THREAD_LOCALE);
+#endif
+
+#ifndef __android__
+  context->category = LC_NUMERIC;
+#endif
+
+  tr_strlcpy (context->old_locale, setlocale (context->category, NULL), sizeof (context->old_locale));
+  setlocale (context->category, locale_name);
+
+#endif
+}
+
+bool
+tr_variantGetReal (const tr_variant * v, double * setme)
+{
+  bool success = false;
+
+  if (!success && ((success = tr_variantIsReal (v))))
+    *setme = v->val.d;
+
+  if (!success && ((success = tr_variantIsInt (v))))
+    *setme = v->val.i;
+
+  if (!success && tr_variantIsString (v))
+    {
+      char * endptr;
+#ifndef __android__
+      struct locale_context locale_ctx;
+#endif
+      //struct locale_context locale_ctx;
+      double d;
+
+      /* the json spec requires a '.' decimal point regardless of locale */
+#ifndef __android__
+      use_numeric_locale (&locale_ctx, "C");
+#endif
+      //use_numeric_locale (&locale_ctx, "C");
+
+      d  = strtod (getStr (v), &endptr);
+      //restore_locale (&locale_ctx);
+#ifndef __android__
+      restore_locale (&locale_ctx);
+#endif
+
+      if ((success = (getStr (v) != endptr) && !*endptr))
+        *setme = d;
+    }
+  return success;
+}
+
+struct evbuffer *
+tr_variantToBuf (const tr_variant * v, tr_variant_fmt fmt)
+{
+#ifndef __android__
+  struct locale_context locale_ctx;
+#endif
+
+  //struct locale_context locale_ctx;
+  struct evbuffer * buf = evbuffer_new();
+
+  //use_numeric_locale (&locale_ctx, "C");
+#ifndef __android__
+  /* parse with LC_NUMERIC="C" to ensure a "." decimal separator */
+  use_numeric_locale (&locale_ctx, "C");
+#endif
+
+  evbuffer_expand (buf, 4096); /* alloc a little memory to start off with */
+
+  switch (fmt)
+    {
+      case TR_VARIANT_FMT_BENC:
+        tr_variantToBufBenc (v, buf);
+        break;
+
+      case TR_VARIANT_FMT_JSON:
+        tr_variantToBufJson (v, buf, false);
+        break;
+
+      case TR_VARIANT_FMT_JSON_LEAN:
+        tr_variantToBufJson (v, buf, true);
+        break;
+    }
+
+  //restore_locale (&locale_ctx);
+#ifndef __android__
+  /* restore the previous locale */
+  restore_locale (&locale_ctx);
+#endif
+  return buf;
+}
+
+int
+tr_variantFromBuf (tr_variant      * setme,
+                   tr_variant_fmt    fmt,
+                   const void      * buf,
+                   size_t            buflen,
+                   const char      * optional_source,
+                   const char     ** setme_end)
+{
+  int err;
+  struct locale_context locale_ctx;
+
+  //use_numeric_locale (&locale_ctx, "C");
+#ifndef __android__
+  /* parse with LC_NUMERIC="C" to ensure a "." decimal separator */
+  use_numeric_locale (&locale_ctx, "C");
+#endif
+
+  switch (fmt)
+    {
+      case TR_VARIANT_FMT_JSON:
+      case TR_VARIANT_FMT_JSON_LEAN:
+        err = tr_jsonParse (optional_source, buf, buflen, setme, setme_end);
+        break;
+
+      default /* TR_VARIANT_FMT_BENC */:
+        err = tr_variantParseBenc (buf, ((const char*)buf)+buflen, setme, setme_end);
+        break;
+    }
+
+  //restore_locale (&locale_ctx);
+  /* restore the previous locale */
+#ifndef __android__
+  restore_locale (&locale_ctx);
+#endif
+  return err;
+}
+</code></pre>
+<h4 id="platform-quote-c"><a href="#platform-quote-c" class="headerlink" title="platform-quote.c"></a>platform-quote.c</h4><p>transmission源码中的libtransmission目录下的platform-quote.c 修改的内容为：</p>
+<pre class=" language-C++"><code class="language-C++">#elif defined (__sun)
+  #include <sys/fs/ufs_quota.h> /* quotactl */
+ #elif defined (__android__)
+  #include <linux/quota.h>
+ #else
+  #include <sys/quota.h> /* quotactl() */
+ #endif
+
+
+ /* disabel quota on android */
+#ifndef __android__
+#ifndef _WIN32
+static const char *
+getdev (const char * path)
+{
+
+#endif /* disabel quota on android */
+
+static int64_t
+tr_getDiskFreeSpace (const char * path)
+{
+
+
+struct tr_device_info *
+tr_device_info_create (const char * path)
+{
+  struct tr_device_info * info;
+
+  info = tr_new0 (struct tr_device_info, 1);
+  info->path = tr_strdup (path);
+#ifndef _WIN32
+#ifndef __android__
+  info->device = tr_strdup (getblkdev (path));
+  info->fstype = tr_strdup (getfstype (path));
+#endif
+#endif
+
+  return info;
+}
+
+int64_t
+tr_device_info_get_free_space (const struct tr_device_info * info)
+{
+  int64_t free_space;
+
+  if ((info == NULL) || (info->path == NULL))
+    {
+      errno = EINVAL;
+      free_space = -1;
+    }
+  else
+    {
+#ifndef __android__
+      free_space = tr_getQuotaFreeSpace (info);
+
+      if (free_space < 0)
+#endif
+        free_space = tr_getDiskFreeSpace (info->path);
+    }
+
+  return free_space;
+}
+</code></pre>
+<h4 id="util-c"><a href="#util-c" class="headerlink" title="util.c"></a>util.c</h4><p>libtransmission目录下的util.c 修改的内容为：</p>
+<pre class=" language-C++"><code class="language-C++">double
+tr_truncd (double x, int precision)
+{
+  char * pt;
+  char buf[128];
+  const int max_precision = (int) log10 (1.0 / DBL_EPSILON) - 1;
+  tr_snprintf (buf, sizeof (buf), "%.*f", max_precision, x);
+#ifndef __android__ // android doesn't support lconv ?
+  if ((pt = strstr (buf, localeconv ()->decimal_point)))
+    pt[precision ? precision+1 : 0] = '\0';
+#endif
+  return atof (buf);
+}
+</code></pre>
+<h4 id="util-h"><a href="#util-h" class="headerlink" title="util.h"></a>util.h</h4><p>libtransmission目录下的util.h 修改的内容为：</p>
+<pre class=" language-C++"><code class="language-C++">/** @brief Private libtransmission function to update tr_time ()'s counter */
+static inline void tr_timeUpdate (time_t now) { __tr_current_time = now; }
+
+#ifdef WIN32
+ #include <windef.h> /* MAX_PATH */
+ #define TR_PATH_MAX (MAX_PATH + 1)
+#else
+ #include <limits.h> /* PATH_MAX */
+ #ifdef PATH_MAX
+  #define TR_PATH_MAX PATH_MAX
+ #else
+  #define TR_PATH_MAX 4096
+ #endif
+#endif
+
+/** @brief Portability wrapper for htonll () that uses the system implementation if available */
+uint64_t tr_htonll (uint64_t);
+</code></pre>
+<p>这些内容修改完之后，就可以执行脚本的执行了，如果正常执行的没有错误的化，会生成下面的文件 因为脚本指定了 –prefix=$THIN/$ARCH 所以会在/thin/arm/目录下生成对应的内容</p>
+<p><img src="/uploads/Transmision 交叉编译/transmission编译结果.png" alt="结果显示"></p>
+<h3 id="交叉编译总结"><a href="#交叉编译总结" class="headerlink" title="交叉编译总结"></a>交叉编译总结</h3><blockquote>
+<p>至此Transmission交叉编译成功,我们为什么要先在ubuntu下面交叉编译，是为了后面移植到android studio 编译做准备，接下来会介绍怎么在Android Studio 中采用CmakeList直接编译源码<br>弄成一个可以调试的NDK项目,这样对于我们的开发能做到事半功倍的效果</p>
+</blockquote>
+
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">AheadSnail</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://aheadsnail.github.io/2018/06/27/transmission-ubuntu-ndk-jiao-cha-bian-yi/">https://aheadsnail.github.io/2018/06/27/transmission-ubuntu-ndk-jiao-cha-bian-yi/</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">AheadSnail</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Android/">
+                                    <span class="chip bg-color">Android</span>
+                                </a>
+                            
+                                <a href="/tags/NDK/">
+                                    <span class="chip bg-color">NDK</span>
+                                </a>
+                            
+                                <a href="/tags/Transmission/">
+                                    <span class="chip bg-color">Transmission</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2018/06/30/transmission-android-cmakelist-bian-yi-guo-cheng/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/23.jpg" class="responsive-img" alt="Transmission Android CmakeList编译过程">
+                        
+                        <span class="card-title">Transmission Android CmakeList编译过程</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            概述
+Transmission Android CmakeList编译过程
+
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2018-06-30
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            AheadSnail
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Android/">
+                        <span class="chip bg-color">Android</span>
+                    </a>
+                    
+                    <a href="/tags/CmakeList/">
+                        <span class="chip bg-color">CmakeList</span>
+                    </a>
+                    
+                    <a href="/tags/NDK/">
+                        <span class="chip bg-color">NDK</span>
+                    </a>
+                    
+                    <a href="/tags/Transmission/">
+                        <span class="chip bg-color">Transmission</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2018/06/25/opus-visual-studio-pei-zhi/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/18.jpg" class="responsive-img" alt="Opus Visual Studio配置">
+                        
+                        <span class="card-title">Opus Visual Studio配置</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            概述
+Opus Visual Studio配置
+
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2018-06-25
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            AheadSnail
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Opus/">
+                        <span class="chip bg-color">Opus</span>
+                    </a>
+                    
+                    <a href="/tags/Visual-Studio/">
+                        <span class="chip bg-color">Visual Studio</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="503838841"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='random'
+                   preload='auto'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 0px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2019-2021</span>
+            
+            <span id="year">2019</span>
+            <a href="/about" target="_blank">AheadSnail</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/blinkfox" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:1181062873@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=1181062873" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 1181062873" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    <!--腾讯兔小巢-->
+    
+    
+
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>

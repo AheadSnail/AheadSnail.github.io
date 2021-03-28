@@ -1,0 +1,2008 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="Android系统启动流程(三),进入Zygote进程, AheadSnail&#39;s blog">
+    <meta name="description" content>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>Android系统启动流程(三),进入Zygote进程 | AheadSnail&#39;s blog</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<link rel="alternate" href="/atom.xml" title="AheadSnail's blog" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">AheadSnail&#39;s blog</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/contact" class="waves-effect waves-light">
+      
+      <i class="fas fa-comments" style="zoom: 0.6;"></i>
+      
+      <span>留言板</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">AheadSnail&#39;s blog</div>
+        <div class="logo-desc">
+            
+            Never really desperate, only the lost of the soul.
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/contact" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-comments"></i>
+			
+			留言板
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/blinkfox/hexo-theme-matery" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/blinkfox/hexo-theme-matery" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/12.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">Android系统启动流程(三),进入Zygote进程</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        padding: 35px 0 15px 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        padding-bottom: 30px;
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Android/">
+                                <span class="chip bg-color">Android</span>
+                            </a>
+                        
+                            <a href="/tags/Zygote/">
+                                <span class="chip bg-color">Zygote</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2018-01-08
+                </div>
+                
+
+                
+
+                
+
+                
+
+                
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <p>Android 进入Zygote过程<br><a id="more"></a></p>
+<pre class=" language-java"><code class="language-java">继上一篇文章介绍 启动zygote就会进入framework<span class="token operator">/</span>base<span class="token operator">/</span>cmds<span class="token operator">/</span>app_process<span class="token operator">/</span>app_main<span class="token punctuation">.</span>cpp的main函数在init<span class="token punctuation">.</span>rc中zygote有四个参数：
+<span class="token operator">-</span>Xzygote <span class="token operator">/</span>system<span class="token operator">/</span>bin <span class="token operator">--</span>zygote <span class="token operator">--</span>start<span class="token operator">-</span>system<span class="token operator">-</span>server，各自的意义如下：
+<span class="token operator">-</span>Xzygote：该参数将作为虚拟机启动时所需的参数；
+<span class="token operator">-</span><span class="token operator">/</span>system<span class="token operator">/</span>bin：代表虚拟机程序所在目录；
+<span class="token operator">-</span>zygote：指明以ZygoteInit<span class="token punctuation">.</span>java类中的main函数作为虚拟机执行入口；
+<span class="token operator">--</span>start<span class="token operator">-</span>system<span class="token operator">-</span>server：告诉Zygote进程启动SystemServer进程；
+在app_main<span class="token punctuation">.</span>cpp的main函数中会使用这些参数。前两个参数主要对虚拟机的设置，后面的参数主要处理systemServer
+
+zygote<span class="token punctuation">.</span>rc文件的内容为
+service zygote <span class="token operator">/</span>system<span class="token operator">/</span>bin<span class="token operator">/</span>app_process64 <span class="token operator">-</span>Xzygote <span class="token operator">/</span>system<span class="token operator">/</span>bin <span class="token operator">--</span>zygote <span class="token operator">--</span>start<span class="token operator">-</span>system<span class="token operator">-</span>server
+    <span class="token keyword">class</span> <span class="token class-name">main</span>
+    socket zygote stream <span class="token number">660</span> root system
+    onrestart write <span class="token operator">/</span>sys<span class="token operator">/</span>android_power<span class="token operator">/</span>request_state wake
+    onrestart write <span class="token operator">/</span>sys<span class="token operator">/</span>power<span class="token operator">/</span>state on
+    onrestart restart audioserver
+    onrestart restart cameraserver
+    onrestart restart media
+    onrestart restart netd
+    writepid <span class="token operator">/</span>dev<span class="token operator">/</span>cpuset<span class="token operator">/</span>foreground<span class="token operator">/</span>tasks
+
+在app_main<span class="token punctuation">.</span>cpp的main函数中会使用这些参数。前两个参数主要对虚拟机的设置，后面的参数主要处理systemServer
+#<span class="token keyword">if</span> <span class="token function">defined</span><span class="token punctuation">(</span>__LP64__<span class="token punctuation">)</span>           <span class="token comment" spellcheck="true">//判断系统为64为还是32为, 进行赋予不同的进程名  </span>
+<span class="token keyword">static</span> <span class="token keyword">const</span> <span class="token keyword">char</span> ABI_LIST_PROPERTY<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">"ro.product.cpu.abilist64"</span><span class="token punctuation">;</span>  
+<span class="token keyword">static</span> <span class="token keyword">const</span> <span class="token keyword">char</span> ZYGOTE_NICE_NAME<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">"zygote64"</span><span class="token punctuation">;</span>  
+#<span class="token keyword">else</span>  
+<span class="token keyword">static</span> <span class="token keyword">const</span> <span class="token keyword">char</span> ABI_LIST_PROPERTY<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">"ro.product.cpu.abilist32"</span><span class="token punctuation">;</span>  
+<span class="token keyword">static</span> <span class="token keyword">const</span> <span class="token keyword">char</span> ZYGOTE_NICE_NAME<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">"zygote"</span><span class="token punctuation">;</span>  
+#endif  
+
+main函数的主要代码为
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">int</span> argc<span class="token punctuation">,</span> <span class="token keyword">char</span><span class="token operator">*</span> <span class="token keyword">const</span> argv<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    AppRuntime <span class="token function">runtime</span><span class="token punctuation">(</span>argv<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token function">computeArgBlockSize</span><span class="token punctuation">(</span>argc<span class="token punctuation">,</span> argv<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">// Process command line arguments</span>
+    <span class="token comment" spellcheck="true">// ignore argv[0]</span>
+    argc<span class="token operator">--</span><span class="token punctuation">;</span>
+    argv<span class="token operator">++</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">int</span> i<span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> argc<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>argv<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">!=</span> <span class="token string">'-'</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">break</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>argv<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token string">'-'</span> <span class="token operator">&amp;&amp;</span> argv<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token operator">++</span>i<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// Skip --.</span>
+            <span class="token keyword">break</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        runtime<span class="token punctuation">.</span><span class="token function">addOption</span><span class="token punctuation">(</span><span class="token function">strdup</span><span class="token punctuation">(</span>argv<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true">// Parse runtime arguments.  Stop at first unrecognized option.</span>
+    bool zygote <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+    bool startSystemServer <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+    bool application <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+    String8 niceName<span class="token punctuation">;</span>
+    String8 className<span class="token punctuation">;</span>
+
+    <span class="token operator">++</span>i<span class="token punctuation">;</span>  <span class="token comment" spellcheck="true">// Skip unused "parent dir" argument.</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span>i <span class="token operator">&lt;</span> argc<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">const</span> <span class="token keyword">char</span><span class="token operator">*</span> arg <span class="token operator">=</span> argv<span class="token punctuation">[</span>i<span class="token operator">++</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">strcmp</span><span class="token punctuation">(</span>arg<span class="token punctuation">,</span> <span class="token string">"--zygote"</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            zygote <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+            niceName <span class="token operator">=</span> ZYGOTE_NICE_NAME<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">strcmp</span><span class="token punctuation">(</span>arg<span class="token punctuation">,</span> <span class="token string">"--start-system-server"</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            startSystemServer <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">strcmp</span><span class="token punctuation">(</span>arg<span class="token punctuation">,</span> <span class="token string">"--application"</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            application <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">strncmp</span><span class="token punctuation">(</span>arg<span class="token punctuation">,</span> <span class="token string">"--nice-name="</span><span class="token punctuation">,</span> <span class="token number">12</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            niceName<span class="token punctuation">.</span><span class="token function">setTo</span><span class="token punctuation">(</span>arg <span class="token operator">+</span> <span class="token number">12</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">strncmp</span><span class="token punctuation">(</span>arg<span class="token punctuation">,</span> <span class="token string">"--"</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            className<span class="token punctuation">.</span><span class="token function">setTo</span><span class="token punctuation">(</span>arg<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">break</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token operator">--</span>i<span class="token punctuation">;</span>
+            <span class="token keyword">break</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    Vector<span class="token operator">&lt;</span>String8<span class="token operator">></span> args<span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>className<span class="token punctuation">.</span><span class="token function">isEmpty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// We're not in zygote mode, the only argument we need to pass</span>
+        <span class="token comment" spellcheck="true">// to RuntimeInit is the application argument.</span>
+        <span class="token comment" spellcheck="true">//</span>
+        <span class="token comment" spellcheck="true">// The Remainder of args get passed to startup class main(). Make</span>
+        <span class="token comment" spellcheck="true">// copies of them before we overwrite them with the process name.</span>
+        args<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>application <span class="token operator">?</span> <span class="token function">String8</span><span class="token punctuation">(</span><span class="token string">"application"</span><span class="token punctuation">)</span> <span class="token operator">:</span> <span class="token function">String8</span><span class="token punctuation">(</span><span class="token string">"tool"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        runtime<span class="token punctuation">.</span><span class="token function">setClassNameAndArgs</span><span class="token punctuation">(</span>className<span class="token punctuation">,</span> argc <span class="token operator">-</span> i<span class="token punctuation">,</span> argv <span class="token operator">+</span> i<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// We're in zygote mode.</span>
+        <span class="token function">maybeCreateDalvikCache</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>startSystemServer<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            args<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token function">String8</span><span class="token punctuation">(</span><span class="token string">"start-system-server"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token keyword">char</span> prop<span class="token punctuation">[</span>PROP_VALUE_MAX<span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">property_get</span><span class="token punctuation">(</span>ABI_LIST_PROPERTY<span class="token punctuation">,</span> prop<span class="token punctuation">,</span> NULL<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token function">LOG_ALWAYS_FATAL</span><span class="token punctuation">(</span><span class="token string">"app_process: Unable to determine ABI list from property %s."</span><span class="token punctuation">,</span>
+                ABI_LIST_PROPERTY<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span> <span class="token number">11</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        String8 <span class="token function">abiFlag</span><span class="token punctuation">(</span><span class="token string">"--abi-list="</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        abiFlag<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span>prop<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        args<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>abiFlag<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">// In zygote mode, pass all remaining arguments to the zygote</span>
+        <span class="token comment" spellcheck="true">// main() method.</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> argc<span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            args<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token function">String8</span><span class="token punctuation">(</span>argv<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>niceName<span class="token punctuation">.</span><span class="token function">isEmpty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        runtime<span class="token punctuation">.</span><span class="token function">setArgv0</span><span class="token punctuation">(</span>niceName<span class="token punctuation">.</span><span class="token function">string</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">set_process_name</span><span class="token punctuation">(</span>niceName<span class="token punctuation">.</span><span class="token function">string</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>zygote<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        runtime<span class="token punctuation">.</span><span class="token function">start</span><span class="token punctuation">(</span><span class="token string">"com.android.internal.os.ZygoteInit"</span><span class="token punctuation">,</span> args<span class="token punctuation">,</span> zygote<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>className<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        runtime<span class="token punctuation">.</span><span class="token function">start</span><span class="token punctuation">(</span><span class="token string">"com.android.internal.os.RuntimeInit"</span><span class="token punctuation">,</span> args<span class="token punctuation">,</span> zygote<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        <span class="token function">fprintf</span><span class="token punctuation">(</span>stderr<span class="token punctuation">,</span> <span class="token string">"Error: no class name or --zygote supplied.\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">app_usage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">LOG_ALWAYS_FATAL</span><span class="token punctuation">(</span><span class="token string">"app_process: no class name or --zygote supplied."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token number">10</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+一上来就构建AppRuntime对象，就会执行对应的构造函数
+AppRuntime <span class="token function">runtime</span><span class="token punctuation">(</span>argv<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token function">computeArgBlockSize</span><span class="token punctuation">(</span>argc<span class="token punctuation">,</span> argv<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+可以发现AppRuntime是继承于AndroidRuntime的
+<span class="token keyword">class</span> <span class="token class-name">AppRuntime</span> <span class="token operator">:</span> <span class="token keyword">public</span> AndroidRuntime
+<span class="token punctuation">{</span>
+<span class="token keyword">public</span><span class="token operator">:</span>
+    <span class="token function">AppRuntime</span><span class="token punctuation">(</span><span class="token keyword">char</span><span class="token operator">*</span> argBlockStart<span class="token punctuation">,</span> <span class="token keyword">const</span> size_t argBlockLength<span class="token punctuation">)</span>
+        <span class="token operator">:</span> <span class="token function">AndroidRuntime</span><span class="token punctuation">(</span>argBlockStart<span class="token punctuation">,</span> argBlockLength<span class="token punctuation">)</span><span class="token comment" spellcheck="true">//执行父类的构造函数，也就是AndroidRuntime.cpp的构造函数</span>
+        <span class="token punctuation">,</span> <span class="token function">mClass</span><span class="token punctuation">(</span>NULL<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+
+AndroidRuntime<span class="token operator">:</span><span class="token operator">:</span><span class="token function">AndroidRuntime</span><span class="token punctuation">(</span><span class="token keyword">char</span><span class="token operator">*</span> argBlockStart<span class="token punctuation">,</span> <span class="token keyword">const</span> size_t argBlockLength<span class="token punctuation">)</span> <span class="token operator">:</span>
+        <span class="token function">mExitWithoutCleanup</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token function">mArgBlockStart</span><span class="token punctuation">(</span>argBlockStart<span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token comment" spellcheck="true">//用成员变量接收过来</span>
+        <span class="token function">mArgBlockLength</span><span class="token punctuation">(</span>argBlockLength<span class="token punctuation">)</span><span class="token comment" spellcheck="true">//用成员变量接收过来</span>
+<span class="token punctuation">{</span>
+<span class="token comment" spellcheck="true">// Pre-allocate enough space to hold a fair number of options.  </span>
+    mOptions<span class="token punctuation">.</span><span class="token function">setCapacity</span><span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//mOptions 的函数原型为     Vector&lt;JavaVMOption> mOptions; 为一个向量集合,这里设置这个集合的容量</span>
+<span class="token punctuation">}</span>
+
+构造完对象之后，mian函数继续往下面执行，将传递的参数，添加到runtime对象中
+ <span class="token keyword">int</span> i<span class="token punctuation">;</span>
+ <span class="token keyword">for</span> <span class="token punctuation">(</span>i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> argc<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+     <span class="token keyword">if</span> <span class="token punctuation">(</span>argv<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">!=</span> <span class="token string">'-'</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">break</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>argv<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token string">'-'</span> <span class="token operator">&amp;&amp;</span> argv<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token operator">++</span>i<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// Skip --.</span>
+        <span class="token keyword">break</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    runtime<span class="token punctuation">.</span><span class="token function">addOption</span><span class="token punctuation">(</span><span class="token function">strdup</span><span class="token punctuation">(</span>argv<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> AndroidRuntime<span class="token operator">:</span><span class="token operator">:</span><span class="token function">addOption</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">char</span><span class="token operator">*</span> optionString<span class="token punctuation">,</span> <span class="token keyword">void</span><span class="token operator">*</span> extraInfo<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//构建Option对象</span>
+    JavaVMOption opt<span class="token punctuation">;</span>
+    opt<span class="token punctuation">.</span>optionString <span class="token operator">=</span> optionString<span class="token punctuation">;</span>
+    opt<span class="token punctuation">.</span>extraInfo <span class="token operator">=</span> extraInfo<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//将option添加到向量结合mOptions中保存起来</span>
+    mOptions<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>opt<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+
+main函数继续执行
+<span class="token comment" spellcheck="true">// Parse runtime arguments.  Stop at first unrecognized option. //解析运行时的参数,从解析init.rc中获得  </span>
+bool zygote <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>  
+bool startSystemServer <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>  
+bool application <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>  
+String8 niceName<span class="token punctuation">;</span>  
+String8 className<span class="token punctuation">;</span>  
+
+<span class="token operator">++</span>i<span class="token punctuation">;</span>  <span class="token comment" spellcheck="true">// Skip unused "parent dir" argument.  </span>
+<span class="token keyword">while</span> <span class="token punctuation">(</span>i <span class="token operator">&lt;</span> argc<span class="token punctuation">)</span> <span class="token punctuation">{</span>  
+    <span class="token keyword">const</span> <span class="token keyword">char</span><span class="token operator">*</span> arg <span class="token operator">=</span> argv<span class="token punctuation">[</span>i<span class="token operator">++</span><span class="token punctuation">]</span><span class="token punctuation">;</span>  
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">strcmp</span><span class="token punctuation">(</span>arg<span class="token punctuation">,</span> <span class="token string">"--zygote"</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>  
+        zygote <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>    <span class="token comment" spellcheck="true">//在zygote模式中启动  </span>
+        niceName <span class="token operator">=</span> ZYGOTE_NICE_NAME<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//设置进程的名字  </span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">strcmp</span><span class="token punctuation">(</span>arg<span class="token punctuation">,</span> <span class="token string">"--start-system-server"</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>  
+        startSystemServer <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>   <span class="token comment" spellcheck="true">//启动System Server  </span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">strcmp</span><span class="token punctuation">(</span>arg<span class="token punctuation">,</span> <span class="token string">"--application"</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>  
+        application <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>          <span class="token comment" spellcheck="true">//在application模式启动  </span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">strncmp</span><span class="token punctuation">(</span>arg<span class="token punctuation">,</span> <span class="token string">"--nice-name="</span><span class="token punctuation">,</span> <span class="token number">12</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>  
+        niceName<span class="token punctuation">.</span><span class="token function">setTo</span><span class="token punctuation">(</span>arg <span class="token operator">+</span> <span class="token number">12</span><span class="token punctuation">)</span><span class="token punctuation">;</span>     <span class="token comment" spellcheck="true">//参数中有进程名,就设置  </span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">strncmp</span><span class="token punctuation">(</span>arg<span class="token punctuation">,</span> <span class="token string">"--"</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>  
+        className<span class="token punctuation">.</span><span class="token function">setTo</span><span class="token punctuation">(</span>arg<span class="token punctuation">)</span><span class="token punctuation">;</span>   <span class="token comment" spellcheck="true">//设置className  </span>
+        <span class="token keyword">break</span><span class="token punctuation">;</span>  
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>  
+        <span class="token operator">--</span>i<span class="token punctuation">;</span>  
+        <span class="token keyword">break</span><span class="token punctuation">;</span>  
+    <span class="token punctuation">}</span>  
+<span class="token punctuation">}</span>  
+
+mian函数继续往下面执行
+Vector<span class="token operator">&lt;</span>String8<span class="token operator">></span> args<span class="token punctuation">;</span><span class="token comment" spellcheck="true">//定义一个向量的集合用来传递参数</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>className<span class="token punctuation">.</span><span class="token function">isEmpty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// We're not in zygote mode, the only argument we need to pass</span>
+    <span class="token comment" spellcheck="true">// to RuntimeInit is the application argument.</span>
+    <span class="token comment" spellcheck="true">//</span>
+    <span class="token comment" spellcheck="true">// The Remainder of args get passed to startup class main(). Make</span>
+    <span class="token comment" spellcheck="true">// copies of them before we overwrite them with the process name.</span>
+    args<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>application <span class="token operator">?</span> <span class="token function">String8</span><span class="token punctuation">(</span><span class="token string">"application"</span><span class="token punctuation">)</span> <span class="token operator">:</span> <span class="token function">String8</span><span class="token punctuation">(</span><span class="token string">"tool"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    runtime<span class="token punctuation">.</span><span class="token function">setClassNameAndArgs</span><span class="token punctuation">(</span>className<span class="token punctuation">,</span> argc <span class="token operator">-</span> i<span class="token punctuation">,</span> argv <span class="token operator">+</span> i<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    根据我们传递的参数会进入到这里
+    <span class="token comment" spellcheck="true">// We're in zygote mode.</span>
+    <span class="token function">maybeCreateDalvikCache</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment" spellcheck="true">//创建data/dalvik-cache,设置环境 </span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>startSystemServer<span class="token punctuation">)</span> <span class="token punctuation">{</span>  <span class="token comment" spellcheck="true">//startSystemServer为true  </span>
+        args<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token function">String8</span><span class="token punctuation">(</span><span class="token string">"start-system-server"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//会添加这个参数</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">char</span> prop<span class="token punctuation">[</span>PROP_VALUE_MAX<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">property_get</span><span class="token punctuation">(</span>ABI_LIST_PROPERTY<span class="token punctuation">,</span> prop<span class="token punctuation">,</span> NULL<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">LOG_ALWAYS_FATAL</span><span class="token punctuation">(</span><span class="token string">"app_process: Unable to determine ABI list from property %s."</span><span class="token punctuation">,</span>
+            ABI_LIST_PROPERTY<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token number">11</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    String8 <span class="token function">abiFlag</span><span class="token punctuation">(</span><span class="token string">"--abi-list="</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    abiFlag<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span>prop<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    args<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>abiFlag<span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//再添加这个参数</span>
+
+    <span class="token comment" spellcheck="true">// In zygote mode, pass all remaining arguments to the zygote</span>
+    <span class="token comment" spellcheck="true">// main() method.</span>
+    <span class="token comment" spellcheck="true">//解析所有传递的参数，添加到args中</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> argc<span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        args<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token function">String8</span><span class="token punctuation">(</span>argv<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+main函数继续执行 
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>niceName<span class="token punctuation">.</span><span class="token function">isEmpty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token comment" spellcheck="true">//通过上面参数的解析，知道niceName 是不为空的,所以会执行下面的代码   niceName = ZYGOTE_NICE_NAME; static const char ZYGOTE_NICE_NAME[] = "zygote";</span>
+    runtime<span class="token punctuation">.</span><span class="token function">setArgv0</span><span class="token punctuation">(</span>niceName<span class="token punctuation">.</span><span class="token function">string</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">set_process_name</span><span class="token punctuation">(</span>niceName<span class="token punctuation">.</span><span class="token function">string</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> AndroidRuntime<span class="token operator">:</span><span class="token operator">:</span><span class="token function">setArgv0</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">char</span><span class="token operator">*</span> argv0<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">memset</span><span class="token punctuation">(</span>mArgBlockStart<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> mArgBlockLength<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//mArgBlockStart 函数原型为  char* const mArgBlockStart;这个成员变量在上面构造函数中已经赋值了，所以这里不会为野指针,重置这块内存空间</span>
+    <span class="token function">strlcpy</span><span class="token punctuation">(</span>mArgBlockStart<span class="token punctuation">,</span> argv0<span class="token punctuation">,</span> mArgBlockLength<span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//将zygote 赋值给mArgBlockStart 这块内存空间</span>
+<span class="token punctuation">}</span>
+
+<span class="token function">set_process_name</span><span class="token punctuation">(</span>niceName<span class="token punctuation">.</span><span class="token function">string</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>为设置当前进程的名字，也即为zygote进程<span class="token punctuation">,</span>系统的函数
+
+main函数继续执行
+<span class="token keyword">if</span> <span class="token punctuation">(</span>zygote<span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token comment" spellcheck="true">//zygote在上面的解析参数中设置了 zygote = true;   标识在zygote模式中启动  所以会执行下面的代码</span>
+    runtime<span class="token punctuation">.</span><span class="token function">start</span><span class="token punctuation">(</span><span class="token string">"com.android.internal.os.ZygoteInit"</span><span class="token punctuation">,</span> args<span class="token punctuation">,</span> zygote<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>className<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    runtime<span class="token punctuation">.</span><span class="token function">start</span><span class="token punctuation">(</span><span class="token string">"com.android.internal.os.RuntimeInit"</span><span class="token punctuation">,</span> args<span class="token punctuation">,</span> zygote<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    <span class="token function">fprintf</span><span class="token punctuation">(</span>stderr<span class="token punctuation">,</span> <span class="token string">"Error: no class name or --zygote supplied.\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">app_usage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOG_ALWAYS_FATAL</span><span class="token punctuation">(</span><span class="token string">"app_process: no class name or --zygote supplied."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token number">10</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+执行下面的代码<span class="token punctuation">,</span>就会执行到AndroidRuntime<span class="token punctuation">.</span>cpp中对应的start函数
+runtime<span class="token punctuation">.</span><span class="token function">start</span><span class="token punctuation">(</span><span class="token string">"com.android.internal.os.ZygoteInit"</span><span class="token punctuation">,</span> args<span class="token punctuation">,</span> zygote<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">/*
+ * Start the Android runtime.  This involves starting the virtual machine
+ * and calling the "static void main(String[] args)" method in the class
+ * named by "className".
+ *
+ * Passes the main function two arguments, the class name and the specified
+ * options string.
+ */</span>
+<span class="token keyword">void</span> AndroidRuntime<span class="token operator">:</span><span class="token operator">:</span><span class="token function">start</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">char</span><span class="token operator">*</span> className<span class="token punctuation">,</span> <span class="token keyword">const</span> Vector<span class="token operator">&lt;</span>String8<span class="token operator">></span><span class="token operator">&amp;</span> options<span class="token punctuation">,</span> bool zygote<span class="token punctuation">)</span><span class="token comment" spellcheck="true">// runtime.start("com.android.internal.os.ZygoteInit", args, true);</span>
+<span class="token punctuation">{</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token comment" spellcheck="true">/* start the virtual machine */</span>
+    JniInvocation jni_invocation<span class="token punctuation">;</span>
+    jni_invocation<span class="token punctuation">.</span><span class="token function">Init</span><span class="token punctuation">(</span>NULL<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    JNIEnv<span class="token operator">*</span> env<span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">startVm</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>mJavaVM<span class="token punctuation">,</span> <span class="token operator">&amp;</span>env<span class="token punctuation">,</span> zygote<span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token comment" spellcheck="true">//启动虚拟机  ,并构建mJavaVM JNIEnv对象</span>
+        <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token function">onVmCreated</span><span class="token punctuation">(</span>env<span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//对虚拟机进行初始化  </span>
+
+    <span class="token comment" spellcheck="true">/*
+     * Register android functions.
+     */</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">startReg</span><span class="token punctuation">(</span>env<span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">ALOGE</span><span class="token punctuation">(</span><span class="token string">"Unable to register all android natives\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true">/*
+     * We want to call main() with a String array with arguments in it.
+     * At present we have two arguments, the class name and an option string.
+     * Create an array to hold them.
+     */</span>
+    jclass stringClass<span class="token punctuation">;</span>
+    jobjectArray strArray<span class="token punctuation">;</span>
+    jstring classNameStr<span class="token punctuation">;</span>
+
+    stringClass <span class="token operator">=</span> env<span class="token operator">-</span><span class="token operator">></span><span class="token function">FindClass</span><span class="token punctuation">(</span><span class="token string">"java/lang/String"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">assert</span><span class="token punctuation">(</span>stringClass <span class="token operator">!=</span> NULL<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    strArray <span class="token operator">=</span> env<span class="token operator">-</span><span class="token operator">></span><span class="token function">NewObjectArray</span><span class="token punctuation">(</span>options<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> stringClass<span class="token punctuation">,</span> NULL<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">assert</span><span class="token punctuation">(</span>strArray <span class="token operator">!=</span> NULL<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    classNameStr <span class="token operator">=</span> env<span class="token operator">-</span><span class="token operator">></span><span class="token function">NewStringUTF</span><span class="token punctuation">(</span>className<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">assert</span><span class="token punctuation">(</span>classNameStr <span class="token operator">!=</span> NULL<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    env<span class="token operator">-</span><span class="token operator">></span><span class="token function">SetObjectArrayElement</span><span class="token punctuation">(</span>strArray<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> classNameStr<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>size_t i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> options<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        jstring optionsStr <span class="token operator">=</span> env<span class="token operator">-</span><span class="token operator">></span><span class="token function">NewStringUTF</span><span class="token punctuation">(</span>options<span class="token punctuation">.</span><span class="token function">itemAt</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">string</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">assert</span><span class="token punctuation">(</span>optionsStr <span class="token operator">!=</span> NULL<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        env<span class="token operator">-</span><span class="token operator">></span><span class="token function">SetObjectArrayElement</span><span class="token punctuation">(</span>strArray<span class="token punctuation">,</span> i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> optionsStr<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true">/*
+     * Start VM.  This thread becomes the main thread of the VM, and will
+     * not return until the VM exits.
+     */</span>
+    <span class="token keyword">char</span><span class="token operator">*</span> slashClassName <span class="token operator">=</span> <span class="token function">toSlashClassName</span><span class="token punctuation">(</span>className<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    jclass startClass <span class="token operator">=</span> env<span class="token operator">-</span><span class="token operator">></span><span class="token function">FindClass</span><span class="token punctuation">(</span>slashClassName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>startClass <span class="token operator">==</span> NULL<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">ALOGE</span><span class="token punctuation">(</span><span class="token string">"JavaVM unable to locate class '%s'\n"</span><span class="token punctuation">,</span> slashClassName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">/* keep going */</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        jmethodID startMeth <span class="token operator">=</span> env<span class="token operator">-</span><span class="token operator">></span><span class="token function">GetStaticMethodID</span><span class="token punctuation">(</span>startClass<span class="token punctuation">,</span> <span class="token string">"main"</span><span class="token punctuation">,</span>
+            <span class="token string">"([Ljava/lang/String;)V"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>startMeth <span class="token operator">==</span> NULL<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token function">ALOGE</span><span class="token punctuation">(</span><span class="token string">"JavaVM unable to find main() in '%s'\n"</span><span class="token punctuation">,</span> className<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">/* keep going */</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            env<span class="token operator">-</span><span class="token operator">></span><span class="token function">CallStaticVoidMethod</span><span class="token punctuation">(</span>startClass<span class="token punctuation">,</span> startMeth<span class="token punctuation">,</span> strArray<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+#<span class="token keyword">if</span> <span class="token number">0</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>env<span class="token operator">-</span><span class="token operator">></span><span class="token function">ExceptionCheck</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+                <span class="token function">threadExitUncaughtException</span><span class="token punctuation">(</span>env<span class="token punctuation">)</span><span class="token punctuation">;</span>
+#endif
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token function">free</span><span class="token punctuation">(</span>slashClassName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">//清理mJavaVM对象</span>
+    <span class="token function">ALOGD</span><span class="token punctuation">(</span><span class="token string">"Shutting down VM\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>mJavaVM<span class="token operator">-</span><span class="token operator">></span><span class="token function">DetachCurrentThread</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!=</span> JNI_OK<span class="token punctuation">)</span>
+        <span class="token function">ALOGW</span><span class="token punctuation">(</span><span class="token string">"Warning: unable to detach main thread\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>mJavaVM<span class="token operator">-</span><span class="token operator">></span><span class="token function">DestroyJavaVM</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token number">0</span><span class="token punctuation">)</span>
+        <span class="token function">ALOGW</span><span class="token punctuation">(</span><span class="token string">"Warning: VM did not shut down cleanly\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token function">startVm</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>mJavaVM<span class="token punctuation">,</span> <span class="token operator">&amp;</span>env<span class="token punctuation">,</span> zygote<span class="token punctuation">)</span>启动虚拟机的函数所在的位置就在AndroidRuntime<span class="token punctuation">.</span>cpp中的startVm中，因为比较复杂，这里就不看了
+<span class="token comment" spellcheck="true">/*
+ * Start the Dalvik Virtual Machine.
+ *
+ * Various arguments, most determined by system properties, are passed in.
+ * The "mOptions" vector is updated.
+ *
+ * CAUTION: when adding options in here, be careful not to put the
+ * char buffer inside a nested scope.  Adding the buffer to the
+ * options using mOptions.add() does not copy the buffer, so if the
+ * buffer goes out of scope the option may be overwritten.  It's best
+ * to put the buffer at the top of the function so that it is more
+ * unlikely that someone will surround it in a scope at a later time
+ * and thus introduce a bug.
+ *
+ * Returns 0 on success.
+ */</span>
+<span class="token keyword">int</span> AndroidRuntime<span class="token operator">:</span><span class="token operator">:</span><span class="token function">startVm</span><span class="token punctuation">(</span>JavaVM<span class="token operator">*</span><span class="token operator">*</span> pJavaVM<span class="token punctuation">,</span> JNIEnv<span class="token operator">*</span><span class="token operator">*</span> pEnv<span class="token punctuation">,</span> bool zygote<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    initArgs<span class="token punctuation">.</span>version <span class="token operator">=</span> JNI_VERSION_1_4<span class="token punctuation">;</span>
+    initArgs<span class="token punctuation">.</span>options <span class="token operator">=</span> mOptions<span class="token punctuation">.</span><span class="token function">editArray</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    initArgs<span class="token punctuation">.</span>nOptions <span class="token operator">=</span> mOptions<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    initArgs<span class="token punctuation">.</span>ignoreUnrecognized <span class="token operator">=</span> JNI_FALSE<span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">/*
+     * Initialize the VM.
+     *
+     * The JavaVM* is essentially per-process, and the JNIEnv* is per-thread.
+     * If this call succeeds, the VM is ready, and we can start issuing
+     * JNI calls.
+     */</span>
+     <span class="token comment" spellcheck="true">//调用JNI_CreateJavaVM函数，完成pJavaVM，pEnv的赋值,此函数为jni.h的提供的函数</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">JNI_CreateJavaVM</span><span class="token punctuation">(</span>pJavaVM<span class="token punctuation">,</span> pEnv<span class="token punctuation">,</span> <span class="token operator">&amp;</span>initArgs<span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">ALOGE</span><span class="token punctuation">(</span><span class="token string">"JNI_CreateJavaVM failed\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+start函数继续执行
+
+jclass stringClass<span class="token punctuation">;</span>
+jobjectArray strArray<span class="token punctuation">;</span>
+jstring classNameStr<span class="token punctuation">;</span>
+
+stringClass <span class="token operator">=</span> env<span class="token operator">-</span><span class="token operator">></span><span class="token function">FindClass</span><span class="token punctuation">(</span><span class="token string">"java/lang/String"</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//找到string类</span>
+<span class="token keyword">assert</span><span class="token punctuation">(</span>stringClass <span class="token operator">!=</span> NULL<span class="token punctuation">)</span><span class="token punctuation">;</span>
+strArray <span class="token operator">=</span> env<span class="token operator">-</span><span class="token operator">></span><span class="token function">NewObjectArray</span><span class="token punctuation">(</span>options<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> stringClass<span class="token punctuation">,</span> NULL<span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//构建一个java对应的字符串数组</span>
+<span class="token keyword">assert</span><span class="token punctuation">(</span>strArray <span class="token operator">!=</span> NULL<span class="token punctuation">)</span><span class="token punctuation">;</span>
+classNameStr <span class="token operator">=</span> env<span class="token operator">-</span><span class="token operator">></span><span class="token function">NewStringUTF</span><span class="token punctuation">(</span>className<span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//className 为 com.android.internal.os.ZygoteInit，也即是将c中的字符串变为java的字符串</span>
+<span class="token keyword">assert</span><span class="token punctuation">(</span>classNameStr <span class="token operator">!=</span> NULL<span class="token punctuation">)</span><span class="token punctuation">;</span>
+env<span class="token operator">-</span><span class="token operator">></span><span class="token function">SetObjectArrayElement</span><span class="token punctuation">(</span>strArray<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> classNameStr<span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//将转换之后的classNameStr字符串填充到java 字符数组的第一个元素，字符的内容为com.android.internal.os.ZygoteInit</span>
+
+<span class="token comment" spellcheck="true">//之后将options中的参数，全部由c中的字符串变成java中的字符串，然后填充到java数组中</span>
+<span class="token keyword">for</span> <span class="token punctuation">(</span>size_t i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> options<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    jstring optionsStr <span class="token operator">=</span> env<span class="token operator">-</span><span class="token operator">></span><span class="token function">NewStringUTF</span><span class="token punctuation">(</span>options<span class="token punctuation">.</span><span class="token function">itemAt</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">string</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">assert</span><span class="token punctuation">(</span>optionsStr <span class="token operator">!=</span> NULL<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    env<span class="token operator">-</span><span class="token operator">></span><span class="token function">SetObjectArrayElement</span><span class="token punctuation">(</span>strArray<span class="token punctuation">,</span> i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> optionsStr<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true">/*
+* Start VM.  This thread becomes the main thread of the VM, and will
+* not return until the VM exits.
+*/</span>
+<span class="token keyword">char</span><span class="token operator">*</span> slashClassName <span class="token operator">=</span> <span class="token function">toSlashClassName</span><span class="token punctuation">(</span>className<span class="token punctuation">)</span><span class="token punctuation">;</span>
+jclass startClass <span class="token operator">=</span> env<span class="token operator">-</span><span class="token operator">></span><span class="token function">FindClass</span><span class="token punctuation">(</span>slashClassName<span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//调用jni的方法，得到com.android.internal.os.ZygoteInit对应的class对象</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span>startClass <span class="token operator">==</span> NULL<span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token comment" spellcheck="true">//如果为空，就代表找不到，这个包名对应的类</span>
+     <span class="token function">ALOGE</span><span class="token punctuation">(</span><span class="token string">"JavaVM unable to locate class '%s'\n"</span><span class="token punctuation">,</span> slashClassName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">/* keep going */</span>
+<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//找到了com.android.internal.os.ZygoteInit 类</span>
+    jmethodID startMeth <span class="token operator">=</span> env<span class="token operator">-</span><span class="token operator">></span><span class="token function">GetStaticMethodID</span><span class="token punctuation">(</span>startClass<span class="token punctuation">,</span> <span class="token string">"main"</span><span class="token punctuation">,</span><span class="token string">"([Ljava/lang/String;)V"</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//找到对应类中的main函数</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>startMeth <span class="token operator">==</span> NULL<span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token comment" spellcheck="true">//找不到main函数，就会返回空</span>
+        <span class="token function">ALOGE</span><span class="token punctuation">(</span><span class="token string">"JavaVM unable to find main() in '%s'\n"</span><span class="token punctuation">,</span> className<span class="token punctuation">)</span><span class="token punctuation">;</span>
+         <span class="token comment" spellcheck="true">/* keep going */</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//找到了对应的main函数,最终利用jni的函数CallStaticVoidMethod，回调执行到java层的main函数</span>
+        <span class="token comment" spellcheck="true">//ZygoteInit代码位置frameworks/base/core/java/com/android/internal/os/ZygoteInit.java</span>
+        env<span class="token operator">-</span><span class="token operator">></span><span class="token function">CallStaticVoidMethod</span><span class="token punctuation">(</span>startClass<span class="token punctuation">,</span> startMeth<span class="token punctuation">,</span> strArray<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+#<span class="token keyword">if</span> <span class="token number">0</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>env<span class="token operator">-</span><span class="token operator">></span><span class="token function">ExceptionCheck</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+           <span class="token function">threadExitUncaughtException</span><span class="token punctuation">(</span>env<span class="token punctuation">)</span><span class="token punctuation">;</span>
+#endif
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token function">free</span><span class="token punctuation">(</span>slashClassName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>在调用完ZygoteInit的main函数后，Zygote就进入了Java世界。<br><img src="/uploads/Android启动流程三/zygoteInit路径.png" alt="结果显示"></p>
+<pre class=" language-java"><code class="language-java">ZygoteInit代码位置frameworks<span class="token operator">/</span>base<span class="token operator">/</span>core<span class="token operator">/</span>java<span class="token operator">/</span>com<span class="token operator">/</span>android<span class="token operator">/</span>internal<span class="token operator">/</span>os<span class="token operator">/</span>ZygoteInit<span class="token punctuation">.</span>java <span class="token punctuation">,</span> 
+在ZygoteInit的main函数中首先将从底层中传过来的参数获取出来<span class="token punctuation">.</span>
+
+  mian函数的代码为
+  <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String argv<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+            <span class="token keyword">boolean</span> startSystemServer <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+            String socketName <span class="token operator">=</span> <span class="token string">"zygote"</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//socketName为zygote  </span>
+            String abiList <span class="token operator">=</span> null<span class="token punctuation">;</span>
+            <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> argv<span class="token punctuation">.</span>length<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token string">"start-system-server"</span><span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span>argv<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token comment" spellcheck="true">//start-system-server在参数列表中,故为true   在C层中 args.add(String8("start-system-server"));有添加这个参数</span>
+                    startSystemServer <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>argv<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">startsWith</span><span class="token punctuation">(</span>ABI_LIST_ARG<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token comment" spellcheck="true">//设置abiList  </span>
+                    abiList <span class="token operator">=</span> argv<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">substring</span><span class="token punctuation">(</span>ABI_LIST_ARG<span class="token punctuation">.</span><span class="token function">length</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>argv<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">startsWith</span><span class="token punctuation">(</span>SOCKET_NAME_ARG<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token comment" spellcheck="true">//如果参数列表有socketName,就重新设置socketName  </span>
+                    socketName <span class="token operator">=</span> argv<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">substring</span><span class="token punctuation">(</span>SOCKET_NAME_ARG<span class="token punctuation">.</span><span class="token function">length</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                    <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">RuntimeException</span><span class="token punctuation">(</span><span class="token string">"Unknown command line argument: "</span> <span class="token operator">+</span> argv<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>abiList <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">RuntimeException</span><span class="token punctuation">(</span><span class="token string">"No ABI list supplied."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+
+            <span class="token function">registerZygoteSocket</span><span class="token punctuation">(</span>socketName<span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//在ZygoteInit中通过RegisterZygoteSocket()进行注册Socket，用于进程间通信。</span>
+
+            <span class="token function">preload</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//Zygote 执行预加载</span>
+
+            <span class="token comment" spellcheck="true">// Finish profiling the zygote initialization.</span>
+            SamplingProfilerIntegration<span class="token punctuation">.</span><span class="token function">writeZygoteSnapshot</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+            <span class="token comment" spellcheck="true">// Do an initial gc to clean up after startup</span>
+            Trace<span class="token punctuation">.</span><span class="token function">traceBegin</span><span class="token punctuation">(</span>Trace<span class="token punctuation">.</span>TRACE_TAG_DALVIK<span class="token punctuation">,</span> <span class="token string">"PostZygoteInitGC"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">gcAndFinalize</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            Trace<span class="token punctuation">.</span><span class="token function">traceEnd</span><span class="token punctuation">(</span>Trace<span class="token punctuation">.</span>TRACE_TAG_DALVIK<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+            Trace<span class="token punctuation">.</span><span class="token function">traceEnd</span><span class="token punctuation">(</span>Trace<span class="token punctuation">.</span>TRACE_TAG_DALVIK<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+            <span class="token comment" spellcheck="true">// Disable tracing so that forked processes do not inherit stale tracing tags from</span>
+            <span class="token comment" spellcheck="true">// Zygote.</span>
+            Trace<span class="token punctuation">.</span><span class="token function">setTracingEnabled</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+            <span class="token comment" spellcheck="true">// Zygote process unmounts root storage spaces.</span>
+            Zygote<span class="token punctuation">.</span><span class="token function">nativeUnmountStorageOnInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+            ZygoteHooks<span class="token punctuation">.</span><span class="token function">stopZygoteNoThreadCreation</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>startSystemServer<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token function">startSystemServer</span><span class="token punctuation">(</span>abiList<span class="token punctuation">,</span> socketName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+
+            Log<span class="token punctuation">.</span><span class="token function">i</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"Accepting command socket connections"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">runSelectLoop</span><span class="token punctuation">(</span>abiList<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+            <span class="token function">closeServerSocket</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">MethodAndArgsCaller</span> caller<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            caller<span class="token punctuation">.</span><span class="token function">run</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Throwable</span> ex<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            Log<span class="token punctuation">.</span><span class="token function">e</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"Zygote died with exception"</span><span class="token punctuation">,</span> ex<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">closeServerSocket</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">throw</span> ex<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+<span class="token function">registerZygoteSocket</span><span class="token punctuation">(</span>socketName<span class="token punctuation">)</span><span class="token punctuation">;</span>函数的实现为
+<span class="token comment" spellcheck="true">/**
+ * Registers a server socket for zygote command connections
+*
+* @throws RuntimeException when open fails
+*/</span>
+<span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">registerZygoteSocket</span><span class="token punctuation">(</span>String socketName<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span>sServerSocket <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">int</span> fileDesc<span class="token punctuation">;</span>
+        <span class="token keyword">final</span> String fullSocketName <span class="token operator">=</span> ANDROID_SOCKET_PREFIX <span class="token operator">+</span> socketName<span class="token punctuation">;</span><span class="token comment" spellcheck="true">//设置完整的socketName  </span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            String env <span class="token operator">=</span> System<span class="token punctuation">.</span><span class="token function">getenv</span><span class="token punctuation">(</span>fullSocketName<span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//获取环境变量  </span>
+            fileDesc <span class="token operator">=</span> Integer<span class="token punctuation">.</span><span class="token function">parseInt</span><span class="token punctuation">(</span>env<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">RuntimeException</span> ex<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">RuntimeException</span><span class="token punctuation">(</span>fullSocketName <span class="token operator">+</span> <span class="token string">" unset or invalid"</span><span class="token punctuation">,</span> ex<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            FileDescriptor fd <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">FileDescriptor</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            fd<span class="token punctuation">.</span>setInt$<span class="token punctuation">(</span>fileDesc<span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//设置文件描述符  </span>
+            sServerSocket <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">LocalServerSocket</span><span class="token punctuation">(</span>fd<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//根据文件描述符创建Server Socket  </span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">IOException</span> ex<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">RuntimeException</span><span class="token punctuation">(</span><span class="token string">"Error binding to local socket '"</span> <span class="token operator">+</span> fileDesc <span class="token operator">+</span> <span class="token string">"'"</span><span class="token punctuation">,</span> ex<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">new</span> <span class="token class-name">LocalServerSocket</span><span class="token punctuation">(</span>fd<span class="token punctuation">)</span>函数的原型为
+<span class="token keyword">public</span> <span class="token function">LocalServerSocket</span><span class="token punctuation">(</span>FileDescriptor fd<span class="token punctuation">)</span> <span class="token keyword">throws</span> IOException
+<span class="token punctuation">{</span>
+    impl <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">LocalSocketImpl</span><span class="token punctuation">(</span>fd<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    impl<span class="token punctuation">.</span><span class="token function">listen</span><span class="token punctuation">(</span>LISTEN_BACKLOG<span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//采用Linux系统的中的select函数监听Socket文件描述符</span>
+    localAddress <span class="token operator">=</span> impl<span class="token punctuation">.</span><span class="token function">getSockAddress</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+其中Socket的监听方式为使用Linux系统调用<span class="token function">select</span><span class="token punctuation">(</span><span class="token punctuation">)</span>函数监听Socket文件描述符，当该文件描述符上有数据时，自动触发中断，在中断处理函数中去读取文件描述符中的数据。
+
+<span class="token function">preload</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//Zygote 执行预加载，至于为什么要执行预加载，下面为解释</span>
+在Android系统中有很多的公共资源，所有的程序都会需要。而Zygote创建应用程序进程过程其实就是复制自身进程地址空间作为应用程序进程的地址空间，
+因此在Zygote进程中加载的类和资源都可以共享给所有由Zygote进程孵化的应用程序。所以就可以在Zygote中对公共类与资源进行加载，当应用程序启动时只需要加载自身特有的类与资源就行了，
+提高了应用软件的启动速度，这也看出面向对象编程中继承关系的好处。所以
+
+预加载的函数实现为
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">preload</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        Log<span class="token punctuation">.</span><span class="token function">d</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"begin preload"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Trace<span class="token punctuation">.</span><span class="token function">traceBegin</span><span class="token punctuation">(</span>Trace<span class="token punctuation">.</span>TRACE_TAG_DALVIK<span class="token punctuation">,</span> <span class="token string">"BeginIcuCachePinning"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">beginIcuCachePinning</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Trace<span class="token punctuation">.</span><span class="token function">traceEnd</span><span class="token punctuation">(</span>Trace<span class="token punctuation">.</span>TRACE_TAG_DALVIK<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Trace<span class="token punctuation">.</span><span class="token function">traceBegin</span><span class="token punctuation">(</span>Trace<span class="token punctuation">.</span>TRACE_TAG_DALVIK<span class="token punctuation">,</span> <span class="token string">"PreloadClasses"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">preloadClasses</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//预加载Classes  </span>
+        Trace<span class="token punctuation">.</span><span class="token function">traceEnd</span><span class="token punctuation">(</span>Trace<span class="token punctuation">.</span>TRACE_TAG_DALVIK<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Trace<span class="token punctuation">.</span><span class="token function">traceBegin</span><span class="token punctuation">(</span>Trace<span class="token punctuation">.</span>TRACE_TAG_DALVIK<span class="token punctuation">,</span> <span class="token string">"PreloadResources"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">preloadResources</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//预加载resources  </span>
+        Trace<span class="token punctuation">.</span><span class="token function">traceEnd</span><span class="token punctuation">(</span>Trace<span class="token punctuation">.</span>TRACE_TAG_DALVIK<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Trace<span class="token punctuation">.</span><span class="token function">traceBegin</span><span class="token punctuation">(</span>Trace<span class="token punctuation">.</span>TRACE_TAG_DALVIK<span class="token punctuation">,</span> <span class="token string">"PreloadOpenGL"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">preloadOpenGL</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//预加载openGL  </span>
+        Trace<span class="token punctuation">.</span><span class="token function">traceEnd</span><span class="token punctuation">(</span>Trace<span class="token punctuation">.</span>TRACE_TAG_DALVIK<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">preloadSharedLibraries</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//预加载共享类库</span>
+        <span class="token function">preloadTextResources</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//预加载文本资源 </span>
+        <span class="token comment" spellcheck="true">// Ask the WebViewFactory to do any initialization that must run in the zygote process,</span>
+        <span class="token comment" spellcheck="true">// for memory sharing purposes.</span>
+        WebViewFactory<span class="token punctuation">.</span><span class="token function">prepareWebViewInZygote</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">endIcuCachePinning</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">warmUpJcaProviders</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Log<span class="token punctuation">.</span><span class="token function">d</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"end preload"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>需要预加载的classes在手机中system/etc/preloaded-classes里面可以看到<br><img src="/uploads/Android启动流程三/zygote预加载类.png" alt="结果显示"></p>
+<pre class=" language-java"><code class="language-java"> <span class="token comment" spellcheck="true">/** 
+ * The path of a file that contains classes to preload. 
+ */</span>  
+<span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">final</span> String PRELOADED_CLASSES <span class="token operator">=</span> <span class="token string">"/system/etc/preloaded-classes"</span><span class="token punctuation">;</span>  
+
+<span class="token comment" spellcheck="true">//预加载classes</span>
+<span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">preloadClasses</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>  
+    <span class="token keyword">final</span> VMRuntime runtime <span class="token operator">=</span> VMRuntime<span class="token punctuation">.</span><span class="token function">getRuntime</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+    InputStream is<span class="token punctuation">;</span>  
+    <span class="token keyword">try</span> <span class="token punctuation">{</span>  
+            is <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">FileInputStream</span><span class="token punctuation">(</span>PRELOADED_CLASSES<span class="token punctuation">)</span><span class="token punctuation">;</span>   <span class="token comment" spellcheck="true">//将classes文件转变为文件输入流  </span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">FileNotFoundException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>  
+            Log<span class="token punctuation">.</span><span class="token function">e</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"Couldn't find "</span> <span class="token operator">+</span> PRELOADED_CLASSES <span class="token operator">+</span> <span class="token string">"."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+            <span class="token keyword">return</span><span class="token punctuation">;</span>  
+        <span class="token punctuation">}</span>  
+
+        Log<span class="token punctuation">.</span><span class="token function">i</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"Preloading classes..."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+        <span class="token keyword">long</span> startTime <span class="token operator">=</span> SystemClock<span class="token punctuation">.</span><span class="token function">uptimeMillis</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>   <span class="token comment" spellcheck="true">//开始预加载时间  </span>
+        <span class="token comment" spellcheck="true">//.........  </span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>  
+            BufferedReader br  
+                <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">BufferedReader</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">InputStreamReader</span><span class="token punctuation">(</span>is<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">256</span><span class="token punctuation">)</span><span class="token punctuation">;</span>   <span class="token comment" spellcheck="true">//封装成BufferReader  </span>
+
+            <span class="token keyword">int</span> count <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>  
+            String line<span class="token punctuation">;</span>  
+            <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>line <span class="token operator">=</span> br<span class="token punctuation">.</span><span class="token function">readLine</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>   
+                <span class="token comment" spellcheck="true">// Skip comments and blank lines.  </span>
+                line <span class="token operator">=</span> line<span class="token punctuation">.</span><span class="token function">trim</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>line<span class="token punctuation">.</span><span class="token function">startsWith</span><span class="token punctuation">(</span><span class="token string">"#"</span><span class="token punctuation">)</span> <span class="token operator">||</span> line<span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>  <span class="token comment" spellcheck="true">//将没有用的行过滤掉   也就是前面带有</span>
+                    <span class="token keyword">continue</span><span class="token punctuation">;</span>  
+                <span class="token punctuation">}</span>  
+
+                Trace<span class="token punctuation">.</span><span class="token function">traceBegin</span><span class="token punctuation">(</span>Trace<span class="token punctuation">.</span>TRACE_TAG_DALVIK<span class="token punctuation">,</span> <span class="token string">"PreloadClass "</span> <span class="token operator">+</span> line<span class="token punctuation">)</span><span class="token punctuation">;</span>  
+                <span class="token keyword">try</span> <span class="token punctuation">{</span>  
+                    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>  
+                        Log<span class="token punctuation">.</span><span class="token function">v</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"Preloading "</span> <span class="token operator">+</span> line <span class="token operator">+</span> <span class="token string">"..."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+                    <span class="token punctuation">}</span>  
+                    <span class="token comment" spellcheck="true">// Load and explicitly initialize the given class. Use  </span>
+                    <span class="token comment" spellcheck="true">// Class.forName(String, boolean, ClassLoader) to avoid repeated stack lookups  </span>
+                    <span class="token comment" spellcheck="true">// (to derive the caller's class-loader). Use true to force initialization, and  </span>
+                    <span class="token comment" spellcheck="true">// null for the boot classpath class-loader (could as well cache the  </span>
+                    <span class="token comment" spellcheck="true">// class-loader of this class in a variable).  </span>
+                    Class<span class="token punctuation">.</span><span class="token function">forName</span><span class="token punctuation">(</span>line<span class="token punctuation">,</span> <span class="token boolean">true</span><span class="token punctuation">,</span> null<span class="token punctuation">)</span><span class="token punctuation">;</span>   <span class="token comment" spellcheck="true">//要求JVM查找并加载指定的类</span>
+                    count<span class="token operator">++</span><span class="token punctuation">;</span>  
+                <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">ClassNotFoundException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>  
+                    Log<span class="token punctuation">.</span><span class="token function">w</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"Class not found for preloading: "</span> <span class="token operator">+</span> line<span class="token punctuation">)</span><span class="token punctuation">;</span>  
+                <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">UnsatisfiedLinkError</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>  
+                    Log<span class="token punctuation">.</span><span class="token function">w</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"Problem preloading "</span> <span class="token operator">+</span> line <span class="token operator">+</span> <span class="token string">": "</span> <span class="token operator">+</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>  
+                <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Throwable</span> t<span class="token punctuation">)</span> <span class="token punctuation">{</span>  
+                    Log<span class="token punctuation">.</span><span class="token function">e</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"Error preloading "</span> <span class="token operator">+</span> line <span class="token operator">+</span> <span class="token string">"."</span><span class="token punctuation">,</span> t<span class="token punctuation">)</span><span class="token punctuation">;</span>  
+                    <span class="token keyword">if</span> <span class="token punctuation">(</span>t <span class="token keyword">instanceof</span> <span class="token class-name">Error</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>  
+                        <span class="token keyword">throw</span> <span class="token punctuation">(</span>Error<span class="token punctuation">)</span> t<span class="token punctuation">;</span>  
+                    <span class="token punctuation">}</span>  
+                    <span class="token keyword">if</span> <span class="token punctuation">(</span>t <span class="token keyword">instanceof</span> <span class="token class-name">RuntimeException</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>  
+                        <span class="token keyword">throw</span> <span class="token punctuation">(</span>RuntimeException<span class="token punctuation">)</span> t<span class="token punctuation">;</span>  
+                    <span class="token punctuation">}</span>  
+                    <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">RuntimeException</span><span class="token punctuation">(</span>t<span class="token punctuation">)</span><span class="token punctuation">;</span>  
+                <span class="token punctuation">}</span>  
+                Trace<span class="token punctuation">.</span><span class="token function">traceEnd</span><span class="token punctuation">(</span>Trace<span class="token punctuation">.</span>TRACE_TAG_DALVIK<span class="token punctuation">)</span><span class="token punctuation">;</span>  
+            <span class="token punctuation">}</span>  
+
+            Log<span class="token punctuation">.</span><span class="token function">i</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"...preloaded "</span> <span class="token operator">+</span> count <span class="token operator">+</span> <span class="token string">" classes in "</span>  
+                    <span class="token operator">+</span> <span class="token punctuation">(</span>SystemClock<span class="token punctuation">.</span><span class="token function">uptimeMillis</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span>startTime<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"ms."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment" spellcheck="true">//计算预加载classes一共花了多长时间  </span>
+  <span class="token comment" spellcheck="true">//......  </span>
+<span class="token punctuation">}</span>  
+
+<span class="token comment" spellcheck="true">//预加载资源文件</span>
+<span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">preloadResources</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>  
+    <span class="token keyword">final</span> VMRuntime runtime <span class="token operator">=</span> VMRuntime<span class="token punctuation">.</span><span class="token function">getRuntime</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+
+    <span class="token keyword">try</span> <span class="token punctuation">{</span>  
+        mResources <span class="token operator">=</span> Resources<span class="token punctuation">.</span><span class="token function">getSystem</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+        mResources<span class="token punctuation">.</span><span class="token function">startPreloading</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>PRELOAD_RESOURCES<span class="token punctuation">)</span> <span class="token punctuation">{</span>  
+            Log<span class="token punctuation">.</span><span class="token function">i</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"Preloading resources..."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+
+            <span class="token keyword">long</span> startTime <span class="token operator">=</span> SystemClock<span class="token punctuation">.</span><span class="token function">uptimeMillis</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment" spellcheck="true">//记录开始预加载resources时间点  </span>
+            TypedArray ar <span class="token operator">=</span> mResources<span class="token punctuation">.</span><span class="token function">obtainTypedArray</span><span class="token punctuation">(</span>   <span class="token comment" spellcheck="true">//所需要加载的资源，其实就是在framework/base/core/res/res/values/arrays.xml中进行定义的  </span>
+                      com<span class="token punctuation">.</span>android<span class="token punctuation">.</span>internal<span class="token punctuation">.</span>R<span class="token punctuation">.</span>array<span class="token punctuation">.</span>preloaded_drawables<span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment" spellcheck="true">//获取需要预加载的drawables  </span>
+            <span class="token keyword">int</span> N <span class="token operator">=</span> <span class="token function">preloadDrawables</span><span class="token punctuation">(</span>ar<span class="token punctuation">)</span><span class="token punctuation">;</span>      <span class="token comment" spellcheck="true">//预加载drawables  </span>
+            ar<span class="token punctuation">.</span><span class="token function">recycle</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+            Log<span class="token punctuation">.</span><span class="token function">i</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"...preloaded "</span> <span class="token operator">+</span> N <span class="token operator">+</span> <span class="token string">" resources in "</span>  
+                      <span class="token operator">+</span> <span class="token punctuation">(</span>SystemClock<span class="token punctuation">.</span><span class="token function">uptimeMillis</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span>startTime<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"ms."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>   <span class="token comment" spellcheck="true">//预加载drawables耗时情况  </span>
+
+            startTime <span class="token operator">=</span> SystemClock<span class="token punctuation">.</span><span class="token function">uptimeMillis</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>     <span class="token comment" spellcheck="true">//开始预加载colorState时间点  </span>
+            ar <span class="token operator">=</span> mResources<span class="token punctuation">.</span><span class="token function">obtainTypedArray</span><span class="token punctuation">(</span>  
+                      com<span class="token punctuation">.</span>android<span class="token punctuation">.</span>internal<span class="token punctuation">.</span>R<span class="token punctuation">.</span>array<span class="token punctuation">.</span>preloaded_color_state_lists<span class="token punctuation">)</span><span class="token punctuation">;</span>   <span class="token comment" spellcheck="true">//获取预加载的color state lists  </span>
+            N <span class="token operator">=</span> <span class="token function">preloadColorStateLists</span><span class="token punctuation">(</span>ar<span class="token punctuation">)</span><span class="token punctuation">;</span>    <span class="token comment" spellcheck="true">//预加载color state  </span>
+            ar<span class="token punctuation">.</span><span class="token function">recycle</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+            Log<span class="token punctuation">.</span><span class="token function">i</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"...preloaded "</span> <span class="token operator">+</span> N <span class="token operator">+</span> <span class="token string">" resources in "</span>  
+                      <span class="token operator">+</span> <span class="token punctuation">(</span>SystemClock<span class="token punctuation">.</span><span class="token function">uptimeMillis</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span>startTime<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"ms."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment" spellcheck="true">//预加载resoures耗时  </span>
+
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>mResources<span class="token punctuation">.</span><span class="token function">getBoolean</span><span class="token punctuation">(</span>  
+                      com<span class="token punctuation">.</span>android<span class="token punctuation">.</span>internal<span class="token punctuation">.</span>R<span class="token punctuation">.</span>bool<span class="token punctuation">.</span>config_freeformWindowManagement<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>  
+                  startTime <span class="token operator">=</span> SystemClock<span class="token punctuation">.</span><span class="token function">uptimeMillis</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+                  ar <span class="token operator">=</span> mResources<span class="token punctuation">.</span><span class="token function">obtainTypedArray</span><span class="token punctuation">(</span>  
+                          com<span class="token punctuation">.</span>android<span class="token punctuation">.</span>internal<span class="token punctuation">.</span>R<span class="token punctuation">.</span>array<span class="token punctuation">.</span>preloaded_freeform_multi_window_drawables<span class="token punctuation">)</span><span class="token punctuation">;</span>  
+                  N <span class="token operator">=</span> <span class="token function">preloadDrawables</span><span class="token punctuation">(</span>ar<span class="token punctuation">)</span><span class="token punctuation">;</span>  
+                  ar<span class="token punctuation">.</span><span class="token function">recycle</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+                  Log<span class="token punctuation">.</span><span class="token function">i</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"...preloaded "</span> <span class="token operator">+</span> N <span class="token operator">+</span> <span class="token string">" resource in "</span>  
+                          <span class="token operator">+</span> <span class="token punctuation">(</span>SystemClock<span class="token punctuation">.</span><span class="token function">uptimeMillis</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-</span> startTime<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"ms."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+             <span class="token punctuation">}</span>  
+        <span class="token punctuation">}</span>  
+        mResources<span class="token punctuation">.</span><span class="token function">finishPreloading</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+    <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">RuntimeException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>  
+          Log<span class="token punctuation">.</span><span class="token function">w</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"Failure preloading resources"</span><span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>  
+    <span class="token punctuation">}</span>  
+<span class="token punctuation">}</span>
+</code></pre>
+<p>com.android.internal.R.array.preloaded_drawables的资源文件的内容<br><img src="/uploads/Android启动流程三/zygote预加载资源的内容.png" alt="结果显示"></p>
+<p>com.android.internal.R.array.preloaded_drawables 预加载资源文件的路径<br><img src="/uploads/Android启动流程三/预加载资源文件的路径.png" alt="结果显示"></p>
+<p>com.android.internal.R.array.preloaded_color_state_lists 的资源文件的内容<br><img src="/uploads/Android启动流程三/zygote预加载color内容.png" alt="结果显示"></p>
+<p>com.android.internal.R.array.preloaded_color_state_lists的资源路径跟上面的com.android.internal.R.array.preloaded_drawables是同一个文件</p>
+<pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">//预加载OpgL</span>
+<span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">preloadOpenGL</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>SystemProperties<span class="token punctuation">.</span><span class="token function">getBoolean</span><span class="token punctuation">(</span>PROPERTY_DISABLE_OPENGL_PRELOADING<span class="token punctuation">,</span> <span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            EGL14<span class="token punctuation">.</span><span class="token function">eglGetDisplay</span><span class="token punctuation">(</span>EGL14<span class="token punctuation">.</span>EGL_DEFAULT_DISPLAY<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true">//预加载共享库</span>
+<span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">preloadSharedLibraries</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        Log<span class="token punctuation">.</span><span class="token function">i</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"Preloading shared libraries..."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        System<span class="token punctuation">.</span><span class="token function">loadLibrary</span><span class="token punctuation">(</span><span class="token string">"android"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        System<span class="token punctuation">.</span><span class="token function">loadLibrary</span><span class="token punctuation">(</span><span class="token string">"compiler_rt"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        System<span class="token punctuation">.</span><span class="token function">loadLibrary</span><span class="token punctuation">(</span><span class="token string">"jnigraphics"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true">//预加载资源文本</span>
+ <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">preloadTextResources</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        Hyphenator<span class="token punctuation">.</span><span class="token function">init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        TextView<span class="token punctuation">.</span><span class="token function">preloadFontCache</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+继续往下执行<span class="token punctuation">,</span>就该创建SystemServer<span class="token punctuation">,</span> 在后文中将讲解<span class="token punctuation">.</span>
+并且循环进入监听模式<span class="token punctuation">,</span> 监听创建进程的请求
+<span class="token keyword">if</span> <span class="token punctuation">(</span>startSystemServer<span class="token punctuation">)</span> <span class="token punctuation">{</span>   <span class="token comment" spellcheck="true">//startSysteServer为true  </span>
+    <span class="token function">startSystemServer</span><span class="token punctuation">(</span>abiList<span class="token punctuation">,</span> socketName<span class="token punctuation">)</span><span class="token punctuation">;</span>     
+<span class="token punctuation">}</span>  
+
+Log<span class="token punctuation">.</span><span class="token function">i</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"Accepting command socket connections"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+<span class="token function">runSelectLoop</span><span class="token punctuation">(</span>abiList<span class="token punctuation">)</span><span class="token punctuation">;</span>     <span class="token comment" spellcheck="true">//接受应用的socket链接请求  </span>
+<span class="token function">closeServerSocket</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>   <span class="token comment" spellcheck="true">//当退出循环时,系统出现问题, 所以也要将server socket关闭.  </span>
+
+
+之后Zygote等待客户端的创建进程请求<span class="token punctuation">.</span>
+<span class="token comment" spellcheck="true">/** 
+ * Runs the zygote process's select loop. Accepts new connections as 
+ * they happen, and reads commands from connections one spawn-request's 
+ * worth at a time. 
+ * 
+ * @throws MethodAndArgsCaller in a child process when a main() should 
+ * be executed. 
+ */</span>  
+<span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">runSelectLoop</span><span class="token punctuation">(</span>String abiList<span class="token punctuation">)</span> <span class="token keyword">throws</span> MethodAndArgsCaller <span class="token punctuation">{</span>  
+    ArrayList<span class="token operator">&lt;</span>FileDescriptor<span class="token operator">></span> fds <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ArrayList</span><span class="token operator">&lt;</span>FileDescriptor<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+    ArrayList<span class="token operator">&lt;</span>ZygoteConnection<span class="token operator">></span> peers <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ArrayList</span><span class="token operator">&lt;</span>ZygoteConnection<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+
+    fds<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>sServerSocket<span class="token punctuation">.</span><span class="token function">getFileDescriptor</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>   
+    peers<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>null<span class="token punctuation">)</span><span class="token punctuation">;</span>  
+
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>  
+        StructPollfd<span class="token punctuation">[</span><span class="token punctuation">]</span> pollFds <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">StructPollfd</span><span class="token punctuation">[</span>fds<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">;</span>  
+        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> pollFds<span class="token punctuation">.</span>length<span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> <span class="token punctuation">{</span>  
+            pollFds<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">StructPollfd</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+            pollFds<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>fd <span class="token operator">=</span> fds<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">;</span>  
+            pollFds<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>events <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">short</span><span class="token punctuation">)</span> POLLIN<span class="token punctuation">;</span>  
+        <span class="token punctuation">}</span>  
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>  
+            Os<span class="token punctuation">.</span><span class="token function">poll</span><span class="token punctuation">(</span>pollFds<span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">ErrnoException</span> ex<span class="token punctuation">)</span> <span class="token punctuation">{</span>  
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">RuntimeException</span><span class="token punctuation">(</span><span class="token string">"poll failed"</span><span class="token punctuation">,</span> ex<span class="token punctuation">)</span><span class="token punctuation">;</span>  
+        <span class="token punctuation">}</span>  
+        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> pollFds<span class="token punctuation">.</span>length <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">;</span> i <span class="token operator">>=</span> <span class="token number">0</span><span class="token punctuation">;</span> <span class="token operator">--</span>i<span class="token punctuation">)</span> <span class="token punctuation">{</span>  
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>pollFds<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>revents <span class="token operator">&amp;</span> POLLIN<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>  
+                <span class="token keyword">continue</span><span class="token punctuation">;</span>  
+            <span class="token punctuation">}</span>  
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>i <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>  
+                ZygoteConnection newPeer <span class="token operator">=</span> <span class="token function">acceptCommandPeer</span><span class="token punctuation">(</span>abiList<span class="token punctuation">)</span><span class="token punctuation">;</span>  
+                peers<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>newPeer<span class="token punctuation">)</span><span class="token punctuation">;</span>  
+                fds<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>newPeer<span class="token punctuation">.</span><span class="token function">getFileDesciptor</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>  
+                <span class="token keyword">boolean</span> done <span class="token operator">=</span> peers<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">runOnce</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>done<span class="token punctuation">)</span> <span class="token punctuation">{</span>  
+                    peers<span class="token punctuation">.</span><span class="token function">remove</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">;</span>  
+                    fds<span class="token punctuation">.</span><span class="token function">remove</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">;</span>  
+                <span class="token punctuation">}</span>  
+            <span class="token punctuation">}</span>  
+        <span class="token punctuation">}</span>  
+    <span class="token punctuation">}</span>  
+<span class="token punctuation">}</span>
+</code></pre>
+<p>流程总结<br><img src="/uploads/Android启动流程三/zygote启动进入到zygoteinit流程图.jpg" alt="结果显示"></p>
+
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">AheadSnail</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://aheadsnail.github.io/2018/01/08/android-xi-tong-qi-dong-liu-cheng-san-jin-ru-zygote-jin-cheng/">https://aheadsnail.github.io/2018/01/08/android-xi-tong-qi-dong-liu-cheng-san-jin-ru-zygote-jin-cheng/</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">AheadSnail</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Android/">
+                                    <span class="chip bg-color">Android</span>
+                                </a>
+                            
+                                <a href="/tags/Zygote/">
+                                    <span class="chip bg-color">Zygote</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2018/01/09/android-xi-tong-qi-dong-liu-cheng-si-jin-ru-systemservice/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/16.jpg" class="responsive-img" alt="Android系统启动流程(四)，进入SystemService">
+                        
+                        <span class="card-title">Android系统启动流程(四)，进入SystemService</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            Android系统启动流程,进入SystemService
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2018-01-09
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            AheadSnail
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Android/">
+                        <span class="chip bg-color">Android</span>
+                    </a>
+                    
+                    <a href="/tags/SystemService/">
+                        <span class="chip bg-color">SystemService</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2018/01/08/android-xi-tong-qi-dong-liu-cheng-er-servicemanager-zygote-qi-dong/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/16.jpg" class="responsive-img" alt="Android系统启动流程(二),ServiceManager，Zygote启动">
+                        
+                        <span class="card-title">Android系统启动流程(二),ServiceManager，Zygote启动</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            Android 理解ServiceManager启动,Zygote启动过程
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2018-01-08
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            AheadSnail
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Android/">
+                        <span class="chip bg-color">Android</span>
+                    </a>
+                    
+                    <a href="/tags/ServiceManager/">
+                        <span class="chip bg-color">ServiceManager</span>
+                    </a>
+                    
+                    <a href="/tags/Zygote/">
+                        <span class="chip bg-color">Zygote</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="503838841"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='random'
+                   preload='auto'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 0px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2019-2021</span>
+            
+            <span id="year">2019</span>
+            <a href="/about" target="_blank">AheadSnail</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/blinkfox" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:1181062873@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=1181062873" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 1181062873" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    <!--腾讯兔小巢-->
+    
+    
+
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>

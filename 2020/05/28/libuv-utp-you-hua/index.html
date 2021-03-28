@@ -1,0 +1,1767 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="libuv+utp优化, AheadSnail&#39;s blog">
+    <meta name="description" content>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>libuv+utp优化 | AheadSnail&#39;s blog</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<link rel="alternate" href="/atom.xml" title="AheadSnail's blog" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">AheadSnail&#39;s blog</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/contact" class="waves-effect waves-light">
+      
+      <i class="fas fa-comments" style="zoom: 0.6;"></i>
+      
+      <span>留言板</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">AheadSnail&#39;s blog</div>
+        <div class="logo-desc">
+            
+            Never really desperate, only the lost of the soul.
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/contact" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-comments"></i>
+			
+			留言板
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/blinkfox/hexo-theme-matery" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/blinkfox/hexo-theme-matery" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/14.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">libuv+utp优化</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        padding: 35px 0 15px 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        padding-bottom: 30px;
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/utp/">
+                                <span class="chip bg-color">utp</span>
+                            </a>
+                        
+                            <a href="/tags/bt/">
+                                <span class="chip bg-color">bt</span>
+                            </a>
+                        
+                            <a href="/tags/libuv/">
+                                <span class="chip bg-color">libuv</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2020-05-28
+                </div>
+                
+
+                
+
+                
+
+                
+
+                
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>之前在Aria2开源项目上强制改成项目想要的效果，在它原本的基础上实现了utp，nat打洞，udp ReusePORT，bt跟http多线程下载 最终导致项目不够稳定，结果就是项目还没上线就直接重写，现在重写了3个多月，已经大体实现，这里整理下 最新遇到的libuv与utp结合的问题</p>
+<p>关于libuv的介绍，可以查看这个链接<br><a href="https://github.com/libuv/libuv" target="_blank" rel="noopener">https://github.com/libuv/libuv</a><br>libuv是一个支持多平台的异步IO库。它主要是为了node.js而开发的，但是也可以用于Luvit, Julia, pyuv及其他软件。 </p>
+<p>关于utp的介绍，可以查看这个链接<br><a href="https://github.com/bittorrent/libutp" target="_blank" rel="noopener">https://github.com/bittorrent/libutp</a><br>libutp其实是 bittorrent 开源出来的，utp本质还是udp，不过在udp的基础上，实现了类似utp的滑动窗口控制，mtu控制，rto，rrt，EACK等的特性使使用者用起来跟tcp一样，而不用考虑丢包，乱序的情况</p>
+<h3 id="libuv-utp结合使用的问题"><a href="#libuv-utp结合使用的问题" class="headerlink" title="libuv+utp结合使用的问题"></a>libuv+utp结合使用的问题</h3><p>1.由于调用libuv的uv_udp_send api发送udp数据的时候，内部并不会拷贝保存要发送的数据，所以对于发送方来说，外面一层一定要自己维护一个缓冲区，保证libuv将数据发送出去的时候，才能移除当前的数据要不然会导致访问了不合法的内存，导致闪退，而对于libutp来说，由于他要保证重发等机制，所以它会内部拷贝一份要发送的数据，方便自己管理控制，原本俩个库是没有什么问题的，但是结合起来就会有问题了，比如当前utp库在确认了这个包对方已经收到的时候，在执行释放的时候，由于不知道libuv不知道当前是否还有未发送的当前包，导致后续发送的时候，访问了非法的内存，导致闪退，下面有几种解决方案</p>
+<h3 id="每次发送拷贝一份"><a href="#每次发送拷贝一份" class="headerlink" title="每次发送拷贝一份"></a>每次发送拷贝一份</h3><p>我们可以在utp库处理完数据调用sendto回调函数的时候，直接分配内存空间再拷贝一份数据再交给libuv发送，那么就不会存在发送不合法的数据问题，下面是本地的测试效果<br><img src="/uploads/libuv优化/全拷贝效果.png" alt="结果显示"></p>
+<p>全拷贝函数简单实现</p>
+<pre class=" language-java"><code class="language-java">ssize_t UVSocketCore<span class="token operator">:</span><span class="token operator">:</span><span class="token function">utp_writeData</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">char</span><span class="token operator">*</span> data<span class="token punctuation">,</span> int32_t len<span class="token punctuation">)</span><span class="token punctuation">{</span>
+    uv_buf_t buf<span class="token punctuation">;</span>
+    buf<span class="token punctuation">.</span>base  <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">char</span><span class="token punctuation">[</span>len<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token function">memcpy</span><span class="token punctuation">(</span>buf<span class="token punctuation">.</span>base<span class="token punctuation">,</span>data<span class="token punctuation">,</span>len<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    buf<span class="token punctuation">.</span>len <span class="token operator">=</span> len<span class="token punctuation">;</span>
+
+    uv_udp_send_t<span class="token operator">*</span> udp_send <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">uv_udp_send_t</span><span class="token punctuation">;</span>
+    udp_send<span class="token operator">-</span><span class="token operator">></span>data <span class="token operator">=</span> buf<span class="token punctuation">.</span>base<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//执行发送 For connected UDP handles, addr must be set to NULL, otherwise it will return UV_EISCONN error.</span>
+    int32_t r <span class="token operator">=</span> <span class="token function">uv_udp_send</span><span class="token punctuation">(</span>udp_send<span class="token punctuation">,</span> udp_handle_<span class="token punctuation">,</span> <span class="token operator">&amp;</span>buf<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> nullptr<span class="token punctuation">,</span>utp_on_send<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>r<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">throw</span> <span class="token function">DL_ABORT_EX</span><span class="token punctuation">(</span><span class="token function">fmt</span><span class="token punctuation">(</span>EX_SOCKET_SEND<span class="token punctuation">,</span> <span class="token function">uv_strerror</span><span class="token punctuation">(</span>r<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>这只是在本地测试效果，是在不会丢包的情况下的表现，真实的网络情况下肯定会丢包的，那就会导致可能一个数据包一直丢包utp库一直重发,导致对于同一个数据包每次都执行了拷贝,这肯定是不合理的每次执行内存的分配，释放也是一个很影响效率的问题</p>
+<h3 id="直接使用同步的方式发送"><a href="#直接使用同步的方式发送" class="headerlink" title="直接使用同步的方式发送"></a>直接使用同步的方式发送</h3><p>如果数据经过libutp处理完之后，就直接将数据包发送出去，在utp库确认要删除这个数据包的时候，由于不会缓存数据包的情况，所以肯定不会有问题，下面是同步发送的效果<br><img src="/uploads/libuv优化/同步效果.png" alt="结果显示"></p>
+<p>由于是采用直接同步发送的方式，所以并没有经过libuv库，直接调用write的方式，执行发送</p>
+<pre class=" language-java"><code class="language-java">ssize_t UVSocketCore<span class="token operator">:</span><span class="token operator">:</span><span class="token function">udpWriteData</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">char</span><span class="token operator">*</span> data<span class="token punctuation">,</span>int32_t len<span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token function">enSureUdpHandle</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    ssize_t r <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> errNum <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>r <span class="token operator">=</span> <span class="token function">write</span><span class="token punctuation">(</span>udp_handle_<span class="token operator">-</span><span class="token operator">></span>io_watcher<span class="token punctuation">.</span>fd<span class="token punctuation">,</span>data<span class="token punctuation">,</span> len<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token operator">-</span><span class="token number">1</span> <span class="token operator">&amp;&amp;</span> A2_EINTR <span class="token operator">==</span> SOCKET_ERRNO<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    errNum <span class="token operator">=</span> SOCKET_ERRNO<span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>r <span class="token operator">==</span> <span class="token operator">-</span><span class="token number">1</span> <span class="token operator">&amp;&amp;</span> <span class="token function">A2_WOULDBLOCK</span><span class="token punctuation">(</span>errNum<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>  <span class="token comment" spellcheck="true">//为阻塞情况,</span>
+        r <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>r <span class="token operator">==</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//打印出现的问题</span>
+        <span class="token function">G_LOG_DEBUG</span><span class="token punctuation">(</span>EX_SOCKET_SEND<span class="token punctuation">,</span> <span class="token function">errorMsg</span><span class="token punctuation">(</span>errNum<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">c_str</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//抛出异常 </span>
+        <span class="token keyword">throw</span> <span class="token function">DL_ABORT_EX</span><span class="token punctuation">(</span><span class="token function">fmt</span><span class="token punctuation">(</span>EX_SOCKET_SEND<span class="token punctuation">,</span> <span class="token function">errorMsg</span><span class="token punctuation">(</span>errNum<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">c_str</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> r<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>可以看到同步发送的效果比全拷贝的效果还差，主要原因是前面一种虽然多执行了多次的拷贝，但是由于是经过libuv库，通过异步发送的方式，性能还是有点差距的,下面看看libuv是怎么样执行异步发送的</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">int</span> <span class="token function">uv__udp_send</span><span class="token punctuation">(</span>uv_udp_send_t<span class="token operator">*</span> req<span class="token punctuation">,</span>
+                 uv_udp_t<span class="token operator">*</span> handle<span class="token punctuation">,</span>
+                 <span class="token keyword">const</span> uv_buf_t bufs<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+                 unsigned <span class="token keyword">int</span> nbufs<span class="token punctuation">,</span>
+                 <span class="token keyword">const</span> struct sockaddr<span class="token operator">*</span> addr<span class="token punctuation">,</span>
+                 unsigned <span class="token keyword">int</span> addrlen<span class="token punctuation">,</span>
+                 uv_udp_send_cb send_cb<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">int</span> err<span class="token punctuation">;</span>
+  <span class="token keyword">int</span> empty_queue<span class="token punctuation">;</span>
+
+  <span class="token keyword">assert</span><span class="token punctuation">(</span>nbufs <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>addr<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    err <span class="token operator">=</span> <span class="token function">uv__udp_maybe_deferred_bind</span><span class="token punctuation">(</span>handle<span class="token punctuation">,</span> addr<span class="token operator">-</span><span class="token operator">></span>sa_family<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>err<span class="token punctuation">)</span>
+      <span class="token keyword">return</span> err<span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token comment" spellcheck="true">/* It's legal for send_queue_count > 0 even when the write_queue is empty;
+   * it means there are error-state requests in the write_completed_queue that
+   * will touch up send_queue_size/count later.
+   */</span>
+  empty_queue <span class="token operator">=</span> <span class="token punctuation">(</span>handle<span class="token operator">-</span><span class="token operator">></span>send_queue_count <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token function">uv__req_init</span><span class="token punctuation">(</span>handle<span class="token operator">-</span><span class="token operator">></span>loop<span class="token punctuation">,</span> req<span class="token punctuation">,</span> UV_UDP_SEND<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">assert</span><span class="token punctuation">(</span>addrlen <span class="token operator">&lt;=</span> <span class="token function">sizeof</span><span class="token punctuation">(</span>req<span class="token operator">-</span><span class="token operator">></span>addr<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>addr <span class="token operator">==</span> NULL<span class="token punctuation">)</span>
+    req<span class="token operator">-</span><span class="token operator">></span>addr<span class="token punctuation">.</span>ss_family <span class="token operator">=</span> AF_UNSPEC<span class="token punctuation">;</span>
+  <span class="token keyword">else</span>
+    <span class="token function">memcpy</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>req<span class="token operator">-</span><span class="token operator">></span>addr<span class="token punctuation">,</span> addr<span class="token punctuation">,</span> addrlen<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  req<span class="token operator">-</span><span class="token operator">></span>send_cb <span class="token operator">=</span> send_cb<span class="token punctuation">;</span>
+  req<span class="token operator">-</span><span class="token operator">></span>handle <span class="token operator">=</span> handle<span class="token punctuation">;</span>
+  req<span class="token operator">-</span><span class="token operator">></span>nbufs <span class="token operator">=</span> nbufs<span class="token punctuation">;</span>
+
+  req<span class="token operator">-</span><span class="token operator">></span>is_utp <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+
+  req<span class="token operator">-</span><span class="token operator">></span>bufs <span class="token operator">=</span> req<span class="token operator">-</span><span class="token operator">></span>bufsml<span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>nbufs <span class="token operator">></span> <span class="token function">ARRAY_SIZE</span><span class="token punctuation">(</span>req<span class="token operator">-</span><span class="token operator">></span>bufsml<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    req<span class="token operator">-</span><span class="token operator">></span>bufs <span class="token operator">=</span> <span class="token function">uv__malloc</span><span class="token punctuation">(</span>nbufs <span class="token operator">*</span> <span class="token function">sizeof</span><span class="token punctuation">(</span>bufs<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>req<span class="token operator">-</span><span class="token operator">></span>bufs <span class="token operator">==</span> NULL<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">uv__req_unregister</span><span class="token punctuation">(</span>handle<span class="token operator">-</span><span class="token operator">></span>loop<span class="token punctuation">,</span> req<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> UV_ENOMEM<span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token function">memcpy</span><span class="token punctuation">(</span>req<span class="token operator">-</span><span class="token operator">></span>bufs<span class="token punctuation">,</span> bufs<span class="token punctuation">,</span> nbufs <span class="token operator">*</span> <span class="token function">sizeof</span><span class="token punctuation">(</span>bufs<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//更新当前handle要发送的数据队列大小,和当前要发送数据队列的长度</span>
+  handle<span class="token operator">-</span><span class="token operator">></span>send_queue_size <span class="token operator">+=</span> <span class="token function">uv__count_bufs</span><span class="token punctuation">(</span>req<span class="token operator">-</span><span class="token operator">></span>bufs<span class="token punctuation">,</span> req<span class="token operator">-</span><span class="token operator">></span>nbufs<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  handle<span class="token operator">-</span><span class="token operator">></span>send_queue_count<span class="token operator">++</span><span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//将当前构建的req添加到 handle的 write_queue 队列中</span>
+  <span class="token function">QUEUE_INSERT_TAIL</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>handle<span class="token operator">-</span><span class="token operator">></span>write_queue<span class="token punctuation">,</span> <span class="token operator">&amp;</span>req<span class="token operator">-</span><span class="token operator">></span>queue<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment" spellcheck="true">//激活当前的handle</span>
+  <span class="token function">uv__handle_start</span><span class="token punctuation">(</span>handle<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment" spellcheck="true">//如果当前队列为空,并且当前没有正在处理完成队列,会直接发送数据</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>empty_queue <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span><span class="token punctuation">(</span>handle<span class="token operator">-</span><span class="token operator">></span>flags <span class="token operator">&amp;</span> UV_HANDLE_UDP_PROCESSING<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">uv__udp_sendmsg</span><span class="token punctuation">(</span>handle<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">/* `uv__udp_sendmsg` may not be able to do non-blocking write straight
+     * away. In such cases the `io_watcher` has to be queued for asynchronous
+     * write.
+     */</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">QUEUE_EMPTY</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>handle<span class="token operator">-</span><span class="token operator">></span>write_queue<span class="token punctuation">)</span><span class="token punctuation">)</span>
+      <span class="token function">uv__io_start</span><span class="token punctuation">(</span>handle<span class="token operator">-</span><span class="token operator">></span>loop<span class="token punctuation">,</span> <span class="token operator">&amp;</span>handle<span class="token operator">-</span><span class="token operator">></span>io_watcher<span class="token punctuation">,</span> POLLOUT<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    <span class="token function">uv__io_start</span><span class="token punctuation">(</span>handle<span class="token operator">-</span><span class="token operator">></span>loop<span class="token punctuation">,</span> <span class="token operator">&amp;</span>handle<span class="token operator">-</span><span class="token operator">></span>io_watcher<span class="token punctuation">,</span> POLLOUT<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true">//要监听的udp的io事件发生了变化</span>
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">uv__udp_io</span><span class="token punctuation">(</span>uv_loop_t<span class="token operator">*</span> loop<span class="token punctuation">,</span> uv__io_t<span class="token operator">*</span> w<span class="token punctuation">,</span> unsigned <span class="token keyword">int</span> revents<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  uv_udp_t<span class="token operator">*</span> handle<span class="token punctuation">;</span>
+
+  handle <span class="token operator">=</span> <span class="token function">container_of</span><span class="token punctuation">(</span>w<span class="token punctuation">,</span> uv_udp_t<span class="token punctuation">,</span> io_watcher<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">assert</span><span class="token punctuation">(</span>handle<span class="token operator">-</span><span class="token operator">></span>type <span class="token operator">==</span> UV_UDP<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment" spellcheck="true">//如果当前的事件为数据到来,执行数据的接收</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>revents <span class="token operator">&amp;</span> POLLIN<span class="token punctuation">)</span>
+    <span class="token function">uv__udp_recvmsg</span><span class="token punctuation">(</span>handle<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment" spellcheck="true">//如果当前的事件为写数据,执行写数据</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>revents <span class="token operator">&amp;</span> POLLOUT<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//执行发送数据包</span>
+    <span class="token function">uv__udp_sendmsg</span><span class="token punctuation">(</span>handle<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//处理已经发送的内容</span>
+    <span class="token function">uv__udp_run_completed</span><span class="token punctuation">(</span>handle<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true">//处理已经发送的req</span>
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">uv__udp_run_completed</span><span class="token punctuation">(</span>uv_udp_t<span class="token operator">*</span> handle<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  uv_udp_send_t<span class="token operator">*</span> req<span class="token punctuation">;</span>
+  QUEUE<span class="token operator">*</span> q<span class="token punctuation">;</span>
+
+  <span class="token comment" spellcheck="true">//标识当前正在处理结果的队列</span>
+  <span class="token keyword">assert</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token punctuation">(</span>handle<span class="token operator">-</span><span class="token operator">></span>flags <span class="token operator">&amp;</span> UV_HANDLE_UDP_PROCESSING<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  handle<span class="token operator">-</span><span class="token operator">></span>flags <span class="token operator">|=</span> UV_HANDLE_UDP_PROCESSING<span class="token punctuation">;</span>
+
+  <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">QUEUE_EMPTY</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>handle<span class="token operator">-</span><span class="token operator">></span>write_completed_queue<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    q <span class="token operator">=</span> <span class="token function">QUEUE_HEAD</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>handle<span class="token operator">-</span><span class="token operator">></span>write_completed_queue<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//将当前元素从 队列中移除出去</span>
+    <span class="token function">QUEUE_REMOVE</span><span class="token punctuation">(</span>q<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    req <span class="token operator">=</span> <span class="token function">QUEUE_DATA</span><span class="token punctuation">(</span>q<span class="token punctuation">,</span> uv_udp_send_t<span class="token punctuation">,</span> queue<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">//从handle中移除当前的req</span>
+    <span class="token function">uv__req_unregister</span><span class="token punctuation">(</span>handle<span class="token operator">-</span><span class="token operator">></span>loop<span class="token punctuation">,</span> req<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    handle<span class="token operator">-</span><span class="token operator">></span>send_queue_size <span class="token operator">-=</span> <span class="token function">uv__count_bufs</span><span class="token punctuation">(</span>req<span class="token operator">-</span><span class="token operator">></span>bufs<span class="token punctuation">,</span> req<span class="token operator">-</span><span class="token operator">></span>nbufs<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    handle<span class="token operator">-</span><span class="token operator">></span>send_queue_count<span class="token operator">--</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>req<span class="token operator">-</span><span class="token operator">></span>bufs <span class="token operator">!=</span> req<span class="token operator">-</span><span class="token operator">></span>bufsml<span class="token punctuation">)</span>
+      <span class="token function">uv__free</span><span class="token punctuation">(</span>req<span class="token operator">-</span><span class="token operator">></span>bufs<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    req<span class="token operator">-</span><span class="token operator">></span>bufs <span class="token operator">=</span> NULL<span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>req<span class="token operator">-</span><span class="token operator">></span>send_cb <span class="token operator">==</span> NULL<span class="token punctuation">)</span>
+      <span class="token keyword">continue</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>req<span class="token operator">-</span><span class="token operator">></span>status <span class="token operator">>=</span> <span class="token number">0</span><span class="token punctuation">)</span>
+      req<span class="token operator">-</span><span class="token operator">></span><span class="token function">send_cb</span><span class="token punctuation">(</span>req<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">else</span>
+      req<span class="token operator">-</span><span class="token operator">></span><span class="token function">send_cb</span><span class="token punctuation">(</span>req<span class="token punctuation">,</span> req<span class="token operator">-</span><span class="token operator">></span>status<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token comment" spellcheck="true">//如果当前handle 要发送的数据队列为空,我们停止写事件的监听</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">QUEUE_EMPTY</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>handle<span class="token operator">-</span><span class="token operator">></span>write_queue<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">/* Pending queue and completion queue empty, stop watcher. */</span>
+    <span class="token function">uv__io_stop</span><span class="token punctuation">(</span>handle<span class="token operator">-</span><span class="token operator">></span>loop<span class="token punctuation">,</span> <span class="token operator">&amp;</span>handle<span class="token operator">-</span><span class="token operator">></span>io_watcher<span class="token punctuation">,</span> POLLOUT<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">uv__io_active</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>handle<span class="token operator">-</span><span class="token operator">></span>io_watcher<span class="token punctuation">,</span> POLLIN<span class="token punctuation">)</span><span class="token punctuation">)</span>
+      <span class="token function">uv__handle_stop</span><span class="token punctuation">(</span>handle<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token comment" spellcheck="true">//重置当前没有正在处理完成队列</span>
+  handle<span class="token operator">-</span><span class="token operator">></span>flags <span class="token operator">&amp;=</span> <span class="token operator">~</span>UV_HANDLE_UDP_PROCESSING<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true">//使用udp发送数据</span>
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">uv__udp_sendmsg</span><span class="token punctuation">(</span>uv_udp_t<span class="token operator">*</span> handle<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  uv_udp_send_t<span class="token operator">*</span> req<span class="token punctuation">;</span>
+  QUEUE<span class="token operator">*</span> q<span class="token punctuation">;</span>
+  struct msghdr h<span class="token punctuation">;</span>
+  ssize_t size<span class="token punctuation">;</span>
+
+  <span class="token comment" spellcheck="true">//一次就将当前handle的 write_queue 队列的内容,执行发送</span>
+  <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">QUEUE_EMPTY</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>handle<span class="token operator">-</span><span class="token operator">></span>write_queue<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//获取到队列的首元素</span>
+    q <span class="token operator">=</span> <span class="token function">QUEUE_HEAD</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>handle<span class="token operator">-</span><span class="token operator">></span>write_queue<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">assert</span><span class="token punctuation">(</span>q <span class="token operator">!=</span> NULL<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    req <span class="token operator">=</span> <span class="token function">QUEUE_DATA</span><span class="token punctuation">(</span>q<span class="token punctuation">,</span> uv_udp_send_t<span class="token punctuation">,</span> queue<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">assert</span><span class="token punctuation">(</span>req <span class="token operator">!=</span> NULL<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">//往下走的就是都要发送的内容</span>
+    <span class="token function">memset</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>h<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> sizeof h<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>req<span class="token operator">-</span><span class="token operator">></span>addr<span class="token punctuation">.</span>ss_family <span class="token operator">==</span> AF_UNSPEC<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      h<span class="token punctuation">.</span>msg_name <span class="token operator">=</span> NULL<span class="token punctuation">;</span>
+      h<span class="token punctuation">.</span>msg_namelen <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+      h<span class="token punctuation">.</span>msg_name <span class="token operator">=</span> <span class="token operator">&amp;</span>req<span class="token operator">-</span><span class="token operator">></span>addr<span class="token punctuation">;</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>req<span class="token operator">-</span><span class="token operator">></span>addr<span class="token punctuation">.</span>ss_family <span class="token operator">==</span> AF_INET6<span class="token punctuation">)</span>
+        h<span class="token punctuation">.</span>msg_namelen <span class="token operator">=</span> <span class="token function">sizeof</span><span class="token punctuation">(</span>struct sockaddr_in6<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>req<span class="token operator">-</span><span class="token operator">></span>addr<span class="token punctuation">.</span>ss_family <span class="token operator">==</span> AF_INET<span class="token punctuation">)</span>
+        h<span class="token punctuation">.</span>msg_namelen <span class="token operator">=</span> <span class="token function">sizeof</span><span class="token punctuation">(</span>struct sockaddr_in<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>req<span class="token operator">-</span><span class="token operator">></span>addr<span class="token punctuation">.</span>ss_family <span class="token operator">==</span> AF_UNIX<span class="token punctuation">)</span>
+        h<span class="token punctuation">.</span>msg_namelen <span class="token operator">=</span> <span class="token function">sizeof</span><span class="token punctuation">(</span>struct sockaddr_un<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        <span class="token keyword">assert</span><span class="token punctuation">(</span><span class="token number">0</span> <span class="token operator">&amp;&amp;</span> <span class="token string">"unsupported address family"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">abort</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true">//要发送数据的赋值</span>
+    h<span class="token punctuation">.</span>msg_iov <span class="token operator">=</span> <span class="token punctuation">(</span>struct iovec<span class="token operator">*</span><span class="token punctuation">)</span> req<span class="token operator">-</span><span class="token operator">></span>bufs<span class="token punctuation">;</span>
+    h<span class="token punctuation">.</span>msg_iovlen <span class="token operator">=</span> req<span class="token operator">-</span><span class="token operator">></span>nbufs<span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">//执行发送</span>
+    <span class="token keyword">do</span> <span class="token punctuation">{</span>
+      size <span class="token operator">=</span> <span class="token function">sendmsg</span><span class="token punctuation">(</span>handle<span class="token operator">-</span><span class="token operator">></span>io_watcher<span class="token punctuation">.</span>fd<span class="token punctuation">,</span> <span class="token operator">&amp;</span>h<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span>size <span class="token operator">==</span> <span class="token operator">-</span><span class="token number">1</span> <span class="token operator">&amp;&amp;</span> errno <span class="token operator">==</span> EINTR<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>size <span class="token operator">==</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token comment" spellcheck="true">//如果当前是写缓冲区满了,直接break掉,下次触发</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>errno <span class="token operator">==</span> EAGAIN <span class="token operator">||</span> errno <span class="token operator">==</span> EWOULDBLOCK <span class="token operator">||</span> errno <span class="token operator">==</span> ENOBUFS<span class="token punctuation">)</span><span class="token punctuation">{</span>
+          <span class="token comment" spellcheck="true">//printf("uv__udp_sendmsg errno == EAGAIN || errno == EWOULDBLOCK || errno == ENOBUFS \n");</span>
+          <span class="token keyword">break</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    req<span class="token operator">-</span><span class="token operator">></span>status <span class="token operator">=</span> <span class="token punctuation">(</span>size <span class="token operator">==</span> <span class="token operator">-</span><span class="token number">1</span> <span class="token operator">?</span> <span class="token function">UV__ERR</span><span class="token punctuation">(</span>errno<span class="token punctuation">)</span> <span class="token operator">:</span> size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">//发送数据报是一项原子操作：要么所有数据被写或什么都不写（并且EMSGSIZE被引发）。那是为什么我们不处理部分写入。只是弹出请求从写队列移到完成队列，完成。</span>
+    <span class="token function">QUEUE_REMOVE</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>req<span class="token operator">-</span><span class="token operator">></span>queue<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">QUEUE_INSERT_TAIL</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>handle<span class="token operator">-</span><span class="token operator">></span>write_completed_queue<span class="token punctuation">,</span> <span class="token operator">&amp;</span>req<span class="token operator">-</span><span class="token operator">></span>queue<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">uv__io_feed</span><span class="token punctuation">(</span>handle<span class="token operator">-</span><span class="token operator">></span>loop<span class="token punctuation">,</span> <span class="token operator">&amp;</span>handle<span class="token operator">-</span><span class="token operator">></span>io_watcher<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>首先是应用层调用发送函数，将要发送的内容封装到 uv_udp_send_t对象中，然后将当前对象做为一个节点的形式插入到 handle的write_queue队列中，如果当前队列没有内容，或者触发了POLLOUT可写的时候，会执行 uv__udp_sendmsg 发送函数，可以看到内部会通过遍历当前write_queue的元素，依次执行sendmsg函数，发送内容，当触发了errno == EAGAIN || errno == EWOULDBLOCK会中断当前的发送操作，那么剩余的内容就会下次再触发 POLLOUT事件的时候执行发送，还有这个UV_HANDLE_UDP_PROCESSING标识，这个可以做到在集中处理已经发送完的请求回调的时候，不允许直接发送数据，就算当前write_queue 为空，也不允许直接发送，所以这俩个操作，可以让udp的io做到集中发送的效果</p>
+<h3 id="utp确认要移除之前手动移除libuv对应的元素"><a href="#utp确认要移除之前手动移除libuv对应的元素" class="headerlink" title="utp确认要移除之前手动移除libuv对应的元素"></a>utp确认要移除之前手动移除libuv对应的元素</h3><p>当然你可以在libutp删除包的时候，遍历当前的发送队列中是否有当前要移除的数据包,如果有就从libuv 的写队列里面将他移除,但是在实现的时候发现了几个问题,首先，对于每个准备删除的包，都要从libuv 的 write_queue 队列中，遍历移除，虽然判断俩个元素是否相同可以直接通过比较指针是否一样来实现，但是通过阅读libutp源码的时候，发现对于ack，rst数据包，并没有提前分配内存，而是栈空间的内容</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">void</span> UTPSocket<span class="token operator">:</span><span class="token operator">:</span><span class="token function">send_ack</span><span class="token punctuation">(</span>bool synack<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    PacketFormatAckV1 pfa<span class="token punctuation">;</span>
+    <span class="token function">zeromem</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>pfa<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    size_t len<span class="token punctuation">;</span>
+    last_rcv_win <span class="token operator">=</span> <span class="token function">get_rcv_window</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    pfa<span class="token punctuation">.</span>pf<span class="token punctuation">.</span><span class="token function">set_version</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    pfa<span class="token punctuation">.</span>pf<span class="token punctuation">.</span><span class="token function">set_type</span><span class="token punctuation">(</span>ST_STATE<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    pfa<span class="token punctuation">.</span>pf<span class="token punctuation">.</span>ext <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    pfa<span class="token punctuation">.</span>pf<span class="token punctuation">.</span>connid <span class="token operator">=</span> conn_id_send<span class="token punctuation">;</span>
+    pfa<span class="token punctuation">.</span>pf<span class="token punctuation">.</span>ack_nr <span class="token operator">=</span> ack_nr<span class="token punctuation">;</span>
+    pfa<span class="token punctuation">.</span>pf<span class="token punctuation">.</span>seq_nr <span class="token operator">=</span> seq_nr<span class="token punctuation">;</span>
+    pfa<span class="token punctuation">.</span>pf<span class="token punctuation">.</span>windowsize <span class="token operator">=</span> <span class="token punctuation">(</span>uint32<span class="token punctuation">)</span> last_rcv_win<span class="token punctuation">;</span>
+    len <span class="token operator">=</span> <span class="token function">sizeof</span><span class="token punctuation">(</span>PacketFormatV1<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>reorder_count <span class="token operator">!=</span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>got_fin_reached<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">assert</span><span class="token punctuation">(</span><span class="token operator">!</span>synack<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        pfa<span class="token punctuation">.</span>pf<span class="token punctuation">.</span>ext <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+        pfa<span class="token punctuation">.</span>ext_next <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        pfa<span class="token punctuation">.</span>ext_len <span class="token operator">=</span> <span class="token number">4</span><span class="token punctuation">;</span>
+        uint m <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        <span class="token keyword">assert</span><span class="token punctuation">(</span>inbuf<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>ack_nr <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">==</span> NULL<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        size_t window <span class="token operator">=</span> min<span class="token operator">&lt;</span>size_t<span class="token operator">></span><span class="token punctuation">(</span><span class="token number">14</span> <span class="token operator">+</span> <span class="token number">16</span><span class="token punctuation">,</span> inbuf<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">// Generate bit mask of segments received.</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span>size_t i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> window<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>inbuf<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>ack_nr <span class="token operator">+</span> i <span class="token operator">+</span> <span class="token number">2</span><span class="token punctuation">)</span> <span class="token operator">!=</span> NULL<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                m <span class="token operator">|=</span> <span class="token number">1</span> <span class="token operator">&lt;&lt;</span> i<span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+        pfa<span class="token punctuation">.</span>acks<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">byte</span><span class="token punctuation">)</span> m<span class="token punctuation">;</span>
+        pfa<span class="token punctuation">.</span>acks<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">byte</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>m <span class="token operator">>></span> <span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        pfa<span class="token punctuation">.</span>acks<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">byte</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>m <span class="token operator">>></span> <span class="token number">16</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        pfa<span class="token punctuation">.</span>acks<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">byte</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>m <span class="token operator">>></span> <span class="token number">24</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        len <span class="token operator">+=</span> <span class="token number">4</span> <span class="token operator">+</span> <span class="token number">2</span><span class="token punctuation">;</span>
+
+
+    <span class="token punctuation">}</span>
+    <span class="token function">send_data</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">byte</span> <span class="token operator">*</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>pfa<span class="token punctuation">,</span> len<span class="token punctuation">,</span> ack_overhead<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">removeSocketFromAckList</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>像对于这类的消息，比较指针是毫无意义的，而且由于是栈空间的内存，如果当前不直接发送，那么下次发送就好出现闪退了，libutp只有对data的数据包会暂存到自己的缓冲队列中 inbuf, outbuf中对于其他的数据包，直接执行发送，所以这种方案就直接抛弃了</p>
+<h3 id="最终优化方案"><a href="#最终优化方案" class="headerlink" title="最终优化方案"></a>最终优化方案</h3><p>对于utp的data包会重发，所以我们可以在原本封装发送数据包的结构体，添加俩个字段send_count，以及is_need_delete ,send_count代表当前数据包发送的次数，我们在utp每次重发的时候，加一处理而在libuv里面当把数据包发送出去的时候，我们让send_count 减一处理，is_need_delete 代表当前数据包是否要删除的标识，所以当满足 is_need_delete &amp;&amp; send_count==0的时候，就是代表可以安全释放的时候</p>
+<pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">//对于一个（将要）被发出去的包，有一个OutgoingPacket与其对应。</span>
+struct OutgoingPacket <span class="token punctuation">{</span>
+    size_t length<span class="token punctuation">;</span><span class="token comment" spellcheck="true">// 总长</span>
+    size_t payload<span class="token punctuation">;</span><span class="token comment" spellcheck="true">// 有效载荷</span>
+    size_t send_count<span class="token punctuation">;</span><span class="token comment" spellcheck="true">//标识当前发送的次数</span>
+    bool is_need_delete<span class="token punctuation">;</span><span class="token comment" spellcheck="true">//标识是否要移除</span>
+    uint64 time_sent<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// microseconds  当前数据包发送的时间</span>
+    uint transmissions<span class="token operator">:</span><span class="token number">31</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// 总传输次数 ,后面的31代表使用31位</span>
+    bool need_resend<span class="token operator">:</span><span class="token number">1</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//标识是否需要重新的发送,后面的1代表使用1个位来存储</span>
+    <span class="token keyword">byte</span> data<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//这里的data是个VLA，实际上是包头+数据包的全部内容。注意到最好不要将包头和数据包分开存放，不然又要多一次复制的开销。</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+对于outbuf的元素其实我们还可以优化，原本是对于要发送的内容，我们会先分配内存空间，然后确认可以删除后，我们执行释放操作，由于存在大量的数据包，一直<span class="token keyword">new</span>，delete操作，所以我们可以利用
+循环队列做到内存的重用<span class="token punctuation">,</span>并且考虑到后续包使用的时候，可能当前分配的大小不够，会再次触发重新分配的操作，我们直接就分配当前utp允许发送的最大长度<span class="token punctuation">,</span>也即是<span class="token number">1402</span>个字节，由于考虑到mtu的存在
+
+size_t packet_size <span class="token operator">=</span> <span class="token function">get_udp_mtu</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+outbuf<span class="token punctuation">.</span><span class="token function">ensure_size</span><span class="token punctuation">(</span>seq_nr<span class="token punctuation">,</span> cur_window_packets<span class="token punctuation">)</span><span class="token punctuation">;</span>
+pkt <span class="token operator">=</span> <span class="token punctuation">(</span>OutgoingPacket<span class="token operator">*</span><span class="token punctuation">)</span> outbuf<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>seq_nr<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">//如果获取的pkt为空,或者当前还没有被对方确认可删除,那么就重新分配内存空间,否则我们直接重用这块内存</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span>pkt <span class="token operator">==</span> NULL <span class="token operator">||</span> <span class="token operator">!</span><span class="token function">is_outgoing_pcaket_send_finish</span><span class="token punctuation">(</span>pkt<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//分配内存空间,注意,我们这里直接分配当前utp允许发送的最大长度,方便后续的重用</span>
+    pkt <span class="token operator">=</span> <span class="token punctuation">(</span>OutgoingPacket<span class="token operator">*</span><span class="token punctuation">)</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">sizeof</span><span class="token punctuation">(</span>OutgoingPacket<span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">+</span> header_size <span class="token operator">+</span> packet_size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//printf("UTPSocket::write_outgoing_packet Reuse seq %u pkt length %d outbuf size %ld  %u \n",(uint)temp->seq_nr,pkt->length,outbuf.size());</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true">//是否发出去的数据包已经发送完成,也即是 发送libuv已经发送完,而且 对方已经确认过,才返回true</span>
+bool <span class="token function">is_outgoing_pcaket_send_finish</span><span class="token punctuation">(</span>OutgoingPacket <span class="token operator">*</span>pkt<span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">return</span> pkt<span class="token operator">-</span><span class="token operator">></span>is_need_delete <span class="token operator">&amp;&amp;</span> pkt<span class="token operator">-</span><span class="token operator">></span>send_count <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+
+这是循环队列的定义
+struct SizableCircularBuffer <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// This is the mask. Since it's always a power of 2, adding 1 to this value will return the size.</span>
+    <span class="token comment" spellcheck="true">//这是标识。由于它始终是2的幂，因此将该值加1将返回大小。</span>
+    size_t mask<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">// This is the elements that the circular buffer points to 是一个存储 void *类型的数组</span>
+    <span class="token keyword">void</span> <span class="token operator">*</span><span class="token operator">*</span>elements<span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">//获取元素</span>
+    <span class="token keyword">void</span> <span class="token operator">*</span><span class="token function">get</span><span class="token punctuation">(</span>size_t i<span class="token punctuation">)</span> <span class="token keyword">const</span> <span class="token punctuation">{</span>
+        <span class="token keyword">assert</span><span class="token punctuation">(</span>elements<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> elements <span class="token operator">?</span> elements<span class="token punctuation">[</span>i <span class="token operator">&amp;</span> mask<span class="token punctuation">]</span> <span class="token operator">:</span> NULL<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true">//添加 元素 默认mask的大小为15, 通过i &amp; mask 重新确定新的下标,下标的大小为 0 - 15范围</span>
+    <span class="token keyword">void</span> <span class="token function">put</span><span class="token punctuation">(</span>size_t i<span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token operator">*</span>data<span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token keyword">assert</span><span class="token punctuation">(</span>elements<span class="token punctuation">)</span><span class="token punctuation">;</span> elements<span class="token punctuation">[</span>i<span class="token operator">&amp;</span>mask<span class="token punctuation">]</span> <span class="token operator">=</span> data<span class="token punctuation">;</span> <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true">//grow需要提供item和index，两个变量可以分别理解为缓冲区中最旧的序号和最新的序号，其中item - index表示最老的未确认的ATPPacket的序号。</span>
+    <span class="token keyword">void</span> <span class="token function">grow</span><span class="token punctuation">(</span>size_t item<span class="token punctuation">,</span> size_t index<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">//实查看调用情况可以发现item表示要插入的元素的编号，如seq_nr；而index表示当前队列中元素的个数，如cur_window_packets，这样队列就不会出现假溢出的现象</span>
+    <span class="token keyword">void</span> <span class="token function">ensure_size</span><span class="token punctuation">(</span>size_t item<span class="token punctuation">,</span> size_t index<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>index <span class="token operator">></span> mask<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token function">grow</span><span class="token punctuation">(</span>item<span class="token punctuation">,</span> index<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true">//返回当前缓冲区的大小</span>
+    size_t <span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token keyword">return</span> mask <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">;</span> <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+队列扩充的方法
+<span class="token keyword">void</span> SizableCircularBuffer<span class="token operator">:</span><span class="token operator">:</span><span class="token function">grow</span><span class="token punctuation">(</span>size_t item<span class="token punctuation">,</span> size_t index<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// Figure out the new size. 确保每次分配的大小为2的幂次方大小</span>
+    size_t size <span class="token operator">=</span> mask <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token keyword">do</span> size <span class="token operator">*=</span> <span class="token number">2</span><span class="token punctuation">;</span> <span class="token keyword">while</span> <span class="token punctuation">(</span>index <span class="token operator">>=</span> size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">// Allocate the new buffer</span>
+    <span class="token keyword">void</span> <span class="token operator">*</span><span class="token operator">*</span>buf <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">void</span><span class="token operator">*</span><span class="token operator">*</span><span class="token punctuation">)</span><span class="token function">calloc</span><span class="token punctuation">(</span>size<span class="token punctuation">,</span> <span class="token function">sizeof</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    size<span class="token operator">--</span><span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">// Copy elements from the old buffer to the new buffer</span>
+    <span class="token comment" spellcheck="true">//grow需要提供item和index，两个变量可以分别理解为缓冲区中最旧的序号和最新的序号，其中item - index表示最老的未确认的ATPPacket的序号。</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>size_t i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;=</span> mask<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        buf<span class="token punctuation">[</span><span class="token punctuation">(</span>item <span class="token operator">-</span> index <span class="token operator">+</span> i<span class="token punctuation">)</span> <span class="token operator">&amp;</span> size<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">get</span><span class="token punctuation">(</span>item <span class="token operator">-</span> index <span class="token operator">+</span> i<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true">// Swap to the newly allocated buffer</span>
+    mask <span class="token operator">=</span> size<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//重新分配了之后,我们要释放之前的内存空间,重新指向新的内存空间</span>
+    <span class="token function">free</span><span class="token punctuation">(</span>elements<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    elements <span class="token operator">=</span> buf<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+当我们在确定当前数据包被对方收到的时候，我们让is_need_delete 为<span class="token boolean">true</span>
+<span class="token comment" spellcheck="true">//标识当前数据包可以移除</span>
+pkt<span class="token operator">-</span><span class="token operator">></span>is_need_delete <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">//free(pkt);</span>
+
+当utp在发送完的时候，含有携带数据<span class="token punctuation">,</span>也即是pkt<span class="token punctuation">,</span>这里要让引用计数减一处理
+<span class="token function">utp_pkt_decrease</span><span class="token punctuation">(</span>extra_data<span class="token operator">-</span><span class="token operator">></span>pkt<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">//让当前的pkt 引用计数减一处理</span>
+<span class="token keyword">void</span> <span class="token function">utp_pkt_decrease</span><span class="token punctuation">(</span><span class="token keyword">void</span> <span class="token operator">*</span>data<span class="token punctuation">)</span><span class="token punctuation">{</span>
+    OutgoingPacket <span class="token operator">*</span>pkt <span class="token operator">=</span> <span class="token punctuation">(</span>OutgoingPacket<span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">assert</span><span class="token punctuation">(</span>pkt<span class="token operator">-</span><span class="token operator">></span>send_count <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    pkt<span class="token operator">-</span><span class="token operator">></span>send_count <span class="token operator">-=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+还有一个inbuf队列，这个队列用于存放当前收到的乱序的包，跟tcp很相似，如果当前收到的包不是下一个接着要处理的包，就放到这个队列中<span class="token punctuation">,</span>所以我们也可以优化内存的大量分配释放的操作<span class="token punctuation">,</span>
+我们可以使用IntgoingPacket结构体来。对于接收到一个乱序包的时候<span class="token punctuation">,</span>用于封装接收的内容以及状态
+struct IntgoingPacket<span class="token punctuation">{</span>
+    size_t    length<span class="token punctuation">;</span><span class="token comment" spellcheck="true">//当前接收到数据的长度</span>
+    bool    is_ack<span class="token punctuation">;</span><span class="token comment" spellcheck="true">//当前接收到的数据包舒服已经确认过</span>
+    <span class="token keyword">byte</span>    data<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>    <span class="token comment" spellcheck="true">//用于存放真正接收到的数据</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">//由于考虑到后面的内存重用,我们直接分配utp允许分配的最大长度</span>
+size_t packet_max_size <span class="token operator">=</span> conn<span class="token operator">-</span><span class="token operator">></span><span class="token function">get_udp_mtu</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">//如果到了这里,说明这个包不是重复的包,我们确定下是否可以复用</span>
+<span class="token comment" spellcheck="true">//如果获取的pkt为空,或者当前还没有被对方确认可删除,那么就重新分配内存空间,否则我们直接重用这块内存</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span>in_pkt <span class="token operator">==</span> NULL <span class="token operator">||</span> <span class="token operator">!</span>in_pkt<span class="token operator">-</span><span class="token operator">></span>is_ack<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//分配内存空间,注意,我们这里直接分配当前utp允许发送的最大长度,方便后续的重用</span>
+    in_pkt <span class="token operator">=</span> <span class="token punctuation">(</span>IntgoingPacket<span class="token operator">*</span><span class="token punctuation">)</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">sizeof</span><span class="token punctuation">(</span>IntgoingPacket<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">+</span> packet_max_size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//printf("utp_process_incoming malloc IntgoingPacket seq %u \n",(uint)pk_seq_nr);</span>
+<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//printf("utp_process_incoming Reuse seq %u inbuf size %ld \n",(uint)in_pkt->seq_nr,conn->inbuf.size());</span>
+<span class="token punctuation">}</span>
+
+对于不是data包的优化，原本是分配在栈内存的，由于要保留libuv的异步发送操作，所以肯定要分配堆内存<span class="token punctuation">,</span>由于这个ack也是大量的<span class="token keyword">new</span>，delete操作，我们也使用内存队列来重复利用内存
+这里我们也定义一个数据结构方便来管理
+<span class="token comment" spellcheck="true">//对于ack,rst 数据结构的封装</span>
+struct OutgoingAckPacket<span class="token punctuation">{</span>
+    size_t length<span class="token punctuation">;</span><span class="token comment" spellcheck="true">// 当前要发送数据包的长度</span>
+    uint16 <span class="token operator">*</span>ack_buf_size<span class="token punctuation">;</span><span class="token comment" spellcheck="true">//为了方便libuv 操作 上层 ack队列中,未发送的元素个数</span>
+    bool is_sended<span class="token punctuation">;</span><span class="token comment" spellcheck="true">//标识当前是否已经发送</span>
+    <span class="token keyword">byte</span> data<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//这里的data是个VLA，</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">//发送ack包</span>
+<span class="token keyword">void</span> UTPSocket<span class="token operator">:</span><span class="token operator">:</span><span class="token function">send_ack</span><span class="token punctuation">(</span>bool synack<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//确保输出的队列含有足够的空间允许添加保存</span>
+    ackbuf<span class="token punctuation">.</span><span class="token function">ensure_size</span><span class="token punctuation">(</span>ack_buf_seq<span class="token punctuation">,</span> ack_buf_size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//真正要发送数据包的长度</span>
+    <span class="token keyword">const</span> size_t header_size <span class="token operator">=</span> <span class="token function">sizeof</span><span class="token punctuation">(</span>PacketFormatAckV1<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    OutgoingAckPacket<span class="token operator">*</span> pkt <span class="token operator">=</span> <span class="token punctuation">(</span>OutgoingAckPacket<span class="token operator">*</span> <span class="token punctuation">)</span>ackbuf<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>ack_buf_seq<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//如果获取的pkt为空,或者当前还没有发送出去,则分配内存空间,如果获取的pkt不为空,并且已经发送出去,则重用这块内存</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>pkt <span class="token operator">==</span> NULL  <span class="token operator">||</span> <span class="token punctuation">(</span>pkt <span class="token operator">!=</span> NULL <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>pkt<span class="token operator">-</span><span class="token operator">></span>is_sended<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        pkt <span class="token operator">=</span> <span class="token punctuation">(</span>OutgoingAckPacket<span class="token operator">*</span><span class="token punctuation">)</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token function">sizeof</span><span class="token punctuation">(</span>OutgoingAckPacket<span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">1</span> <span class="token operator">+</span> header_size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//printf("UTPSocket::send_ack malloc \n");</span>
+    <span class="token punctuation">}</span><span class="token keyword">else</span><span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//printf("UTPSocket::send_ack Reuse ackBuf size %ld \n",ackbuf.size());</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//重置data部分</span>
+    PacketFormatAckV1<span class="token operator">*</span> pfa <span class="token operator">=</span> <span class="token punctuation">(</span>PacketFormatAckV1<span class="token operator">*</span><span class="token punctuation">)</span> pkt<span class="token operator">-</span><span class="token operator">></span>data<span class="token punctuation">;</span>
+    <span class="token function">memset</span><span class="token punctuation">(</span>pfa<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> header_size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//重置pkt部分</span>
+    pkt<span class="token operator">-</span><span class="token operator">></span>ack_buf_size <span class="token operator">=</span> <span class="token operator">&amp;</span>ack_buf_size<span class="token punctuation">;</span>
+    pkt<span class="token operator">-</span><span class="token operator">></span>is_sended <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//添加data内容</span>
+    size_t len<span class="token punctuation">;</span>
+    last_rcv_win <span class="token operator">=</span> <span class="token function">get_rcv_window</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    pfa<span class="token operator">-</span><span class="token operator">></span>pf<span class="token punctuation">.</span><span class="token function">set_version</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    pfa<span class="token operator">-</span><span class="token operator">></span>pf<span class="token punctuation">.</span><span class="token function">set_type</span><span class="token punctuation">(</span>ST_STATE<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//如果扩展字段为0,代表不适用扩展内容</span>
+    pfa<span class="token operator">-</span><span class="token operator">></span>pf<span class="token punctuation">.</span>ext <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//告知当前的连接的id,这个很重要</span>
+    pfa<span class="token operator">-</span><span class="token operator">></span>pf<span class="token punctuation">.</span>connid <span class="token operator">=</span> conn_id_send<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//发送当前的ack,跟序列号包</span>
+    pfa<span class="token operator">-</span><span class="token operator">></span>pf<span class="token punctuation">.</span>ack_nr <span class="token operator">=</span> ack_nr<span class="token punctuation">;</span>
+    pfa<span class="token operator">-</span><span class="token operator">></span>pf<span class="token punctuation">.</span>seq_nr <span class="token operator">=</span> seq_nr<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//告知对方,我们的滑动窗口大小</span>
+    pfa<span class="token operator">-</span><span class="token operator">></span>pf<span class="token punctuation">.</span>windowsize <span class="token operator">=</span> <span class="token punctuation">(</span>uint32<span class="token punctuation">)</span>last_rcv_win<span class="token punctuation">;</span>
+    len <span class="token operator">=</span> <span class="token function">sizeof</span><span class="token punctuation">(</span>PacketFormatV1<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">// that are shutting down  我们永远不需要发送EACK 对于正在进行关闭的连接</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>reorder_count <span class="token operator">!=</span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>got_fin_reached<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//如果重新排序计数> 0，代表乱序, 则发送EACK。如果重新排序计数应始终为0,对于synacks</span>
+        <span class="token keyword">assert</span><span class="token punctuation">(</span><span class="token operator">!</span>synack<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//代表当前需要使用到扩展字段</span>
+        pfa<span class="token operator">-</span><span class="token operator">></span>pf<span class="token punctuation">.</span>ext <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+        pfa<span class="token operator">-</span><span class="token operator">></span>ext_next <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        pfa<span class="token operator">-</span><span class="token operator">></span>ext_len <span class="token operator">=</span> <span class="token number">4</span><span class="token punctuation">;</span>
+        uint m <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">//重新排序计数只能为非零 ,如果数据包ack_nr +1还没有 已收到</span>
+        <span class="token comment" spellcheck="true">//IntgoingPacket *in_package = (IntgoingPacket*)inbuf.get(ack_nr + 1);</span>
+        <span class="token comment" spellcheck="true">//assert(in_package == NULL || !in_package->is_ack);</span>
+        <span class="token comment" spellcheck="true">//也即是最多发送30个ack过去</span>
+        size_t window <span class="token operator">=</span> min<span class="token operator">&lt;</span>size_t<span class="token operator">></span><span class="token punctuation">(</span><span class="token number">14</span><span class="token operator">+</span><span class="token number">16</span><span class="token punctuation">,</span> inbuf<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">// Generate bit mask of segments received.</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span>size_t i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> window<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            IntgoingPacket <span class="token operator">*</span> in_package <span class="token operator">=</span> <span class="token punctuation">(</span>IntgoingPacket<span class="token operator">*</span><span class="token punctuation">)</span>inbuf<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>ack_nr <span class="token operator">+</span> i <span class="token operator">+</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>in_package <span class="token operator">!=</span> NULL <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>in_package<span class="token operator">-</span><span class="token operator">></span>is_ack<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                m <span class="token operator">|=</span> <span class="token number">1</span> <span class="token operator">&lt;&lt;</span> i<span class="token punctuation">;</span>
+
+                #<span class="token keyword">if</span> UTP_DEBUG_LOGGING
+                <span class="token function">log</span><span class="token punctuation">(</span>UTP_LOG_DEBUG<span class="token punctuation">,</span> <span class="token string">"EACK packet [%u]"</span><span class="token punctuation">,</span> ack_nr <span class="token operator">+</span> i <span class="token operator">+</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                #endif
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+        pfa<span class="token operator">-</span><span class="token operator">></span>acks<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">byte</span><span class="token punctuation">)</span>m<span class="token punctuation">;</span>
+        pfa<span class="token operator">-</span><span class="token operator">></span>acks<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">byte</span><span class="token punctuation">)</span><span class="token punctuation">(</span>m <span class="token operator">>></span> <span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        pfa<span class="token operator">-</span><span class="token operator">></span>acks<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">byte</span><span class="token punctuation">)</span><span class="token punctuation">(</span>m <span class="token operator">>></span> <span class="token number">16</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        pfa<span class="token operator">-</span><span class="token operator">></span>acks<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">byte</span><span class="token punctuation">)</span><span class="token punctuation">(</span>m <span class="token operator">>></span> <span class="token number">24</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        len <span class="token operator">+=</span> <span class="token number">4</span> <span class="token operator">+</span> <span class="token number">2</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//当前真正要发送的长度</span>
+    pkt<span class="token operator">-</span><span class="token operator">></span>length <span class="token operator">=</span> len<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//保存到ack发送队列中,标识下一个要发送的数据包序列号加一处理,标识发送队列含有一个元素没有发送</span>
+    ackbuf<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span>ack_buf_seq<span class="token punctuation">,</span> pkt<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    ack_buf_seq<span class="token operator">++</span><span class="token punctuation">;</span>
+    ack_buf_size<span class="token operator">++</span><span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">//printf("UTPSocket::send_ack ack_buf_size %d ack_buf_seq %d \n",ack_buf_size,ack_buf_seq);</span>
+    <span class="token comment" spellcheck="true">//如果是包含了EACK,则发送的长度为26个字节</span>
+    <span class="token function">send_data</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">byte</span><span class="token operator">*</span><span class="token punctuation">)</span>pkt<span class="token operator">-</span><span class="token operator">></span>data<span class="token punctuation">,</span><span class="token punctuation">(</span><span class="token keyword">byte</span><span class="token operator">*</span><span class="token punctuation">)</span>pkt<span class="token punctuation">,</span><span class="token boolean">false</span><span class="token punctuation">,</span> pkt<span class="token operator">-</span><span class="token operator">></span>length<span class="token punctuation">,</span> ack_overhead<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">removeSocketFromAckList</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+当libuv发送完ack包的时候，我们让 is_sended 置为 <span class="token boolean">true</span>，同时让这个ack的队列大小减一处理
+<span class="token comment" spellcheck="true">//对于ack之类的包,我们要设置标识为已发送</span>
+<span class="token function">utp_set_ack_pkt_send_finish</span><span class="token punctuation">(</span>extra_data<span class="token operator">-</span><span class="token operator">></span>pkt<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">//设置ack对应的包以及发送,并且将ack队列的大小减一处理</span>
+<span class="token keyword">void</span> <span class="token function">utp_set_ack_pkt_send_finish</span><span class="token punctuation">(</span><span class="token keyword">void</span> <span class="token operator">*</span>data<span class="token punctuation">)</span><span class="token punctuation">{</span>
+    OutgoingAckPacket <span class="token operator">*</span>ack <span class="token operator">=</span> <span class="token punctuation">(</span>OutgoingAckPacket<span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    ack<span class="token operator">-</span><span class="token operator">></span>is_sended <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+    <span class="token operator">*</span>ack<span class="token operator">-</span><span class="token operator">></span>ack_buf_size <span class="token operator">=</span> <span class="token operator">*</span>ack<span class="token operator">-</span><span class="token operator">></span>ack_buf_size <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>这样我们就解决了所有的问题，甚至优化了libutp原本的不足，下面是结果，<br><img src="/uploads/libuv优化/优化效果.png" alt="结果显示"></p>
+<p>可以看出优化完对于服务端来说是影响比较大的，不管在cpu还是在上传速度方面都有很大的提升，但是对于客户端来说cpu的效果并没有多大的优化，我们利用perf来监控下对于客户端的性能主要消耗在哪里 我们可以执行 sudo perf record -g来监控cpu主要损耗的地方，当下载完的时候，按ctrl C退出检测,查看报告可以执行 perf report来查看报告，下面是报告的结果</p>
+<p><img src="/uploads/libuv优化/perf整体监控.png" alt="结果显示"></p>
+<p>找到我们当前的进程，进行分析<br><img src="/uploads/libuv优化/找到高的原因.png" alt="结果显示"></p>
+<p>我们可以看到主要的损耗还是在发送的函数,还有为啥优化后服务端跟客户端的对比为啥差那么远，由于服务端是共享方，所以肯定会存在大量的发送数据到另一端，而客户端只是单纯的请求方，相比于服务端来说，发送的包或者内容肯定会少很多，其实对于客户端来说主要发送的还是确认包，也即是ack包，而且由于是本地传输，所以对于libuv的异步发送对于客户端来说表现的跟同步并没有多大的区别但是对于服务端来说，由于存在大量的发送数据包，即使在本地传输也会存在 io 集中处理的情况，所以会好很多，而且我们优化了 outbuf这个是针对发送的数据包用来存储的队列，由于客户端发送的data包很少，所以这个优化对于客户端来说，也并没有多大的影响，但是服务端存在大量的发送data包，所以服务端的优化就很明显了，还有我们有针对乱序的包优化的 inbuf，原本这个是针对客户端的主要优化，但是由于是本地传输，并不存在对包的情况，所以并不会有乱序包的情况，所以这个优化也没体现出来，但是在 真正的网络上效果肯定会有的，而且对于真正的下载来说很少存在只下载不共享的情况</p>
+<h3 id="参考链"><a href="#参考链" class="headerlink" title="参考链"></a>参考链</h3><ol>
+<li><a href="https://github.com/libuv/libuv" target="_blank" rel="noopener">libuv</a></li>
+<li><a href="https://github.com/bittorrent/libutp" target="_blank" rel="noopener">libutp</a></li>
+<li><a href="https://blog.csdn.net/weixin_36465540/article/details/105008406" target="_blank" rel="noopener">TCP/UDP的接收缓冲区和发送缓冲区</a></li>
+<li><a href="http://www.calvinneo.com/2017/12/05/libutp%E6%BA%90%E7%A0%81%E7%AE%80%E6%9E%90/" target="_blank" rel="noopener">libutp源码简析</a></li>
+</ol>
+
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">AheadSnail</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://aheadsnail.github.io/2020/05/28/libuv-utp-you-hua/">https://aheadsnail.github.io/2020/05/28/libuv-utp-you-hua/</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">AheadSnail</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/utp/">
+                                    <span class="chip bg-color">utp</span>
+                                </a>
+                            
+                                <a href="/tags/bt/">
+                                    <span class="chip bg-color">bt</span>
+                                </a>
+                            
+                                <a href="/tags/libuv/">
+                                    <span class="chip bg-color">libuv</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2020/06/29/shi-yong-libuv-xiao-jie/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/1.jpg" class="responsive-img" alt="使用Libuv小结">
+                        
+                        <span class="card-title">使用Libuv小结</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2020-06-29
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            AheadSnail
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/bt/">
+                        <span class="chip bg-color">bt</span>
+                    </a>
+                    
+                    <a href="/tags/libuv/">
+                        <span class="chip bg-color">libuv</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2019/10/26/aria2-xing-neng-you-hua-xia-pian/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/17.jpg" class="responsive-img" alt="Aria2性能优化下篇">
+                        
+                        <span class="card-title">Aria2性能优化下篇</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2019-10-26
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            AheadSnail
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Android/">
+                        <span class="chip bg-color">Android</span>
+                    </a>
+                    
+                    <a href="/tags/Aria2/">
+                        <span class="chip bg-color">Aria2</span>
+                    </a>
+                    
+                    <a href="/tags/NDK/">
+                        <span class="chip bg-color">NDK</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="503838841"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='random'
+                   preload='auto'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 0px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2019-2021</span>
+            
+            <span id="year">2019</span>
+            <a href="/about" target="_blank">AheadSnail</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/blinkfox" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:1181062873@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=1181062873" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 1181062873" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    <!--腾讯兔小巢-->
+    
+    
+
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>

@@ -1,0 +1,1774 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="Android Aop 理解, AheadSnail&#39;s blog">
+    <meta name="description" content>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>Android Aop 理解 | AheadSnail&#39;s blog</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<link rel="alternate" href="/atom.xml" title="AheadSnail's blog" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">AheadSnail&#39;s blog</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/contact" class="waves-effect waves-light">
+      
+      <i class="fas fa-comments" style="zoom: 0.6;"></i>
+      
+      <span>留言板</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">AheadSnail&#39;s blog</div>
+        <div class="logo-desc">
+            
+            Never really desperate, only the lost of the soul.
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/contact" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-comments"></i>
+			
+			留言板
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/blinkfox/hexo-theme-matery" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/blinkfox/hexo-theme-matery" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/12.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">Android Aop 理解</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        padding: 35px 0 15px 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        padding-bottom: 30px;
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Android/">
+                                <span class="chip bg-color">Android</span>
+                            </a>
+                        
+                            <a href="/tags/Aop/">
+                                <span class="chip bg-color">Aop</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2018-06-23
+                </div>
+                
+
+                
+
+                
+
+                
+
+                
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><blockquote>
+<p>Android Aop 理解</p>
+</blockquote>
+<a id="more"></a>
+<h3 id="什么是AOP？"><a href="#什么是AOP？" class="headerlink" title="什么是AOP？"></a>什么是AOP？</h3><blockquote>
+<p>大家都知道OOP，即ObjectOriented Programming，面向对象编程。而本文要介绍的是AOP。AOP是Aspect Oriented Programming的缩写，中译文为面向切向编程。OOP和AOP是什么关系呢？<br>首先:OOP和AOP都是方法论。我记得在刚学习C++的时候，最难学的并不是C++的语法，而是C++所代表的那种看问题的方法，即OOP。同样，今天在AOP中，我发现其难度并不在利用AOP干活，而是从AOP的角度来看待问题，设计解决方法。这就是为什么我特意强调AOP是一种方法论的原因！</p>
+</blockquote>
+<p>在OOP的世界中，问题或者功能都被划分到一个一个的模块里边。每个模块专心干自己的事情，模块之间通过设计好的接口交互。从图示来看，OOP世界中，最常见的表示比如：</p>
+<p><img src="/uploads/AOP/oop.png" alt="结果显示"></p>
+<blockquote>
+<p>图1中所示为AndroidFramework中的模块。OOP世界中，大家画的模块图基本上是这样的，每个功能都放在一个模块里。非常好理解，而且确实简化了我们所处理问题的难度。<br>OOP的精髓是把功能或问题模块化，每个模块处理自己的家务事。但在现实世界中，并不是所有问题都能完美得划分到模块中。举个最简单而又常见的例子：现在想为每个模块加上日志功能，<br>要求模块运行时候能输出日志。在不知道AOP的情况下，一般的处理都是：先设计一个日志输出模块，这个模块提供日志输出API，比如Android中的Log类。然后，<br>其他模块需要输出日志的时候调用Log类的几个函数，比如e(TAG,…)，w(TAG,…)，d(TAG,…)，i(TAG,…)等。</p>
+</blockquote>
+<p>在没有接触AOP之前，包括我在内，想到的解决方案就是上面这样的。但是，从OOP角度看，除了日志模块本身，其他模块的家务事绝大部分情况下应该都不会包含日志输出功能。什么意思？<br>以ActivityManagerService为例，你能说它的家务事里包含日志输出吗？显然，ActivityManagerService的功能点中不包含输出日志这一项。但实际上，软件中的众多模块确实又需要打印日志。<br>这个日志输出功能，从整体来看，都是一个面上的。而这个面的范围，就不局限在单个模块里了，而是横跨多个模块。</p>
+<p>在没有AOP之前，各个模块要打印日志，就是自己处理。反正日志模块的那几个API都已经写好了，你在其他模块的任何地方，任何时候都可以调用。功能是得到了满足，但是好像没有Oriented的感觉了。<br>是的，随意加日志输出功能，使得其他模块的代码和日志模块耦合非常紧密。而且，将来要是日志模块修改了API，则使用它们的地方都得改。这种搞法，一点也不酷。</p>
+<p>AOP的目标就是解决上面提到的不cool的问题。在AOP中：</p>
+<blockquote>
+<p>第一，我们要认识到OOP世界中，有些功能是横跨并嵌入众多模块里的，比如打印日志，比如统计某个模块中某些函数的执行时间等。这些功能在各个模块里分散得很厉害，可能到处都能见到。<br>第二，AOP的目标是把这些功能集中起来，放到一个统一的地方来控制和管理。如果说，OOP如果是把问题划分到单个模块的话，那么AOP就是把涉及到众多模块的某一类问题进行统一管理。<br>比如我们可以设计两个Aspects，一个是管理某个软件中所有模块的日志输出的功能，另外一个是管理该软件中一些特殊函数调用的权限检查。</p>
+</blockquote>
+<h3 id="AOP基础语法"><a href="#AOP基础语法" class="headerlink" title="AOP基础语法"></a>AOP基础语法</h3><blockquote>
+<p>AOP虽然是方法论，但就好像OOP中的Java一样，一些先行者也开发了一套语言来支持AOP。目前用得比较火的就是AspectJ了，它是一种几乎和Java完全一样的语言，<br>而且完全兼容Java（AspectJ应该就是一种扩展Java，但它不是像Groovy[1]那样的拓展。）。当然，除了使用AspectJ特殊的语言外，AspectJ还支持原生的Java，只要加上对应的AspectJ注解就好。所以，使用AspectJ有两种方法：</p>
+</blockquote>
+<p>1.完全使用AspectJ的语言。这语言一点也不难，和Java几乎一样，也能在AspectJ中调用Java的任何类库。AspectJ只是多了一些关键词罢了。<br>2.或者使用纯Java语言开发，然后使用AspectJ注解，简称@AspectJ。</p>
+<h4 id="Join-Points介绍"><a href="#Join-Points介绍" class="headerlink" title="Join Points介绍"></a>Join Points介绍</h4><p>Join Points（以后简称JPoints）是AspectJ中最关键的一个概念。什么是JPoints呢？JPoints就是程序运行时的一些执行点。那么，一个程序中，哪些执行点是JPoints呢？比如：</p>
+<blockquote>
+<p>l. 一个函数的调用可以是一个JPoint。比如Log.e()这个函数。e的执行可以是一个JPoint，而调用e的函数也可以认为是一个JPoint。<br>2.设置一个变量，或者读取一个变量，也可以是一个JPoint。比如Demo类中有一个debug的boolean变量。设置它的地方或者读取它的地方都可以看做是JPoints。<br>3.for循环可以看做是JPoint。<br>理论上说，一个程序中很多地方都可以被看做是JPoint，但是AspectJ中，只有如表1所示的几种执行点被认为是JPoint</p>
+</blockquote>
+<p><img src="/uploads/AOP/JoinPoint.png" alt="结果显示"></p>
+<h4 id="Pointcuts介绍"><a href="#Pointcuts介绍" class="headerlink" title="Pointcuts介绍"></a>Pointcuts介绍</h4><blockquote>
+<p>pointcuts这个单词不好翻译，此处直接用英文好了。那么，Pointcuts是什么呢？前面介绍的内容可知，一个程序会有很多的JPoints，即使是同一个函数（比如testMethod这个函数），<br>还分为call类型和execution类型的JPoint。显然，不是所有的JPoint，也不是所有类型的JPoint都是我们关注的。再次以AopDemo为例，我们只要求在Activity的几个生命周期函数中打印日志，<br>只有这几个生命周期函数才是我们业务需要的JPoint，而其他的什么JPoint我不需要关注。<br>怎么从一堆一堆的JPoints中选择自己想要的JPoints呢？恩，这就是Pointcuts的功能。一句话，Pointcuts的目标是提供一种方法使得开发者能够选择自己感兴趣的JoinPoints。</p>
+</blockquote>
+<p>直接来看一个例子，现在我想把图2中的示例代码中，那些调用println的地方找到，该怎么弄？代码该这么写：</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> pointcut  <span class="token function">testAll</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">:</span> <span class="token function">call</span><span class="token punctuation">(</span><span class="token keyword">public</span>  <span class="token operator">*</span>  <span class="token operator">*</span><span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span><span class="token function">within</span><span class="token punctuation">(</span>TestAspect<span class="token punctuation">)</span> <span class="token punctuation">;</span>
+</code></pre>
+<p>注意，aspectj的语法和Java一样，只不过多了一些关键词</p>
+<p>我们来看看上述代码</p>
+<blockquote>
+<p>第一个public：表示这个pointcut是public访问。这主要和aspect的继承关系有关，属于AspectJ的高级玩法，本文不考虑。<br>pointcut：关键词，表示这里定义的是一个pointcut。pointcut定义有点像函数定义。总之，在AspectJ中，你得定义一个pointcut。<br>testAll()：pointcut的名字。在AspectJ中，定义Pointcut可分为有名和匿名两种办法。个人建议使用named方法。因为在后面，我们要使用一个pointcut的话，就可以直接使用它的名字就好。<br>testAll后面有一个冒号，这是pointcut定义名字后，必须加上。冒号后面是这个pointcut怎么选择Joinpoint的条件。<br>本例中，call(public  <em>  </em>.println(..))是一种选择条件。call表示我们选择的Joinpoint类型为call类型。</p>
+</blockquote>
+<p>public  **.println(..)：这小行代码使用了通配符。</p>
+<blockquote>
+<p>由于我们这里选择的JoinPoint类型为call类型，它对应的目标JPoint一定是某个函数。所以我们要找到这个/些函数。public<br>表示目标JPoint的访问类型（public/private/protect）。第一个<em>表示返回值的类型是任意类型。第二个</em>用来指明包名。此处不限定包名。紧接其后的println是函数名。<br>这表明我们选择的函数是任何包中定义的名字叫println的函数。当然，唯一确定一个函数除了包名外，还有它的参数。在(..)中，就指明了目标函数的参数应该是什么样子的。<br>比如这里使用了通配符..，代表任意个数的参数，任意类型的参数。</p>
+</blockquote>
+<p>再来看call后面的&amp;&amp;：</p>
+<blockquote>
+<p>AspectJ可以把几个条件组合起来，目前支持 &amp;&amp;，||，以及！这三个条件。这三个条件的意思不用我说了吧？和Java中的是一样的。<br>来看最后一个!within(TestAspectJ)：前面的!表示不满足某个条件。within是另外一种类型选择方法，特别注意，这种类型和前面讲到的joinpoint的那几种类型不同。within的类型是数据类型，<br>而joinpoint的类型更像是动态的，执行时的类型。</p>
+</blockquote>
+<p>上例中的pointcut合起来就是：</p>
+<blockquote>
+<p>l 选择那些调用println（而且不考虑println函数的参数是什么）的Joinpoint。<br>2 另外，调用者的类型不要是TestAspect的。</p>
+</blockquote>
+<h4 id="直接针对JoinPoint的选择"><a href="#直接针对JoinPoint的选择" class="headerlink" title="直接针对JoinPoint的选择"></a>直接针对JoinPoint的选择</h4><p>pointcuts中最常用的选择条件和Joinpoint的类型密切相关，比如图<br><img src="/uploads/AOP/pointcutsAndJoinPoints.png" alt="结果显示"></p>
+<p>以上图为例，如果我们想选择类型为methodexecution的JPoint，那么pointcuts的写法就得包括execution(XXX)来限定。<br>除了指定JPoint类型外，我们还要更进一步选择目标函数</p>
+<blockquote>
+<p>选择的根据就是上图列出的什么MethodSignature，ConstructorSignature，TypeSinature，FieldSignature等。名字听起来陌生得很，<br>其实就是指定JPoint对应的函数（包括构造函数），Static block的信息。比如图4中的那个println例子，首先它的JPoint类型是call，所以它的查询条件是根据MethodSignature来表达。</p>
+</blockquote>
+<p>一个Method Signature的完整表达式为：</p>
+<blockquote>
+<p>@注解 访问权限 返回值的类型 包名.函数名(参数)<br>@注解和访问权限（public/private/protect，以及static/final）属于可选项。如果不设置它们，则默认都会选择。以访问权限为例，如果没有设置访问权限作为条件，那么public，private，protect及static、final的函数都会进行搜索。<br>返回值类型就是普通的函数的返回值类型。如果不限定类型的话，就用<em>通配符表示<br>包名.函数名用于查找匹配的函数。可以使用通配符，包括</em>和..以及+号。其中*号用于匹配除.号之外的任意字符，而..则表示任意子package，+号表示子类。  </p>
+</blockquote>
+<p>比如:</p>
+<blockquote>
+<p>java.<em>.Date：可以表示java.sql.Date，也可以表示java.util.Date<br>Test</em>：可以表示TestBase，也可以表示TestDervied<br>java..<em>：表示java任意子类<br>java..</em>Model+：表示Java任意package中名字以Model结尾的子类，比如TabelModel，TreeModel  等<br>最后来看函数的参数。参数匹配比较简单，主要是参数类型，比如：<br>(int, char)：表示参数只有两个，并且第一个参数类型是int，第二个参数类型是char<br>(String, ..)：表示至少有一个参数。并且第一个参数类型是String，后面参数类型不限。在参数匹配中， ..代表任意参数个数和类型<br>(Object …)：表示不定个数的参数，且类型都是Object，这里的…不是通配符，而是Java中代表不定参数的意思 </p>
+</blockquote>
+<p>Constructorsignature和Method Signature类似，只不过构造函数没有返回值，而且函数名必须叫new。比如： </p>
+<blockquote>
+<p> public <em>..TestDerived.new(..)：<br>public：选择public访问权限  
+</em>..代表任意包名<br>TestDerived.new：代表TestDerived的构造函数<br>(..)：代表参数个数和类型都是任意  </p>
+</blockquote>
+<p>再来看Field Signature和Type Signature，用它们的地方见图5。下面直接上几个例子：  </p>
+<blockquote>
+<p>Field Signature标准格式：<br>@注解 访问权限 类型 类名.成员变量名<br>其中，@注解和访问权限是可选的<br>类型：成员变量类型，<em>代表任意类型<br>类名.成员变量名：成员变量名可以是</em>，代表任意成员变量  </p>
+</blockquote>
+<p>比如，</p>
+<blockquote>
+<p>set(inttest..TestBase.base)：表示设置TestBase.base变量时的JPoint<br>Type Signature：直接上例子<br>staticinitialization(test..TestBase)：表示TestBase类的static block<br>handler(NullPointerException)：表示catch到NullPointerException的JPoint。注意，图2的源码第23行截获的其实是Exception，其真实类型是NullPointerException。<br>但是由于JPointer的查询匹配是静态的，即编译过程中进行的匹配，所以handler(NullPointerException)在运行时并不能真正被截获。只有改成handler(Exception)，<br>或者把源码第23行改成NullPointerException才行。      </p>
+</blockquote>
+<h4 id="间接针对JPoint的选择"><a href="#间接针对JPoint的选择" class="headerlink" title="间接针对JPoint的选择"></a>间接针对JPoint的选择</h4><p>除了根据前面提到的Signature信息来匹配JPoint外，AspectJ还提供其他一些选择方法来选择JPoint。比如某个类中的所有JPoint，每一个函数执行流程中所包含的JPoint。<br>特别强调，不论什么选择方法，最终都是为了找到目标的JPoint。</p>
+<p>下面列出了一些常用的非JPoint选择方法：</p>
+<p><img src="/uploads/AOP/简介选择JPoint.png" alt="结果显示"></p>
+<h4 id="advice和aspect介绍"><a href="#advice和aspect介绍" class="headerlink" title="advice和aspect介绍"></a>advice和aspect介绍</h4><p>恭喜，看到这个地方来，AspectJ的核心部分就掌握一大部分了。现在，我们知道如何通过pointcuts来选择合适的JPoint。那么，下一步工作就很明确了，选择这些JPoint后，我们肯定是需要干一些事情的。比如前面例子中的输出都有before，after之类的。这其实JPoint在执行前，执行后，都执行了一些我们设置的代码。在AspectJ中，这段代码叫advice。简单点说，advice就是一种Hook。</p>
+<p>ASpectJ中有好几个Hook，主要是根据JPoint执行时机的不同而不同，比如下面的：</p>
+<pre class=" language-java"><code class="language-java"><span class="token function">before</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">:</span><span class="token function">testAll</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>  
+  System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"before calling: "</span> <span class="token operator">+</span> thisJoinPoint<span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//打印这个JPoint的信息  </span>
+  System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"      at:"</span> <span class="token operator">+</span> thisJoinPoint<span class="token punctuation">.</span><span class="token function">getSourceLocation</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//打印这个JPoint对应的源代码位置  </span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>testAll()是前面定义的pointcuts，而before()定义了在这个pointcuts选中的JPoint执行前我们要干的事情。下图列出了AspectJ所支持的Advice的类型：<br><img src="/uploads/AOP/advice.png" alt="结果显示"></p>
+<p>注意，after和before没有返回值，但是around的目标是替代原JPoint的，所以它一般会有返回值，而且返回值的类型需要匹配被选中的JPoint。我们来看个例子，见图7。</p>
+<p><img src="/uploads/AOP/around返回值.png" alt="结果显示"></p>
+<blockquote>
+<p>第一个红框是修改后的testMethod，在这个testMethod中，肯定会抛出一个空指针异常。<br>第二个红框是我们配置的advice，除了before以外，还加了一个around。我们重点来看around，它的返回值是Object。虽然匹配的JPoint是testMethod，其定义的返回值是void。<br>但是AspectJ考虑的很周到。在around里，可以设置返回值类型为Object来表示返回任意类型的返回值。AspectJ在真正返回参数的时候，会自动进行转换。比如，假设inttestMethod定义了int作为返回值类型，<br>我们在around里可以返回一个Integer，AspectJ会自动转换成int作为返回值。</p>
+</blockquote>
+<p>再看around中的//proceed()这句话。这代表调用真正的JPoint函数，即testMethod。由于这里我们屏蔽了proceed，所以testMethod真正的内容并未执行，故运行的时候空指针异常就不会抛出来。<br>也就是说，我们完全截获了testMethod的运行，甚至可以任意修改它，让它执行别的函数都没有问题。。</p>
+<h4 id="参数传递和JPoint信息"><a href="#参数传递和JPoint信息" class="headerlink" title="参数传递和JPoint信息"></a>参数传递和JPoint信息</h4><p>到此，AspectJ最基本的东西其实讲差不多了，但是在实际使用AspectJ的时候，你会发现前面的内容还欠缺一点，尤其是advice的地方：</p>
+<blockquote>
+<p>前面介绍的advice都是没有参数信息的，而JPoint肯定是或多或少有参数的。而且advice既然是对JPoint的截获或者hook也好，肯定需要利用传入给JPoint的参数干点什么事情。<br>比方所around advice，我可以对传入的参数进行检查，如果参数不合法，我就直接返回，根本就不需要调用proceed做处理。<br>往advice传参数比较简单，就是利用前面提到的this(),target(),args()等方法。另外，整个pointcuts和advice编写的语法也有一些区别。具体方法如下：</p>
+</blockquote>
+<p>先在pointcuts定义时候指定参数类型和名字</p>
+<pre class=" language-java"><code class="language-java">pointcut <span class="token function">testAll</span><span class="token punctuation">(</span>Test<span class="token punctuation">.</span>TestDerived derived<span class="token punctuation">,</span><span class="token keyword">int</span> x<span class="token punctuation">)</span><span class="token operator">:</span><span class="token function">call</span><span class="token punctuation">(</span><span class="token operator">*</span>Test<span class="token punctuation">.</span>TestDerived<span class="token punctuation">.</span><span class="token function">testMethod</span><span class="token punctuation">(</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span><span class="token punctuation">)</span>  <span class="token operator">&amp;&amp;</span> <span class="token function">target</span><span class="token punctuation">(</span>derived<span class="token punctuation">)</span><span class="token operator">&amp;&amp;</span> <span class="token function">args</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span>
+</code></pre>
+<p>注意上述pointcuts的写法，首先在testAll中定义参数类型和参数名。这一点和定义一个函数完全一样,接着看target和args。此处的target和args括号中用得是参数名。而参数名则是在前面pointcuts中定义好的。这属于target和args的另外一种用法。</p>
+<blockquote>
+<p>注意，增加参数并不会影响pointcuts对JPoint的匹配<br>上面的pointcuts选择和 pointcut testAll():call(*Test.TestDerived.testMethod(..)) &amp;&amp; target(Test.TestDerived) &amp;&amp;args(int)是一样的  只不过我们需要把参数传入advice，才需要改造</p>
+</blockquote>
+<p>接下来是修改advice：</p>
+<pre class=" language-java"><code class="language-java">Object <span class="token function">around</span><span class="token punctuation">(</span>Test<span class="token punctuation">.</span>TestDerived derived<span class="token punctuation">,</span><span class="token keyword">int</span> x<span class="token punctuation">)</span><span class="token operator">:</span><span class="token function">testAll</span><span class="token punctuation">(</span>derived<span class="token punctuation">,</span>x<span class="token punctuation">)</span><span class="token punctuation">{</span>  
+    System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"     arg1="</span> <span class="token operator">+</span> derived<span class="token punctuation">)</span><span class="token punctuation">;</span>  
+    System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"     arg2="</span> <span class="token operator">+</span> x<span class="token punctuation">)</span><span class="token punctuation">;</span>  
+    <span class="token keyword">return</span> <span class="token function">proceed</span><span class="token punctuation">(</span>derived<span class="token punctuation">,</span>x<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//注意，proceed就必须把所有参数传进去。  </span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>advice的定义现在也和函数定义一样，把参数类型和参数名传进来。接着把参数名传给pointcuts，此处是testAll。注意，advice必须和使用的pointcuts在参数类型和名字上保持一致。然后在advice的代码中，你就可以引用参数了，比如derived和x，都可以打印出来。</p>
+<p>总结，参数传递其实并不复杂，关键是得记住语法：</p>
+<blockquote>
+<p>pointcuts修改：像定义函数一样定义pointcuts，然后在this,target或args中绑定参数名（注意，不再是参数类型，而是参数名）。<br>advice修改：也像定义函数一样定义advice，然后在冒号后面的pointcuts中绑定参数名（注意是参数名）<br>在advice的代码中使用参数名。</p>
+</blockquote>
+<h3 id="使用AOP做权限申请"><a href="#使用AOP做权限申请" class="headerlink" title="使用AOP做权限申请"></a>使用AOP做权限申请</h3><pre class=" language-java"><code class="language-java">不使用AOP做权限处理的时候
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">AopDemoActivity</span> <span class="token keyword">extends</span> <span class="token class-name">Activity</span> <span class="token punctuation">{</span>  
+   <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">final</span> String TAG <span class="token operator">=</span> <span class="token string">"AopDemoActivity"</span><span class="token punctuation">;</span>  
+
+   <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">onCreate</span><span class="token punctuation">(</span>Bundle savedInstanceState<span class="token punctuation">)</span> <span class="token punctuation">{</span>  
+       <span class="token keyword">super</span><span class="token punctuation">.</span><span class="token function">onCreate</span><span class="token punctuation">(</span>savedInstanceState<span class="token punctuation">)</span><span class="token punctuation">;</span>  
+       <span class="token function">setContentView</span><span class="token punctuation">(</span>R<span class="token punctuation">.</span>layout<span class="token punctuation">.</span>layout_main<span class="token punctuation">)</span><span class="token punctuation">;</span>  
+       Log<span class="token punctuation">.</span><span class="token function">e</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span><span class="token string">"onCreate"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+    <span class="token punctuation">}</span>  
+
+    protectedvoid <span class="token function">onResume</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>  
+       <span class="token keyword">super</span><span class="token punctuation">.</span><span class="token function">onResume</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+       Log<span class="token punctuation">.</span><span class="token function">e</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"onResume"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+       <span class="token comment" spellcheck="true">//checkPhoneState会检查app是否申明了android.permission.READ_PHONE_STATE权限</span>
+       <span class="token function">checkPhoneState</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+    <span class="token punctuation">}</span>  
+
+   <span class="token keyword">private</span> <span class="token keyword">boolean</span> <span class="token function">checkPermission</span><span class="token punctuation">(</span>String permissionName<span class="token punctuation">)</span><span class="token punctuation">{</span>  
+       <span class="token keyword">try</span><span class="token punctuation">{</span>  
+           PackageManager pm <span class="token operator">=</span> <span class="token function">getPackageManager</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+           <span class="token comment" spellcheck="true">//调用PackageMangaer的checkPermission函数，检查自己是否申明使用某权限  </span>
+           <span class="token keyword">int</span> nret <span class="token operator">=</span> pm<span class="token punctuation">.</span><span class="token function">checkPermission</span><span class="token punctuation">(</span>permissionName<span class="token punctuation">,</span><span class="token function">getPackageName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+           <span class="token keyword">return</span> nret <span class="token operator">==</span> PackageManager<span class="token punctuation">.</span>PERMISSION_GRANTED<span class="token punctuation">;</span>  
+        <span class="token punctuation">}</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>  
+    <span class="token punctuation">}</span>  
+<span class="token punctuation">}</span>
+</code></pre>
+<p>我们需要在每一个使用的地方都要添加类似的代码,就算是抽离出一个模块，使用的时候也是有很大的耦合，比如当我要修改权限模块的时候，每一个使用的地方都要修改,使用AOP的处理：</p>
+<pre class=" language-gradle"><code class="language-gradle">1.首先在项目主的build.gradle中添加配置
+dependencies {
+    classpath 'com.android.tools.build:gradle:3.0.1'
+    classpath 'com.hujiang.aspectjx:gradle-android-plugin-aspectjx:1.1.0'(要添加的内容)
+    classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'(要添加的内容)
+}
+
+2.新建一个android Library 然后在build.gradle 文件中添加配置
+
+apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'(要添加的内容)
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
+    compile 'org.aspectj:aspectjrt:1.8.9'(要添加的内容)
+}
+
+3.然后在主工程的build.gradle 文件中添加配置
+
+apply plugin: 'com.android.application'
+apply plugin: 'android-aspectjx'(要添加的内容)
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
+    implementation project(":lib-permission")(要添加的内容，这个的意思是这个主工程要使用library库)
+}
+</code></pre>
+<p>大致讲下思路：我们会新建一个透明的activity用来专门的处理权限的请求，因为这个透明的，所以用户是无感知的，而且这个Activity的调用时交由AspetJ来调用触发，最后将请求的权限的结果<br>通过反射的方式回调回去</p>
+<p>libray代码的编写：</p>
+<pre class=" language-java"><code class="language-java"><span class="token annotation punctuation">@Retention</span><span class="token punctuation">(</span>RetentionPolicy<span class="token punctuation">.</span>RUNTIME<span class="token punctuation">)</span>
+<span class="token annotation punctuation">@Target</span><span class="token punctuation">(</span>ElementType<span class="token punctuation">.</span>METHOD<span class="token punctuation">)</span>
+<span class="token keyword">public</span> @<span class="token keyword">interface</span> <span class="token class-name">Permission</span> <span class="token punctuation">{</span>
+    String<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token function">value</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//要请求的权限，这里支持传递一个权限的数组</span>
+    <span class="token keyword">int</span> <span class="token function">requestCode</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">default</span> PermissionUtils<span class="token punctuation">.</span>DEFAULT_REQUEST_CODE<span class="token punctuation">;</span> 
+<span class="token punctuation">}</span>
+
+<span class="token annotation punctuation">@Retention</span><span class="token punctuation">(</span>RetentionPolicy<span class="token punctuation">.</span>RUNTIME<span class="token punctuation">)</span>
+<span class="token annotation punctuation">@Target</span><span class="token punctuation">(</span>ElementType<span class="token punctuation">.</span>METHOD<span class="token punctuation">)</span>
+<span class="token keyword">public</span> @<span class="token keyword">interface</span> <span class="token class-name">PermissionCanceled</span> <span class="token punctuation">{</span>
+    <span class="token keyword">int</span> <span class="token function">requestCode</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">default</span> PermissionUtils<span class="token punctuation">.</span>DEFAULT_REQUEST_CODE<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token annotation punctuation">@Retention</span><span class="token punctuation">(</span>RetentionPolicy<span class="token punctuation">.</span>RUNTIME<span class="token punctuation">)</span>
+<span class="token annotation punctuation">@Target</span><span class="token punctuation">(</span>ElementType<span class="token punctuation">.</span>METHOD<span class="token punctuation">)</span>
+<span class="token keyword">public</span> @<span class="token keyword">interface</span> <span class="token class-name">PermissionDenied</span> <span class="token punctuation">{</span>
+    <span class="token keyword">int</span> <span class="token function">requestCode</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">default</span> PermissionUtils<span class="token punctuation">.</span>DEFAULT_REQUEST_CODE<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true">//权限处理的回调</span>
+<span class="token keyword">public</span> <span class="token keyword">interface</span> <span class="token class-name">IPermission</span> <span class="token punctuation">{</span>
+
+    <span class="token comment" spellcheck="true">/**
+     * 已经授权
+     */</span>
+    <span class="token keyword">void</span> <span class="token function">ganted</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">/**
+     * 取消授权
+     */</span>
+    <span class="token keyword">void</span> <span class="token function">cancled</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">/**
+     *被拒绝 点击了不再提示
+     */</span>
+    <span class="token keyword">void</span> <span class="token function">denied</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true">/**
+ * 专门用来处理权限请求的用户无感知的 activity
+ */</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">PermissionActivity</span> <span class="token keyword">extends</span> <span class="token class-name">Activity</span><span class="token punctuation">{</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">final</span> String PARAM_PERMISSION <span class="token operator">=</span> <span class="token string">"param_permission"</span><span class="token punctuation">;</span>
+    <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">final</span> String PARAM_REQUEST_CODE <span class="token operator">=</span> <span class="token string">"param_request_code"</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">private</span> String<span class="token punctuation">[</span><span class="token punctuation">]</span> mPermissions<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> <span class="token keyword">int</span> mRequestCode<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> <span class="token keyword">static</span> IPermission permissionListener<span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">/**
+     * 请求权限,由AspetJ来调用
+     */</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">requestPermission</span><span class="token punctuation">(</span>Context context<span class="token punctuation">,</span> String<span class="token punctuation">[</span><span class="token punctuation">]</span> permissions<span class="token punctuation">,</span> <span class="token keyword">int</span> requestCode<span class="token punctuation">,</span> IPermission iPermission<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        permissionListener <span class="token operator">=</span> iPermission<span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">//启动当前的PermissionActivity ，传递要请求的权限</span>
+        Intent intent <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Intent</span><span class="token punctuation">(</span>context<span class="token punctuation">,</span> PermissionActivity<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        intent<span class="token punctuation">.</span><span class="token function">setFlags</span><span class="token punctuation">(</span>Intent<span class="token punctuation">.</span>FLAG_ACTIVITY_NEW_TASK <span class="token operator">|</span> Intent<span class="token punctuation">.</span>FLAG_ACTIVITY_CLEAR_TOP<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Bundle bundle <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Bundle</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        bundle<span class="token punctuation">.</span><span class="token function">putStringArray</span><span class="token punctuation">(</span>PARAM_PERMISSION<span class="token punctuation">,</span> permissions<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        bundle<span class="token punctuation">.</span><span class="token function">putInt</span><span class="token punctuation">(</span>PARAM_REQUEST_CODE<span class="token punctuation">,</span> requestCode<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        intent<span class="token punctuation">.</span><span class="token function">putExtras</span><span class="token punctuation">(</span>bundle<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        context<span class="token punctuation">.</span><span class="token function">startActivity</span><span class="token punctuation">(</span>intent<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">//因为要做一个无感知的activity，所以要禁止掉界面跳转的动画</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>context <span class="token keyword">instanceof</span> <span class="token class-name">Activity</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token punctuation">(</span><span class="token punctuation">(</span>Activity<span class="token punctuation">)</span> context<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">overridePendingTransition</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">onCreate</span><span class="token punctuation">(</span><span class="token annotation punctuation">@Nullable</span> Bundle savedInstanceState<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">super</span><span class="token punctuation">.</span><span class="token function">onCreate</span><span class="token punctuation">(</span>savedInstanceState<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">// 权限申请</span>
+        <span class="token function">setContentView</span><span class="token punctuation">(</span>R<span class="token punctuation">.</span>layout<span class="token punctuation">.</span>tim_permission_layout<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">this</span><span class="token punctuation">.</span>mPermissions <span class="token operator">=</span> <span class="token function">getIntent</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getStringArrayExtra</span><span class="token punctuation">(</span>PARAM_PERMISSION<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>mRequestCode <span class="token operator">=</span> <span class="token function">getIntent</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getIntExtra</span><span class="token punctuation">(</span>PARAM_REQUEST_CODE<span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>mPermissions <span class="token operator">==</span> null <span class="token operator">||</span> mRequestCode <span class="token operator">&lt;</span> <span class="token number">0</span> <span class="token operator">||</span> permissionListener <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">finish</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token comment" spellcheck="true">//检查是否已授权</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>PermissionUtils<span class="token punctuation">.</span><span class="token function">hasPermission</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">,</span> mPermissions<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            permissionListener<span class="token punctuation">.</span><span class="token function">ganted</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">finish</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        ActivityCompat<span class="token punctuation">.</span><span class="token function">requestPermissions</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span>mPermissions<span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span>mRequestCode<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true">/**
+     * grantResults对应于申请的结果，这里的数组对应于申请时的第二个权限字符串数组。
+     * 如果你同时申请两个权限，那么grantResults的length就为2，分别记录你两个权限的申请结果
+     */</span>
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">onRequestPermissionsResult</span><span class="token punctuation">(</span><span class="token keyword">int</span> requestCode<span class="token punctuation">,</span> <span class="token annotation punctuation">@NonNull</span> String<span class="token punctuation">[</span><span class="token punctuation">]</span> permissions<span class="token punctuation">,</span> <span class="token annotation punctuation">@NonNull</span> <span class="token keyword">int</span><span class="token punctuation">[</span><span class="token punctuation">]</span> grantResults<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">super</span><span class="token punctuation">.</span><span class="token function">onRequestPermissionsResult</span><span class="token punctuation">(</span>requestCode<span class="token punctuation">,</span> permissions<span class="token punctuation">,</span> grantResults<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">//请求权限成功</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>PermissionUtils<span class="token punctuation">.</span><span class="token function">verifyPermission</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">,</span> grantResults<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            permissionListener<span class="token punctuation">.</span><span class="token function">ganted</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">finish</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token comment" spellcheck="true">//用户点击了不再显示</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>PermissionUtils<span class="token punctuation">.</span><span class="token function">shouldShowRequestPermissionRationale</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">,</span> permissions<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            permissionListener<span class="token punctuation">.</span><span class="token function">denied</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">finish</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token comment" spellcheck="true">//用户取消</span>
+        permissionListener<span class="token punctuation">.</span><span class="token function">cancled</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">finish</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">finish</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">super</span><span class="token punctuation">.</span><span class="token function">finish</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//因为要做一个无感知的activity，所以要禁止掉界面跳转的动画</span>
+        <span class="token function">overridePendingTransition</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>因为要做一个透明的Activity，所以要设置透明的主题</p>
+<pre class=" language-xml"><code class="language-xml"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>application</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>activity</span> <span class="token attr-name"><span class="token namespace">android:</span>name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>.PermissionActivity<span class="token punctuation">"</span></span> <span class="token attr-name"><span class="token namespace">android:</span>theme</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>@style/translucent<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>activity</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>application</span><span class="token punctuation">></span></span>
+
+布局也是做成一个透明的
+<span class="token prolog">&lt;?xml version="1.0" encoding="utf-8"?></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>LinearLayout</span> <span class="token attr-name"><span class="token namespace">xmlns:</span>android</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>http://schemas.android.com/apk/res/android<span class="token punctuation">"</span></span>
+    <span class="token attr-name"><span class="token namespace">android:</span>layout_width</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>match_parent<span class="token punctuation">"</span></span>
+    <span class="token attr-name"><span class="token namespace">android:</span>layout_height</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>match_parent<span class="token punctuation">"</span></span>
+    <span class="token attr-name"><span class="token namespace">android:</span>background</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>@android:color/transparent<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>LinearLayout</span><span class="token punctuation">></span></span>
+</code></pre>
+<p>权限处理的工具类</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">PermissionUtils</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token keyword">int</span> DEFAULT_REQUEST_CODE <span class="token operator">=</span> <span class="token number">0xABC1994</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">static</span> SimpleArrayMap<span class="token operator">&lt;</span>String<span class="token punctuation">,</span> Integer<span class="token operator">></span> MIN_SDK_PERMISSIONS<span class="token punctuation">;</span>
+
+    <span class="token keyword">static</span> <span class="token punctuation">{</span>
+        MIN_SDK_PERMISSIONS <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">SimpleArrayMap</span><span class="token operator">&lt;</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        MIN_SDK_PERMISSIONS<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token string">"com.android.voicemail.permission.ADD_VOICEMAIL"</span><span class="token punctuation">,</span> <span class="token number">14</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        MIN_SDK_PERMISSIONS<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token string">"android.permission.BODY_SENSORS"</span><span class="token punctuation">,</span> <span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        MIN_SDK_PERMISSIONS<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token string">"android.permission.READ_CALL_LOG"</span><span class="token punctuation">,</span> <span class="token number">16</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        MIN_SDK_PERMISSIONS<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token string">"android.permission.READ_EXTERNAL_STORAGE"</span><span class="token punctuation">,</span> <span class="token number">16</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        MIN_SDK_PERMISSIONS<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token string">"android.permission.USE_SIP"</span><span class="token punctuation">,</span> <span class="token number">9</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        MIN_SDK_PERMISSIONS<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token string">"android.permission.WRITE_CALL_LOG"</span><span class="token punctuation">,</span> <span class="token number">16</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        MIN_SDK_PERMISSIONS<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token string">"android.permission.SYSTEM_ALERT_WINDOW"</span><span class="token punctuation">,</span> <span class="token number">23</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        MIN_SDK_PERMISSIONS<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token string">"android.permission.WRITE_SETTINGS"</span><span class="token punctuation">,</span> <span class="token number">23</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+
+    <span class="token comment" spellcheck="true">/**
+     * 检查是否需要请求权限
+     * @param context
+     * @param permissions
+     * @return
+     * false --- 需要  true ---不需要
+     */</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">boolean</span> <span class="token function">hasPermission</span><span class="token punctuation">(</span>Context context<span class="token punctuation">,</span> String <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>permissions<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+        <span class="token keyword">for</span> <span class="token punctuation">(</span>String permission <span class="token operator">:</span> permissions<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">permissionExists</span><span class="token punctuation">(</span>permission<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span><span class="token function">hasSelfPermission</span><span class="token punctuation">(</span>context<span class="token punctuation">,</span> permission<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true">/**
+     * @Description 检测某个权限是否已经授权；如果已授权则返回true，如果未授权则返回false
+     * @version
+     */</span>
+    <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">boolean</span> <span class="token function">hasSelfPermission</span><span class="token punctuation">(</span>Context context<span class="token punctuation">,</span> String permission<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">// ContextCompat.checkSelfPermission，主要用于检测某个权限是否已经被授予。</span>
+            <span class="token comment" spellcheck="true">// 方法返回值为PackageManager.PERMISSION_DENIED或者PackageManager.PERMISSION_GRANTED</span>
+            <span class="token comment" spellcheck="true">// 当返回DENIED就需要进行申请授权了。</span>
+            <span class="token keyword">return</span> ContextCompat<span class="token punctuation">.</span><span class="token function">checkSelfPermission</span><span class="token punctuation">(</span>context<span class="token punctuation">,</span> permission<span class="token punctuation">)</span> <span class="token operator">==</span> PackageManager<span class="token punctuation">.</span>PERMISSION_GRANTED<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">RuntimeException</span> t<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true">/**
+     * @Description 如果在这个SDK版本存在的权限，则返回true
+     * @version
+     */</span>
+    <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">boolean</span> <span class="token function">permissionExists</span><span class="token punctuation">(</span>String permission<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        Integer minVersion <span class="token operator">=</span> MIN_SDK_PERMISSIONS<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>permission<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> minVersion <span class="token operator">==</span> null <span class="token operator">||</span> Build<span class="token punctuation">.</span>VERSION<span class="token punctuation">.</span>SDK_INT <span class="token operator">>=</span> minVersion<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true">/**
+     * @Description 检验返回的权限处理是否成功
+     * 
+     */</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">boolean</span> <span class="token function">verifyPermission</span><span class="token punctuation">(</span>Context context<span class="token punctuation">,</span> <span class="token keyword">int</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span> gantedResults<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>gantedResults <span class="token operator">==</span> null <span class="token operator">||</span> gantedResults<span class="token punctuation">.</span>length <span class="token operator">==</span> <span class="token number">0</span> <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> ganted <span class="token operator">:</span> gantedResults<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>ganted <span class="token operator">!=</span> PackageManager<span class="token punctuation">.</span>PERMISSION_GRANTED<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true">/**
+     * @Description 检查需要给予的权限是否需要显示理由
+     * @version
+     */</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">boolean</span> <span class="token function">shouldShowRequestPermissionRationale</span><span class="token punctuation">(</span>Activity activity<span class="token punctuation">,</span> String<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span> permissions<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span>String permission <span class="token operator">:</span> permissions<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">// 这个API主要用于给用户一个申请权限的解释，该方法只有在用户在上一次已经拒绝过你的这个权限申请。</span>
+            <span class="token comment" spellcheck="true">// 也就是说，用户已经拒绝一次了，你又弹个授权框，你需要给用户一个解释，为什么要授权，则使用该方法。</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>ActivityCompat<span class="token punctuation">.</span><span class="token function">shouldShowRequestPermissionRationale</span><span class="token punctuation">(</span>activity<span class="token punctuation">,</span> permission<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+
+    <span class="token comment" spellcheck="true">/**
+     * @Description 反射调用annotationClass 对应的方法
+     * 
+     */</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">invokAnnotation</span><span class="token punctuation">(</span>Object object<span class="token punctuation">,</span> Class <span class="token class-name">annotationClass</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//获取切面上下文的类型</span>
+        Class<span class="token operator">&lt;</span><span class="token operator">?</span><span class="token operator">></span> clz <span class="token operator">=</span> object<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//获取类型中的方法</span>
+        Method<span class="token punctuation">[</span><span class="token punctuation">]</span> methods <span class="token operator">=</span> clz<span class="token punctuation">.</span><span class="token function">getDeclaredMethods</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>methods <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span>Method method <span class="token operator">:</span> methods<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">//获取该方法是否有PermissionCanceled注解</span>
+            <span class="token keyword">boolean</span> isHasAnnotation <span class="token operator">=</span> method<span class="token punctuation">.</span><span class="token function">isAnnotationPresent</span><span class="token punctuation">(</span>annotationClass<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>isHasAnnotation<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                method<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                    method<span class="token punctuation">.</span><span class="token function">invoke</span><span class="token punctuation">(</span>object<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">IllegalAccessException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">InvocationTargetException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token annotation punctuation">@Aspect</span>  <span class="token comment" spellcheck="true">//必须使用@AspectJ标注，这样class PermissionAspect就等同于 aspect PermissionAspect了  </span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">PermissionAspect</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">final</span> String TAG <span class="token operator">=</span> <span class="token string">"TimPermissionAspect"</span><span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">//寻找Jpoint</span>
+    <span class="token comment" spellcheck="true">//来看这个Pointcut，首先，它在选择Jpoint的时候，把@com.dn.tim.lib_permission.annotation.Permission使用上了，这表明所有那些public的，并且携带有这个注解的API都是目标JPoint </span>
+    <span class="token comment" spellcheck="true">//接着，由于我们希望在函数中获取注解的信息，所有这里的poincut函数有一个参数，参数类型是 Permission，参数名为permission</span>
+    <span class="token comment" spellcheck="true">//这个参数我们需要在后面的advice里用上，所以pointcut还使用了@annotation(ann)这种方法来告诉 AspectJ，这个permission是一个注解 </span>
+    <span class="token annotation punctuation">@Pointcut</span><span class="token punctuation">(</span><span class="token string">"execution(@com.dn.tim.lib_permission.annotation.Permission * *(..)) &amp;&amp; @annotation(permission)"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">requestPermission</span><span class="token punctuation">(</span>Permission permission<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+    <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true">//接下来是advice，advice的真正功能由aroundJointPoint函数来实现，这个aroundJointPoint函数第二个参数就是我们想要 </span>
+    <span class="token comment" spellcheck="true">//的注解。在实际运行过程中，AspectJ会把这个信息从JPoint中提出出来并传递给aroundJointPoint函数。 </span>
+    <span class="token annotation punctuation">@Around</span><span class="token punctuation">(</span><span class="token string">"requestPermission(permission)"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">aroundJointPoint</span><span class="token punctuation">(</span><span class="token keyword">final</span> ProceedingJoinPoint joinPoint<span class="token punctuation">,</span> Permission permission<span class="token punctuation">)</span> <span class="token keyword">throws</span> Throwable<span class="token punctuation">{</span>
+
+        <span class="token comment" spellcheck="true">//初始化context</span>
+        Context context <span class="token operator">=</span> null<span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//获取到这个JointPoint 代表的this对象</span>
+        <span class="token keyword">final</span> Object object <span class="token operator">=</span> joinPoint<span class="token punctuation">.</span><span class="token function">getThis</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>joinPoint<span class="token punctuation">.</span><span class="token function">getThis</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">instanceof</span> <span class="token class-name">Context</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            context <span class="token operator">=</span> <span class="token punctuation">(</span>Context<span class="token punctuation">)</span> object<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>joinPoint<span class="token punctuation">.</span><span class="token function">getThis</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">instanceof</span> <span class="token class-name">android<span class="token punctuation">.</span>support<span class="token punctuation">.</span>v4<span class="token punctuation">.</span>app<span class="token punctuation">.</span>Fragment</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            context <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>android<span class="token punctuation">.</span>support<span class="token punctuation">.</span>v4<span class="token punctuation">.</span>app<span class="token punctuation">.</span>Fragment<span class="token punctuation">)</span> object<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getActivity</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>joinPoint<span class="token punctuation">.</span><span class="token function">getThis</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">instanceof</span> <span class="token class-name">android<span class="token punctuation">.</span>app<span class="token punctuation">.</span>Fragment</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            context <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>android<span class="token punctuation">.</span>app<span class="token punctuation">.</span>Fragment<span class="token punctuation">)</span> object<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getActivity</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>context <span class="token operator">==</span> null <span class="token operator">||</span> permission <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            Log<span class="token punctuation">.</span><span class="token function">d</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"aroundJonitPoint error "</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token comment" spellcheck="true">//调用启动透明的权限请求类</span>
+        <span class="token keyword">final</span> Context finalContext <span class="token operator">=</span> context<span class="token punctuation">;</span>
+        TimPermissionActivity<span class="token punctuation">.</span><span class="token function">requestPermission</span><span class="token punctuation">(</span>context<span class="token punctuation">,</span> permission<span class="token punctuation">.</span><span class="token function">value</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> permission<span class="token punctuation">.</span><span class="token function">requestCode</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">IPermission</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token annotation punctuation">@Override</span>
+            <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">ganted</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                    <span class="token comment" spellcheck="true">//around是替代了原JPoint，如果要执行原JPoint的话，需要调用proceed，也即是执行含有Permission注解的方法</span>
+                    joinPoint<span class="token punctuation">.</span><span class="token function">proceed</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Throwable</span> throwable<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    throwable<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+
+            <span class="token annotation punctuation">@Override</span>
+            <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">cancled</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">//反射调用含有PermissionCanceled 注解的方法</span>
+                PermissionUtils<span class="token punctuation">.</span><span class="token function">invokAnnotation</span><span class="token punctuation">(</span>object<span class="token punctuation">,</span> PermissionCanceled<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+
+            <span class="token annotation punctuation">@Override</span>
+            <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">denied</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">//反射调用含有PermissionDenied 注解的方法</span>
+                PermissionUtils<span class="token punctuation">.</span><span class="token function">invokAnnotation</span><span class="token punctuation">(</span>object<span class="token punctuation">,</span> PermissionDenied<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                PermissionUtils<span class="token punctuation">.</span><span class="token function">goToMenu</span><span class="token punctuation">(</span>finalContext<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+
+
+<span class="token annotation punctuation">@Permission</span><span class="token punctuation">(</span><span class="token punctuation">{</span>Manifest<span class="token punctuation">.</span>permission<span class="token punctuation">.</span>WRITE_EXTERNAL_STORAGE<span class="token punctuation">,</span>Manifest<span class="token punctuation">.</span>permission<span class="token punctuation">.</span>CAMERA<span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">requestTwoPermission</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    Toast<span class="token punctuation">.</span><span class="token function">makeText</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">,</span> <span class="token string">"请求两个权限成功（写和相机）"</span><span class="token punctuation">,</span> Toast<span class="token punctuation">.</span>LENGTH_SHORT<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token annotation punctuation">@PermissionCanceled</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">cancel</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    Log<span class="token punctuation">.</span><span class="token function">i</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"writeCancel: "</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
+    Toast<span class="token punctuation">.</span><span class="token function">makeText</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">,</span> <span class="token string">"cancel"</span><span class="token punctuation">,</span> Toast<span class="token punctuation">.</span>LENGTH_SHORT<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token annotation punctuation">@PermissionDenied</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">deny</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    Log<span class="token punctuation">.</span><span class="token function">i</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"writeDeny:"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    Toast<span class="token punctuation">.</span><span class="token function">makeText</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">,</span> <span class="token string">"deny"</span><span class="token punctuation">,</span> Toast<span class="token punctuation">.</span>LENGTH_SHORT<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">AheadSnail</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://aheadsnail.github.io/2018/06/23/android-aop-li-jie/">https://aheadsnail.github.io/2018/06/23/android-aop-li-jie/</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">AheadSnail</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Android/">
+                                    <span class="chip bg-color">Android</span>
+                                </a>
+                            
+                                <a href="/tags/Aop/">
+                                    <span class="chip bg-color">Aop</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2018/06/25/opus-visual-studio-pei-zhi/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/18.jpg" class="responsive-img" alt="Opus Visual Studio配置">
+                        
+                        <span class="card-title">Opus Visual Studio配置</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            概述
+Opus Visual Studio配置
+
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2018-06-25
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            AheadSnail
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Opus/">
+                        <span class="chip bg-color">Opus</span>
+                    </a>
+                    
+                    <a href="/tags/Visual-Studio/">
+                        <span class="chip bg-color">Visual Studio</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2018/06/20/android-zhong-shi-xian-aira2/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/21.jpg" class="responsive-img" alt="Android中实现Aira2">
+                        
+                        <span class="card-title">Android中实现Aira2</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            概述
+Android 中利用Aria2 完成一个P2P的下载神器
+
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2018-06-20
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            AheadSnail
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/AndroidStudio/">
+                        <span class="chip bg-color">AndroidStudio</span>
+                    </a>
+                    
+                    <a href="/tags/Aria2/">
+                        <span class="chip bg-color">Aria2</span>
+                    </a>
+                    
+                    <a href="/tags/P2P/">
+                        <span class="chip bg-color">P2P</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="503838841"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='random'
+                   preload='auto'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 0px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2019-2021</span>
+            
+            <span id="year">2019</span>
+            <a href="/about" target="_blank">AheadSnail</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/blinkfox" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:1181062873@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=1181062873" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 1181062873" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    <!--腾讯兔小巢-->
+    
+    
+
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>

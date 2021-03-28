@@ -1,0 +1,1575 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="so入门加密, AheadSnail&#39;s blog">
+    <meta name="description" content>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>so入门加密 | AheadSnail&#39;s blog</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<link rel="alternate" href="/atom.xml" title="AheadSnail's blog" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">AheadSnail&#39;s blog</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/contact" class="waves-effect waves-light">
+      
+      <i class="fas fa-comments" style="zoom: 0.6;"></i>
+      
+      <span>留言板</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">AheadSnail&#39;s blog</div>
+        <div class="logo-desc">
+            
+            Never really desperate, only the lost of the soul.
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/contact" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-comments"></i>
+			
+			留言板
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/blinkfox/hexo-theme-matery" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/blinkfox/hexo-theme-matery" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/19.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">so入门加密</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        padding: 35px 0 15px 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        padding-bottom: 30px;
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Android/">
+                                <span class="chip bg-color">Android</span>
+                            </a>
+                        
+                            <a href="/tags/ELF/">
+                                <span class="chip bg-color">ELF</span>
+                            </a>
+                        
+                            <a href="/tags/SO/">
+                                <span class="chip bg-color">SO</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2020-09-29
+                </div>
+                
+
+                
+
+                
+
+                
+
+                
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>Android 系统安全愈发重要，像传统pc安全的可执行文件加固一样，应用加固是Android系统安全中非常重要的一环。目前Android 应用加固可以分为dex加固和Native加固，Native 加固的保护对象为 Native 层的 SO 文件，使用加壳、反调试、混淆、VM 等手段增加SO文件的反编译难度。目前最主流的 SO 文件保护方案还是加壳技术,本篇主要用来记录下native层加密</p>
+<h3 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h3><p>通过修改之后，使用readelf和ida等工具打开，会报各种错误</p>
+<h3 id="ELF文件的理解"><a href="#ELF文件的理解" class="headerlink" title="ELF文件的理解"></a>ELF文件的理解</h3><p>elf文件是一种目标文件格式，用于定义不同类型目标文件以什么样的格式，都放了些什么东西。主要   用于linux平台。windows下是PE/COFF格式,可执行文件、可重定位文件(.o)、共享目标文件(.so)、核心转储文件都是以elf文件格式存储的,ELF文件组成部分：文件头、段表(section)、程序头，具体的可以参考下面有关ELF文件的详解</p>
+<p><a href="https://blog.csdn.net/feglass/article/details/51469511" target="_blank" rel="noopener">ELF文件格式解析</a><br><a href="https://blog.csdn.net/zhangmiaoping23/article/details/82285664" target="_blank" rel="noopener">ELF文件格式解析(完)</a></p>
+<p>elf文件视图</p>
+<p><img src="/uploads/so加密/elf文件视图.png" alt="结果显示"><br><img src="/uploads/so加密/elf装载视图.png" alt="结果显示"></p>
+<p>链接视图是以节（section）为单位，执行视图是以段（segment）为单位。链接视图就是在链接时用到的视图，而执行视图则是在执行时用到的视图。上图左侧的视角是从链接来看的，右侧的视角是执行来看的。总个文件可以分为四个部分：</p>
+<blockquote>
+<p>ELF header： 描述整个文件的组织。<br>Program Header Table: 描述文件中的各种segments，用来告诉系统如何创建进程映像的。<br>sections 或者 segments：segments是从运行的角度来描述elf文件，sections是从链接的角度来描述elf文件，也就是说，在链接阶段，我们可以忽略program header table来处理此文件，在运行阶段可以忽略section header table来处理此程序（所以很多加固手段删除了section header table）。从图中我们也可以看出，segments与sections是包含的关系，一个segment包含若干个section。<br>Section Header Table: 包含了文件各个segction的属性信息，我们都将结合例子来解释。</p>
+</blockquote>
+<p>因为 so文件是以segment为单位映射到内存的，所以加密的原理我们就可以利用装载视图，对于Session的内容作特定的修改,比如对于so来说,e_entry 入口地址是无意义的，所以我们可以进行修改,当然修改字段也是有讲究的，并不是每个字段都是可以的,还有对于session表中的.init和.fini的特点，这里要注意下</p>
+<blockquote>
+<p>.init:可执行指令，构成进程的初始化代码，发生在main函数调用之前。<br>.fini:进程终止指令，发生在main函数调用之后。</p>
+</blockquote>
+<p>以上这么分析感觉有点像c++的构造函数和析构函数，的确构造和析构是由此实现的。</p>
+<blockquote>
+<p>并且结合GGC的可扩展机制：<strong>attribute</strong>((section(“.mytext”)));可以把相应的函数和要保护的代码放在自己所定义的节里面,这就引入了我们今天的主题，可以把我们关键的so文件中的核心函数放在自己所定义的节里面，然后进行加密保护，在合适的时机构造解密函数，当然解密函数可以用这个_attribute__((constructor))进行定义;类似于C++构造函数发生在main函数之前。</p>
+</blockquote>
+<h3 id="Android-So的加载过程"><a href="#Android-So的加载过程" class="headerlink" title="Android So的加载过程"></a>Android So的加载过程</h3><p>具体的加载过程，可以参考下面的链接</p>
+<p><a href="https://shuwoom.com/?p=351" target="_blank" rel="noopener">08-SO加载解析过程</a><br><a href="https://shuwoom.com/?p=286" target="_blank" rel="noopener">07-ELF文件格式分析</a><br><a href="https://zhuanlan.zhihu.com/p/22652847" target="_blank" rel="noopener">腾讯Bugly干货分享 Android Linker 与 SO 加壳技术</a><br><a href="https://bbs.pediy.com/thread-249589.htm" target="_blank" rel="noopener">Android ELF系列:ELF文件格式简析到linker的链接so文件原理分析</a></p>
+<p>大致就是加载解析so，就是解析 ELF 文件，将解析的信息保存到 soinfo中，对于dlopen返回的其实就是这个类型的对象，下面重点看下当解析出soinfo的时候，还做了什么处理</p>
+<p>CallConstructors</p>
+<blockquote>
+<p>在编译 SO 时，可以通过链接选项-init或是给函数添加属性<strong>attribute</strong>((constructor))来指定 SO 的初始化函数，这些初始化函数在 SO 装载链接后便会被调用，再之后才会将 SO 的 soinfo 指针返回给 dl_open 的调用者。SO 层面的保护手段，有两个介入点, 一个是 jni_onload, 另一个就是初始化函数，比如反调试、脱壳等，逆向分析时经常需要动态调试分析这些初始化函数。完成 SO 的装载链接后，返回到 do_dlopen 函数, do_open 获得 find_library 返回的刚刚加载的 SO 的 soinfo，在将 soinfo 返回给其他模块使用之前，最后还需要调用 soinfo 的成员函数 CallConstructors。</p>
+</blockquote>
+<pre class=" language-java"><code class="language-java"> soinfo<span class="token operator">*</span> <span class="token function">do_dlopen</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">char</span><span class="token operator">*</span> name<span class="token punctuation">,</span> <span class="token keyword">int</span> flags<span class="token punctuation">,</span> <span class="token keyword">const</span> Android_dlextinfo<span class="token operator">*</span> extinfo<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+   <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+   soinfo<span class="token operator">*</span> si <span class="token operator">=</span> <span class="token function">find_library</span><span class="token punctuation">(</span>name<span class="token punctuation">,</span> flags<span class="token punctuation">,</span> extinfo<span class="token punctuation">)</span><span class="token punctuation">;</span>
+   <span class="token keyword">if</span> <span class="token punctuation">(</span>si <span class="token operator">!=</span> NULL<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+       si<span class="token operator">-</span><span class="token operator">></span><span class="token function">CallConstructors</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+   <span class="token punctuation">}</span>
+   <span class="token keyword">return</span> si<span class="token punctuation">;</span>
+ <span class="token punctuation">}</span>
+CallConstructors 函数会调用 SO 的首先调用所有依赖的 SO 的 soinfo 的 CallConstructors 函数，接着调用自己的 soinfo 成员变量 init 和 看 init_array 指定的函数，这两个变量在在解析 dynamic section 时赋值。
+
+ <span class="token keyword">void</span> soinfo<span class="token operator">:</span><span class="token operator">:</span><span class="token function">CallConstructors</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+   <span class="token comment" spellcheck="true">//如果已经调用过，则直接返回</span>
+   <span class="token keyword">if</span> <span class="token punctuation">(</span>constructors_called<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+     <span class="token keyword">return</span><span class="token punctuation">;</span>
+   <span class="token punctuation">}</span>
+   <span class="token comment" spellcheck="true">// 调用依赖 SO 的 Constructors 函数</span>
+   <span class="token function">get_children</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">for_each</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token punctuation">(</span>soinfo<span class="token operator">*</span> si<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+     si<span class="token operator">-</span><span class="token operator">></span><span class="token function">CallConstructors</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+   <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+   <span class="token comment" spellcheck="true">// 调用 init_func</span>
+   <span class="token function">CallFunction</span><span class="token punctuation">(</span><span class="token string">"DT_INIT"</span><span class="token punctuation">,</span> init_func<span class="token punctuation">)</span><span class="token punctuation">;</span>
+   <span class="token comment" spellcheck="true">// 调用 init_array 中的函数</span>
+   <span class="token function">CallArray</span><span class="token punctuation">(</span><span class="token string">"DT_INIT_ARRAY"</span><span class="token punctuation">,</span> init_array<span class="token punctuation">,</span> init_array_count<span class="token punctuation">,</span> <span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+ <span class="token punctuation">}</span>
+</code></pre>
+<p>有了以上分析基础后，在需要动态跟踪初始化函数时，我们就知道可以将断点设在 do_dlopen 或是 CallConstructors。</p>
+<h3 id="So简单加密demo实现"><a href="#So简单加密demo实现" class="headerlink" title="So简单加密demo实现"></a>So简单加密demo实现</h3><p>首先看加密的实现</p>
+<pre class=" language-java"><code class="language-java">#include <span class="token operator">&lt;</span>jni<span class="token punctuation">.</span>h<span class="token operator">></span>
+#include <span class="token operator">&lt;</span>stdio<span class="token punctuation">.</span>h<span class="token operator">></span>
+#include <span class="token operator">&lt;</span>stdlib<span class="token punctuation">.</span>h<span class="token operator">></span>
+#include <span class="token operator">&lt;</span>string<span class="token punctuation">.</span>h<span class="token operator">></span>
+#include <span class="token operator">&lt;</span>unistd<span class="token punctuation">.</span>h<span class="token operator">></span>
+#include <span class="token operator">&lt;</span>sys<span class="token operator">/</span>types<span class="token punctuation">.</span>h<span class="token operator">></span>
+#include <span class="token operator">&lt;</span>elf<span class="token punctuation">.</span>h<span class="token operator">></span>
+#include <span class="token operator">&lt;</span>sys<span class="token operator">/</span>mman<span class="token punctuation">.</span>h<span class="token operator">></span>
+#include <span class="token operator">&lt;</span>stdio<span class="token punctuation">.</span>h<span class="token operator">></span>
+#include <span class="token operator">&lt;</span>fcntl<span class="token punctuation">.</span>h<span class="token operator">></span>
+#include <span class="token operator">&lt;</span>elf<span class="token punctuation">.</span>h<span class="token operator">></span>
+#include <span class="token operator">&lt;</span>stdlib<span class="token punctuation">.</span>h<span class="token operator">></span>
+#include <span class="token operator">&lt;</span>string<span class="token punctuation">.</span>h<span class="token operator">></span>
+#include <span class="token operator">&lt;</span>unistd<span class="token punctuation">.</span>h<span class="token operator">></span>
+#include <span class="token string">"PrintLog.h"</span>
+
+JNIEXPORT jint JNICALL
+<span class="token function">Java_com_example_androidelf_MainActivity_encoder</span><span class="token punctuation">(</span>JNIEnv <span class="token operator">*</span>env<span class="token punctuation">,</span> jobject thiz<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">char</span> target_section<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">".textdemo"</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//存储 Session的 String 索引表</span>
+    <span class="token keyword">char</span> <span class="token operator">*</span>shstr <span class="token operator">=</span> NULL<span class="token punctuation">;</span>
+    <span class="token keyword">char</span> <span class="token operator">*</span>content <span class="token operator">=</span> NULL<span class="token punctuation">;</span>
+    Elf64_Ehdr ehdr<span class="token punctuation">;</span>
+    Elf64_Shdr shdr<span class="token punctuation">;</span>
+    <span class="token keyword">int</span> i<span class="token punctuation">;</span>
+    unsigned <span class="token keyword">int</span> base<span class="token punctuation">,</span> length<span class="token punctuation">;</span>
+    unsigned <span class="token keyword">short</span> nblock<span class="token punctuation">;</span>
+    unsigned <span class="token keyword">short</span> nsize<span class="token punctuation">;</span>
+    unsigned <span class="token keyword">char</span> block_size <span class="token operator">=</span> <span class="token number">16</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">int</span> fd<span class="token punctuation">;</span>
+
+    fd <span class="token operator">=</span> <span class="token function">open</span><span class="token punctuation">(</span><span class="token string">"/sdcard/libnative-lib.so"</span><span class="token punctuation">,</span> O_RDWR<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>fd <span class="token operator">&lt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"open libnative-lib.so failed\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">goto</span> _error<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true">//读取头部  ELF Header的结构体：</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">read</span><span class="token punctuation">(</span>fd<span class="token punctuation">,</span> <span class="token operator">&amp;</span>ehdr<span class="token punctuation">,</span> <span class="token function">sizeof</span><span class="token punctuation">(</span>Elf64_Ehdr<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token function">sizeof</span><span class="token punctuation">(</span>Elf64_Ehdr<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"Read ELF header error"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">goto</span> _error<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true">//定位到shstrndx 对应的 Elf32_Shdr，代表session的段</span>
+    <span class="token function">lseek</span><span class="token punctuation">(</span>fd<span class="token punctuation">,</span> ehdr<span class="token punctuation">.</span>e_shoff <span class="token operator">+</span> <span class="token function">sizeof</span><span class="token punctuation">(</span>Elf64_Shdr<span class="token punctuation">)</span> <span class="token operator">*</span> ehdr<span class="token punctuation">.</span>e_shstrndx<span class="token punctuation">,</span> SEEK_SET<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">//读取shstrndx 中的字符串，存放在str空间中</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">read</span><span class="token punctuation">(</span>fd<span class="token punctuation">,</span> <span class="token operator">&amp;</span>shdr<span class="token punctuation">,</span> <span class="token function">sizeof</span><span class="token punctuation">(</span>Elf64_Shdr<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token function">sizeof</span><span class="token punctuation">(</span>Elf64_Shdr<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"Read ELF section string table error"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">goto</span> _error<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true">//分配内存空间，从shoff位置开始读取section header，存放在shdr,这个做为后续用来存储当前 Session的字符串的索引</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>shstr <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">)</span> <span class="token function">malloc</span><span class="token punctuation">(</span>shdr<span class="token punctuation">.</span>sh_size<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">==</span> NULL<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"Malloc space for section string table failed"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">goto</span> _error<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true">//定位到 sh_offset代表此session在文件中的偏移</span>
+    <span class="token function">lseek</span><span class="token punctuation">(</span>fd<span class="token punctuation">,</span> shdr<span class="token punctuation">.</span>sh_offset<span class="token punctuation">,</span> SEEK_SET<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">//读取字符串的内容</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">read</span><span class="token punctuation">(</span>fd<span class="token punctuation">,</span> shstr<span class="token punctuation">,</span> shdr<span class="token punctuation">.</span>sh_size<span class="token punctuation">)</span> <span class="token operator">!=</span> shdr<span class="token punctuation">.</span>sh_size<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"Read string table failed"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">goto</span> _error<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true">//定位到 Section Header Table 偏移量</span>
+    <span class="token function">lseek</span><span class="token punctuation">(</span>fd<span class="token punctuation">,</span> ehdr<span class="token punctuation">.</span>e_shoff<span class="token punctuation">,</span> SEEK_SET<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">// ehdr.e_shnum 代表当前 Section Header Tabele中 含有多少个 Session,下面遍历这些Session</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> ehdr<span class="token punctuation">.</span>e_shnum<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//依次执行读取操作，读取到  shdr 变量中</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">read</span><span class="token punctuation">(</span>fd<span class="token punctuation">,</span> <span class="token operator">&amp;</span>shdr<span class="token punctuation">,</span> <span class="token function">sizeof</span><span class="token punctuation">(</span>Elf64_Shdr<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token function">sizeof</span><span class="token punctuation">(</span>Elf64_Shdr<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"Find section .text procedure failed"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">goto</span> _error<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"session name %s"</span><span class="token punctuation">,</span> shstr <span class="token operator">+</span> shdr<span class="token punctuation">.</span>sh_name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//依次读取 Section的名字，注意 sh_name 代表Session的名字，他实际上是.shstrtab中的索引，该string table中存储着所有 session 的名字</span>
+        <span class="token comment" spellcheck="true">//通过shdr -> sh_name 在str字符串中索引，与.mytext进行字符串比较，如果不匹配，继续读取</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">strcmp</span><span class="token punctuation">(</span>shstr <span class="token operator">+</span> shdr<span class="token punctuation">.</span>sh_name<span class="token punctuation">,</span> target_section<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">//找到对应的我们要加密的session， 通过shdr -> sh_offset 和 shdr -> sh_size字段，将.mytext内容读取并保存在content中。</span>
+            base <span class="token operator">=</span> shdr<span class="token punctuation">.</span>sh_offset<span class="token punctuation">;</span>
+            length <span class="token operator">=</span> shdr<span class="token punctuation">.</span>sh_size<span class="token punctuation">;</span>
+            <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"Find section %s\n"</span><span class="token punctuation">,</span> target_section<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">break</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true">//定位到查找到session的位置</span>
+    <span class="token function">lseek</span><span class="token punctuation">(</span>fd<span class="token punctuation">,</span> base<span class="token punctuation">,</span> SEEK_SET<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//分配内存空间，存储要加密的内容</span>
+    content <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">)</span> <span class="token function">malloc</span><span class="token punctuation">(</span>length<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>content <span class="token operator">==</span> NULL<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"Malloc space for content failed"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">goto</span> _error<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//读取内容</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">read</span><span class="token punctuation">(</span>fd<span class="token punctuation">,</span> content<span class="token punctuation">,</span> length<span class="token punctuation">)</span> <span class="token operator">!=</span> length<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"Read section .text failed"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">goto</span> _error<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    nblock <span class="token operator">=</span> length <span class="token operator">/</span> block_size<span class="token punctuation">;</span>
+    nsize <span class="token operator">=</span> base <span class="token operator">/</span> <span class="token number">4096</span> <span class="token operator">+</span> <span class="token punctuation">(</span>base <span class="token operator">%</span> <span class="token number">4096</span> <span class="token operator">==</span> <span class="token number">0</span> <span class="token operator">?</span> <span class="token number">0</span> <span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"base = %d, length = %d\n"</span><span class="token punctuation">,</span> base<span class="token punctuation">,</span> length<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"nblock = %d, nsize = %d\n"</span><span class="token punctuation">,</span> nblock<span class="token punctuation">,</span> nsize<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">//为了验证第二节中关于section 字段可以任意修改的结论，这里，将shdr -> addr 写入ELF头e_shoff，将shdr -> sh_size 和 addr 所在内存块写入e_entry中，</span>
+    <span class="token comment" spellcheck="true">//即ehdr.e_entry = (length &lt;&lt; 16) + nsize。当然，这样同时也简化了解密流程，还有一个好处是：如果将so文件头修正放回去，程序是不能运行的。</span>
+    ehdr<span class="token punctuation">.</span>e_entry <span class="token operator">=</span> <span class="token punctuation">(</span>length <span class="token operator">&lt;&lt;</span> <span class="token number">16</span><span class="token punctuation">)</span> <span class="token operator">+</span> nsize<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//ndroid7.0后JNI库必须保留Section Headers。由于加密时修改了shoff值，导致加载so库值解析Section Headers 解析不了，</span>
+    <span class="token comment" spellcheck="true">//包.dynamic section header was not found。修改测量：shoff和entry目的是为了存储加密的偏移大小和加密的大小。我们可以使用entry高低16位来分别存储着两个值。即可解决该问题。</span>
+    ehdr<span class="token punctuation">.</span>e_flags <span class="token operator">=</span> base<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//ehdr.e_entry = (length >> 16) + base;</span>
+
+    <span class="token comment" spellcheck="true">//  为了便于理解，不使用复杂的加密算法。这里，只将content的所有内容取反，即 *content = ~(*content);</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> length<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        content<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token operator">~</span>content<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true">//最后将修改的内容写回去</span>
+    <span class="token function">lseek</span><span class="token punctuation">(</span>fd<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> SEEK_SET<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">write</span><span class="token punctuation">(</span>fd<span class="token punctuation">,</span> <span class="token operator">&amp;</span>ehdr<span class="token punctuation">,</span> <span class="token function">sizeof</span><span class="token punctuation">(</span>Elf64_Ehdr<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token function">sizeof</span><span class="token punctuation">(</span>Elf64_Ehdr<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"Write ELFhead to .so failed"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">goto</span> _error<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token function">lseek</span><span class="token punctuation">(</span>fd<span class="token punctuation">,</span> base<span class="token punctuation">,</span> SEEK_SET<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">write</span><span class="token punctuation">(</span>fd<span class="token punctuation">,</span> content<span class="token punctuation">,</span> length<span class="token punctuation">)</span> <span class="token operator">!=</span> length<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"Write modified content to .so failed"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">goto</span> _error<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"Completed"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    _error<span class="token operator">:</span>
+    <span class="token function">free</span><span class="token punctuation">(</span>content<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">free</span><span class="token punctuation">(</span>shstr<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">close</span><span class="token punctuation">(</span>fd<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>加密流程：</p>
+<blockquote>
+<p>1)  从so文件头读取section偏移shoff、shnum和shstrtab<br>2)  读取shstrtab中的字符串，存放在str空间中<br>3)  从shoff位置开始读取section header, 存放在shdr<br>4)  通过shdr -&gt; sh_name 在str字符串中索引，与.mytext进行字符串比较，如果不匹配，继续读取<br>5)  通过shdr -&gt; sh_offset 和 shdr -&gt; sh_size字段，将.mytext内容读取并保存在content中。<br>6)  为了便于理解，不使用复杂的加密算法。这里，只将content的所有内容取反，即 <em>content = ~(</em>content);<br>7)  将content内容写回so文件中<br>8)  为了验证第二节中关于section 字段可以任意修改的结论，这里，将shdr -&gt; addr 写入ELF头e_shoff，将shdr -&gt; sh_size 和 addr 所在内存块写入e_entry中，即  ehdr.e_entry = (length &lt;&lt; 16) + nsize。当然，这样同时也简化了解密流程，还有一个好处是：如果将so文件头修正放回去，程序是不能运行的。</p>
+</blockquote>
+<p>这里要注意，对于第八点来说，在Android 7.0以上是不允许修改 e_shoff 的，具体可以参考下面的连接，这里为了方便将addr放在了 flags字段中,还有要注意是64位还是32位的，这个可以通过头部的class字段知道<br><a href="https://blog.micblo.com/2018/02/10/Android-SO%E5%BA%93%E6%96%87%E4%BB%B6%E5%A4%B4%E5%88%86%E6%9E%90/" target="_blank" rel="noopener">ELF学习日记-Android SO库文件头分析</a></p>
+<p>解密的实现</p>
+<pre class=" language-java"><code class="language-java">#include <span class="token operator">&lt;</span>jni<span class="token punctuation">.</span>h<span class="token operator">></span>
+#include <span class="token operator">&lt;</span>stdio<span class="token punctuation">.</span>h<span class="token operator">></span>
+#include <span class="token operator">&lt;</span>stdlib<span class="token punctuation">.</span>h<span class="token operator">></span>
+#include <span class="token operator">&lt;</span>string<span class="token punctuation">.</span>h<span class="token operator">></span>
+#include <span class="token operator">&lt;</span>unistd<span class="token punctuation">.</span>h<span class="token operator">></span>
+#include <span class="token operator">&lt;</span>sys<span class="token operator">/</span>types<span class="token punctuation">.</span>h<span class="token operator">></span>
+#include <span class="token operator">&lt;</span>elf<span class="token punctuation">.</span>h<span class="token operator">></span>
+#include <span class="token operator">&lt;</span>sys<span class="token operator">/</span>mman<span class="token punctuation">.</span>h<span class="token operator">></span>
+#include <span class="token operator">&lt;</span>stdio<span class="token punctuation">.</span>h<span class="token operator">></span>
+#include <span class="token operator">&lt;</span>fcntl<span class="token punctuation">.</span>h<span class="token operator">></span>
+#include <span class="token operator">&lt;</span>elf<span class="token punctuation">.</span>h<span class="token operator">></span>
+#include <span class="token operator">&lt;</span>stdlib<span class="token punctuation">.</span>h<span class="token operator">></span>
+#include <span class="token operator">&lt;</span>string<span class="token punctuation">.</span>h<span class="token operator">></span>
+#include <span class="token operator">&lt;</span>unistd<span class="token punctuation">.</span>h<span class="token operator">></span>
+#include <span class="token string">"PrintLog.h"</span>
+
+jstring <span class="token function">getString</span><span class="token punctuation">(</span>JNIEnv<span class="token operator">*</span><span class="token punctuation">)</span> <span class="token function">__attribute__</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">section</span> <span class="token punctuation">(</span><span class="token string">".textdemo"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+jstring <span class="token function">getString</span><span class="token punctuation">(</span>JNIEnv<span class="token operator">*</span> env<span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token operator">*</span>env<span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">NewStringUTF</span><span class="token punctuation">(</span>env<span class="token punctuation">,</span> <span class="token string">"Native method return 123!"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">//解密时，需要保证解密函数在so加载时被调用，所以函数的声明为  void init_getString() __attribute__((constructor));</span>
+<span class="token keyword">void</span> <span class="token function">init_getString</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token function">__attribute__</span><span class="token punctuation">(</span><span class="token punctuation">(</span>constructor<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+unsigned <span class="token keyword">long</span> <span class="token function">getLibAddr</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">init_getString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">char</span> name<span class="token punctuation">[</span><span class="token number">15</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    unsigned <span class="token keyword">int</span> nblock<span class="token punctuation">;</span>
+    unsigned <span class="token keyword">int</span> nsize<span class="token punctuation">;</span>
+    unsigned <span class="token keyword">long</span> base<span class="token punctuation">;</span>
+    unsigned <span class="token keyword">long</span> text_addr<span class="token punctuation">;</span>
+    unsigned <span class="token keyword">int</span> i<span class="token punctuation">;</span>
+    Elf64_Ehdr <span class="token operator">*</span>ehdr<span class="token punctuation">;</span>
+    Elf64_Shdr <span class="token operator">*</span>shdr<span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">//首先调用 getLibAddr方法，得到so 文件在内存中的开地址</span>
+    base <span class="token operator">=</span> <span class="token function">getLibAddr</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">//读取前 52个字节，即 ELF 头，通过 e_shoff 获得 .mytext内存加载地址，endr_entry获取 .mytext大小和所在内存块</span>
+    <span class="token comment" spellcheck="true">//这是因为你存的时候，就是这样存储的</span>
+    ehdr <span class="token operator">=</span> <span class="token punctuation">(</span>Elf64_Ehdr <span class="token operator">*</span><span class="token punctuation">)</span>base<span class="token punctuation">;</span>
+
+    text_addr <span class="token operator">=</span> ehdr<span class="token operator">-</span><span class="token operator">></span>e_flags <span class="token operator">+</span> base<span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">// ehdr.e_entry = (length &lt;&lt; 16) + nsize;</span>
+    nblock <span class="token operator">=</span> ehdr<span class="token operator">-</span><span class="token operator">></span>e_entry <span class="token operator">>></span> <span class="token number">16</span><span class="token punctuation">;</span>
+    nsize <span class="token operator">=</span> ehdr<span class="token operator">-</span><span class="token operator">></span>e_entry <span class="token operator">&amp;</span> <span class="token number">0xffff</span><span class="token punctuation">;</span>
+
+    <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"nblock = %d nsize == %d \n"</span><span class="token punctuation">,</span> nblock<span class="token punctuation">,</span>nsize<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">//修改.mytext所在内存块的读写权限</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">mprotect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">void</span> <span class="token operator">*</span><span class="token punctuation">)</span> base<span class="token punctuation">,</span> <span class="token number">4096</span> <span class="token operator">*</span> nsize<span class="token punctuation">,</span> PROT_READ <span class="token operator">|</span> PROT_EXEC <span class="token operator">|</span> PROT_WRITE<span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"mem privilege change failed"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true">//将 [e_shoff,e_shoff+size]内存区域数据解密，即取反操作</span>
+    <span class="token keyword">for</span><span class="token punctuation">(</span>i<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span>i<span class="token operator">&lt;</span> nblock<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token keyword">char</span> <span class="token operator">*</span>addr <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">char</span><span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">(</span>text_addr <span class="token operator">+</span> i<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token operator">*</span>addr <span class="token operator">=</span> <span class="token operator">~</span><span class="token punctuation">(</span><span class="token operator">*</span>addr<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true">//修改会内存区域的读写权限</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">mprotect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">void</span> <span class="token operator">*</span><span class="token punctuation">)</span> base<span class="token punctuation">,</span> <span class="token number">4096</span> <span class="token operator">*</span> nsize<span class="token punctuation">,</span> PROT_READ <span class="token operator">|</span> PROT_EXEC<span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"mem privilege change failed"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"Decrypt success"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+unsigned <span class="token keyword">long</span> <span class="token function">getLibAddr</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    unsigned <span class="token keyword">long</span> ret <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">char</span> name<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">"libnative-lib.so"</span><span class="token punctuation">;</span>
+    <span class="token keyword">char</span> buf<span class="token punctuation">[</span><span class="token number">4096</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">*</span>temp<span class="token punctuation">;</span>
+    <span class="token keyword">int</span> pid<span class="token punctuation">;</span>
+    FILE <span class="token operator">*</span>fp<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//当前当前进程下面的所有的文件描述符</span>
+    pid <span class="token operator">=</span> <span class="token function">getpid</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">sprintf</span><span class="token punctuation">(</span>buf<span class="token punctuation">,</span> <span class="token string">"/proc/%d/maps"</span><span class="token punctuation">,</span> pid<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    fp <span class="token operator">=</span> <span class="token function">fopen</span><span class="token punctuation">(</span>buf<span class="token punctuation">,</span> <span class="token string">"r"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>fp <span class="token operator">==</span> NULL<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"open failed"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">goto</span> _error<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">while</span><span class="token punctuation">(</span><span class="token function">fgets</span><span class="token punctuation">(</span>buf<span class="token punctuation">,</span> <span class="token function">sizeof</span><span class="token punctuation">(</span>buf<span class="token punctuation">)</span><span class="token punctuation">,</span> fp<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//找到  libnative-lib.so 的内存映射地址</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">strstr</span><span class="token punctuation">(</span>buf<span class="token punctuation">,</span> name<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+            temp <span class="token operator">=</span> <span class="token function">strtok</span><span class="token punctuation">(</span>buf<span class="token punctuation">,</span> <span class="token string">"-"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            ret <span class="token operator">=</span> <span class="token function">strtoul</span><span class="token punctuation">(</span>temp<span class="token punctuation">,</span> NULL<span class="token punctuation">,</span> <span class="token number">16</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">break</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    _error<span class="token operator">:</span>
+    <span class="token function">fclose</span><span class="token punctuation">(</span>fp<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> ret<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+JNIEXPORT jstring JNICALL
+<span class="token function">Java_com_example_androidelf_MainActivity_stringFromJNI</span><span class="token punctuation">(</span> JNIEnv<span class="token operator">*</span> env<span class="token punctuation">,</span>jobject thiz <span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token function">getString</span><span class="token punctuation">(</span>env<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>在这里重点解释这个解密函数：<br>首先看到的是getLibAddr()这个函数：在介绍这个函数之前首先了解一个内存映射问题：<br>和Linux一样，Android提供了基于/proc的“伪文件”系统来作为查看用户进程内存映像的接口(cat /proc/pid/maps)。可以说，这是Android系统内核层开放给用户层关于进程内存信息的一扇窗户。通过它，我们可以查看到当前进程空间的内存映射情况，模块加载情况以及虚拟地址和内存读写执行（rwxp）属性等。<br><img src="/uploads/so加密/进程下面打开的文件描述符.png" alt="结果显示"></p>
+<p>因为根据前面加载so的流程可以知道，其实也是调用open函数打开一个文件，所以肯定可以这里面找到<br>接下来包括内存权限的修改以及函数的解密算法，最后包括内存权限的修改回去，应该都比较好理解。ok，以上编写完以后就编译生成.so文件</p>
+<p>解密时，需要保证解密函数在so加载时被调用，那函数声明为：init_getString <strong>attribute</strong>((constructor))。(也可以使用c++构造器实现， 其本质也是用attribute实现)<br>解密流程：</p>
+<blockquote>
+<p>1)  动态链接器通过call_array调用init_getString<br>2)  Init_getString首先调用getLibAddr方法，得到so文件在内存中的起始地址<br>3)  读取前52字节，即ELF头。通过 e_flags 获得.textdemo内存加载地址，ehdr.e_entry获取.mytext大小和所在内存块<br>4)  修改.textdemo 所在内存块的读写权限<br>5)  将[e_flags, e_flags + size]内存区域数据解密，即取反操作：<em>content = ~(</em>content);<br>6)  修改回内存区域的读写权限<br>(这里是对代码段的数据进行解密，需要写权限。如果对数据段的数据解密，是不需要更改权限直接操作的)</p>
+</blockquote>
+<p>这里要注意的是，我们的这个解密算法是肯定写在我们的so里面的，第一次运行的时候，我们只能执行安装操作，而不能直接使用，因为我们使用了解密函数，而一开始我们的so是没有加密的，那肯定会崩溃所以一开始我们我们可以将这个原始的so打包出来，然后放到sd卡下面，接着 程序运行的时候，加载  System.loadLibrary(“encoder-lib”); 完成加密的操作</p>
+<p>加密的结果，我们可以使用  readelf -S libnative-lib.so ,查看session信息，可以看到，我们加的session  textdemo 是在里面的<br><img src="/uploads/so加密/添加的session.png" alt="结果显示"></p>
+<p>拿到加密后的so使用  IDA 打开，可以看到出现了错误<br><img src="/uploads/so加密/加密后的so使用ID.png" alt="结果显示"></p>
+<p>接着拿到加密后的so重新加载，此时就可以解析出来<br><img src="/uploads/so加密/解码成功.png" alt="结果显示"></p>
+<h3 id="LLVM"><a href="#LLVM" class="headerlink" title="LLVM"></a>LLVM</h3><p>LLVM可以做到达到混淆native层代码的效果，增大破解的难度，可以参考下面的文章<br><a href="https://blog.csdn.net/tabactivity/article/details/81262570" target="_blank" rel="noopener">手把手编译OLLVM（obfuscator-llvm）</a><br><a href="https://blog.csdn.net/mergerly/article/details/60962140?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromBaidu-1.channel_param&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromBaidu-1.channel_param" target="_blank" rel="noopener">利用OLLVM混淆Android Native代码篇一</a><br>也可以参考我之前写的关于LLVM的搭建过程,其实有些目前市面上的sdk，有些就是直接使用了llvm来做的<br><a href="https://aheadsnail.github.io/2018/06/17/Window%E4%B8%8BOOLLVM-Android%E7%BC%96%E8%AF%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">Window下OOLLVM Android编译环境搭建</a></p>
+<h3 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h3><ol>
+<li><a href="https://blog.micblo.com/2018/02/10/Android-SO%E5%BA%93%E6%96%87%E4%BB%B6%E5%A4%B4%E5%88%86%E6%9E%90/#%E5%81%B7%E5%B0%B1%E5%AE%8C%E4%BA%8B%E4%BA%86" target="_blank" rel="noopener">ELF学习日记-Android SO库文件头分析</a></li>
+<li><a href="https://www.matools.com/blog/190347556" target="_blank" rel="noopener">Android SO库文件头分析</a></li>
+<li><a href="https://xz.aliyun.com/t/5328" target="_blank" rel="noopener">android so加固之section加密</a></li>
+<li><a href="https://cloud.tencent.com/developer/article/1193471" target="_blank" rel="noopener">ELF中可以被修改又不影响执行的区域</a></li>
+<li><a href="https://blog.csdn.net/qq_40239482/article/details/100132259" target="_blank" rel="noopener">ELF文件解析和加载(附代码)</a></li>
+<li><a href="https://blog.csdn.net/zhangmiaoping23/article/details/80016399" target="_blank" rel="noopener">Android SO文件保护加固——加密篇</a></li>
+<li><a href="https://shuwoom.com/?p=286" target="_blank" rel="noopener">ELF文件格式分析</a></li>
+<li><a href="https://shuwoom.com/?p=351" target="_blank" rel="noopener">SO加载解析过程</a></li>
+<li><a href="https://blog.csdn.net/ylcangel/article/details/37997853" target="_blank" rel="noopener">ELF 解析.dynamic 节</a></li>
+<li><a href="https://www.jianshu.com/p/27bed97a3896" target="_blank" rel="noopener">ELF文件格式修复</a></li>
+<li><a href="http://www.polaris-lab.com/index.php/2019/09/" target="_blank" rel="noopener">无文件的ELF执行</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/22652847" target="_blank" rel="noopener">【腾讯Bugly干货分享】Android Linker 与 SO 加壳技术</a></li>
+<li><a href="https://bbs.pediy.com/thread-249589.htm" target="_blank" rel="noopener">Android ELF系列:ELF文件格式简析到linker的链接so文件原理分析</a></li>
+<li><a href="https://blog.csdn.net/helloworld_ptt/article/details/79575783" target="_blank" rel="noopener">Windows下的ELF文件解析代码C++</a></li>
+<li><a href="https://github.com/elemeta/elfloader" target="_blank" rel="noopener">elfloader</a></li>
+<li><a href="https://github.com/nsxz/ReflectiveELFLoader" target="_blank" rel="noopener">ReflectiveELFLoader</a></li>
+</ol>
+
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">AheadSnail</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://aheadsnail.github.io/2020/09/29/so-ru-men-jia-mi/">https://aheadsnail.github.io/2020/09/29/so-ru-men-jia-mi/</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">AheadSnail</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Android/">
+                                    <span class="chip bg-color">Android</span>
+                                </a>
+                            
+                                <a href="/tags/ELF/">
+                                    <span class="chip bg-color">ELF</span>
+                                </a>
+                            
+                                <a href="/tags/SO/">
+                                    <span class="chip bg-color">SO</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2020/10/19/wei-xin-zhong-duan-kua-ping-tai-zu-jian-mars-huan-jing-pei-zhi/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/19.jpg" class="responsive-img" alt="微信终端跨平台组件 Mars环境配置">
+                        
+                        <span class="card-title">微信终端跨平台组件 Mars环境配置</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2020-10-19
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            AheadSnail
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Android/">
+                        <span class="chip bg-color">Android</span>
+                    </a>
+                    
+                    <a href="/tags/NDK/">
+                        <span class="chip bg-color">NDK</span>
+                    </a>
+                    
+                    <a href="/tags/Mars/">
+                        <span class="chip bg-color">Mars</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2020/09/26/mmkv-ge-ren-li-jie/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="mmkv个人理解">
+                        
+                        <span class="card-title">mmkv个人理解</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2020-09-26
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            AheadSnail
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Android/">
+                        <span class="chip bg-color">Android</span>
+                    </a>
+                    
+                    <a href="/tags/mmkv/">
+                        <span class="chip bg-color">mmkv</span>
+                    </a>
+                    
+                    <a href="/tags/SharedPreferences/">
+                        <span class="chip bg-color">SharedPreferences</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="503838841"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='random'
+                   preload='auto'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 0px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2019-2021</span>
+            
+            <span id="year">2019</span>
+            <a href="/about" target="_blank">AheadSnail</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/blinkfox" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:1181062873@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=1181062873" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 1181062873" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    <!--腾讯兔小巢-->
+    
+    
+
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>

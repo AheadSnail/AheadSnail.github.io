@@ -1,0 +1,417 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>AheadSnail&#39;s blog</title>
+  <icon>https://www.gravatar.com/avatar/3da6bcfd648195461bee332217d8ec72</icon>
+  <subtitle>Good good study Day day up</subtitle>
+  <link href="https://aheadsnail.github.io/atom.xml" rel="self"/>
+  
+  <link href="https://aheadsnail.github.io/"/>
+  <updated>2021-03-28T03:21:22.033Z</updated>
+  <id>https://aheadsnail.github.io/</id>
+  
+  <author>
+    <name>AheadSnail</name>
+    <email>1037626127@qq.com</email>
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>grafika-理解</title>
+    <link href="https://aheadsnail.github.io/2021/01/07/grafika-li-jie/"/>
+    <id>https://aheadsnail.github.io/2021/01/07/grafika-li-jie/</id>
+    <published>2021-01-07T03:21:30.000Z</published>
+    <updated>2021-03-28T03:21:22.033Z</updated>
+    
+    
+    <summary type="html">阅读 grafika 源码 ，记录下个人对grafika 的理解</summary>
+    
+    
+    
+    
+    <category term="Android" scheme="https://aheadsnail.github.io/tags/Android/"/>
+    
+    <category term="音视频" scheme="https://aheadsnail.github.io/tags/音视频/"/>
+    
+    <category term="grafika" scheme="https://aheadsnail.github.io/tags/grafika/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>AudioVideoRecordingSample 理解</title>
+    <link href="https://aheadsnail.github.io/2020/12/23/audiovideorecordingsample-li-jie/"/>
+    <id>https://aheadsnail.github.io/2020/12/23/audiovideorecordingsample-li-jie/</id>
+    <published>2020-12-23T02:56:45.000Z</published>
+    <updated>2021-03-28T03:22:53.129Z</updated>
+    
+    
+    <summary type="html">AudioVideoRecordingSample 理解</summary>
+    
+    
+    
+    
+    <category term="Android" scheme="https://aheadsnail.github.io/tags/Android/"/>
+    
+    <category term="AudioVideoRecordingSample" scheme="https://aheadsnail.github.io/tags/AudioVideoRecordingSample/"/>
+    
+    <category term="音视频" scheme="https://aheadsnail.github.io/tags/音视频/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>阅读 GpuImage 有感</title>
+    <link href="https://aheadsnail.github.io/2020/12/16/gpuimage-yuan-ma-fen-xi/"/>
+    <id>https://aheadsnail.github.io/2020/12/16/gpuimage-yuan-ma-fen-xi/</id>
+    <published>2020-12-16T03:03:16.000Z</published>
+    <updated>2021-03-28T03:22:10.529Z</updated>
+    
+    
+    <summary type="html">阅读 GpuImage 有感</summary>
+    
+    
+    
+    
+    <category term="Android" scheme="https://aheadsnail.github.io/tags/Android/"/>
+    
+    <category term="音视频" scheme="https://aheadsnail.github.io/tags/音视频/"/>
+    
+    <category term="GpuImage" scheme="https://aheadsnail.github.io/tags/GpuImage/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>微信终端跨平台组件 Mars环境配置</title>
+    <link href="https://aheadsnail.github.io/2020/10/19/wei-xin-zhong-duan-kua-ping-tai-zu-jian-mars-huan-jing-pei-zhi/"/>
+    <id>https://aheadsnail.github.io/2020/10/19/wei-xin-zhong-duan-kua-ping-tai-zu-jian-mars-huan-jing-pei-zhi/</id>
+    <published>2020-10-19T02:44:59.000Z</published>
+    <updated>2021-03-28T03:28:37.346Z</updated>
+    
+    
+    <summary type="html">微信终端跨平台组件 Mars环境配置</summary>
+    
+    
+    
+    
+    <category term="Android" scheme="https://aheadsnail.github.io/tags/Android/"/>
+    
+    <category term="NDK" scheme="https://aheadsnail.github.io/tags/NDK/"/>
+    
+    <category term="Mars" scheme="https://aheadsnail.github.io/tags/Mars/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>so入门加密</title>
+    <link href="https://aheadsnail.github.io/2020/09/29/so-ru-men-jia-mi/"/>
+    <id>https://aheadsnail.github.io/2020/09/29/so-ru-men-jia-mi/</id>
+    <published>2020-09-29T01:09:32.000Z</published>
+    <updated>2021-03-28T03:26:57.192Z</updated>
+    
+    
+    <summary type="html">在native层为.so文件进行加固</summary>
+    
+    
+    
+    
+    <category term="Android" scheme="https://aheadsnail.github.io/tags/Android/"/>
+    
+    <category term="ELF" scheme="https://aheadsnail.github.io/tags/ELF/"/>
+    
+    <category term="SO" scheme="https://aheadsnail.github.io/tags/SO/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>mmkv个人理解</title>
+    <link href="https://aheadsnail.github.io/2020/09/26/mmkv-ge-ren-li-jie/"/>
+    <id>https://aheadsnail.github.io/2020/09/26/mmkv-ge-ren-li-jie/</id>
+    <published>2020-09-26T11:12:37.000Z</published>
+    <updated>2021-03-28T03:25:42.974Z</updated>
+    
+    
+    <summary type="html">mmkv个人理解</summary>
+    
+    
+    
+    
+    <category term="Android" scheme="https://aheadsnail.github.io/tags/Android/"/>
+    
+    <category term="mmkv" scheme="https://aheadsnail.github.io/tags/mmkv/"/>
+    
+    <category term="SharedPreferences" scheme="https://aheadsnail.github.io/tags/SharedPreferences/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Binder 记录</title>
+    <link href="https://aheadsnail.github.io/2020/09/17/binder-ji-lu/"/>
+    <id>https://aheadsnail.github.io/2020/09/17/binder-ji-lu/</id>
+    <published>2020-09-17T03:13:45.000Z</published>
+    <updated>2021-03-28T03:35:01.986Z</updated>
+    
+    
+    <summary type="html">Binder 记录</summary>
+    
+    
+    
+    
+    <category term="Android" scheme="https://aheadsnail.github.io/tags/Android/"/>
+    
+    <category term="Binder" scheme="https://aheadsnail.github.io/tags/Binder/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Bt项目总结</title>
+    <link href="https://aheadsnail.github.io/2020/08/24/bt-xiang-mu-zong-jie/"/>
+    <id>https://aheadsnail.github.io/2020/08/24/bt-xiang-mu-zong-jie/</id>
+    <published>2020-08-24T12:48:53.000Z</published>
+    <updated>2021-03-28T03:33:00.211Z</updated>
+    
+    
+    <summary type="html">Bt项目总结</summary>
+    
+    
+    
+    
+    <category term="bt" scheme="https://aheadsnail.github.io/tags/bt/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>使用Libuv小结</title>
+    <link href="https://aheadsnail.github.io/2020/06/29/shi-yong-libuv-xiao-jie/"/>
+    <id>https://aheadsnail.github.io/2020/06/29/shi-yong-libuv-xiao-jie/</id>
+    <published>2020-06-29T02:26:32.000Z</published>
+    <updated>2021-03-28T03:31:23.803Z</updated>
+    
+    
+    <summary type="html">使用Libuv小结</summary>
+    
+    
+    
+    
+    <category term="bt" scheme="https://aheadsnail.github.io/tags/bt/"/>
+    
+    <category term="libuv" scheme="https://aheadsnail.github.io/tags/libuv/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>libuv+utp优化</title>
+    <link href="https://aheadsnail.github.io/2020/05/28/libuv-utp-you-hua/"/>
+    <id>https://aheadsnail.github.io/2020/05/28/libuv-utp-you-hua/</id>
+    <published>2020-05-28T07:25:22.000Z</published>
+    <updated>2021-03-28T03:39:34.030Z</updated>
+    
+    
+    <summary type="html">libuv+utp优化</summary>
+    
+    
+    
+    
+    <category term="utp" scheme="https://aheadsnail.github.io/tags/utp/"/>
+    
+    <category term="bt" scheme="https://aheadsnail.github.io/tags/bt/"/>
+    
+    <category term="libuv" scheme="https://aheadsnail.github.io/tags/libuv/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Aria2性能优化下篇</title>
+    <link href="https://aheadsnail.github.io/2019/10/26/aria2-xing-neng-you-hua-xia-pian/"/>
+    <id>https://aheadsnail.github.io/2019/10/26/aria2-xing-neng-you-hua-xia-pian/</id>
+    <published>2019-10-26T02:25:22.000Z</published>
+    <updated>2021-03-28T03:38:45.589Z</updated>
+    
+    
+    <summary type="html">Aria2性能优化下篇</summary>
+    
+    
+    
+    
+    <category term="Android" scheme="https://aheadsnail.github.io/tags/Android/"/>
+    
+    <category term="Aria2" scheme="https://aheadsnail.github.io/tags/Aria2/"/>
+    
+    <category term="NDK" scheme="https://aheadsnail.github.io/tags/NDK/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Aria2性能优化上篇</title>
+    <link href="https://aheadsnail.github.io/2019/10/15/aria2-xing-neng-you-hua-shang-pian/"/>
+    <id>https://aheadsnail.github.io/2019/10/15/aria2-xing-neng-you-hua-shang-pian/</id>
+    <published>2019-10-15T01:01:46.000Z</published>
+    <updated>2021-03-28T03:36:45.865Z</updated>
+    
+    
+    <summary type="html">Aria2性能优化上篇</summary>
+    
+    
+    
+    
+    <category term="Android" scheme="https://aheadsnail.github.io/tags/Android/"/>
+    
+    <category term="Aria2" scheme="https://aheadsnail.github.io/tags/Aria2/"/>
+    
+    <category term="NDK" scheme="https://aheadsnail.github.io/tags/NDK/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Valgrind Native 内存检测</title>
+    <link href="https://aheadsnail.github.io/2019/07/20/valgrind-native-nei-cun-jian-ce/"/>
+    <id>https://aheadsnail.github.io/2019/07/20/valgrind-native-nei-cun-jian-ce/</id>
+    <published>2019-07-20T06:21:19.000Z</published>
+    <updated>2021-03-28T02:18:43.489Z</updated>
+    
+    
+    <summary type="html">Valgrind Native 内存检测</summary>
+    
+    
+    
+    
+    <category term="Android" scheme="https://aheadsnail.github.io/tags/Android/"/>
+    
+    <category term="NDK" scheme="https://aheadsnail.github.io/tags/NDK/"/>
+    
+    <category term="Valgrind" scheme="https://aheadsnail.github.io/tags/Valgrind/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Matrix Resource Cannary 源码解析</title>
+    <link href="https://aheadsnail.github.io/2019/03/15/matrix-resource-cannary-yuan-ma-jie-xi/"/>
+    <id>https://aheadsnail.github.io/2019/03/15/matrix-resource-cannary-yuan-ma-jie-xi/</id>
+    <published>2019-03-15T01:12:38.000Z</published>
+    <updated>2021-03-28T02:18:43.483Z</updated>
+    
+    
+    <summary type="html">Matrix Resource Cannary 源码解析</summary>
+    
+    
+    
+    
+    <category term="Android" scheme="https://aheadsnail.github.io/tags/Android/"/>
+    
+    <category term="Matrix" scheme="https://aheadsnail.github.io/tags/Matrix/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Matrix SQLite Lint源码解析</title>
+    <link href="https://aheadsnail.github.io/2019/03/14/matrix-sqlite-lint-yuan-ma-jie-xi/"/>
+    <id>https://aheadsnail.github.io/2019/03/14/matrix-sqlite-lint-yuan-ma-jie-xi/</id>
+    <published>2019-03-14T01:04:20.000Z</published>
+    <updated>2021-03-28T02:18:43.483Z</updated>
+    
+    
+    <summary type="html">Matrix SQLite Lint源码解析</summary>
+    
+    
+    
+    
+    <category term="Android" scheme="https://aheadsnail.github.io/tags/Android/"/>
+    
+    <category term="Matrix" scheme="https://aheadsnail.github.io/tags/Matrix/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Matrix IO Canary源码解析</title>
+    <link href="https://aheadsnail.github.io/2019/03/13/matrix-io-canary-yuan-ma-jie-xi/"/>
+    <id>https://aheadsnail.github.io/2019/03/13/matrix-io-canary-yuan-ma-jie-xi/</id>
+    <published>2019-03-13T01:51:57.000Z</published>
+    <updated>2021-03-28T02:18:43.482Z</updated>
+    
+    
+    <summary type="html">Matrix IO Canary源码解析</summary>
+    
+    
+    
+    
+    <category term="Android" scheme="https://aheadsnail.github.io/tags/Android/"/>
+    
+    <category term="Matrix" scheme="https://aheadsnail.github.io/tags/Matrix/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Matrix Trace Canary 源码分析</title>
+    <link href="https://aheadsnail.github.io/2019/03/12/matrix-trace-canary-yuan-ma-fen-xi/"/>
+    <id>https://aheadsnail.github.io/2019/03/12/matrix-trace-canary-yuan-ma-fen-xi/</id>
+    <published>2019-03-12T05:58:27.000Z</published>
+    <updated>2021-03-28T02:18:43.484Z</updated>
+    
+    
+    <summary type="html">Matrix Trace Canary 源码分析</summary>
+    
+    
+    
+    
+    <category term="Android" scheme="https://aheadsnail.github.io/tags/Android/"/>
+    
+    <category term="Matrix" scheme="https://aheadsnail.github.io/tags/Matrix/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Aria2 Bt 辅助 Http下载实现</title>
+    <link href="https://aheadsnail.github.io/2019/03/11/aria2-bt-fu-zhu-http-xia-zai-shi-xian/"/>
+    <id>https://aheadsnail.github.io/2019/03/11/aria2-bt-fu-zhu-http-xia-zai-shi-xian/</id>
+    <published>2019-03-11T08:41:21.000Z</published>
+    <updated>2021-03-28T02:18:43.472Z</updated>
+    
+    
+    <summary type="html">Aria2 Bt 辅助 Http下载实现</summary>
+    
+    
+    
+    
+    <category term="Aria2" scheme="https://aheadsnail.github.io/tags/Aria2/"/>
+    
+    <category term="NDK" scheme="https://aheadsnail.github.io/tags/NDK/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>C++智能指针</title>
+    <link href="https://aheadsnail.github.io/2018/12/15/c-zhi-neng-zhi-zhen/"/>
+    <id>https://aheadsnail.github.io/2018/12/15/c-zhi-neng-zhi-zhen/</id>
+    <published>2018-12-15T07:40:37.000Z</published>
+    <updated>2021-03-28T02:18:43.477Z</updated>
+    
+    
+    <summary type="html">C++智能指针</summary>
+    
+    
+    
+    
+    <category term="C++" scheme="https://aheadsnail.github.io/tags/C/"/>
+    
+    <category term="智能指针" scheme="https://aheadsnail.github.io/tags/智能指针/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Aria2 改造Tracker逻辑</title>
+    <link href="https://aheadsnail.github.io/2018/12/06/aria2-gai-zao-tracker-luo-ji/"/>
+    <id>https://aheadsnail.github.io/2018/12/06/aria2-gai-zao-tracker-luo-ji/</id>
+    <published>2018-12-06T01:22:43.000Z</published>
+    <updated>2021-03-28T02:18:43.473Z</updated>
+    
+    
+    <summary type="html">Aria2 改造Tracker逻辑</summary>
+    
+    
+    
+    
+    <category term="Aria2" scheme="https://aheadsnail.github.io/tags/Aria2/"/>
+    
+    <category term="NDK" scheme="https://aheadsnail.github.io/tags/NDK/"/>
+    
+  </entry>
+  
+</feed>

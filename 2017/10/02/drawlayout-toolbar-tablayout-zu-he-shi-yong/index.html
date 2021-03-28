@@ -1,0 +1,1688 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="DrawLayout，ToolBar,TabLayout组合使用, AheadSnail&#39;s blog">
+    <meta name="description" content>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>DrawLayout，ToolBar,TabLayout组合使用 | AheadSnail&#39;s blog</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<link rel="alternate" href="/atom.xml" title="AheadSnail's blog" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">AheadSnail&#39;s blog</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/contact" class="waves-effect waves-light">
+      
+      <i class="fas fa-comments" style="zoom: 0.6;"></i>
+      
+      <span>留言板</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">AheadSnail&#39;s blog</div>
+        <div class="logo-desc">
+            
+            Never really desperate, only the lost of the soul.
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/contact" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-comments"></i>
+			
+			留言板
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/blinkfox/hexo-theme-matery" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/blinkfox/hexo-theme-matery" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/13.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">DrawLayout，ToolBar,TabLayout组合使用</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        padding: 35px 0 15px 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        padding-bottom: 30px;
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Android/">
+                                <span class="chip bg-color">Android</span>
+                            </a>
+                        
+                            <a href="/tags/DrawLayout，ToolBar/">
+                                <span class="chip bg-color">DrawLayout，ToolBar</span>
+                            </a>
+                        
+                            <a href="/tags/TabLayout/">
+                                <span class="chip bg-color">TabLayout</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2017-10-02
+                </div>
+                
+
+                
+
+                
+
+                
+
+                
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <p>DrawLayout，ToolBar,TabLayout组合使用<br><a id="more"></a></p>
+<h1 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a><strong>运行结果</strong></h1><p><img src="/uploads/DrawlayoutDemo.gif" alt="结果显示"></p>
+<h1 id="ToolBar使用流程"><a href="#ToolBar使用流程" class="headerlink" title="ToolBar使用流程"></a><strong>ToolBar使用流程</strong></h1><ul>
+<li>第一步  引入v7包</li>
+<li>第二步   修改Them主题  如果不修改，则会报异常 android:theme=”@style/Theme.AppCompat.NoActionBar”</li>
+<li>异常 This Activity already has an action bar supplied by the window decor</li>
+<li>第三步 在布局中写入ToolBar</li>
+<li>第三步  把Activity替换成AppCampactActivity     </li>
+<li>第四步   替换ToolBar setSupportActionBar(mToolbar);</li>
+</ul>
+<p><strong>ToolBar 常用的API介绍</strong></p>
+<pre class=" language-java"><code class="language-java"><span class="token number">1</span><span class="token punctuation">.</span> item的icon和title属性顾名思义，而app<span class="token operator">:</span>showAsAction属性则是用来指定这个动作是放置在操作栏上，还是溢出菜单中。当它的值设置为”ifRomom”时，如果操作栏有空间放置，
+则放置在操作栏上，否则放置到溢出菜单中。当它的值设置为”always”，这个动作将总是放置在操作栏上。当它的值设置为”never”，这个动作将总是放置在溢出菜单中。
+app<span class="token operator">:</span>showAsAction若为ifRoom则，作为app bar的按钮，若为never则为overflow menu中的选项，若app bar中的空间不足，则会将超出的部分全部放入overflow menu中
+
+下面的内容为我们项目工程里面的style的默认的三个颜色值
+设置ToolBar 颜色
+<span class="token operator">&lt;</span>item name<span class="token operator">=</span><span class="token string">"colorPrimary"</span><span class="token operator">></span>#2e8abb<span class="token operator">&lt;</span><span class="token operator">/</span>item<span class="token operator">></span> <span class="token operator">&lt;</span><span class="token operator">!</span><span class="token operator">--</span>浅蓝色<span class="token operator">--</span><span class="token operator">></span>
+设置状态蓝颜色
+<span class="token operator">&lt;</span>item name<span class="token operator">=</span><span class="token string">"colorPrimaryDark"</span><span class="token operator">></span>#3A5FCD<span class="token operator">&lt;</span><span class="token operator">/</span>item<span class="token operator">></span> <span class="token operator">&lt;</span><span class="token operator">!</span><span class="token operator">--</span>深蓝色<span class="token operator">--</span><span class="token operator">></span>
+设置副标题字体颜色
+<span class="token operator">&lt;</span>item name<span class="token operator">=</span><span class="token string">"android:textColorSecondary"</span><span class="token operator">></span>#00FFFF<span class="token operator">&lt;</span><span class="token operator">/</span>item<span class="token operator">></span>
+
+ToolBar  API
+<span class="token function">collapseActionView</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+折叠当前展开了行动视图。
+
+<span class="token function">showOverflowMenu</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+从显示相关的菜单溢出项目。
+
+<span class="token function">dismissPopupMenus</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+关闭所有当前显示弹出式菜单，包括溢出或子菜单。
+
+<span class="token function">isOverflowMenuShowing</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+检查溢出菜单是否正在显示。
+
+<span class="token function">inflateMenu</span><span class="token punctuation">(</span><span class="token keyword">int</span> resId<span class="token punctuation">)</span>
+膨胀的菜单资源到这个工具栏。
+
+<span class="token function">hideOverflowMenu</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+隐藏关联菜单溢出项目。
+
+<span class="token function">setContentInsetEndWithActions</span><span class="token punctuation">(</span><span class="token keyword">int</span> insetEndWithActions<span class="token punctuation">)</span>
+设置开始的内容插入时操作按钮都存在使用。
+
+<span class="token function">setContentInsetStartWithNavigation</span><span class="token punctuation">(</span><span class="token keyword">int</span> insetStartWithNavigation<span class="token punctuation">)</span>
+设置启动内容插入时，导航按钮存在使用。
+
+<span class="token function">setContentInsetsRelative</span><span class="token punctuation">(</span><span class="token keyword">int</span> contentInsetStart<span class="token punctuation">,</span> <span class="token keyword">int</span> contentInsetEnd<span class="token punctuation">)</span>
+设置此相对布局方向工具栏的内容插图。
+
+<span class="token function">setLogo</span><span class="token punctuation">(</span>Drawable drawable<span class="token punctuation">)</span>
+设置一个Log图片。
+
+<span class="token function">setLogoDescription</span><span class="token punctuation">(</span><span class="token keyword">int</span> resId<span class="token punctuation">)</span>
+设置Log的说明。
+
+<span class="token function">setNavigationContentDescription</span><span class="token punctuation">(</span>CharSequence description<span class="token punctuation">)</span>
+如果存在设置导航按钮的内容。
+
+<span class="token function">setNavigationOnClickListener</span><span class="token punctuation">(</span>View<span class="token punctuation">.</span>OnClickListener listener<span class="token punctuation">)</span>
+设置一个侦听器来导航事件
+
+<span class="token function">setOverflowIcon</span><span class="token punctuation">(</span>Drawable icon<span class="token punctuation">)</span>
+设置图标使用的溢出按钮。
+
+<span class="token function">setSubtitle</span><span class="token punctuation">(</span>CharSequence subtitle<span class="token punctuation">)</span>
+设置此工具栏的字幕。
+
+<span class="token function">setSubtitleTextAppearance</span><span class="token punctuation">(</span>Context context<span class="token punctuation">,</span> <span class="token keyword">int</span> resId<span class="token punctuation">)</span>
+设置文本颜色，大小，样式，颜色提示，并突出显示颜色从指定TextAppearance资源。
+
+<span class="token function">setTitleMargin</span><span class="token punctuation">(</span><span class="token keyword">int</span> start<span class="token punctuation">,</span> <span class="token keyword">int</span> top<span class="token punctuation">,</span> <span class="token keyword">int</span> end<span class="token punctuation">,</span> <span class="token keyword">int</span> bottom<span class="token punctuation">)</span>
+设置标题边距。
+
+<span class="token function">setTitleTextAppearance</span><span class="token punctuation">(</span>Context context<span class="token punctuation">,</span> <span class="token keyword">int</span> resId<span class="token punctuation">)</span>
+设置文本颜色，大小，样式，颜色提示，并突出显示颜色从指定TextAppearance资源。
+
+<span class="token function">setTitleTextColor</span><span class="token punctuation">(</span><span class="token keyword">int</span> color<span class="token punctuation">)</span>
+设置标题的文本颜色，如果存在的话
+</code></pre>
+<h1 id="TabLayout的基本使用"><a href="#TabLayout的基本使用" class="headerlink" title="TabLayout的基本使用"></a><strong>TabLayout的基本使用</strong></h1><pre class=" language-java"><code class="language-java">abLayout的基本使用
+<span class="token number">1</span> 在应用的build<span class="token punctuation">.</span>gradle中添加support<span class="token operator">:</span>design支持库
+<span class="token number">2</span> 创建activity_weibo_timeline<span class="token punctuation">.</span>xml文件，在布局文件中添加TabLayout及ViewPager：
+<span class="token number">3</span><span class="token punctuation">.</span>Tab的模式
+数据很多的时候我们应该怎么办呢，简书中的第二个Tab就是可以滑动的：
+我们先多加几个tab：
+超过屏幕之外了
+然后设置属性为：
+app<span class="token operator">:</span>tabMode<span class="token operator">=</span><span class="token string">"scrollable"</span>（默认是fixed：固定的，标签很多时候会被挤压，不能滑动。）
+
+<span class="token number">1</span><span class="token punctuation">.</span>改变选中字体的颜色    （觉得选中的颜色不好看    ）
+app<span class="token operator">:</span>tabSelectedTextColor<span class="token operator">=</span><span class="token string">"@android:color/holo_orange_light"</span>
+
+改变未选中字体的颜色
+app<span class="token operator">:</span>tabTextColor<span class="token operator">=</span><span class="token string">"@color/colorPrimary"</span>
+
+改变指示器下标的颜色
+app<span class="token operator">:</span>tabIndicatorColor<span class="token operator">=</span><span class="token string">"@android:color/holo_orange_light"</span>
+
+改变整个TabLayout的颜色
+app<span class="token operator">:</span>tabBackground<span class="token operator">=</span><span class="token string">"color"</span>
+
+改变TabLayout内部字体大小app<span class="token operator">:</span>tabTextAppearance<span class="token operator">=</span><span class="token string">"@android:style/TextAppearance.Holo.Large"</span><span class="token comment" spellcheck="true">//设置文字的外貌</span>
+
+改变指示器下标的高度
+app<span class="token operator">:</span>tabIndicatorHeight<span class="token operator">=</span><span class="token string">"4dp"</span>
+
+有时候Tab只有文字感觉有点单调了
+tabLayout<span class="token punctuation">.</span><span class="token function">addTab</span><span class="token punctuation">(</span>tabLayout<span class="token punctuation">.</span><span class="token function">newTab</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">setText</span><span class="token punctuation">(</span><span class="token string">"Tab 1"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">setIcon</span><span class="token punctuation">(</span>R<span class="token punctuation">.</span>mipmap<span class="token punctuation">.</span>ic_launcher<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>    
+
+<span class="token number">8</span><span class="token punctuation">.</span>加入Padding
+设置Tab内部的子控件的Padding：
+
+app<span class="token operator">:</span>tabPadding<span class="token operator">=</span><span class="token string">"xxdp"</span>
+app<span class="token operator">:</span>tabPaddingTop<span class="token operator">=</span><span class="token string">"xxdp"</span>
+app<span class="token operator">:</span>tabPaddingStart<span class="token operator">=</span><span class="token string">"xxdp"</span>
+app<span class="token operator">:</span>tabPaddingEnd<span class="token operator">=</span><span class="token string">"xxdp"</span>
+app<span class="token operator">:</span>tabPaddingBottom<span class="token operator">=</span><span class="token string">"xxdp"</span>
+
+设置整个TabLayout的Padding：
+app<span class="token operator">:</span>paddingEnd<span class="token operator">=</span><span class="token string">"xxdp"</span>
+app<span class="token operator">:</span>paddingStart<span class="token operator">=</span><span class="token string">"xxdp"</span>
+<span class="token number">9</span><span class="token punctuation">.</span>内容的显示模式
+app<span class="token operator">:</span>tabGravity<span class="token operator">=</span><span class="token string">"center"</span><span class="token comment" spellcheck="true">//居中，如果是fill，则是充满</span>
+
+<span class="token number">10</span><span class="token punctuation">.</span>Tab的宽度限制
+设置最大的tab宽度：
+app<span class="token operator">:</span>tabMaxWidth<span class="token operator">=</span><span class="token string">"xxdp"</span>    
+设置最小的tab宽度：
+app<span class="token operator">:</span>tabMinWidth<span class="token operator">=</span><span class="token string">"xxdp"</span>
+<span class="token number">11</span><span class="token punctuation">.</span>Tab的“Margin”
+TabLayout开始位置的偏移量：
+app<span class="token operator">:</span>tabContentStart<span class="token operator">=</span><span class="token string">"100dp"</span>
+</code></pre>
+<h1 id="Palette的简单实用"><a href="#Palette的简单实用" class="headerlink" title="Palette的简单实用"></a><strong>Palette的简单实用</strong></h1><pre class=" language-java"><code class="language-java">Palette是一个类似调色板的工具类，根据传入的bitmap，提取出主体颜色，使得图片和颜色更加搭配，界面更协调。
+Palette 可以从一张图片中提取颜色，我们可以把提取的颜色融入到App UI中，可以使UI风格更加美观融洽。比如，我们可以从图片中提取颜色设置给ActionBar做背景颜色，
+这样ActionBar的颜色就会随着显示图片的变化而变化。
+
+使用
+ 1compile <span class="token string">'com.android.support:palette-v7:23.4.0'</span>
+     Palette可以提取的颜色如下<span class="token operator">:</span>
+  ● Vibrant （有活力的）
+  ● Vibrant dark（有活力的 暗色）
+  ● Vibrant light（有活力的 亮色）
+  ● Muted （柔和的）
+  ● Muted dark（柔和的 暗色）
+  ● Muted light（柔和的 亮色）
+第一步  compile <span class="token string">'com.android.support:palette-v7:23.4.0'</span>
+
+第一步，我们需要通过一个Bitmap对象来生成一个对应的Palette对象。 Palette 提供了四个静态方法用来生成对象。
+  ● Palette <span class="token function">generate</span><span class="token punctuation">(</span>Bitmap bitmap<span class="token punctuation">)</span>
+  ● Palette <span class="token function">generate</span><span class="token punctuation">(</span>Bitmap bitmap<span class="token punctuation">,</span> <span class="token keyword">int</span> numColors<span class="token punctuation">)</span>
+  ● <span class="token function">generateAsync</span><span class="token punctuation">(</span>Bitmap bitmap<span class="token punctuation">,</span> PaletteAsyncListener listener<span class="token punctuation">)</span>
+  ● <span class="token function">generateAsync</span><span class="token punctuation">(</span>Bitmap bitmap<span class="token punctuation">,</span> <span class="token keyword">int</span> numColors<span class="token punctuation">,</span> <span class="token keyword">final</span> PaletteAsyncListener listener<span class="token punctuation">)</span>
+不难看出，生成方法分为<span class="token function">generate</span><span class="token punctuation">(</span>同步<span class="token punctuation">)</span>和<span class="token function">generateAsync</span><span class="token punctuation">(</span>异步<span class="token punctuation">)</span>两种，如果图片过大使用generate方法，可能会阻塞主线程，我们更倾向于使用generateAsync的方法，
+其实内部就是创建了一个AsyncTask。generateAsync方法需要一个PaletteAsyncListener对象用于监听生成完毕的回调。除了必须的Bitmap参数外，还可以传入一个numColors参数指定颜色数，默认是 <span class="token number">16</span>。
+第二步，得到Palette对象后，就可以拿到提取到的颜色值
+  ● Palette<span class="token punctuation">.</span><span class="token function">getVibrantSwatch</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  ● Palette<span class="token punctuation">.</span><span class="token function">getDarkVibrantSwatch</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  ● Palette<span class="token punctuation">.</span><span class="token function">getLightVibrantSwatch</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  ● Palette<span class="token punctuation">.</span><span class="token function">getMutedSwatch</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  ● Palette<span class="token punctuation">.</span><span class="token function">getDarkMutedSwatch</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  ● Palette<span class="token punctuation">.</span><span class="token function">getLightMutedSwatch</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+第三步，使用颜色，上面get方法中返回的是一个 Swatch 样本对象，这个样本对象是Palette的一个内部类，它提供了一些获取最终颜色的方法。
+  ● <span class="token function">getPopulation</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">:</span> 样本中的像素数量
+  ● <span class="token function">getRgb</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">:</span> 颜色的RBG值
+  ● <span class="token function">getHsl</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">:</span> 颜色的HSL值
+  ● <span class="token function">getBodyTextColor</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">:</span> 主体文字的颜色值
+  ● <span class="token function">getTitleTextColor</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">:</span> 标题文字的颜色值
+通过 <span class="token function">getRgb</span><span class="token punctuation">(</span><span class="token punctuation">)</span> 可以得到最终的颜色值并应用到UI中。<span class="token function">getBodyTextColor</span><span class="token punctuation">(</span><span class="token punctuation">)</span> 和 <span class="token function">getTitleTextColor</span><span class="token punctuation">(</span><span class="token punctuation">)</span> 可以得到此颜色下文字适合的颜色，这样很方便我们设置文字的颜色，使文字看起来更加舒服。
+</code></pre>
+<h1 id="源码实现"><a href="#源码实现" class="headerlink" title="源码实现"></a><strong>源码实现</strong></h1><pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">MainActivity</span> <span class="token keyword">extends</span> <span class="token class-name">AppCompatActivity</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">private</span> DrawerLayout mDrawLayout<span class="token punctuation">;</span>
+
+    <span class="token keyword">private</span> TabLayout mTabLayout<span class="token punctuation">;</span>
+
+    <span class="token keyword">private</span> ViewPager mViewPager<span class="token punctuation">;</span>
+
+    <span class="token keyword">private</span> Toolbar mToolbar<span class="token punctuation">;</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">final</span> String<span class="token punctuation">[</span><span class="token punctuation">]</span> titels <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"分类"</span><span class="token punctuation">,</span> <span class="token string">"主页"</span><span class="token punctuation">,</span> <span class="token string">"热门推荐"</span><span class="token punctuation">,</span> <span class="token string">"热门收藏"</span><span class="token punctuation">,</span> <span class="token string">"本月热榜"</span><span class="token punctuation">,</span> <span class="token string">"今日热榜"</span><span class="token punctuation">,</span> <span class="token string">"专栏"</span><span class="token punctuation">,</span> <span class="token string">"随机"</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+    <span class="token keyword">private</span> <span class="token keyword">int</span><span class="token punctuation">[</span><span class="token punctuation">]</span> drawbles <span class="token operator">=</span> <span class="token punctuation">{</span>R<span class="token punctuation">.</span>drawable<span class="token punctuation">.</span>a<span class="token punctuation">,</span> R<span class="token punctuation">.</span>drawable<span class="token punctuation">.</span>b<span class="token punctuation">,</span> R<span class="token punctuation">.</span>drawable<span class="token punctuation">.</span>c<span class="token punctuation">,</span> R<span class="token punctuation">.</span>drawable<span class="token punctuation">.</span>d<span class="token punctuation">,</span> R<span class="token punctuation">.</span>drawable<span class="token punctuation">.</span>e<span class="token punctuation">,</span>
+                              R<span class="token punctuation">.</span>drawable<span class="token punctuation">.</span>f<span class="token punctuation">,</span> R<span class="token punctuation">.</span>drawable<span class="token punctuation">.</span>g<span class="token punctuation">,</span> R<span class="token punctuation">.</span>drawable<span class="token punctuation">.</span>h<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">onCreate</span><span class="token punctuation">(</span>Bundle savedInstanceState<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token keyword">super</span><span class="token punctuation">.</span><span class="token function">onCreate</span><span class="token punctuation">(</span>savedInstanceState<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">setContentView</span><span class="token punctuation">(</span>R<span class="token punctuation">.</span>layout<span class="token punctuation">.</span>activity_main<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        mToolbar <span class="token operator">=</span> <span class="token punctuation">(</span>Toolbar<span class="token punctuation">)</span> <span class="token function">findViewById</span><span class="token punctuation">(</span>R<span class="token punctuation">.</span>id<span class="token punctuation">.</span>toolbar<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//注意如果要想修改Toolbar的内容跟主题等要在setSupportActionBar内容之前修改，如果放在了后面修改是不可以的</span>
+        mToolbar<span class="token punctuation">.</span><span class="token function">setTitle</span><span class="token punctuation">(</span><span class="token string">"热门推荐"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//actionBarDrawerToggle 的添加要放在setSupportActionBar的后面</span>
+        <span class="token function">setSupportActionBar</span><span class="token punctuation">(</span>mToolbar<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        mDrawLayout <span class="token operator">=</span> <span class="token punctuation">(</span>DrawerLayout<span class="token punctuation">)</span> <span class="token function">findViewById</span><span class="token punctuation">(</span>R<span class="token punctuation">.</span>id<span class="token punctuation">.</span>drawLayout<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        mTabLayout <span class="token operator">=</span> <span class="token punctuation">(</span>TabLayout<span class="token punctuation">)</span> <span class="token function">findViewById</span><span class="token punctuation">(</span>R<span class="token punctuation">.</span>id<span class="token punctuation">.</span>tabLayout<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//当TabLayout的内容过多的时候，可以设置这个值，然后TabLayout就可以滑动了</span>
+        mTabLayout<span class="token punctuation">.</span><span class="token function">setTabMode</span><span class="token punctuation">(</span>TabLayout<span class="token punctuation">.</span>MODE_SCROLLABLE<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//设置TabLayout下划线的高度，如果设置为0，就不会显示这个下划线</span>
+
+        <span class="token comment" spellcheck="true">//设置参数，后面的俩个参数是Accessibilty中辅助参数使用的, 第二个参数为DrawLayout,第三个参数为Toolbar，所以他们是同套使用的</span>
+        ActionBarDrawerToggle actionBarDrawerToggle <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ActionBarDrawerToggle</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">,</span> mDrawLayout<span class="token punctuation">,</span> mToolbar<span class="token punctuation">,</span> R<span class="token punctuation">.</span>string<span class="token punctuation">.</span>open<span class="token punctuation">,</span> R<span class="token punctuation">.</span>string<span class="token punctuation">.</span>close<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//设置Drawlayout监听</span>
+        mDrawLayout<span class="token punctuation">.</span><span class="token function">addDrawerListener</span><span class="token punctuation">(</span>actionBarDrawerToggle<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//只有调用了这个方法，才会同步显示出来</span>
+        actionBarDrawerToggle<span class="token punctuation">.</span><span class="token function">syncState</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        mViewPager <span class="token operator">=</span> <span class="token punctuation">(</span>ViewPager<span class="token punctuation">)</span> <span class="token function">findViewById</span><span class="token punctuation">(</span>R<span class="token punctuation">.</span>id<span class="token punctuation">.</span>viewPager<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//给TabLayout 跟ViewPager设置关联,里面的原理也是互相设置监听</span>
+        mTabLayout<span class="token punctuation">.</span><span class="token function">setupWithViewPager</span><span class="token punctuation">(</span>mViewPager<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        mViewPager<span class="token punctuation">.</span><span class="token function">setAdapter</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">MyViewPagerAdapter</span><span class="token punctuation">(</span><span class="token function">getSupportFragmentManager</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">//给Viewpager设置滑动的监听</span>
+        mViewPager<span class="token punctuation">.</span><span class="token function">addOnPageChangeListener</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">ViewPager<span class="token punctuation">.</span>OnPageChangeListener</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token annotation punctuation">@Override</span>
+            <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">onPageScrolled</span><span class="token punctuation">(</span><span class="token keyword">int</span> position<span class="token punctuation">,</span> <span class="token keyword">float</span> positionOffset<span class="token punctuation">,</span> <span class="token keyword">int</span> positionOffsetPixels<span class="token punctuation">)</span>
+            <span class="token punctuation">{</span>
+
+            <span class="token punctuation">}</span>
+
+            <span class="token annotation punctuation">@Override</span>
+            <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">onPageSelected</span><span class="token punctuation">(</span><span class="token keyword">int</span> position<span class="token punctuation">)</span>
+            <span class="token punctuation">{</span>
+                <span class="token function">changeThemae</span><span class="token punctuation">(</span>position<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+
+            <span class="token annotation punctuation">@Override</span>
+            <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">onPageScrollStateChanged</span><span class="token punctuation">(</span><span class="token keyword">int</span> state<span class="token punctuation">)</span>
+            <span class="token punctuation">{</span>
+
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">//一上来就要改变主题</span>
+        <span class="token function">changeThemae</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true">/**
+     * 改变主题背景等
+     *
+     * @param position
+     */</span>
+    <span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">changeThemae</span><span class="token punctuation">(</span><span class="token keyword">int</span> position<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        Bitmap bitmap <span class="token operator">=</span> BitmapFactory<span class="token punctuation">.</span><span class="token function">decodeResource</span><span class="token punctuation">(</span><span class="token function">getResources</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> drawbles<span class="token punctuation">[</span>position<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">//Palette的作用是从一个图片里面分析出来6种颜色，占用比较多的颜色，其中的分析是耗时的</span>
+        Palette<span class="token punctuation">.</span><span class="token function">from</span><span class="token punctuation">(</span>bitmap<span class="token punctuation">)</span>
+               <span class="token punctuation">.</span><span class="token function">generate</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Palette<span class="token punctuation">.</span>PaletteAsyncListener</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+               <span class="token punctuation">{</span>
+                   <span class="token annotation punctuation">@Override</span>
+                   <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">onGenerated</span><span class="token punctuation">(</span>Palette palette<span class="token punctuation">)</span>
+                   <span class="token punctuation">{</span>
+                       <span class="token comment" spellcheck="true">//Might be null.</span>
+                       Palette<span class="token punctuation">.</span>Swatch lightSwath <span class="token operator">=</span> palette<span class="token punctuation">.</span><span class="token function">getLightVibrantSwatch</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                       <span class="token comment" spellcheck="true">//如果获取到的swatch 为空，就遍历值到获取一个不为空的，而且要注意，不可能全部都为空的</span>
+                       <span class="token keyword">if</span> <span class="token punctuation">(</span>lightSwath <span class="token operator">==</span> null<span class="token punctuation">)</span>
+                       <span class="token punctuation">{</span>
+                           <span class="token keyword">for</span> <span class="token punctuation">(</span>Palette<span class="token punctuation">.</span>Swatch swatch <span class="token operator">:</span> palette<span class="token punctuation">.</span><span class="token function">getSwatches</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+                           <span class="token punctuation">{</span>
+                               lightSwath <span class="token operator">=</span> swatch<span class="token punctuation">;</span>
+                               <span class="token keyword">break</span><span class="token punctuation">;</span>
+                           <span class="token punctuation">}</span>
+                       <span class="token punctuation">}</span>
+
+                       <span class="token comment" spellcheck="true">//颜色加深处理</span>
+                       mViewPager<span class="token punctuation">.</span><span class="token function">setBackgroundColor</span><span class="token punctuation">(</span>lightSwath<span class="token punctuation">.</span><span class="token function">getRgb</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                       <span class="token comment" spellcheck="true">//设置下滑线的颜色</span>
+                       mTabLayout<span class="token punctuation">.</span><span class="token function">setSelectedTabIndicatorColor</span><span class="token punctuation">(</span>lightSwath<span class="token punctuation">.</span><span class="token function">getRgb</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                       mTabLayout<span class="token punctuation">.</span><span class="token function">setBackgroundColor</span><span class="token punctuation">(</span>lightSwath<span class="token punctuation">.</span><span class="token function">getRgb</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                       <span class="token comment" spellcheck="true">//设置ToolBar的背景</span>
+                       mToolbar<span class="token punctuation">.</span><span class="token function">setBackgroundColor</span><span class="token punctuation">(</span>lightSwath<span class="token punctuation">.</span><span class="token function">getRgb</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                       <span class="token keyword">if</span> <span class="token punctuation">(</span>Build<span class="token punctuation">.</span>VERSION<span class="token punctuation">.</span>SDK_INT <span class="token operator">></span> <span class="token number">21</span><span class="token punctuation">)</span>
+                       <span class="token punctuation">{</span>
+                           Window window <span class="token operator">=</span> <span class="token function">getWindow</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                           <span class="token comment" spellcheck="true">//状态栏 颜色加深,设置沉浸式的颜色</span>
+                           window<span class="token punctuation">.</span><span class="token function">setStatusBarColor</span><span class="token punctuation">(</span><span class="token function">colorBurn</span><span class="token punctuation">(</span>lightSwath<span class="token punctuation">.</span><span class="token function">getRgb</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                           <span class="token comment" spellcheck="true">//设置虚拟按键的颜色</span>
+                           window<span class="token punctuation">.</span><span class="token function">setNavigationBarColor</span><span class="token punctuation">(</span>lightSwath<span class="token punctuation">.</span><span class="token function">getRgb</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                       <span class="token punctuation">}</span>
+                   <span class="token punctuation">}</span>
+               <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true">/**
+     * 颜色加深处理，如果不加深的话，状态栏就会显示不清楚
+     *
+     * @param rgb
+     * @return
+     */</span>
+    <span class="token keyword">private</span> <span class="token keyword">int</span> <span class="token function">colorBurn</span><span class="token punctuation">(</span><span class="token keyword">int</span> rgb<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token keyword">int</span> red <span class="token operator">=</span> Color<span class="token punctuation">.</span><span class="token function">red</span><span class="token punctuation">(</span>rgb<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">int</span> green <span class="token operator">=</span> Color<span class="token punctuation">.</span><span class="token function">green</span><span class="token punctuation">(</span>rgb<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">int</span> blue <span class="token operator">=</span> Color<span class="token punctuation">.</span><span class="token function">blue</span><span class="token punctuation">(</span>rgb<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">//要注意对于单通道来说，值变小代表颜色越深</span>
+        red <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">int</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>red <span class="token operator">*</span> <span class="token number">0.8f</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        green <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">int</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>green <span class="token operator">*</span> <span class="token number">0.8f</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        blue <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">int</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>blue <span class="token operator">*</span> <span class="token number">0.8f</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">return</span> Color<span class="token punctuation">.</span><span class="token function">rgb</span><span class="token punctuation">(</span>red<span class="token punctuation">,</span> green<span class="token punctuation">,</span> blue<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+
+    <span class="token keyword">private</span> <span class="token keyword">class</span> <span class="token class-name">MyViewPagerAdapter</span> <span class="token keyword">extends</span> <span class="token class-name">FragmentPagerAdapter</span>
+    <span class="token punctuation">{</span>
+
+        <span class="token keyword">public</span> <span class="token function">MyViewPagerAdapter</span><span class="token punctuation">(</span>FragmentManager fm<span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token keyword">super</span><span class="token punctuation">(</span>fm<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token annotation punctuation">@Override</span>
+        <span class="token keyword">public</span> Fragment <span class="token function">getItem</span><span class="token punctuation">(</span><span class="token keyword">int</span> position<span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            Fragment fragment <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ImageFrament</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            Bundle bundle <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Bundle</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            bundle<span class="token punctuation">.</span><span class="token function">putInt</span><span class="token punctuation">(</span><span class="token string">"id"</span><span class="token punctuation">,</span> drawbles<span class="token punctuation">[</span>position<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">//传递参数</span>
+            fragment<span class="token punctuation">.</span><span class="token function">setArguments</span><span class="token punctuation">(</span>bundle<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span> fragment<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token annotation punctuation">@Override</span>
+        <span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">getCount</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> titels<span class="token punctuation">.</span>length<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token comment" spellcheck="true">//重写这个方法可以设置TabLayout中的内容，</span>
+        <span class="token annotation punctuation">@Override</span>
+        <span class="token keyword">public</span> CharSequence <span class="token function">getPageTitle</span><span class="token punctuation">(</span><span class="token keyword">int</span> position<span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> titels<span class="token punctuation">[</span>position<span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">onCreateOptionsMenu</span><span class="token punctuation">(</span>Menu menu<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token function">getMenuInflater</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">inflate</span><span class="token punctuation">(</span>R<span class="token punctuation">.</span>menu<span class="token punctuation">.</span>main<span class="token punctuation">,</span> menu<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token keyword">super</span><span class="token punctuation">.</span><span class="token function">onCreateOptionsMenu</span><span class="token punctuation">(</span>menu<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>菜单设置</p>
+<pre class=" language-java"><code class="language-java"><span class="token operator">&lt;</span><span class="token operator">?</span>xml version<span class="token operator">=</span><span class="token string">"1.0"</span> encoding<span class="token operator">=</span><span class="token string">"utf-8"</span><span class="token operator">?</span><span class="token operator">></span>
+<span class="token operator">&lt;</span>menu xmlns<span class="token operator">:</span>android<span class="token operator">=</span><span class="token string">"http://schemas.android.com/apk/res/android"</span>
+    xmlns<span class="token operator">:</span>app<span class="token operator">=</span><span class="token string">"http://schemas.android.com/apk/res-auto"</span><span class="token operator">></span>
+
+    <span class="token operator">&lt;</span><span class="token operator">!</span><span class="token operator">--</span>orderInCategory 越小，就越会优先显示<span class="token operator">--</span><span class="token operator">></span>
+    <span class="token operator">&lt;</span><span class="token operator">!</span><span class="token operator">--</span>actionViewClass 可以设置控件的名字<span class="token operator">--</span><span class="token operator">></span>
+    <span class="token operator">&lt;</span><span class="token operator">!</span><span class="token operator">--</span>showAsAction ifRoom 表示如果有空间的话，就会显示出来，always标识一定要显示出来，nerver标识会隐藏起来，设置在memnu菜单里面<span class="token operator">--</span><span class="token operator">></span>
+
+    <span class="token operator">&lt;</span>item
+        android<span class="token operator">:</span>id<span class="token operator">=</span><span class="token string">"@+id/ab_search"</span>
+        android<span class="token operator">:</span>orderInCategory<span class="token operator">=</span><span class="token string">"80"</span>
+        android<span class="token operator">:</span>title<span class="token operator">=</span><span class="token string">"输入名字"</span>
+        app<span class="token operator">:</span>actionViewClass<span class="token operator">=</span><span class="token string">"android.support.v7.widget.SearchView"</span>
+        app<span class="token operator">:</span>showAsAction<span class="token operator">=</span><span class="token string">"ifRoom"</span><span class="token operator">/</span><span class="token operator">></span>
+    <span class="token operator">&lt;</span>item
+        android<span class="token operator">:</span>id<span class="token operator">=</span><span class="token string">"@+id/action_share"</span>
+        android<span class="token operator">:</span>orderInCategory<span class="token operator">=</span><span class="token string">"90"</span>
+        android<span class="token operator">:</span>title<span class="token operator">=</span><span class="token string">"分享"</span>
+        app<span class="token operator">:</span>actionProviderClass<span class="token operator">=</span><span class="token string">"android.support.v7.widget.ShareActionProvider"</span>
+        app<span class="token operator">:</span>showAsAction<span class="token operator">=</span><span class="token string">"ifRoom"</span><span class="token operator">/</span><span class="token operator">></span>
+    <span class="token operator">&lt;</span>item
+        android<span class="token operator">:</span>id<span class="token operator">=</span><span class="token string">"@+id/action_settings"</span>
+        android<span class="token operator">:</span>orderInCategory<span class="token operator">=</span><span class="token string">"100"</span>
+        android<span class="token operator">:</span>title<span class="token operator">=</span><span class="token string">"设置"</span>
+        app<span class="token operator">:</span>showAsAction<span class="token operator">=</span><span class="token string">"never"</span><span class="token operator">/</span><span class="token operator">></span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>menu<span class="token operator">></span>
+</code></pre>
+<p>主布局设置</p>
+<pre class=" language-java"><code class="language-java"><span class="token operator">&lt;</span><span class="token operator">?</span>xml version<span class="token operator">=</span><span class="token string">"1.0"</span> encoding<span class="token operator">=</span><span class="token string">"utf-8"</span><span class="token operator">?</span><span class="token operator">></span>
+<span class="token operator">&lt;</span>LinearLayout
+    xmlns<span class="token operator">:</span>android<span class="token operator">=</span><span class="token string">"http://schemas.android.com/apk/res/android"</span>
+    xmlns<span class="token operator">:</span>tools<span class="token operator">=</span><span class="token string">"http://schemas.android.com/tools"</span>
+    android<span class="token operator">:</span>layout_width<span class="token operator">=</span><span class="token string">"match_parent"</span>
+    android<span class="token operator">:</span>layout_height<span class="token operator">=</span><span class="token string">"match_parent"</span>
+    android<span class="token operator">:</span>orientation<span class="token operator">=</span><span class="token string">"vertical"</span>
+    tools<span class="token operator">:</span>context<span class="token operator">=</span><span class="token string">"com.example.administrator.drawlayoutexample.MainActivity"</span><span class="token operator">></span>
+
+    <span class="token operator">&lt;</span>include layout<span class="token operator">=</span><span class="token string">"@layout/tooblayout"</span><span class="token operator">/</span><span class="token operator">></span>
+
+    <span class="token operator">&lt;</span>android<span class="token punctuation">.</span>support<span class="token punctuation">.</span>v4<span class="token punctuation">.</span>widget<span class="token punctuation">.</span>DrawerLayout
+        android<span class="token operator">:</span>id<span class="token operator">=</span><span class="token string">"@+id/drawLayout"</span>
+        android<span class="token operator">:</span>layout_width<span class="token operator">=</span><span class="token string">"match_parent"</span>
+        android<span class="token operator">:</span>layout_height<span class="token operator">=</span><span class="token string">"match_parent"</span><span class="token operator">></span>
+
+        <span class="token operator">&lt;</span><span class="token operator">!</span><span class="token operator">--</span> DrawLayout使用中，里面只能包含俩个子View<span class="token punctuation">,</span>一个是侧滑区域，一个是内容区域
+        使用了android<span class="token operator">:</span>layout_gravity<span class="token operator">=</span><span class="token string">"start"</span> 的标识的为侧滑区域，注意这个要自己写完整
+        并不会有提示
+        <span class="token operator">--</span><span class="token operator">></span>
+        <span class="token operator">&lt;</span>LinearLayout
+            android<span class="token operator">:</span>layout_width<span class="token operator">=</span><span class="token string">"match_parent"</span>
+            android<span class="token operator">:</span>layout_height<span class="token operator">=</span><span class="token string">"match_parent"</span>
+            android<span class="token operator">:</span>layout_gravity<span class="token operator">=</span><span class="token string">"start"</span>
+            android<span class="token operator">:</span>background<span class="token operator">=</span><span class="token string">"@drawable/drawer"</span><span class="token operator">></span>
+        <span class="token operator">&lt;</span><span class="token operator">/</span>LinearLayout<span class="token operator">></span>
+
+        <span class="token operator">&lt;</span><span class="token operator">!</span><span class="token operator">--</span>内容区域，因为里面的内容控件有俩个所以外面包裹了一层，整体作为一个<span class="token operator">--</span><span class="token operator">></span>
+        <span class="token operator">&lt;</span>LinearLayout
+            android<span class="token operator">:</span>layout_width<span class="token operator">=</span><span class="token string">"match_parent"</span>
+            android<span class="token operator">:</span>layout_height<span class="token operator">=</span><span class="token string">"match_parent"</span>
+            android<span class="token operator">:</span>orientation<span class="token operator">=</span><span class="token string">"vertical"</span><span class="token operator">></span>
+
+            <span class="token operator">&lt;</span><span class="token operator">!</span><span class="token operator">--</span>TabLayout在布局中设置的item如果跟ViewPager一起使用的时候，不会生效<span class="token operator">--</span><span class="token operator">></span>
+            <span class="token operator">&lt;</span>android<span class="token punctuation">.</span>support<span class="token punctuation">.</span>design<span class="token punctuation">.</span>widget<span class="token punctuation">.</span>TabLayout
+                android<span class="token operator">:</span>id<span class="token operator">=</span><span class="token string">"@+id/tabLayout"</span>
+                android<span class="token operator">:</span>layout_width<span class="token operator">=</span><span class="token string">"match_parent"</span>
+                android<span class="token operator">:</span>layout_height<span class="token operator">=</span><span class="token string">"wrap_content"</span><span class="token operator">></span>
+
+                <span class="token operator">&lt;</span><span class="token operator">!</span><span class="token operator">--</span> <span class="token operator">&lt;</span>android<span class="token punctuation">.</span>support<span class="token punctuation">.</span>design<span class="token punctuation">.</span>widget<span class="token punctuation">.</span>TabItem
+                     android<span class="token operator">:</span>layout_width<span class="token operator">=</span><span class="token string">"wrap_content"</span>
+                     android<span class="token operator">:</span>layout_height<span class="token operator">=</span><span class="token string">"wrap_content"</span>
+                     android<span class="token operator">:</span>text<span class="token operator">=</span><span class="token string">"分类"</span><span class="token operator">/</span><span class="token operator">></span>
+
+                 <span class="token operator">&lt;</span>android<span class="token punctuation">.</span>support<span class="token punctuation">.</span>design<span class="token punctuation">.</span>widget<span class="token punctuation">.</span>TabItem
+                     android<span class="token operator">:</span>layout_width<span class="token operator">=</span><span class="token string">"wrap_content"</span>
+                     android<span class="token operator">:</span>layout_height<span class="token operator">=</span><span class="token string">"wrap_content"</span>
+                     android<span class="token operator">:</span>text<span class="token operator">=</span><span class="token string">"分类"</span><span class="token operator">/</span><span class="token operator">></span>
+
+                 <span class="token operator">&lt;</span>android<span class="token punctuation">.</span>support<span class="token punctuation">.</span>design<span class="token punctuation">.</span>widget<span class="token punctuation">.</span>TabItem
+                     android<span class="token operator">:</span>layout_width<span class="token operator">=</span><span class="token string">"wrap_content"</span>
+                     android<span class="token operator">:</span>layout_height<span class="token operator">=</span><span class="token string">"wrap_content"</span>
+                     android<span class="token operator">:</span>text<span class="token operator">=</span><span class="token string">"分类"</span><span class="token operator">/</span><span class="token operator">></span><span class="token operator">--</span><span class="token operator">></span>
+            <span class="token operator">&lt;</span><span class="token operator">/</span>android<span class="token punctuation">.</span>support<span class="token punctuation">.</span>design<span class="token punctuation">.</span>widget<span class="token punctuation">.</span>TabLayout<span class="token operator">></span>
+
+            <span class="token operator">&lt;</span>android<span class="token punctuation">.</span>support<span class="token punctuation">.</span>v4<span class="token punctuation">.</span>view<span class="token punctuation">.</span>ViewPager
+                android<span class="token operator">:</span>id<span class="token operator">=</span><span class="token string">"@+id/viewPager"</span>
+                android<span class="token operator">:</span>layout_width<span class="token operator">=</span><span class="token string">"match_parent"</span>
+                android<span class="token operator">:</span>layout_height<span class="token operator">=</span><span class="token string">"match_parent"</span><span class="token operator">></span>
+            <span class="token operator">&lt;</span><span class="token operator">/</span>android<span class="token punctuation">.</span>support<span class="token punctuation">.</span>v4<span class="token punctuation">.</span>view<span class="token punctuation">.</span>ViewPager<span class="token operator">></span>
+        <span class="token operator">&lt;</span><span class="token operator">/</span>LinearLayout<span class="token operator">></span>
+    <span class="token operator">&lt;</span><span class="token operator">/</span>android<span class="token punctuation">.</span>support<span class="token punctuation">.</span>v4<span class="token punctuation">.</span>widget<span class="token punctuation">.</span>DrawerLayout<span class="token operator">></span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>LinearLayout<span class="token operator">></span>
+</code></pre>
+
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">AheadSnail</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://aheadsnail.github.io/2017/10/02/drawlayout-toolbar-tablayout-zu-he-shi-yong/">https://aheadsnail.github.io/2017/10/02/drawlayout-toolbar-tablayout-zu-he-shi-yong/</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">AheadSnail</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Android/">
+                                    <span class="chip bg-color">Android</span>
+                                </a>
+                            
+                                <a href="/tags/DrawLayout，ToolBar/">
+                                    <span class="chip bg-color">DrawLayout，ToolBar</span>
+                                </a>
+                            
+                                <a href="/tags/TabLayout/">
+                                    <span class="chip bg-color">TabLayout</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2017/10/03/android-chen-jin-shi-gua-pei-cardview-shi-yong/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/22.jpg" class="responsive-img" alt="Android沉浸式适配，CardView使用">
+                        
+                        <span class="card-title">Android沉浸式适配，CardView使用</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            Android沉浸式适配，CardView使用
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2017-10-03
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            AheadSnail
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Android/">
+                        <span class="chip bg-color">Android</span>
+                    </a>
+                    
+                    <a href="/tags/沉浸式适配/">
+                        <span class="chip bg-color">沉浸式适配</span>
+                    </a>
+                    
+                    <a href="/tags/CardView/">
+                        <span class="chip bg-color">CardView</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2017/09/26/snackbar-xiang-jie/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="SnackBar 详解">
+                        
+                        <span class="card-title">SnackBar 详解</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            SnackBar 使用详解，及代码分析
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2017-09-26
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            AheadSnail
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Android/">
+                        <span class="chip bg-color">Android</span>
+                    </a>
+                    
+                    <a href="/tags/design/">
+                        <span class="chip bg-color">design</span>
+                    </a>
+                    
+                    <a href="/tags/SnackBar/">
+                        <span class="chip bg-color">SnackBar</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="503838841"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='random'
+                   preload='auto'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 0px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2019-2021</span>
+            
+            <span id="year">2019</span>
+            <a href="/about" target="_blank">AheadSnail</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/blinkfox" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:1181062873@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=1181062873" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 1181062873" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    <!--腾讯兔小巢-->
+    
+    
+
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>

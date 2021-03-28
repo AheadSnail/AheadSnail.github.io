@@ -1,0 +1,1779 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="SnackBar 详解, AheadSnail&#39;s blog">
+    <meta name="description" content>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>SnackBar 详解 | AheadSnail&#39;s blog</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<link rel="alternate" href="/atom.xml" title="AheadSnail's blog" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">AheadSnail&#39;s blog</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/contact" class="waves-effect waves-light">
+      
+      <i class="fas fa-comments" style="zoom: 0.6;"></i>
+      
+      <span>留言板</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">AheadSnail&#39;s blog</div>
+        <div class="logo-desc">
+            
+            Never really desperate, only the lost of the soul.
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/contact" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-comments"></i>
+			
+			留言板
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/blinkfox/hexo-theme-matery" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/blinkfox/hexo-theme-matery" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/0.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">SnackBar 详解</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        padding: 35px 0 15px 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        padding-bottom: 30px;
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Android/">
+                                <span class="chip bg-color">Android</span>
+                            </a>
+                        
+                            <a href="/tags/design/">
+                                <span class="chip bg-color">design</span>
+                            </a>
+                        
+                            <a href="/tags/SnackBar/">
+                                <span class="chip bg-color">SnackBar</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2017-09-26
+                </div>
+                
+
+                
+
+                
+
+                
+
+                
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <p>SnackBar 使用详解，及代码分析<br><a id="more"></a></p>
+<h1 id="SnackBar使用的好处"><a href="#SnackBar使用的好处" class="headerlink" title="SnackBar使用的好处"></a><strong>SnackBar使用的好处</strong></h1><ul>
+<li>dialog  笨拙  体验大打折扣，会阻断用户的连段性 ，交互性太强   </li>
+<li>Toast   没有交互性  （只能交互 ）</li>
+<li>SnackBar可以自动消失，也可以手动取消, 而Toast虽然可以手动取消, 但是无法一直显示</li>
+<li>Snackbar类似dialog, 生命周期跟随当前Activity,  FrameLayout.addView()</li>
+<li>显示在最上层  没用控件可以覆盖它</li>
+</ul>
+<h1 id="SnackBar的简单的使用"><a href="#SnackBar的简单的使用" class="headerlink" title="SnackBar的简单的使用"></a><strong>SnackBar的简单的使用</strong></h1><pre class=" language-java"><code class="language-java"> <span class="token comment" spellcheck="true">//第一个参数要传递一个View，第二个参数为要显示的文字，第三个参数为显示的时间</span>
+ <span class="token comment" spellcheck="true">//第三个参数为要显示的样式，如果为LENGTH_LONG,LENGTH_SHOT会自动的消失，如果为LENGTH_INDEFINITE不会自动的消失(不点击的时候)</span>
+ Snackbar<span class="token punctuation">.</span><span class="token function">make</span><span class="token punctuation">(</span>mBtn<span class="token punctuation">,</span> <span class="token string">"厦门下雨了"</span><span class="token punctuation">,</span> Snackbar<span class="token punctuation">.</span>LENGTH_INDEFINITE<span class="token punctuation">)</span>
+                        <span class="token comment" spellcheck="true">//可以设置点击的时候，动作的执行</span>
+                        <span class="token punctuation">.</span><span class="token function">setAction</span><span class="token punctuation">(</span><span class="token string">"确定"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">View<span class="token punctuation">.</span>OnClickListener</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                        <span class="token punctuation">{</span>
+                            <span class="token annotation punctuation">@Override</span>
+                            <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">onClick</span><span class="token punctuation">(</span>View view<span class="token punctuation">)</span>
+                            <span class="token punctuation">{</span>
+                                Toast<span class="token punctuation">.</span><span class="token function">makeText</span><span class="token punctuation">(</span>MainActivity<span class="token punctuation">.</span><span class="token keyword">this</span><span class="token punctuation">,</span><span class="token string">"确定了"</span><span class="token punctuation">,</span>Toast<span class="token punctuation">.</span>LENGTH_SHORT<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                            <span class="token punctuation">}</span>
+                        <span class="token punctuation">}</span><span class="token punctuation">)</span>
+                        <span class="token comment" spellcheck="true">//可以监听显示，消失的动作</span>
+                        <span class="token punctuation">.</span><span class="token function">setCallback</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Snackbar<span class="token punctuation">.</span>Callback</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                        <span class="token punctuation">{</span>
+                            <span class="token annotation punctuation">@Override</span>
+                            <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">onDismissed</span><span class="token punctuation">(</span>Snackbar transientBottomBar<span class="token punctuation">,</span> <span class="token keyword">int</span> event<span class="token punctuation">)</span>
+                            <span class="token punctuation">{</span>
+                                time<span class="token operator">=</span>System<span class="token punctuation">.</span><span class="token function">currentTimeMillis</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span>time<span class="token punctuation">;</span>
+                                Toast<span class="token punctuation">.</span><span class="token function">makeText</span><span class="token punctuation">(</span>MainActivity<span class="token punctuation">.</span><span class="token keyword">this</span><span class="token punctuation">,</span><span class="token string">"  时间"</span> <span class="token operator">+</span>time<span class="token punctuation">,</span>Toast<span class="token punctuation">.</span>LENGTH_SHORT<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                                <span class="token keyword">super</span><span class="token punctuation">.</span><span class="token function">onDismissed</span><span class="token punctuation">(</span>transientBottomBar<span class="token punctuation">,</span> event<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                            <span class="token punctuation">}</span>
+
+                            <span class="token annotation punctuation">@Override</span>
+                            <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">onShown</span><span class="token punctuation">(</span>Snackbar sb<span class="token punctuation">)</span>
+                            <span class="token punctuation">{</span>
+                                time<span class="token operator">=</span>System<span class="token punctuation">.</span><span class="token function">currentTimeMillis</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                                <span class="token keyword">super</span><span class="token punctuation">.</span><span class="token function">onShown</span><span class="token punctuation">(</span>sb<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                            <span class="token punctuation">}</span>
+                        <span class="token punctuation">}</span><span class="token punctuation">)</span>
+                        <span class="token punctuation">.</span><span class="token function">setActionTextColor</span><span class="token punctuation">(</span>Color<span class="token punctuation">.</span>BLUE<span class="token punctuation">)</span><span class="token comment" spellcheck="true">//设置action的颜色</span>
+                        <span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//最终一定要调用这个方法，要不然是不会显示的</span>
+</code></pre>
+<h1 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a><strong>运行结果</strong></h1><p><img src="/uploads/snackBar.png" alt="结果显示"></p>
+<p>当SnackBar的显示方式设置为LENGTH_INDEFINITE不会自动的消失,而设置的时间为LENGTH_LONG,LENGTH_SHOT会自动的消失源码体现:</p>
+<pre class=" language-java"><code class="language-java">首先我们调用show的时候<span class="token punctuation">,</span>这里假设都为第一次使用
+ <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">show</span><span class="token punctuation">(</span><span class="token keyword">int</span> duration<span class="token punctuation">,</span> Callback callback<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">synchronized</span> <span class="token punctuation">(</span>mLock<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isCurrentSnackbarLocked</span><span class="token punctuation">(</span>callback<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">// Means that the callback is already in the queue. We'll just update the duration</span>
+                mCurrentSnackbar<span class="token punctuation">.</span>duration <span class="token operator">=</span> duration<span class="token punctuation">;</span>
+
+                <span class="token comment" spellcheck="true">// If this is the Snackbar currently being shown, call re-schedule it's</span>
+                <span class="token comment" spellcheck="true">// timeout</span>
+                mHandler<span class="token punctuation">.</span><span class="token function">removeCallbacksAndMessages</span><span class="token punctuation">(</span>mCurrentSnackbar<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token function">scheduleTimeoutLocked</span><span class="token punctuation">(</span>mCurrentSnackbar<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">return</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isNextSnackbarLocked</span><span class="token punctuation">(</span>callback<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">// We'll just update the duration</span>
+                mNextSnackbar<span class="token punctuation">.</span>duration <span class="token operator">=</span> duration<span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">// Else, we need to create a new record and queue it</span>
+                因为我们是第一次进来，所以我们会走到这里
+                mNextSnackbar <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">SnackbarRecord</span><span class="token punctuation">(</span>duration<span class="token punctuation">,</span> callback<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>mCurrentSnackbar <span class="token operator">!=</span> null <span class="token operator">&amp;&amp;</span> <span class="token function">cancelSnackbarLocked</span><span class="token punctuation">(</span>mCurrentSnackbar<span class="token punctuation">,</span>
+                    Snackbar<span class="token punctuation">.</span>Callback<span class="token punctuation">.</span>DISMISS_EVENT_CONSECUTIVE<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">// If we currently have a Snackbar, try and cancel it and wait in line</span>
+                <span class="token keyword">return</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">// Clear out the current snackbar</span>
+                mCurrentSnackbar <span class="token operator">=</span> null<span class="token punctuation">;</span>
+                <span class="token comment" spellcheck="true">// Otherwise, just show it now</span>
+                然后走到这里
+                <span class="token function">showNextSnackbarLocked</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token function">isCurrentSnackbarLocked</span><span class="token punctuation">(</span>callback<span class="token punctuation">)</span> 源码实现为：这里是通过判断当前的callback跟mCurrentSnackbar中设置的callback是否一样，如果是一样就表示为当前的callback
+    <span class="token keyword">private</span> <span class="token keyword">boolean</span> <span class="token function">isCurrentSnackbarLocked</span><span class="token punctuation">(</span>Callback callback<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> mCurrentSnackbar <span class="token operator">!=</span> null <span class="token operator">&amp;&amp;</span> mCurrentSnackbar<span class="token punctuation">.</span><span class="token function">isSnackbar</span><span class="token punctuation">(</span>callback<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token function">isNextSnackbarLocked</span><span class="token punctuation">(</span>callback<span class="token punctuation">)</span> 源码实现为 这里是通过判断当前的callback跟mNextSnackbar中设置的callback是否一样，如果是一样就表示为下一个
+    <span class="token keyword">private</span> <span class="token keyword">boolean</span> <span class="token function">isNextSnackbarLocked</span><span class="token punctuation">(</span>Callback callback<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> mNextSnackbar <span class="token operator">!=</span> null <span class="token operator">&amp;&amp;</span> mNextSnackbar<span class="token punctuation">.</span><span class="token function">isSnackbar</span><span class="token punctuation">(</span>callback<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token function">showNextSnackbarLocked</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">showNextSnackbarLocked</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>mNextSnackbar <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            mCurrentSnackbar <span class="token operator">=</span> mNextSnackbar<span class="token punctuation">;</span>
+            mNextSnackbar <span class="token operator">=</span> null<span class="token punctuation">;</span>
+
+            <span class="token keyword">final</span> Callback callback <span class="token operator">=</span> mCurrentSnackbar<span class="token punctuation">.</span>callback<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>callback <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                callback<span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">// The callback doesn't exist any more, clear out the Snackbar</span>
+                mCurrentSnackbar <span class="token operator">=</span> null<span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    然后通过callback的回答，通过handler的接受显示的消息，然后执行showview的方法
+    <span class="token keyword">final</span> <span class="token keyword">void</span> <span class="token function">showView</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+          <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+          mTargetParent<span class="token punctuation">.</span><span class="token function">addView</span><span class="token punctuation">(</span>mView<span class="token punctuation">)</span><span class="token punctuation">;</span>将当前的SnackBar的内容，添加到跟布局里面
+          判断是否允许执行动画，也就是默认的从上往下显示SnackBar的时候动画
+          <span class="token keyword">if</span> <span class="token punctuation">(</span>ViewCompat<span class="token punctuation">.</span><span class="token function">isLaidOut</span><span class="token punctuation">(</span>mView<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">shouldAnimate</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">// If animations are enabled, animate it in</span>
+                <span class="token function">animateViewIn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">// Else if anims are disabled just call back now</span>
+                <span class="token function">onViewShown</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">void</span> <span class="token function">animateViewIn</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>Build<span class="token punctuation">.</span>VERSION<span class="token punctuation">.</span>SDK_INT <span class="token operator">>=</span> <span class="token number">12</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">final</span> <span class="token keyword">int</span> viewHeight <span class="token operator">=</span> mView<span class="token punctuation">.</span><span class="token function">getHeight</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>USE_OFFSET_API<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                ViewCompat<span class="token punctuation">.</span><span class="token function">offsetTopAndBottom</span><span class="token punctuation">(</span>mView<span class="token punctuation">,</span> viewHeight<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                mView<span class="token punctuation">.</span><span class="token function">setTranslationY</span><span class="token punctuation">(</span>viewHeight<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">final</span> ValueAnimator animator <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ValueAnimator</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            animator<span class="token punctuation">.</span><span class="token function">setIntValues</span><span class="token punctuation">(</span>viewHeight<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            animator<span class="token punctuation">.</span><span class="token function">setInterpolator</span><span class="token punctuation">(</span>FAST_OUT_SLOW_IN_INTERPOLATOR<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            animator<span class="token punctuation">.</span><span class="token function">setDuration</span><span class="token punctuation">(</span>ANIMATION_DURATION<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            animator<span class="token punctuation">.</span><span class="token function">addListener</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">AnimatorListenerAdapter</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token annotation punctuation">@Override</span>
+                <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">onAnimationStart</span><span class="token punctuation">(</span>Animator animator<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    mContentViewCallback<span class="token punctuation">.</span><span class="token function">animateContentIn</span><span class="token punctuation">(</span>
+                            ANIMATION_DURATION <span class="token operator">-</span> ANIMATION_FADE_DURATION<span class="token punctuation">,</span>
+                            ANIMATION_FADE_DURATION<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+
+                <span class="token annotation punctuation">@Override</span>
+                <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">onAnimationEnd</span><span class="token punctuation">(</span>Animator animator<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token function">onViewShown</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 当动画结束的时候
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">void</span> <span class="token function">onViewShown</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    SnackbarManager<span class="token punctuation">.</span><span class="token function">getInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">onShown</span><span class="token punctuation">(</span>mManagerCallback<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>mCallbacks <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">// Notify the callbacks. Do that from the end of the list so that if a callback</span>
+            <span class="token comment" spellcheck="true">// removes itself as the result of being called, it won't mess up with our iteration</span>
+            <span class="token keyword">int</span> callbackCount <span class="token operator">=</span> mCallbacks<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> callbackCount <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">;</span> i <span class="token operator">>=</span> <span class="token number">0</span><span class="token punctuation">;</span> i<span class="token operator">--</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                mCallbacks<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">onShown</span><span class="token punctuation">(</span><span class="token punctuation">(</span>B<span class="token punctuation">)</span> <span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">/**
+     * Should be called when a Snackbar is being shown. This is after any entrance animation has
+     * finished.
+     */</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">onShown</span><span class="token punctuation">(</span>Callback callback<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">synchronized</span> <span class="token punctuation">(</span>mLock<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isCurrentSnackbarLocked</span><span class="token punctuation">(</span>callback<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token function">scheduleTimeoutLocked</span><span class="token punctuation">(</span>mCurrentSnackbar<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    下面的这里就是为什么会消失和不会消失的源码体现了
+    <span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">scheduleTimeoutLocked</span><span class="token punctuation">(</span>SnackbarRecord r<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>r<span class="token punctuation">.</span>duration <span class="token operator">==</span> Snackbar<span class="token punctuation">.</span>LENGTH_INDEFINITE<span class="token punctuation">)</span> <span class="token punctuation">{</span> 如果方式设置的为Snackbar<span class="token punctuation">.</span>LENGTH_INDEFINITE就直接<span class="token keyword">return</span>，所以会一直显示
+            <span class="token comment" spellcheck="true">// If we're set to indefinite, we don't want to set a timeout</span>
+            <span class="token keyword">return</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        如果方式不为Snackbar<span class="token punctuation">.</span>LENGTH_INDEFINITE<span class="token punctuation">,</span>通过handler<span class="token punctuation">,</span>setDeleyedMessage来做到隔多久消失
+        <span class="token keyword">int</span> durationMs <span class="token operator">=</span> LONG_DURATION_MS<span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>r<span class="token punctuation">.</span>duration <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            durationMs <span class="token operator">=</span> r<span class="token punctuation">.</span>duration<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>r<span class="token punctuation">.</span>duration <span class="token operator">==</span> Snackbar<span class="token punctuation">.</span>LENGTH_SHORT<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            durationMs <span class="token operator">=</span> SHORT_DURATION_MS<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        mHandler<span class="token punctuation">.</span><span class="token function">removeCallbacksAndMessages</span><span class="token punctuation">(</span>r<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        mHandler<span class="token punctuation">.</span><span class="token function">sendMessageDelayed</span><span class="token punctuation">(</span>Message<span class="token punctuation">.</span><span class="token function">obtain</span><span class="token punctuation">(</span>mHandler<span class="token punctuation">,</span> MSG_TIMEOUT<span class="token punctuation">,</span> r<span class="token punctuation">)</span><span class="token punctuation">,</span> durationMs<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>当SnackBar的显示方式设置为LENGTH_INDEFINITE不会自动的消失(不点击的时候),或者再创建一个SnackBar的时候，之前的那个就会消失掉<br>.setAction(“确定”, new View.OnClickListener()源码的实现方式为</p>
+<pre class=" language-java"><code class="language-java"> <span class="token comment" spellcheck="true">/**
+     * Set the action to be displayed in this {@link BaseTransientBottomBar}.
+     *
+     * @param text     Text to display for the action
+     * @param listener callback to be invoked when the action is clicked
+     */</span>
+    <span class="token annotation punctuation">@NonNull</span>
+    <span class="token keyword">public</span> Snackbar <span class="token function">setAction</span><span class="token punctuation">(</span>CharSequence text<span class="token punctuation">,</span> <span class="token keyword">final</span> View<span class="token punctuation">.</span>OnClickListener listener<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">final</span> SnackbarContentLayout contentLayout <span class="token operator">=</span> <span class="token punctuation">(</span>SnackbarContentLayout<span class="token punctuation">)</span> mView<span class="token punctuation">.</span><span class="token function">getChildAt</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">final</span> TextView tv <span class="token operator">=</span> contentLayout<span class="token punctuation">.</span><span class="token function">getActionView</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>TextUtils<span class="token punctuation">.</span><span class="token function">isEmpty</span><span class="token punctuation">(</span>text<span class="token punctuation">)</span> <span class="token operator">||</span> listener <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            tv<span class="token punctuation">.</span><span class="token function">setVisibility</span><span class="token punctuation">(</span>View<span class="token punctuation">.</span>GONE<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            tv<span class="token punctuation">.</span><span class="token function">setOnClickListener</span><span class="token punctuation">(</span>null<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            我们的listener不为空
+            tv<span class="token punctuation">.</span><span class="token function">setVisibility</span><span class="token punctuation">(</span>View<span class="token punctuation">.</span>VISIBLE<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            tv<span class="token punctuation">.</span><span class="token function">setText</span><span class="token punctuation">(</span>text<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            tv<span class="token punctuation">.</span><span class="token function">setOnClickListener</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">View<span class="token punctuation">.</span>OnClickListener</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token annotation punctuation">@Override</span>
+                <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">onClick</span><span class="token punctuation">(</span>View view<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    listener<span class="token punctuation">.</span><span class="token function">onClick</span><span class="token punctuation">(</span>view<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token comment" spellcheck="true">// Now dismiss the Snackbar</span>
+                    <span class="token function">dispatchDismiss</span><span class="token punctuation">(</span>BaseCallback<span class="token punctuation">.</span>DISMISS_EVENT_ACTION<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token function">dispatchDismiss</span><span class="token punctuation">(</span>BaseCallback<span class="token punctuation">.</span>DISMISS_EVENT_ACTION<span class="token punctuation">)</span><span class="token punctuation">;</span>源码实现
+    <span class="token keyword">void</span> <span class="token function">dispatchDismiss</span><span class="token punctuation">(</span><span class="token annotation punctuation">@BaseCallback</span><span class="token punctuation">.</span>DismissEvent <span class="token keyword">int</span> event<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        SnackbarManager<span class="token punctuation">.</span><span class="token function">getInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">dismiss</span><span class="token punctuation">(</span>mManagerCallback<span class="token punctuation">,</span> event<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    SnackbarManager<span class="token punctuation">.</span><span class="token function">getInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">dismiss</span><span class="token punctuation">(</span>mManagerCallback<span class="token punctuation">,</span> event<span class="token punctuation">)</span><span class="token punctuation">;</span>源码实现
+     <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">dismiss</span><span class="token punctuation">(</span>Callback callback<span class="token punctuation">,</span> <span class="token keyword">int</span> event<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">synchronized</span> <span class="token punctuation">(</span>mLock<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isCurrentSnackbarLocked</span><span class="token punctuation">(</span>callback<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token comment" spellcheck="true">//isCurrentSnackbarLocked（）会比较当前显示的SnackBar设置的callback是否跟传递的callback是否一样,当前因为只有一个snackBar</span>
+                <span class="token function">cancelSnackbarLocked</span><span class="token punctuation">(</span>mCurrentSnackbar<span class="token punctuation">,</span> event<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isNextSnackbarLocked</span><span class="token punctuation">(</span>callback<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token function">cancelSnackbarLocked</span><span class="token punctuation">(</span>mNextSnackbar<span class="token punctuation">,</span> event<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+     <span class="token function">cancelSnackbarLocked</span><span class="token punctuation">(</span>mCurrentSnackbar<span class="token punctuation">,</span> event<span class="token punctuation">)</span><span class="token punctuation">;</span>源码实现为
+     <span class="token keyword">private</span> <span class="token keyword">boolean</span> <span class="token function">cancelSnackbarLocked</span><span class="token punctuation">(</span>SnackbarRecord record<span class="token punctuation">,</span> <span class="token keyword">int</span> event<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        取出当前的callba
+        <span class="token keyword">final</span> Callback callback <span class="token operator">=</span> record<span class="token punctuation">.</span>callback<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>callback <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">// Make sure we remove any timeouts for the SnackbarRecord</span>
+            mHandler<span class="token punctuation">.</span><span class="token function">removeCallbacksAndMessages</span><span class="token punctuation">(</span>record<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            callback<span class="token punctuation">.</span><span class="token function">dismiss</span><span class="token punctuation">(</span>event<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+     callback<span class="token punctuation">.</span><span class="token function">dismiss</span><span class="token punctuation">(</span>event<span class="token punctuation">)</span><span class="token punctuation">;</span>源码实现
+       <span class="token annotation punctuation">@Override</span>
+        <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">dismiss</span><span class="token punctuation">(</span><span class="token keyword">int</span> event<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            sHandler<span class="token punctuation">.</span><span class="token function">sendMessage</span><span class="token punctuation">(</span>sHandler<span class="token punctuation">.</span><span class="token function">obtainMessage</span><span class="token punctuation">(</span>MSG_DISMISS<span class="token punctuation">,</span> event<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span>
+                    BaseTransientBottomBar<span class="token punctuation">.</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        handler接受到消息
+        se MSG_DISMISS<span class="token operator">:</span>
+          <span class="token punctuation">(</span><span class="token punctuation">(</span>BaseTransientBottomBar<span class="token punctuation">)</span> message<span class="token punctuation">.</span>obj<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">hideView</span><span class="token punctuation">(</span>message<span class="token punctuation">.</span>arg1<span class="token punctuation">)</span><span class="token punctuation">;</span>
+       <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+       最终执行了下面的关键代码，将当前的mView从根布局里面移除出去
+       <span class="token keyword">if</span> <span class="token punctuation">(</span>Build<span class="token punctuation">.</span>VERSION<span class="token punctuation">.</span>SDK_INT <span class="token operator">&lt;</span> <span class="token number">11</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">// We need to hide the Snackbar on pre-v11 since it uses an old style Animation.</span>
+            <span class="token comment" spellcheck="true">// ViewGroup has special handling in removeView() when getAnimation() != null in</span>
+            <span class="token comment" spellcheck="true">// that it waits. This then means that the calculated insets are wrong and the</span>
+            <span class="token comment" spellcheck="true">// any dodging views do not return. We workaround it by setting the view to gone while</span>
+            <span class="token comment" spellcheck="true">// ViewGroup actually gets around to removing it.</span>
+            mView<span class="token punctuation">.</span><span class="token function">setVisibility</span><span class="token punctuation">(</span>View<span class="token punctuation">.</span>GONE<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token comment" spellcheck="true">// Lastly, hide and remove the view from the parent (if attached)</span>
+        <span class="token keyword">final</span> ViewParent parent <span class="token operator">=</span> mView<span class="token punctuation">.</span><span class="token function">getParent</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>parent <span class="token keyword">instanceof</span> <span class="token class-name">ViewGroup</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token punctuation">(</span><span class="token punctuation">(</span>ViewGroup<span class="token punctuation">)</span> parent<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">removeView</span><span class="token punctuation">(</span>mView<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+</code></pre>
+<pre><code>要想改变SnackBar里面左边显示的大小，跟颜色，可以通过下面的方式来改变
+View view1=snackbar.getView();
+TextView textView= (TextView) view1.findViewById(R.id.snackbar_text);
+默认的情况下使用SnackBar的弹出样式只会在底部弹出,(如果包含了CoordinatorLayout就可以做到弹出位置的改变,具体看下面)
+</code></pre><h1 id="SnackBar源码分析"><a href="#SnackBar源码分析" class="headerlink" title="SnackBar源码分析"></a><strong>SnackBar源码分析</strong></h1><pre class=" language-java"><code class="language-java">当我们最简单的调用Snackbar<span class="token punctuation">.</span><span class="token function">make</span><span class="token punctuation">(</span>mBtn<span class="token punctuation">,</span> <span class="token string">"厦门下雨了"</span><span class="token punctuation">,</span> Snackbar<span class="token punctuation">.</span>LENGTH_SHORT<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>的时候，先看make的实现
+ <span class="token annotation punctuation">@NonNull</span>
+ <span class="token keyword">public</span> <span class="token keyword">static</span> Snackbar <span class="token function">make</span><span class="token punctuation">(</span><span class="token annotation punctuation">@NonNull</span> View view<span class="token punctuation">,</span> <span class="token annotation punctuation">@NonNull</span> CharSequence text<span class="token punctuation">,</span>
+            <span class="token annotation punctuation">@Duration</span> <span class="token keyword">int</span> duration<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        关键的方法，找到可以适用的Parent
+        <span class="token keyword">final</span> ViewGroup parent <span class="token operator">=</span> <span class="token function">findSuitableParent</span><span class="token punctuation">(</span>view<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        如果没有找到，抛出异常
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>parent <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">IllegalArgumentException</span><span class="token punctuation">(</span><span class="token string">"No suitable parent found from the given view. "</span>
+                    <span class="token operator">+</span> <span class="token string">"Please provide a valid view."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        加载布局<span class="token punctuation">,</span>当作一个content，添加到上面已经找的Parent里面
+        <span class="token keyword">final</span> LayoutInflater inflater <span class="token operator">=</span> LayoutInflater<span class="token punctuation">.</span><span class="token function">from</span><span class="token punctuation">(</span>parent<span class="token punctuation">.</span><span class="token function">getContext</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">final</span> SnackbarContentLayout content <span class="token operator">=</span>
+                <span class="token punctuation">(</span>SnackbarContentLayout<span class="token punctuation">)</span> inflater<span class="token punctuation">.</span><span class="token function">inflate</span><span class="token punctuation">(</span>
+                        R<span class="token punctuation">.</span>layout<span class="token punctuation">.</span>design_layout_snackbar_include<span class="token punctuation">,</span> parent<span class="token punctuation">,</span> <span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">final</span> Snackbar snackbar <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Snackbar</span><span class="token punctuation">(</span>parent<span class="token punctuation">,</span> content<span class="token punctuation">,</span> content<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        snackbar<span class="token punctuation">.</span><span class="token function">setText</span><span class="token punctuation">(</span>text<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        snackbar<span class="token punctuation">.</span><span class="token function">setDuration</span><span class="token punctuation">(</span>duration<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> snackbar<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+ <span class="token keyword">final</span> ViewGroup parent <span class="token operator">=</span> <span class="token function">findSuitableParent</span><span class="token punctuation">(</span>view<span class="token punctuation">)</span><span class="token punctuation">;</span>源码的实现
+ <span class="token keyword">private</span> <span class="token keyword">static</span> ViewGroup <span class="token function">findSuitableParent</span><span class="token punctuation">(</span>View view<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        ViewGroup fallback <span class="token operator">=</span> null<span class="token punctuation">;</span>
+        <span class="token keyword">do</span> <span class="token punctuation">{</span>
+            如果父布局中有CoordinatorLayout，就会找到这个布局做为parent，所以SnackBar就会添加到这里面，所以这个可以改变SnackBar弹出位置的关键实现
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>view <span class="token keyword">instanceof</span> <span class="token class-name">CoordinatorLayout</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> 
+                <span class="token comment" spellcheck="true">// We've found a CoordinatorLayout, use it</span>
+                <span class="token keyword">return</span> <span class="token punctuation">(</span>ViewGroup<span class="token punctuation">)</span> view<span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>view <span class="token keyword">instanceof</span> <span class="token class-name">FrameLayout</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> 
+                默认的情况下，我们没有使用CoordinatorLayout的话，就会找到我们的跟布局也就是DecorView，DecorView本身是继承了FrameLayout<span class="token punctuation">,</span>android<span class="token punctuation">.</span>R<span class="token punctuation">.</span>id<span class="token punctuation">.</span>content 也就为FrameLayout跟布局
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>view<span class="token punctuation">.</span><span class="token function">getId</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> android<span class="token punctuation">.</span>R<span class="token punctuation">.</span>id<span class="token punctuation">.</span>content<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token comment" spellcheck="true">// If we've hit the decor content view, then we didn't find a CoL in the</span>
+                    <span class="token comment" spellcheck="true">// hierarchy, so use it.</span>
+                    <span class="token keyword">return</span> <span class="token punctuation">(</span>ViewGroup<span class="token punctuation">)</span> view<span class="token punctuation">;</span> 找到跟布局将当前的view返回
+                <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                    <span class="token comment" spellcheck="true">// It's not the content view but we'll use it as our fallback</span>
+                    fallback <span class="token operator">=</span> <span class="token punctuation">(</span>ViewGroup<span class="token punctuation">)</span> view<span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>view <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">// Else, we will loop and crawl up the view hierarchy and try to find a parent</span>
+                这边遍历查找，如果是view的话，就找到parent，
+                <span class="token keyword">final</span> ViewParent parent <span class="token operator">=</span> view<span class="token punctuation">.</span><span class="token function">getParent</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+                view <span class="token operator">=</span> parent <span class="token keyword">instanceof</span> <span class="token class-name">View</span> <span class="token operator">?</span> <span class="token punctuation">(</span>View<span class="token punctuation">)</span> parent <span class="token operator">:</span> null<span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span>view <span class="token operator">!=</span> null<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">// If we reach here then we didn't find a CoL or a suitable content view so we'll fallback</span>
+        <span class="token keyword">return</span> fallback<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p><strong>findSuitableParent 原理为</strong><br><img src="/uploads/SnackBar原理.png" alt="SnackBar原理"></p>
+<p>R.layout.design_layout_snackbar_include布局为。可以看到就是一个SnackbarContentLayout，下面的俩个就是显示一个在左边，一个在右边的Action控件</p>
+<pre class=" language-java"><code class="language-java"><span class="token operator">&lt;</span>view
+    xmlns<span class="token operator">:</span>android<span class="token operator">=</span><span class="token string">"http://schemas.android.com/apk/res/android"</span>
+    <span class="token keyword">class</span><span class="token operator">=</span><span class="token string">"android.support.design.internal.SnackbarContentLayout"</span>
+    android<span class="token operator">:</span>theme<span class="token operator">=</span><span class="token string">"@style/ThemeOverlay.AppCompat.Dark"</span>
+    android<span class="token operator">:</span>layout_width<span class="token operator">=</span><span class="token string">"match_parent"</span>
+    android<span class="token operator">:</span>layout_height<span class="token operator">=</span><span class="token string">"wrap_content"</span>
+    android<span class="token operator">:</span>layout_gravity<span class="token operator">=</span><span class="token string">"bottom"</span><span class="token operator">></span>
+
+    <span class="token operator">&lt;</span>TextView
+        android<span class="token operator">:</span>id<span class="token operator">=</span><span class="token string">"@+id/snackbar_text"</span>
+        android<span class="token operator">:</span>layout_width<span class="token operator">=</span><span class="token string">"wrap_content"</span>
+        android<span class="token operator">:</span>layout_height<span class="token operator">=</span><span class="token string">"wrap_content"</span>
+        android<span class="token operator">:</span>layout_weight<span class="token operator">=</span><span class="token string">"1"</span>
+        android<span class="token operator">:</span>paddingTop<span class="token operator">=</span><span class="token string">"@dimen/design_snackbar_padding_vertical"</span>
+        android<span class="token operator">:</span>paddingBottom<span class="token operator">=</span><span class="token string">"@dimen/design_snackbar_padding_vertical"</span>
+        android<span class="token operator">:</span>paddingLeft<span class="token operator">=</span><span class="token string">"@dimen/design_snackbar_padding_horizontal"</span>
+        android<span class="token operator">:</span>paddingRight<span class="token operator">=</span><span class="token string">"@dimen/design_snackbar_padding_horizontal"</span>
+        android<span class="token operator">:</span>textAppearance<span class="token operator">=</span><span class="token string">"@style/TextAppearance.Design.Snackbar.Message"</span>
+        android<span class="token operator">:</span>maxLines<span class="token operator">=</span><span class="token string">"@integer/design_snackbar_text_max_lines"</span>
+        android<span class="token operator">:</span>layout_gravity<span class="token operator">=</span><span class="token string">"center_vertical|left|start"</span>
+        android<span class="token operator">:</span>ellipsize<span class="token operator">=</span><span class="token string">"end"</span>
+        android<span class="token operator">:</span>textAlignment<span class="token operator">=</span><span class="token string">"viewStart"</span><span class="token operator">/</span><span class="token operator">></span>
+
+    <span class="token operator">&lt;</span>Button
+        android<span class="token operator">:</span>id<span class="token operator">=</span><span class="token string">"@+id/snackbar_action"</span>
+        android<span class="token operator">:</span>layout_width<span class="token operator">=</span><span class="token string">"wrap_content"</span>
+        android<span class="token operator">:</span>layout_height<span class="token operator">=</span><span class="token string">"wrap_content"</span>
+        android<span class="token operator">:</span>layout_marginLeft<span class="token operator">=</span><span class="token string">"@dimen/design_snackbar_extra_spacing_horizontal"</span>
+        android<span class="token operator">:</span>layout_marginStart<span class="token operator">=</span><span class="token string">"@dimen/design_snackbar_extra_spacing_horizontal"</span>
+        android<span class="token operator">:</span>layout_gravity<span class="token operator">=</span><span class="token string">"center_vertical|right|end"</span>
+        android<span class="token operator">:</span>minWidth<span class="token operator">=</span><span class="token string">"48dp"</span>
+        android<span class="token operator">:</span>visibility<span class="token operator">=</span><span class="token string">"gone"</span>
+        android<span class="token operator">:</span>textColor<span class="token operator">=</span><span class="token string">"?attr/colorAccent"</span>
+        style<span class="token operator">=</span><span class="token string">"?attr/borderlessButtonStyle"</span><span class="token operator">/</span><span class="token operator">></span>
+
+<span class="token operator">&lt;</span><span class="token operator">/</span>view<span class="token operator">></span>
+</code></pre>
+<p>当执行到这里的时候，传递Parnent,content</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">final</span> Snackbar snackbar <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Snackbar</span><span class="token punctuation">(</span>parent<span class="token punctuation">,</span> content<span class="token punctuation">,</span> content<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">private</span> <span class="token function">Snackbar</span><span class="token punctuation">(</span>ViewGroup parent<span class="token punctuation">,</span> View content<span class="token punctuation">,</span> ContentViewCallback contentViewCallback<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">super</span><span class="token punctuation">(</span>parent<span class="token punctuation">,</span> content<span class="token punctuation">,</span> contentViewCallback<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+Snackbar的父类为BaseTransientBottomBar
+<span class="token keyword">protected</span> <span class="token function">BaseTransientBottomBar</span><span class="token punctuation">(</span><span class="token annotation punctuation">@NonNull</span> ViewGroup parent<span class="token punctuation">,</span> <span class="token annotation punctuation">@NonNull</span> View content<span class="token punctuation">,</span>
+            <span class="token annotation punctuation">@NonNull</span> ContentViewCallback contentViewCallback<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>parent <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">IllegalArgumentException</span><span class="token punctuation">(</span><span class="token string">"Transient bottom bar must have non-null parent"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>content <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">IllegalArgumentException</span><span class="token punctuation">(</span><span class="token string">"Transient bottom bar must have non-null content"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>contentViewCallback <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">IllegalArgumentException</span><span class="token punctuation">(</span><span class="token string">"Transient bottom bar must have non-null callback"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        赋值操作
+        mTargetParent <span class="token operator">=</span> parent<span class="token punctuation">;</span>
+        mContentViewCallback <span class="token operator">=</span> contentViewCallback<span class="token punctuation">;</span>
+        mContext <span class="token operator">=</span> parent<span class="token punctuation">.</span><span class="token function">getContext</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        ThemeUtils<span class="token punctuation">.</span><span class="token function">checkAppCompatTheme</span><span class="token punctuation">(</span>mContext<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        LayoutInflater inflater <span class="token operator">=</span> LayoutInflater<span class="token punctuation">.</span><span class="token function">from</span><span class="token punctuation">(</span>mContext<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">// Note that for backwards compatibility reasons we inflate a layout that is defined</span>
+        <span class="token comment" spellcheck="true">// in the extending Snackbar class. This is to prevent breakage of apps that have custom</span>
+        <span class="token comment" spellcheck="true">// coordinator layout behaviors that depend on that layout.</span>
+        再次的加载一个布局
+        mView <span class="token operator">=</span> <span class="token punctuation">(</span>SnackbarBaseLayout<span class="token punctuation">)</span> inflater<span class="token punctuation">.</span><span class="token function">inflate</span><span class="token punctuation">(</span>
+                R<span class="token punctuation">.</span>layout<span class="token punctuation">.</span>design_layout_snackbar<span class="token punctuation">,</span> mTargetParent<span class="token punctuation">,</span> <span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        再将内容添加到了mView里面
+        mView<span class="token punctuation">.</span><span class="token function">addView</span><span class="token punctuation">(</span>content<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>R.layout.design_layout_snackbar 布局，其实就是一个SnackbarLayout，控件</p>
+<pre class=" language-java"><code class="language-java"><span class="token operator">&lt;</span>view xmlns<span class="token operator">:</span>android<span class="token operator">=</span><span class="token string">"http://schemas.android.com/apk/res/android"</span>
+      <span class="token keyword">class</span><span class="token operator">=</span><span class="token string">"android.support.design.widget.Snackbar$SnackbarLayout"</span>
+      android<span class="token operator">:</span>layout_width<span class="token operator">=</span><span class="token string">"wrap_content"</span>
+      android<span class="token operator">:</span>layout_height<span class="token operator">=</span><span class="token string">"wrap_content"</span>
+      android<span class="token operator">:</span>layout_gravity<span class="token operator">=</span><span class="token string">"bottom|center_horizontal"</span>
+      android<span class="token operator">:</span>theme<span class="token operator">=</span><span class="token string">"@style/ThemeOverlay.AppCompat.Dark"</span>
+      style<span class="token operator">=</span><span class="token string">"@style/Widget.Design.Snackbar"</span> <span class="token operator">/</span><span class="token operator">></span>
+
+并且初始化了俩个全剧变量，在Snackbar的父类为BaseTransientBottomBar
+<span class="token keyword">final</span> SnackbarManager<span class="token punctuation">.</span>Callback mManagerCallback <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">SnackbarManager<span class="token punctuation">.</span>Callback</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token annotation punctuation">@Override</span>
+        <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">show</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            sHandler<span class="token punctuation">.</span><span class="token function">sendMessage</span><span class="token punctuation">(</span>sHandler<span class="token punctuation">.</span><span class="token function">obtainMessage</span><span class="token punctuation">(</span>MSG_SHOW<span class="token punctuation">,</span> BaseTransientBottomBar<span class="token punctuation">.</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token annotation punctuation">@Override</span>
+        <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">dismiss</span><span class="token punctuation">(</span><span class="token keyword">int</span> event<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            sHandler<span class="token punctuation">.</span><span class="token function">sendMessage</span><span class="token punctuation">(</span>sHandler<span class="token punctuation">.</span><span class="token function">obtainMessage</span><span class="token punctuation">(</span>MSG_DISMISS<span class="token punctuation">,</span> event<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span>
+                    BaseTransientBottomBar<span class="token punctuation">.</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+ <span class="token punctuation">}</span><span class="token punctuation">;</span>
+ <span class="token keyword">static</span> <span class="token punctuation">{</span>
+        sHandler <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Handler</span><span class="token punctuation">(</span>Looper<span class="token punctuation">.</span><span class="token function">getMainLooper</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Handler<span class="token punctuation">.</span>Callback</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token annotation punctuation">@Override</span>
+            <span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">handleMessage</span><span class="token punctuation">(</span>Message message<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">switch</span> <span class="token punctuation">(</span>message<span class="token punctuation">.</span>what<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token keyword">case</span> MSG_SHOW<span class="token operator">:</span>
+                        <span class="token punctuation">(</span><span class="token punctuation">(</span>BaseTransientBottomBar<span class="token punctuation">)</span> message<span class="token punctuation">.</span>obj<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">showView</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+                    <span class="token keyword">case</span> MSG_DISMISS<span class="token operator">:</span>
+                        <span class="token punctuation">(</span><span class="token punctuation">(</span>BaseTransientBottomBar<span class="token punctuation">)</span> message<span class="token punctuation">.</span>obj<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">hideView</span><span class="token punctuation">(</span>message<span class="token punctuation">.</span>arg1<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+                <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>当我们最简单的调用show();的时候，就会调用到BaseTransientBottomBar中的对应的方法 ,mManagerCallback为make的时候创建的全局变量</p>
+<pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">/**
+* Show the {@link BaseTransientBottomBar}.
+*/</span>
+  <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">show</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+     SnackbarManager<span class="token punctuation">.</span><span class="token function">getInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span>mDuration<span class="token punctuation">,</span> mManagerCallback<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">show</span><span class="token punctuation">(</span><span class="token keyword">int</span> duration<span class="token punctuation">,</span> Callback callback<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">synchronized</span> <span class="token punctuation">(</span>mLock<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isCurrentSnackbarLocked</span><span class="token punctuation">(</span>callback<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">// Means that the callback is already in the queue. We'll just update the duration</span>
+                mCurrentSnackbar<span class="token punctuation">.</span>duration <span class="token operator">=</span> duration<span class="token punctuation">;</span>
+
+                <span class="token comment" spellcheck="true">// If this is the Snackbar currently being shown, call re-schedule it's</span>
+                <span class="token comment" spellcheck="true">// timeout</span>
+                mHandler<span class="token punctuation">.</span><span class="token function">removeCallbacksAndMessages</span><span class="token punctuation">(</span>mCurrentSnackbar<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token function">scheduleTimeoutLocked</span><span class="token punctuation">(</span>mCurrentSnackbar<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">return</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isNextSnackbarLocked</span><span class="token punctuation">(</span>callback<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">// We'll just update the duration</span>
+                mNextSnackbar<span class="token punctuation">.</span>duration <span class="token operator">=</span> duration<span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">// Else, we need to create a new record and queue it</span>
+                第一次执行的时候会先执行到这里<span class="token punctuation">,</span>创建一个Snack的记录，并且给mNextSnackbar变量赋值
+                mNextSnackbar <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">SnackbarRecord</span><span class="token punctuation">(</span>duration<span class="token punctuation">,</span> callback<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>mCurrentSnackbar <span class="token operator">!=</span> null <span class="token operator">&amp;&amp;</span> <span class="token function">cancelSnackbarLocked</span><span class="token punctuation">(</span>mCurrentSnackbar<span class="token punctuation">,</span>
+                    Snackbar<span class="token punctuation">.</span>Callback<span class="token punctuation">.</span>DISMISS_EVENT_CONSECUTIVE<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">// If we currently have a Snackbar, try and cancel it and wait in line</span>
+                <span class="token keyword">return</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                首先将mCurrentSnackbar <span class="token operator">=</span> null<span class="token punctuation">;</span>
+                <span class="token comment" spellcheck="true">// Clear out the current snackbar</span>
+                mCurrentSnackbar <span class="token operator">=</span> null<span class="token punctuation">;</span>
+                <span class="token comment" spellcheck="true">// Otherwise, just show it now</span>
+                <span class="token function">showNextSnackbarLocked</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>mNextSnackbar = new SnackbarRecord(duration, callback);中实现为</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">SnackbarRecord</span> <span class="token punctuation">{</span>
+    <span class="token keyword">final</span> WeakReference<span class="token operator">&lt;</span>Callback<span class="token operator">></span> callback<span class="token punctuation">;</span>
+    <span class="token keyword">int</span> duration<span class="token punctuation">;</span>
+    <span class="token keyword">boolean</span> paused<span class="token punctuation">;</span>
+
+    <span class="token function">SnackbarRecord</span><span class="token punctuation">(</span><span class="token keyword">int</span> duration<span class="token punctuation">,</span> Callback callback<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>callback <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">WeakReference</span><span class="token operator">&lt;</span><span class="token operator">></span><span class="token punctuation">(</span>callback<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>duration <span class="token operator">=</span> duration<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">boolean</span> <span class="token function">isSnackbar</span><span class="token punctuation">(</span>Callback callback<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> callback <span class="token operator">!=</span> null <span class="token operator">&amp;&amp;</span> <span class="token keyword">this</span><span class="token punctuation">.</span>callback<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> callback<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>showNextSnackbarLocked();源码的实现为</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">showNextSnackbarLocked</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//上面有给这个变量赋值 mNextSnackbar = new SnackbarRecord(duration, callback);</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>mNextSnackbar <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        mCurrentSnackbar <span class="token operator">=</span> mNextSnackbar<span class="token punctuation">;</span>
+        mNextSnackbar <span class="token operator">=</span> null<span class="token punctuation">;</span>
+
+        这边取出<span class="token keyword">final</span> WeakReference<span class="token operator">&lt;</span>Callback<span class="token operator">></span> callback<span class="token punctuation">;</span>里面的内容，也就是mManagerCallback
+        <span class="token keyword">final</span> Callback callback <span class="token operator">=</span> mCurrentSnackbar<span class="token punctuation">.</span>callback<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>callback <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            最终执行show的回调
+            callback<span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">// The callback doesn't exist any more, clear out the Snackbar</span>
+             mCurrentSnackbar <span class="token operator">=</span> null<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>callback.show(); 实现也就是调用到了 mManagerCallback中的show回调</p>
+<pre class=" language-java"><code class="language-java">    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">show</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        通过handler来发送消息
+        sHandler<span class="token punctuation">.</span><span class="token function">sendMessage</span><span class="token punctuation">(</span>sHandler<span class="token punctuation">.</span><span class="token function">obtainMessage</span><span class="token punctuation">(</span>MSG_SHOW<span class="token punctuation">,</span> BaseTransientBottomBar<span class="token punctuation">.</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+        <span class="token keyword">case</span> MSG_SHOW<span class="token operator">:</span>
+              <span class="token punctuation">(</span><span class="token punctuation">(</span>BaseTransientBottomBar<span class="token punctuation">)</span> message<span class="token punctuation">.</span>obj<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">showView</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+
+     <span class="token punctuation">(</span><span class="token punctuation">(</span>BaseTransientBottomBar<span class="token punctuation">)</span> message<span class="token punctuation">.</span>obj<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">showView</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 中关键的代码    
+      <span class="token keyword">final</span> <span class="token keyword">void</span> <span class="token function">showView</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        这样就将创建的view，添加到了跟布局里面，这样就可以显示在所有的布局的上面
+        mTargetParent<span class="token punctuation">.</span><span class="token function">addView</span><span class="token punctuation">(</span>mView<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<h1 id="上面的流程图为"><a href="#上面的流程图为" class="headerlink" title="上面的流程图为"></a><strong>上面的流程图为</strong></h1><p><img src="/uploads/SnackBar时序图.png" alt="SnackBar时序图"></p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a><strong>总结</strong></h1><p>我们可以使用这种方式实现全局的悬浮按钮。。。</p>
+
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">AheadSnail</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://aheadsnail.github.io/2017/09/26/snackbar-xiang-jie/">https://aheadsnail.github.io/2017/09/26/snackbar-xiang-jie/</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">AheadSnail</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Android/">
+                                    <span class="chip bg-color">Android</span>
+                                </a>
+                            
+                                <a href="/tags/design/">
+                                    <span class="chip bg-color">design</span>
+                                </a>
+                            
+                                <a href="/tags/SnackBar/">
+                                    <span class="chip bg-color">SnackBar</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2017/10/02/drawlayout-toolbar-tablayout-zu-he-shi-yong/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/13.jpg" class="responsive-img" alt="DrawLayout，ToolBar,TabLayout组合使用">
+                        
+                        <span class="card-title">DrawLayout，ToolBar,TabLayout组合使用</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            DrawLayout，ToolBar,TabLayout组合使用
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2017-10-02
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            AheadSnail
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Android/">
+                        <span class="chip bg-color">Android</span>
+                    </a>
+                    
+                    <a href="/tags/DrawLayout，ToolBar/">
+                        <span class="chip bg-color">DrawLayout，ToolBar</span>
+                    </a>
+                    
+                    <a href="/tags/TabLayout/">
+                        <span class="chip bg-color">TabLayout</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2017/09/26/navigation-yuan-ma-zhong-mvp-de-ti-xian-xiang-jie/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/1.jpg" class="responsive-img" alt="Navigation 详解">
+                        
+                        <span class="card-title">Navigation 详解</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            Navigation 使用详解，及代码分析
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2017-09-26
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            AheadSnail
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Android/">
+                        <span class="chip bg-color">Android</span>
+                    </a>
+                    
+                    <a href="/tags/design/">
+                        <span class="chip bg-color">design</span>
+                    </a>
+                    
+                    <a href="/tags/Navigation/">
+                        <span class="chip bg-color">Navigation</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="503838841"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='random'
+                   preload='auto'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 0px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2019-2021</span>
+            
+            <span id="year">2019</span>
+            <a href="/about" target="_blank">AheadSnail</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/blinkfox" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:1181062873@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=1181062873" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 1181062873" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    <!--腾讯兔小巢-->
+    
+    
+
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>

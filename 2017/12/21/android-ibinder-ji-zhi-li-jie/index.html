@@ -1,0 +1,2024 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="Android IBinder机制理解, AheadSnail&#39;s blog">
+    <meta name="description" content>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>Android IBinder机制理解 | AheadSnail&#39;s blog</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<link rel="alternate" href="/atom.xml" title="AheadSnail's blog" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">AheadSnail&#39;s blog</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/contact" class="waves-effect waves-light">
+      
+      <i class="fas fa-comments" style="zoom: 0.6;"></i>
+      
+      <span>留言板</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">AheadSnail&#39;s blog</div>
+        <div class="logo-desc">
+            
+            Never really desperate, only the lost of the soul.
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/contact" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-comments"></i>
+			
+			留言板
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/blinkfox/hexo-theme-matery" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/blinkfox/hexo-theme-matery" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/13.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">Android IBinder机制理解</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        padding: 35px 0 15px 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        padding-bottom: 30px;
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Android/">
+                                <span class="chip bg-color">Android</span>
+                            </a>
+                        
+                            <a href="/tags/IBinder/">
+                                <span class="chip bg-color">IBinder</span>
+                            </a>
+                        
+                            <a href="/tags/IPC/">
+                                <span class="chip bg-color">IPC</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2017-12-21
+                </div>
+                
+
+                
+
+                
+
+                
+
+                
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <p>什么是IPC机制</p>
+<pre><code>（1）IPC是Inter-Process Communication的缩写，含义为进程间通信或者跨进程通信，是指两个进程之间进行数据交换的过程。
+（2）ANR是Application Not Responding的缩写，即应用无响应。主线程执行大量的耗时操作容易导致ANR现象发生。
+（3）在Android中最有特色的进程间通信方式就是Binder了，通过Binder可以轻松地实现进程间通信。
+（4）Android还支持Socket，通过Socket也可以实现任意两个终端或者两个进程之间的通信。
+</code></pre><p>什么是Binder</p>
+<pre><code>（1）Binder实现了IBinder接口。
+（2）从IPC角度来说，Binder是Android中的一种跨进程通信方式。Binder还可以理解为一种虚拟的物理设备，它的设备驱动是/dev/binder，这种通信方式在Linux中没有。
+（3）从Android Framework角度来说，Binder是ServiceManager连接各种Manager（ActivityManager、WindowManager，等等）和相应ManagerService的桥梁。
+（4）从Android应用层来说，Binder是客户端和服务端进行通信的媒介，当bindService的时候，服务端会返回一个包含了服务端业务调用的Binder对象，
+通过这个对象，客户端就可以获取服务端提供的服务或者数据，这里的服务包括普通服务和基于AIDL的服务。
+（5）AIDL即Android interface definition Language，即Android接口定义语言。
+</code></pre><p>2、在分析Binder的工作原理之前，我们先补充一下Android设计模式之Proxy模式</p>
+<pre><code>Proxy代理模式简介：
+代理模式是对象的结构模式。代理模式给某一个对象提供一个代理对象，并由代理对象控制对原对象的引用。
+模式的使用场景：
+就是一个人或者机构代表另一个人或者机构采取行动。在一些情况下，一个客户不想或者不能够直接引用一个对象，而代理对象可以在客户端和目标对象之间起到中介的作用。
+</code></pre><p><img src="/uploads/代理模式原理图.png" alt="结果显示"></p>
+<pre><code>抽象对象角色AbstarctObject：声明了目标对象和代理对象的共同接口，这样一来在任何可以使用目标对象的地方都可以使用代理对象。
+目标对象角色RealObject：定义了代理对象所代表的目标对象。
+代理对象角色ProxyObject：代理对象内部含有目标对象的引用，从而可以在任何时候操作目标对象；代理对象提供一个与目标对象相同的接口，
+以便可以在任何时候替代目标对象。代理对象通常在客户端调用传递给目标对象之前或之后，执行某个操作，而不是单纯地将调用传递给目标对象。
+</code></pre><p>Proxy代理模式的简单实现</p>
+<pre class=" language-java"><code class="language-java">抽象对象角色
+<span class="token keyword">public</span> <span class="token keyword">abstract</span> <span class="token keyword">class</span> <span class="token class-name">AbstractObject</span> <span class="token punctuation">{</span>  
+    <span class="token comment" spellcheck="true">//操作  </span>
+    <span class="token keyword">public</span> <span class="token keyword">abstract</span> <span class="token keyword">void</span> <span class="token function">operation</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+<span class="token punctuation">}</span>  
+
+目标对象角色
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">RealObject</span> <span class="token keyword">extends</span> <span class="token class-name">AbstractObject</span> <span class="token punctuation">{</span>  
+    <span class="token annotation punctuation">@Override</span>  
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">operation</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>  
+        <span class="token comment" spellcheck="true">//一些操作  </span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"一些操作"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+    <span class="token punctuation">}</span>  
+<span class="token punctuation">}</span>  
+
+代理对象角色
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">ProxyObject</span> <span class="token keyword">extends</span> <span class="token class-name">AbstractObject</span><span class="token punctuation">{</span>  
+    RealObject realObject <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">RealObject</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//目标对象角色  </span>
+    <span class="token annotation punctuation">@Override</span>  
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">operation</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>  
+        <span class="token comment" spellcheck="true">//调用目标对象之前可以做相关操作  </span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"before"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>          
+        realObject<span class="token punctuation">.</span><span class="token function">operation</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>        <span class="token comment" spellcheck="true">//目标对象角色的操作函数  </span>
+        <span class="token comment" spellcheck="true">//调用目标对象之后可以做相关操作  </span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"after"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+    <span class="token punctuation">}</span>  
+<span class="token punctuation">}</span>  
+
+客户端
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Client</span> <span class="token punctuation">{</span>  
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>  
+        AbstractObject obj <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ProxyObject</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+        obj<span class="token punctuation">.</span><span class="token function">operation</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+    <span class="token punctuation">}</span>  
+<span class="token punctuation">}</span>
+</code></pre>
+<p>写Aidl要注意的地方</p>
+<pre><code>其实AIDL这门语言非常的简单，基本上它的语法和 Java 是一样的，只是在一些细微处有些许差别——毕竟它只是被创造出来简化Android程序员工作的
+太复杂不好——所以在这里我就着重的说一下它和 Java 不一样的地方。主要有下面这些点：
+
+文件类型：用AIDL书写的文件的后缀是 .aidl，而不是 .java。
+数据类型：AIDL默认支持一些数据类型，在使用这些数据类型的时候是不需要导包的，但是除了这些类型之外的数据类型，在使用之前必须导包，就算目标文件与当前正在编写的 .aidl 文件在同一个包下——在 Java 中，
+这种情况是不需要导包的。比如，现在我们编写了两个文件，一个叫做 Book.java ，另一个叫做 BookManager.aidl，它们都在 com.lypeer.aidldemo 包下 ，现在我们需要在 .aidl 文件里使用 Book 对象，
+那么我们就必须在 .aidl 文件里面写上 import com.lypeer.aidldemo.Book; 哪怕 .java 文件和 .aidl 文件就在一个包下。 
+
+默认支持的数据类型包括： 
+Java中的八种基本数据类型，包括 byte，short，int，long，float，double，boolean，char。
+String 类型。
+CharSequence类型。
+List类型：List中的所有元素必须是AIDL支持的类型之一，或者是一个其他AIDL生成的接口，或者是定义的parcelable（下文关于这个会有详解）。List可以使用泛型。
+Map类型：Map中的所有元素必须是AIDL支持的类型之一，或者是一个其他AIDL生成的接口，或者是定义的parcelable。Map是不支持泛型的。
+
+定向tag：这是一个极易被忽略的点——这里的“被忽略”指的不是大家都不知道，而是很少人会正确的使用它。在我的理解里，定向 tag 是这样的：
+AIDL中的定向 tag 表示了在跨进程通信中数据的流向，其中 in 表示数据只能由客户端流向服务端， out 表示数据只能由服务端流向客户端，
+而 inout 则表示数据可在服务端与客户端之间双向流通。其中，数据流向是针对在客户端中的那个传入方法的对象而言的。in 为定向 tag 的话表现为服务端将会接收到一个那个对象的完整数据，
+但是客户端的那个对象不会因为服务端对传参的修改而发生变动；out 的话表现为服务端将会接收到那个对象的的空对象，但是在服务端对接收到的空对象有任何修改之后客户端将会同步变动
+inout 为定向 tag 的情况下，服务端将会接收到客户端传来对象的完整信息，并且客户端将会同步服务端对该对象的任何变动。 
+另外，Java 中的基本类型和 String ，CharSequence 的定向 tag 默认且只能是 in 。还有，请注意，请不要滥用定向 tag ，而是要根据需要选取合适的——要是不管三七二十一，
+全都一上来就用 inout ，等工程大了系统的开销就会大很多——因为排列整理参数的开销是很昂贵的。两种AIDL文件：在我的理解里，所有的AIDL文件大致可以分为两类。
+一类是用来定义parcelable对象，以供其他AIDL文件使用AIDL中非默认支持的数据类型的。一类是用来定义方法接口，以供系统使用来完成跨进程通信的。可以看到，两类文件都是在“定义”些什么，
+而不涉及具体的实现，这就是为什么它叫做“Android接口定义语言”。 注：所有的非默认支持数据类型必须通过第一类AIDL文件定义才能被使用。
+
+
+于不同的进程有着不同的内存区域，并且它们只能访问自己的那一块内存区域，所以我们不能像平时那样，传一个句柄过去就完事了——句柄指向的是一个内存区域，
+现在目标进程根本不能访问源进程的内存，那把它传过去又有什么用呢？所以我们必须将要传输的数据转化为能够在内存之间流通的形式。这个转化的过程就叫做序列化与反序列化。
+简单来说是这样的：比如现在我们要将一个对象的数据从客户端传到服务端去，我们就可以在客户端对这个对象进行序列化的操作，将其中包含的数据转化为序列化流，
+然后将这个序列化流传输到服务端的内存中去，再在服务端对这个数据流进行反序列化的操作，从而还原其中包含的数据——通过这种方式，我们就达到了在一个进程中访问另一个进程的数据的目的。
+而通常，在我们通过AIDL进行跨进程通信的时候，选择的序列化方式是实现 Parcelable 接口。关于实现 Parcelable 接口之后里面具体有那些方法啦，每个方法是干嘛的啦，
+这些我就不展开来讲了，那並非这篇文章的重点，我下面主要讲一下如何快速的生成一个合格的可序列化的类（以Book.java为例）。
+注：若AIDL文件中涉及到的所有数据类型均为默认支持的数据类型，则无此步骤。因为默认支持的那些数据类型都是可序列化的。
+
+但是请注意，这里有一个坑：默认生成的模板类的对象只支持为 in 的定向 tag 。为什么呢？因为默认生成的类里面只有 writeToParcel() 方法，而如果要支持为 out 或者 inout 的定向 tag 的话，
+还需要实现 readFromParcel() 方法——而这个方法其实并没有在 Parcelable 接口里面，所以需要我们从头写，读取的顺序要跟写的顺序保持一致
+
+注意：这里又有一个坑！大家可能注意到了，在 Book.aidl 文件中，我一直在强调：Book.aidl与Book.java的包名应当是一样的。这似乎理所当然的意味着这两个文件应当是在同一个包里面的——事实上，
+很多比较老的文章里就是这样说的，他们说最好都在 aidl 包里同一个包下，方便移植——然而在 Android Studio 里并不是这样。如果这样做的话，系统根本就找不到 Book.java 文件，
+从而在其他的AIDL文件里面使用 Book 对象的时候会报 Symbol not found 的错误。为什么会这样呢？因为 Gradle 。大家都知道，Android Studio 是默认使用 Gradle 来构建 Android 项目的，
+而 Gradle 在构建项目的时候会通过 sourceSets 来配置不同文件的访问路径，从而加快查找速度——问题就出在这里。Gradle 默认是将 java 代码的访问路径设置在 java 包下的，这样一来，
+如果 java 文件是放在 aidl 包下的话那么理所当然系统是找不到这个 java 文件的。那应该怎么办呢？
+
+又要 java文件和 aidl 文件的包名是一样的，又要能找到这个 java 文件——那么仔细想一下的话，其实解决方法是很显而易见的。首先我们可以把问题转化成：如何在保证两个文件包名一样的情况下，
+让系统能够找到我们的 java 文件？这样一来思路就很明确了：要么让系统来 aidl 包里面来找 java 文件，要么把 java 文件放到系统能找到的地方去，也即放到 java 包里面去。
+接下来我详细的讲一下这两种方式具体应该怎么做：
+
+修改 build.gradle 文件：在 android{} 中间加上下面的内容：
+sourceSets {
+    main {
+        java.srcDirs = [&#39;src/main/java&#39;, &#39;src/main/aidl&#39;]
+    }
+}
+
+也就是把 java 代码的访问路径设置成了 java 包和 aidl 包，这样一来系统就会到 aidl 包里面去查找 java 文件，也就达到了我们的目的。
+只是有一点，这样设置后 Android Studio 中的项目目录会有一些改变，我感觉改得挺难看的。
+
+把 java 文件放到 java 包下去：把 Book.java 放到 java 包里任意一个包下，保持其包名不变，与 Book.aidl 一致。只要它的包名不变，Book.aidl 就能找到 Book.java ，
+而只要 Book.java 在 java 包下，那么系统也是能找到它的。但是这样做的话也有一个问题，就是在移植相关 .aidl 文件和 .java 文件的时候没那么方便，不能直接把整个 aidl 文件夹拿过去完事儿了，
+还要单独将 .java 文件放到 java 文件夹里去。
+
+我们可以用上面两个方法之一来解决找不到 .java 文件的坑，具体用哪个就看大家怎么选了，反正都挺简单的。
+到这里我们就已经将AIDL文件新建并且书写完毕了，clean 一下项目，如果没有报错，这一块就算是大功告成了。
+</code></pre><p><img src="/uploads/IBinder机制原理图.png" alt="结果显示"></p>
+<pre><code>Binder一个很重要的作用是：将客户端的请求参数通过Parcel包装后传到远程服务端，远程服务端解析数据并执行对应的操作，
+同时客户端线程挂起，当服务端方法执行完毕后，再将返回结果写入到另外一个Parcel中并将其通过Binder传回到客户端，
+客户端接收到返回数据的Parcel后，Binder会解析数据包中的内容并将原始结果返回给客户端，至此，整个Binder的工作过程就完成了。
+由此可见，Binder更像一个数据通道，Parcel对象就在这个通道中跨进程传输，至于双方如何通信，这并不负责，只需要双方按照约定好的规范去打包和解包数据即可。
+</code></pre><p>AIDL案例</p>
+<pre class=" language-java"><code class="language-java">调用者调用bindService来绑定服务
+ <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">bindService</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Intent</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token keyword">new</span> <span class="token class-name">ServiceConnection</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+            <span class="token annotation punctuation">@Override</span>
+            <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">onServiceDisconnected</span><span class="token punctuation">(</span>ComponentName name<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">// TODO Auto-generated method stub</span>
+
+            <span class="token punctuation">}</span>
+
+            <span class="token annotation punctuation">@Override</span>
+            <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">onServiceConnected</span><span class="token punctuation">(</span>ComponentName name<span class="token punctuation">,</span> IBinder service<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">//当服务连接的时候，会返回远程IBinder引用</span>
+                IBinderTest asInterface <span class="token operator">=</span> IBinderTest<span class="token punctuation">.</span>Stub<span class="token punctuation">.</span><span class="token function">asInterface</span><span class="token punctuation">(</span>service<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                    asInterface<span class="token punctuation">.</span><span class="token function">testBinder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">RemoteException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token comment" spellcheck="true">// TODO Auto-generated catch block</span>
+                    e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>Context<span class="token punctuation">.</span>BIND_AUTO_CREATE<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+下面这个类是远程提供的服务
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">MyService</span> <span class="token keyword">extends</span> <span class="token class-name">Service</span><span class="token punctuation">{</span>
+
+    <span class="token keyword">private</span> MyBinder binder<span class="token punctuation">;</span>
+
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> IBinder <span class="token function">onBind</span><span class="token punctuation">(</span>Intent intent<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// TODO Auto-generated method stub</span>
+        <span class="token keyword">return</span> binder<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">onCreate</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// TODO Auto-generated method stub</span>
+        binder <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">MyBinder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">super</span><span class="token punctuation">.</span><span class="token function">onCreate</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+
+    <span class="token keyword">class</span> <span class="token class-name">MyBinder</span> <span class="token keyword">extends</span> <span class="token class-name">IBinderTest<span class="token punctuation">.</span>Stub</span>
+    <span class="token punctuation">{</span>
+
+        <span class="token annotation punctuation">@Override</span>
+        <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">testBinder</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">throws</span> RemoteException <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">// TODO Auto-generated method stub</span>
+
+        <span class="token punctuation">}</span>
+
+        <span class="token annotation punctuation">@Override</span>
+        <span class="token keyword">public</span> String <span class="token function">getBinderString</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">throws</span> RemoteException <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">// TODO Auto-generated method stub</span>
+            <span class="token keyword">return</span> null<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+下面这个是远程提供的aidl文件
+<span class="token keyword">package</span> com<span class="token punctuation">.</span>dn<span class="token punctuation">.</span>inter<span class="token punctuation">;</span>
+<span class="token keyword">interface</span> <span class="token class-name">IBinderTest</span><span class="token punctuation">{</span>
+    <span class="token keyword">void</span> <span class="token function">testBinder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    String <span class="token function">getBinderString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+下面的这个类是远程提供的aidl自动生成的类，注意在客户端使用远程文件的aidl的时候，一定要保证俩者的包名路径是一样的，这样aidl文件才会自动的生成下面的这个类文件
+<span class="token keyword">public</span> <span class="token keyword">interface</span> <span class="token class-name">IBinderTest</span> <span class="token keyword">extends</span> <span class="token class-name">android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>IInterface</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">/** Local-side IPC implementation stub class. */</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">abstract</span> <span class="token keyword">class</span> <span class="token class-name">Stub</span> <span class="token keyword">extends</span> <span class="token class-name">android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>Binder</span> <span class="token keyword">implements</span> <span class="token class-name">com<span class="token punctuation">.</span>dn<span class="token punctuation">.</span>inter<span class="token punctuation">.</span>IBinderTest</span> <span class="token punctuation">{</span>
+        <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">final</span> java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>String DESCRIPTOR <span class="token operator">=</span> <span class="token string">"com.dn.inter.IBinderTest"</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">/** Construct the stub at attach it to the interface. */</span>
+        <span class="token keyword">public</span> <span class="token function">Stub</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">attachInterface</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">,</span> DESCRIPTOR<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token comment" spellcheck="true">/**
+         * Cast an IBinder object into an com.dn.inter.IBinderTest interface,
+         * generating a proxy if needed.
+         */</span>
+        <span class="token keyword">public</span> <span class="token keyword">static</span> com<span class="token punctuation">.</span>dn<span class="token punctuation">.</span>inter<span class="token punctuation">.</span>IBinderTest <span class="token function">asInterface</span><span class="token punctuation">(</span>android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>IBinder obj<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>obj <span class="token operator">==</span> null<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">return</span> null<span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>IInterface iin <span class="token operator">=</span> obj<span class="token punctuation">.</span><span class="token function">queryLocalInterface</span><span class="token punctuation">(</span>DESCRIPTOR<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">(</span>iin <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span>iin <span class="token keyword">instanceof</span> <span class="token class-name">com<span class="token punctuation">.</span>dn<span class="token punctuation">.</span>inter<span class="token punctuation">.</span>IBinderTest</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>com<span class="token punctuation">.</span>dn<span class="token punctuation">.</span>inter<span class="token punctuation">.</span>IBinderTest<span class="token punctuation">)</span> iin<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">com<span class="token punctuation">.</span>dn<span class="token punctuation">.</span>inter<span class="token punctuation">.</span>IBinderTest<span class="token punctuation">.</span>Stub<span class="token punctuation">.</span>Proxy</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token annotation punctuation">@Override</span>
+        <span class="token keyword">public</span> android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>IBinder <span class="token function">asBinder</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token annotation punctuation">@Override</span>
+        <span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">onTransact</span><span class="token punctuation">(</span><span class="token keyword">int</span> code<span class="token punctuation">,</span> android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>Parcel data<span class="token punctuation">,</span> android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>Parcel reply<span class="token punctuation">,</span> <span class="token keyword">int</span> flags<span class="token punctuation">)</span>
+                <span class="token keyword">throws</span> android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>RemoteException <span class="token punctuation">{</span>
+            <span class="token keyword">switch</span> <span class="token punctuation">(</span>code<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">case</span> INTERFACE_TRANSACTION<span class="token operator">:</span> <span class="token punctuation">{</span>
+                reply<span class="token punctuation">.</span><span class="token function">writeString</span><span class="token punctuation">(</span>DESCRIPTOR<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">case</span> TRANSACTION_testBinder<span class="token operator">:</span> <span class="token punctuation">{</span>
+                data<span class="token punctuation">.</span><span class="token function">enforceInterface</span><span class="token punctuation">(</span>DESCRIPTOR<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">testBinder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                reply<span class="token punctuation">.</span><span class="token function">writeNoException</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">case</span> TRANSACTION_getBinderString<span class="token operator">:</span> <span class="token punctuation">{</span>
+                data<span class="token punctuation">.</span><span class="token function">enforceInterface</span><span class="token punctuation">(</span>DESCRIPTOR<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>String _result <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">getBinderString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                reply<span class="token punctuation">.</span><span class="token function">writeNoException</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                reply<span class="token punctuation">.</span><span class="token function">writeString</span><span class="token punctuation">(</span>_result<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">return</span> <span class="token keyword">super</span><span class="token punctuation">.</span><span class="token function">onTransact</span><span class="token punctuation">(</span>code<span class="token punctuation">,</span> data<span class="token punctuation">,</span> reply<span class="token punctuation">,</span> flags<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">Proxy</span> <span class="token keyword">implements</span> <span class="token class-name">com<span class="token punctuation">.</span>dn<span class="token punctuation">.</span>inter<span class="token punctuation">.</span>IBinderTest</span> <span class="token punctuation">{</span>
+            <span class="token keyword">private</span> android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>IBinder mRemote<span class="token punctuation">;</span>
+
+            <span class="token function">Proxy</span><span class="token punctuation">(</span>android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>IBinder remote<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                mRemote <span class="token operator">=</span> remote<span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+
+            <span class="token annotation punctuation">@Override</span>
+            <span class="token keyword">public</span> android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>IBinder <span class="token function">asBinder</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">return</span> mRemote<span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+
+            <span class="token keyword">public</span> java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>String <span class="token function">getInterfaceDescriptor</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">return</span> DESCRIPTOR<span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+
+            <span class="token annotation punctuation">@Override</span>
+            <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">testBinder</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">throws</span> android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>RemoteException <span class="token punctuation">{</span>
+                android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>Parcel _data <span class="token operator">=</span> android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>Parcel<span class="token punctuation">.</span><span class="token function">obtain</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>Parcel _reply <span class="token operator">=</span> android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>Parcel<span class="token punctuation">.</span><span class="token function">obtain</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                    _data<span class="token punctuation">.</span><span class="token function">writeInterfaceToken</span><span class="token punctuation">(</span>DESCRIPTOR<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    mRemote<span class="token punctuation">.</span><span class="token function">transact</span><span class="token punctuation">(</span>Stub<span class="token punctuation">.</span>TRANSACTION_testBinder<span class="token punctuation">,</span> _data<span class="token punctuation">,</span> _reply<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    _reply<span class="token punctuation">.</span><span class="token function">readException</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span> <span class="token keyword">finally</span> <span class="token punctuation">{</span>
+                    _reply<span class="token punctuation">.</span><span class="token function">recycle</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    _data<span class="token punctuation">.</span><span class="token function">recycle</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+
+            <span class="token annotation punctuation">@Override</span>
+            <span class="token keyword">public</span> java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>String <span class="token function">getBinderString</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">throws</span> android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>RemoteException <span class="token punctuation">{</span>
+                android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>Parcel _data <span class="token operator">=</span> android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>Parcel<span class="token punctuation">.</span><span class="token function">obtain</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>Parcel _reply <span class="token operator">=</span> android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>Parcel<span class="token punctuation">.</span><span class="token function">obtain</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>String _result<span class="token punctuation">;</span>
+                <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                    _data<span class="token punctuation">.</span><span class="token function">writeInterfaceToken</span><span class="token punctuation">(</span>DESCRIPTOR<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    mRemote<span class="token punctuation">.</span><span class="token function">transact</span><span class="token punctuation">(</span>Stub<span class="token punctuation">.</span>TRANSACTION_getBinderString<span class="token punctuation">,</span> _data<span class="token punctuation">,</span> _reply<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    _reply<span class="token punctuation">.</span><span class="token function">readException</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    _result <span class="token operator">=</span> _reply<span class="token punctuation">.</span><span class="token function">readString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span> <span class="token keyword">finally</span> <span class="token punctuation">{</span>
+                    _reply<span class="token punctuation">.</span><span class="token function">recycle</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    _data<span class="token punctuation">.</span><span class="token function">recycle</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+                <span class="token keyword">return</span> _result<span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token keyword">int</span> TRANSACTION_testBinder <span class="token operator">=</span> <span class="token punctuation">(</span>android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>IBinder<span class="token punctuation">.</span>FIRST_CALL_TRANSACTION <span class="token operator">+</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token keyword">int</span> TRANSACTION_getBinderString <span class="token operator">=</span> <span class="token punctuation">(</span>android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>IBinder<span class="token punctuation">.</span>FIRST_CALL_TRANSACTION <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">testBinder</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">throws</span> android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>RemoteException<span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>String <span class="token function">getBinderString</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">throws</span> android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>RemoteException<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>AIDL源码解析</p>
+<pre class=" language-java"><code class="language-java">当客户端调用了 <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">bindService</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Intent</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token keyword">new</span> <span class="token class-name">ServiceConnection</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token punctuation">,</span>这里的<span class="token keyword">this</span>为context的实现类，其实就是ContextImpl
+ <span class="token annotation punctuation">@Override</span>
+ <span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">bindService</span><span class="token punctuation">(</span>Intent service<span class="token punctuation">,</span> ServiceConnection conn<span class="token punctuation">,</span>
+            <span class="token keyword">int</span> flags<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">warnIfCallingFromSystemProcess</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token function">bindServiceCommon</span><span class="token punctuation">(</span>service<span class="token punctuation">,</span> conn<span class="token punctuation">,</span> flags<span class="token punctuation">,</span> Process<span class="token punctuation">.</span><span class="token function">myUserHandle</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+当调用到<span class="token function">bindServiceCommon</span><span class="token punctuation">(</span>service<span class="token punctuation">,</span> conn<span class="token punctuation">,</span> flags<span class="token punctuation">,</span> Process<span class="token punctuation">.</span><span class="token function">myUserHandle</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">private</span> <span class="token keyword">boolean</span> <span class="token function">bindServiceCommon</span><span class="token punctuation">(</span>Intent service<span class="token punctuation">,</span> ServiceConnection conn<span class="token punctuation">,</span> <span class="token keyword">int</span> flags<span class="token punctuation">,</span>
+            UserHandle user<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span> 中间省略代码
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            <span class="token keyword">int</span> res <span class="token operator">=</span> ActivityManagerNative<span class="token punctuation">.</span><span class="token function">getDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">bindService</span><span class="token punctuation">(</span>
+                mMainThread<span class="token punctuation">.</span><span class="token function">getApplicationThread</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">getActivityToken</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                service<span class="token punctuation">,</span> service<span class="token punctuation">.</span><span class="token function">resolveTypeIfNeeded</span><span class="token punctuation">(</span><span class="token function">getContentResolver</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                sd<span class="token punctuation">,</span> flags<span class="token punctuation">,</span> user<span class="token punctuation">.</span><span class="token function">getIdentifier</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>res <span class="token operator">&lt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">SecurityException</span><span class="token punctuation">(</span>
+                        <span class="token string">"Not allowed to bind to service "</span> <span class="token operator">+</span> service<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">return</span> res <span class="token operator">!=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">RemoteException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+ <span class="token punctuation">}</span>
+ 这里的ActivityManagerNative<span class="token punctuation">.</span><span class="token function">getDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span>为
+   <span class="token comment" spellcheck="true">/**
+     * Retrieve the system's default/global activity manager.
+     */</span>
+ <span class="token keyword">static</span> <span class="token keyword">public</span> IActivityManager <span class="token function">getDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> gDefault<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+ <span class="token punctuation">}</span>
+ 调用gDefault<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span>就会执行到下面的crate函数
+ <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">final</span> Singleton<span class="token operator">&lt;</span>IActivityManager<span class="token operator">></span> gDefault <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Singleton</span><span class="token operator">&lt;</span>IActivityManager<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">protected</span> IActivityManager <span class="token function">create</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            IBinder b <span class="token operator">=</span> ServiceManager<span class="token punctuation">.</span><span class="token function">getService</span><span class="token punctuation">(</span><span class="token string">"activity"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                Log<span class="token punctuation">.</span><span class="token function">v</span><span class="token punctuation">(</span><span class="token string">"ActivityManager"</span><span class="token punctuation">,</span> <span class="token string">"default service binder = "</span> <span class="token operator">+</span> b<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            IActivityManager am <span class="token operator">=</span> <span class="token function">asInterface</span><span class="token punctuation">(</span>b<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                Log<span class="token punctuation">.</span><span class="token function">v</span><span class="token punctuation">(</span><span class="token string">"ActivityManager"</span><span class="token punctuation">,</span> <span class="token string">"default service = "</span> <span class="token operator">+</span> am<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">return</span> am<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span>
+这里要注意一下<span class="token keyword">public</span> <span class="token keyword">abstract</span> <span class="token keyword">class</span> <span class="token class-name">ActivityManagerNative</span> <span class="token keyword">extends</span> <span class="token class-name">Binder</span> <span class="token keyword">implements</span> <span class="token class-name">IActivityManager</span>
+而且 IActivityManager继承于， <span class="token keyword">public</span> <span class="token keyword">interface</span> <span class="token class-name">IActivityManager</span> <span class="token keyword">extends</span> <span class="token class-name">IInterface</span> 
+ActivityManagerNative就跟我们使用aidl自动生成的文件是一样的
+都是继承与Binder<span class="token punctuation">,</span>实现了IInterface接口，其实他本质就相当于是一个aidl文件
+
+通过调用ActivityManagerNative<span class="token punctuation">.</span><span class="token function">getDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span>得到一个IActivityManager对象，其本身是一个接口，如果要启动的服务不是在当前的进程的话，就得到一个ActivityManagerProxy对象
+里面的mRemote保存了远程服务端的IBinder对象
+所以当执行到bindService的时候，执行的为ActivityManagerProxy中的bindService方法
+ <span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">bindService</span><span class="token punctuation">(</span>IApplicationThread caller<span class="token punctuation">,</span> IBinder token<span class="token punctuation">,</span>
+            Intent service<span class="token punctuation">,</span> String resolvedType<span class="token punctuation">,</span> IServiceConnection connection<span class="token punctuation">,</span>
+            <span class="token keyword">int</span> flags<span class="token punctuation">,</span> <span class="token keyword">int</span> userId<span class="token punctuation">)</span> <span class="token keyword">throws</span> RemoteException <span class="token punctuation">{</span>
+        Parcel data <span class="token operator">=</span> Parcel<span class="token punctuation">.</span><span class="token function">obtain</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Parcel reply <span class="token operator">=</span> Parcel<span class="token punctuation">.</span><span class="token function">obtain</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        data<span class="token punctuation">.</span><span class="token function">writeInterfaceToken</span><span class="token punctuation">(</span>IActivityManager<span class="token punctuation">.</span>descriptor<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        data<span class="token punctuation">.</span><span class="token function">writeStrongBinder</span><span class="token punctuation">(</span>caller <span class="token operator">!=</span> null <span class="token operator">?</span> caller<span class="token punctuation">.</span><span class="token function">asBinder</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">:</span> null<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        data<span class="token punctuation">.</span><span class="token function">writeStrongBinder</span><span class="token punctuation">(</span>token<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        service<span class="token punctuation">.</span><span class="token function">writeToParcel</span><span class="token punctuation">(</span>data<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        data<span class="token punctuation">.</span><span class="token function">writeString</span><span class="token punctuation">(</span>resolvedType<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        data<span class="token punctuation">.</span><span class="token function">writeStrongBinder</span><span class="token punctuation">(</span>connection<span class="token punctuation">.</span><span class="token function">asBinder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        data<span class="token punctuation">.</span><span class="token function">writeInt</span><span class="token punctuation">(</span>flags<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        data<span class="token punctuation">.</span><span class="token function">writeInt</span><span class="token punctuation">(</span>userId<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        mRemote<span class="token punctuation">.</span><span class="token function">transact</span><span class="token punctuation">(</span>BIND_SERVICE_TRANSACTION<span class="token punctuation">,</span> data<span class="token punctuation">,</span> reply<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        reply<span class="token punctuation">.</span><span class="token function">readException</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">int</span> res <span class="token operator">=</span> reply<span class="token punctuation">.</span><span class="token function">readInt</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        data<span class="token punctuation">.</span><span class="token function">recycle</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        reply<span class="token punctuation">.</span><span class="token function">recycle</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> res<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+当执行到  mRemote<span class="token punctuation">.</span><span class="token function">transact</span><span class="token punctuation">(</span>BIND_SERVICE_TRANSACTION<span class="token punctuation">,</span> data<span class="token punctuation">,</span> reply<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>的时候，客户端就会往IBinder驱动里面写数据，客户端会挂起，一直等待服务端的执行结果
+同时会调用服务端的onTransact方法，同时将传递的数据回调回来服务端这边解析数据，调用服务端对应的方法，同时将结果写回IBinder启动中，客户端继续往下面执行
+<span class="token keyword">case</span> BIND_SERVICE_TRANSACTION<span class="token operator">:</span> <span class="token punctuation">{</span>
+            data<span class="token punctuation">.</span><span class="token function">enforceInterface</span><span class="token punctuation">(</span>IActivityManager<span class="token punctuation">.</span>descriptor<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            IBinder b <span class="token operator">=</span> data<span class="token punctuation">.</span><span class="token function">readStrongBinder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            IApplicationThread app <span class="token operator">=</span> ApplicationThreadNative<span class="token punctuation">.</span><span class="token function">asInterface</span><span class="token punctuation">(</span>b<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            IBinder token <span class="token operator">=</span> data<span class="token punctuation">.</span><span class="token function">readStrongBinder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            Intent service <span class="token operator">=</span> Intent<span class="token punctuation">.</span>CREATOR<span class="token punctuation">.</span><span class="token function">createFromParcel</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            String resolvedType <span class="token operator">=</span> data<span class="token punctuation">.</span><span class="token function">readString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            b <span class="token operator">=</span> data<span class="token punctuation">.</span><span class="token function">readStrongBinder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">int</span> fl <span class="token operator">=</span> data<span class="token punctuation">.</span><span class="token function">readInt</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">int</span> userId <span class="token operator">=</span> data<span class="token punctuation">.</span><span class="token function">readInt</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            IServiceConnection conn <span class="token operator">=</span> IServiceConnection<span class="token punctuation">.</span>Stub<span class="token punctuation">.</span><span class="token function">asInterface</span><span class="token punctuation">(</span>b<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">int</span> res <span class="token operator">=</span> <span class="token function">bindService</span><span class="token punctuation">(</span>app<span class="token punctuation">,</span> token<span class="token punctuation">,</span> service<span class="token punctuation">,</span> resolvedType<span class="token punctuation">,</span> conn<span class="token punctuation">,</span> fl<span class="token punctuation">,</span> userId<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            reply<span class="token punctuation">.</span><span class="token function">writeNoException</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            reply<span class="token punctuation">.</span><span class="token function">writeInt</span><span class="token punctuation">(</span>res<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+当执行到 <span class="token keyword">int</span> res <span class="token operator">=</span> <span class="token function">bindService</span><span class="token punctuation">(</span>app<span class="token punctuation">,</span> token<span class="token punctuation">,</span> service<span class="token punctuation">,</span> resolvedType<span class="token punctuation">,</span> conn<span class="token punctuation">,</span> fl<span class="token punctuation">,</span> userId<span class="token punctuation">)</span><span class="token punctuation">;</span>的时候，就会执行下面的方法
+<span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">bindService</span><span class="token punctuation">(</span>IApplicationThread caller<span class="token punctuation">,</span> IBinder token<span class="token punctuation">,</span>
+            Intent service<span class="token punctuation">,</span> String resolvedType<span class="token punctuation">,</span>
+            IServiceConnection connection<span class="token punctuation">,</span> <span class="token keyword">int</span> flags<span class="token punctuation">,</span> <span class="token keyword">int</span> userId<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">enforceNotIsolatedCaller</span><span class="token punctuation">(</span><span class="token string">"bindService"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">// Refuse possible leaked file descriptors</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>service <span class="token operator">!=</span> null <span class="token operator">&amp;&amp;</span> service<span class="token punctuation">.</span><span class="token function">hasFileDescriptors</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token boolean">true</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">IllegalArgumentException</span><span class="token punctuation">(</span><span class="token string">"File descriptors passed in Intent"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token keyword">synchronized</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> mServices<span class="token punctuation">.</span><span class="token function">bindServiceLocked</span><span class="token punctuation">(</span>caller<span class="token punctuation">,</span> token<span class="token punctuation">,</span> service<span class="token punctuation">,</span> resolvedType<span class="token punctuation">,</span>
+                    connection<span class="token punctuation">,</span> flags<span class="token punctuation">,</span> userId<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+这里的  <span class="token keyword">final</span> ActiveServices mServices，当执行到bindServiceLocked
+ <span class="token keyword">int</span> <span class="token function">bindServiceLocked</span><span class="token punctuation">(</span>IApplicationThread caller<span class="token punctuation">,</span> IBinder token<span class="token punctuation">,</span>
+            Intent service<span class="token punctuation">,</span> String resolvedType<span class="token punctuation">,</span>
+            IServiceConnection connection<span class="token punctuation">,</span> <span class="token keyword">int</span> flags<span class="token punctuation">,</span> <span class="token keyword">int</span> userId<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+            <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>前面省略很多代码，前面的代码有检查如果在同一个进程的话，就不会去启动其他的进程
+            <span class="token comment" spellcheck="true">//这里假设远程的不是同一个进程，而且服务没有启动过，就会执行下面的代码</span>
+            <span class="token comment" spellcheck="true">// If this is the first app connected back to this binding,</span>
+            <span class="token comment" spellcheck="true">// and the service had previously asked to be told when</span>
+            <span class="token comment" spellcheck="true">// rebound, then do so.</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>b<span class="token punctuation">.</span>intent<span class="token punctuation">.</span>apps<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">1</span> <span class="token operator">&amp;&amp;</span> b<span class="token punctuation">.</span>intent<span class="token punctuation">.</span>doRebind<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token function">requestServiceBindingLocked</span><span class="token punctuation">(</span>s<span class="token punctuation">,</span> b<span class="token punctuation">.</span>intent<span class="token punctuation">,</span> callerFg<span class="token punctuation">,</span> <span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+当执行到requestserviceBindingLocked函数
+ <span class="token keyword">private</span> <span class="token keyword">final</span> <span class="token keyword">boolean</span> <span class="token function">requestServiceBindingLocked</span><span class="token punctuation">(</span>ServiceRecord r<span class="token punctuation">,</span>
+            IntentBindRecord i<span class="token punctuation">,</span> <span class="token keyword">boolean</span> execInFg<span class="token punctuation">,</span> <span class="token keyword">boolean</span> rebind<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>省略代码
+        r<span class="token punctuation">.</span>app<span class="token punctuation">.</span>thread<span class="token punctuation">.</span><span class="token function">scheduleBindService</span><span class="token punctuation">(</span>r<span class="token punctuation">,</span> i<span class="token punctuation">.</span>intent<span class="token punctuation">.</span><span class="token function">getIntent</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> rebind<span class="token punctuation">,</span>r<span class="token punctuation">.</span>app<span class="token punctuation">.</span>repProcState<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+这里的r<span class="token punctuation">.</span>app<span class="token punctuation">.</span>thread为 IApplicationThread thread<span class="token punctuation">;</span>本质是一个接口，这里的实现类为ApplicationThread<span class="token punctuation">,</span>所以就会执行到
+  <span class="token keyword">public</span> <span class="token keyword">final</span> <span class="token keyword">void</span> <span class="token function">scheduleBindService</span><span class="token punctuation">(</span>IBinder token<span class="token punctuation">,</span> Intent intent<span class="token punctuation">,</span>
+                <span class="token keyword">boolean</span> rebind<span class="token punctuation">,</span> <span class="token keyword">int</span> processState<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>省略代码
+            <span class="token function">sendMessage</span><span class="token punctuation">(</span>H<span class="token punctuation">.</span>BIND_SERVICE<span class="token punctuation">,</span> s<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+这里handler接收者为
+<span class="token keyword">case</span> BIND_SERVICE<span class="token operator">:</span>
+<span class="token function">handleBindService</span><span class="token punctuation">(</span><span class="token punctuation">(</span>BindServiceData<span class="token punctuation">)</span>msg<span class="token punctuation">.</span>obj<span class="token punctuation">)</span>；               
+<span class="token keyword">break</span><span class="token punctuation">;</span>
+
+所以执行handleBindService就会执行到
+<span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">handleBindService</span><span class="token punctuation">(</span>BindServiceData data<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        这里获取到我们远程调用的service<span class="token punctuation">,</span>data<span class="token punctuation">.</span>token为我们的类名
+        Service s <span class="token operator">=</span> mServices<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>data<span class="token punctuation">.</span>token<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>DEBUG_SERVICE<span class="token punctuation">)</span>
+            Slog<span class="token punctuation">.</span><span class="token function">v</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"handleBindService s="</span> <span class="token operator">+</span> s <span class="token operator">+</span> <span class="token string">" rebind="</span> <span class="token operator">+</span> data<span class="token punctuation">.</span>rebind<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>s <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                data<span class="token punctuation">.</span>intent<span class="token punctuation">.</span><span class="token function">setExtrasClassLoader</span><span class="token punctuation">(</span>s<span class="token punctuation">.</span><span class="token function">getClassLoader</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                data<span class="token punctuation">.</span>intent<span class="token punctuation">.</span><span class="token function">prepareToEnterProcess</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>data<span class="token punctuation">.</span>rebind<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                        <span class="token comment" spellcheck="true">//这边调用远程service.onBind()函数，并且返回IBinder对象，对应于我们的代码也就是 返回了一个 class MyBinder extends IBinderTest.Stub这样的实例对象</span>
+                        IBinder binder <span class="token operator">=</span> s<span class="token punctuation">.</span><span class="token function">onBind</span><span class="token punctuation">(</span>data<span class="token punctuation">.</span>intent<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        <span class="token comment" spellcheck="true">//最终将的当前的service 公开</span>
+                        ActivityManagerNative<span class="token punctuation">.</span><span class="token function">getDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">publishService</span><span class="token punctuation">(</span>
+                                data<span class="token punctuation">.</span>token<span class="token punctuation">,</span> data<span class="token punctuation">.</span>intent<span class="token punctuation">,</span> binder<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                        s<span class="token punctuation">.</span><span class="token function">onRebind</span><span class="token punctuation">(</span>data<span class="token punctuation">.</span>intent<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        ActivityManagerNative<span class="token punctuation">.</span><span class="token function">getDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">serviceDoneExecuting</span><span class="token punctuation">(</span>
+                                data<span class="token punctuation">.</span>token<span class="token punctuation">,</span> SERVICE_DONE_EXECUTING_ANON<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token punctuation">}</span>
+                    <span class="token function">ensureJitEnabled</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">RemoteException</span> ex<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>mInstrumentation<span class="token punctuation">.</span><span class="token function">onException</span><span class="token punctuation">(</span>s<span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">RuntimeException</span><span class="token punctuation">(</span>
+                            <span class="token string">"Unable to bind to service "</span> <span class="token operator">+</span> s
+                            <span class="token operator">+</span> <span class="token string">" with "</span> <span class="token operator">+</span> data<span class="token punctuation">.</span>intent <span class="token operator">+</span> <span class="token string">": "</span> <span class="token operator">+</span> e<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+mServices<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>data<span class="token punctuation">.</span>token<span class="token punctuation">)</span>中获取service的时候，如果要获取的service不存在的话，就会执行下面的方法
+ <span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">handleCreateService</span><span class="token punctuation">(</span>CreateServiceData data<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+     LoadedApk packageInfo <span class="token operator">=</span> <span class="token function">getPackageInfoNoCheck</span><span class="token punctuation">(</span>
+                data<span class="token punctuation">.</span>info<span class="token punctuation">.</span>applicationInfo<span class="token punctuation">,</span> data<span class="token punctuation">.</span>compatInfo<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Service service <span class="token operator">=</span> null<span class="token punctuation">;</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">//根据我们要加载的class，获取到我们的service实例,这里远程的service对象被创建了</span>
+            java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>ClassLoader cl <span class="token operator">=</span> packageInfo<span class="token punctuation">.</span><span class="token function">getClassLoader</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            service <span class="token operator">=</span> <span class="token punctuation">(</span>Service<span class="token punctuation">)</span> cl<span class="token punctuation">.</span><span class="token function">loadClass</span><span class="token punctuation">(</span>data<span class="token punctuation">.</span>info<span class="token punctuation">.</span>name<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">newInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>mInstrumentation<span class="token punctuation">.</span><span class="token function">onException</span><span class="token punctuation">(</span>service<span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">RuntimeException</span><span class="token punctuation">(</span>
+                    <span class="token string">"Unable to instantiate service "</span> <span class="token operator">+</span> data<span class="token punctuation">.</span>info<span class="token punctuation">.</span>name
+                    <span class="token operator">+</span> <span class="token string">": "</span> <span class="token operator">+</span> e<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>localLOGV<span class="token punctuation">)</span> Slog<span class="token punctuation">.</span><span class="token function">v</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"Creating service "</span> <span class="token operator">+</span> data<span class="token punctuation">.</span>info<span class="token punctuation">.</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+            ContextImpl context <span class="token operator">=</span> ContextImpl<span class="token punctuation">.</span><span class="token function">createAppContext</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">,</span> packageInfo<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            context<span class="token punctuation">.</span><span class="token function">setOuterContext</span><span class="token punctuation">(</span>service<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+            Application app <span class="token operator">=</span> packageInfo<span class="token punctuation">.</span><span class="token function">makeApplication</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">,</span> mInstrumentation<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            service<span class="token punctuation">.</span><span class="token function">attach</span><span class="token punctuation">(</span>context<span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">,</span> data<span class="token punctuation">.</span>info<span class="token punctuation">.</span>name<span class="token punctuation">,</span> data<span class="token punctuation">.</span>token<span class="token punctuation">,</span> app<span class="token punctuation">,</span>
+                    ActivityManagerNative<span class="token punctuation">.</span><span class="token function">getDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+            <span class="token comment" spellcheck="true">//这里执行了远程service的onCreate回调函数</span>
+            service<span class="token punctuation">.</span><span class="token function">onCreate</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">//然后将当前创建的service，添加到mServices中，之后有的话，就不会再次的创建service了,这也就是为什么重新bindService的时候，不会重新的创建service</span>
+            mServices<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span>data<span class="token punctuation">.</span>token<span class="token punctuation">,</span> service<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                ActivityManagerNative<span class="token punctuation">.</span><span class="token function">getDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">serviceDoneExecuting</span><span class="token punctuation">(</span>
+                        data<span class="token punctuation">.</span>token<span class="token punctuation">,</span> SERVICE_DONE_EXECUTING_ANON<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">RemoteException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">// nothing to do.</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>mInstrumentation<span class="token punctuation">.</span><span class="token function">onException</span><span class="token punctuation">(</span>service<span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">RuntimeException</span><span class="token punctuation">(</span>
+                    <span class="token string">"Unable to create service "</span> <span class="token operator">+</span> data<span class="token punctuation">.</span>info<span class="token punctuation">.</span>name
+                    <span class="token operator">+</span> <span class="token string">": "</span> <span class="token operator">+</span> e<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+ <span class="token punctuation">}</span>
+
+ 当执行到ActivityManagerNative<span class="token punctuation">.</span><span class="token function">getDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">publishService</span><span class="token punctuation">(</span>data<span class="token punctuation">.</span>token<span class="token punctuation">,</span> data<span class="token punctuation">.</span>intent<span class="token punctuation">,</span> binder<span class="token punctuation">)</span><span class="token punctuation">;</span>
+ 这里的ActivityManagerNative<span class="token punctuation">.</span><span class="token function">getDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span>为<span class="token keyword">public</span> <span class="token keyword">interface</span> <span class="token class-name">IActivityManager</span> <span class="token keyword">extends</span> <span class="token class-name">IInterface</span> 是一个接口，这里的实现类为ActivityManagerService
+  <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">publishService</span><span class="token punctuation">(</span>IBinder token<span class="token punctuation">,</span> Intent intent<span class="token punctuation">,</span> IBinder service<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// Refuse possible leaked file descriptors</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>intent <span class="token operator">!=</span> null <span class="token operator">&amp;&amp;</span> intent<span class="token punctuation">.</span><span class="token function">hasFileDescriptors</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token boolean">true</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">IllegalArgumentException</span><span class="token punctuation">(</span><span class="token string">"File descriptors passed in Intent"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token keyword">synchronized</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token punctuation">(</span>token <span class="token keyword">instanceof</span> <span class="token class-name">ServiceRecord</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">IllegalArgumentException</span><span class="token punctuation">(</span><span class="token string">"Invalid service token"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            mServices<span class="token punctuation">.</span><span class="token function">publishServiceLocked</span><span class="token punctuation">(</span><span class="token punctuation">(</span>ServiceRecord<span class="token punctuation">)</span>token<span class="token punctuation">,</span> intent<span class="token punctuation">,</span> service<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+ <span class="token keyword">void</span> <span class="token function">publishServiceLocked</span><span class="token punctuation">(</span>ServiceRecord r<span class="token punctuation">,</span> Intent intent<span class="token punctuation">,</span> IBinder service<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>省略代码
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+              <span class="token comment" spellcheck="true">//这边最终利用我们传递的conn回调回去,也即为我们的代码 public void onServiceConnected(ComponentName name, IBinder service) 至此将远程的IBinder传递回来了</span>
+              c<span class="token punctuation">.</span>conn<span class="token punctuation">.</span><span class="token function">connected</span><span class="token punctuation">(</span>r<span class="token punctuation">.</span>name<span class="token punctuation">,</span> service<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                log<span class="token punctuation">.</span><span class="token function">w</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"Failure sending service "</span> <span class="token operator">+</span> r<span class="token punctuation">.</span>name <span class="token operator">+</span>
+                    <span class="token string">" to connection "</span> <span class="token operator">+</span> c<span class="token punctuation">.</span>conn<span class="token punctuation">.</span><span class="token function">asBinder</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span>
+                    <span class="token string">" (in "</span> <span class="token operator">+</span> c<span class="token punctuation">.</span>binding<span class="token punctuation">.</span>client<span class="token punctuation">.</span>processName <span class="token operator">+</span> <span class="token string">")"</span><span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                 <span class="token punctuation">}</span>
+               <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>    
+    <span class="token punctuation">}</span>
+
+<span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">onServiceConnected</span><span class="token punctuation">(</span>ComponentName name<span class="token punctuation">,</span> IBinder service<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        IBinderTest asInterface <span class="token operator">=</span> IBinderTest<span class="token punctuation">.</span>Stub<span class="token punctuation">.</span><span class="token function">asInterface</span><span class="token punctuation">(</span>service<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            asInterface<span class="token punctuation">.</span><span class="token function">testBinder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">RemoteException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">// TODO Auto-generated catch block</span>
+            e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+当执行到这里的时候IBinderTest asInterface <span class="token operator">=</span> IBinderTest<span class="token punctuation">.</span>Stub<span class="token punctuation">.</span><span class="token function">asInterface</span><span class="token punctuation">(</span>service<span class="token punctuation">)</span><span class="token punctuation">;</span>就会执行到远端AIDL自动生成的类文件中的
+<span class="token comment" spellcheck="true">/* 
+* 用于将服务端的Binder对象转换成客户端所需的AIDL接口类型的对象， 
+* 这种转换过程是区分进程的， 
+* 如果客户端和服务端位于同一进程，那么此方法返回的就是服务端的Stub对象本身， 
+* 否则返回的是系统封装后的Stub.proxy代理对象。 
+* */</span>  
+<span class="token keyword">public</span> <span class="token keyword">static</span> com<span class="token punctuation">.</span>dn<span class="token punctuation">.</span>inter<span class="token punctuation">.</span>IBinderTest <span class="token function">asInterface</span><span class="token punctuation">(</span>android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>IBinder obj<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>obj <span class="token operator">==</span> null<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> null<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>IInterface iin <span class="token operator">=</span> obj<span class="token punctuation">.</span><span class="token function">queryLocalInterface</span><span class="token punctuation">(</span>DESCRIPTOR<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">(</span>iin <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span>iin <span class="token keyword">instanceof</span> <span class="token class-name">com<span class="token punctuation">.</span>dn<span class="token punctuation">.</span>inter<span class="token punctuation">.</span>IBinderTest</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>com<span class="token punctuation">.</span>dn<span class="token punctuation">.</span>inter<span class="token punctuation">.</span>IBinderTest<span class="token punctuation">)</span> iin<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">com<span class="token punctuation">.</span>dn<span class="token punctuation">.</span>inter<span class="token punctuation">.</span>IBinderTest<span class="token punctuation">.</span>Stub<span class="token punctuation">.</span>Proxy</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span><span class="token punctuation">;</span>这里为远程调用会执行到这里
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true">//这个类为远程代理类，我们不能直接的操作远程的内容，只能通过代理的机制来访问,通过代理来通知我们要干什么事情</span>
+<span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">Proxy</span> <span class="token keyword">implements</span> <span class="token class-name">com<span class="token punctuation">.</span>dn<span class="token punctuation">.</span>inter<span class="token punctuation">.</span>IBinderTest</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//创建一个引用来保存远程的IBInder对象</span>
+    <span class="token keyword">private</span> android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>IBinder mRemote<span class="token punctuation">;</span>
+
+    <span class="token function">Proxy</span><span class="token punctuation">(</span>android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>IBinder remote<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        mRemote <span class="token operator">=</span> remote<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+当我们在代码中这样调用asInterface<span class="token punctuation">.</span><span class="token function">testBinder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>的时候，就会调用到proxy中的对应的函数，也就是我们客户端通过操作代理类，代理类来告知真正的目标对象
+<span class="token comment" spellcheck="true">/* 
+* 这个方法运行在客户端， 
+* 因为当客户端和服务端不在同一进程时，服务端返回代理类Proxy，所以客户端会通过Proxy调用到代理类的getBookList方法， 
+* 当客户端远程调用此方法时，它的内部实现是这样的： 
+* 首先创建该方法所需要的输入型Parcel对象_data、输出型Parcel对象_reply和返回值对象List， 
+* 然后把该方法的参数信息写入_data中， 
+* 接着调用transact方法来发起RPC（远程过程调用）请求，同时当前线程挂起， 
+* 然后服务端的onTransact方法会被调用，直到RPC过程返回后，当前线程继续执行， 
+* 并从_reply中取出RPC过程的返回结果。 
+* 最后返回_reply中的数据。 
+* */</span>  
+<span class="token annotation punctuation">@Override</span>
+<span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">testBinder</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">throws</span> android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>RemoteException <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//得到俩个Parcel对象，用来进程将传递内容,持久化操作</span>
+    android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>Parcel _data <span class="token operator">=</span> android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>Parcel<span class="token punctuation">.</span><span class="token function">obtain</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>Parcel _reply <span class="token operator">=</span> android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>Parcel<span class="token punctuation">.</span><span class="token function">obtain</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            _data<span class="token punctuation">.</span><span class="token function">writeInterfaceToken</span><span class="token punctuation">(</span>DESCRIPTOR<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            mRemote<span class="token punctuation">.</span><span class="token function">transact</span><span class="token punctuation">(</span>Stub<span class="token punctuation">.</span>TRANSACTION_testBinder<span class="token punctuation">,</span> _data<span class="token punctuation">,</span> _reply<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            _reply<span class="token punctuation">.</span><span class="token function">readException</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">finally</span> <span class="token punctuation">{</span>
+            _reply<span class="token punctuation">.</span><span class="token function">recycle</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            _data<span class="token punctuation">.</span><span class="token function">recycle</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+上面所说的通过调用transact方法来发起远程调用，其实本质是首先将内容写到IBinder中，IBinder本质为是设备驱动<span class="token operator">/</span>dev<span class="token operator">/</span>binder，这种通信方式在Linux中没有。是通过NDK的方法来调用c层代码的
+比如当调用     mRemote<span class="token punctuation">.</span><span class="token function">transact</span><span class="token punctuation">(</span>Stub<span class="token punctuation">.</span>TRANSACTION_testBinder<span class="token punctuation">,</span> _data<span class="token punctuation">,</span> _reply<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>就会调用到IBinder中的实现类为BinderProxy ，这个就跟proxy是一样的，是代理，Binder就相当于是服务端
+
+<span class="token keyword">final</span> <span class="token keyword">class</span> <span class="token class-name">BinderProxy</span> <span class="token keyword">implements</span> <span class="token class-name">IBinder</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">native</span> <span class="token keyword">boolean</span> <span class="token function">pingBinder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">public</span> <span class="token keyword">native</span> <span class="token keyword">boolean</span> <span class="token function">isBinderAlive</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> IInterface <span class="token function">queryLocalInterface</span><span class="token punctuation">(</span>String descriptor<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> null<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">transact</span><span class="token punctuation">(</span><span class="token keyword">int</span> code<span class="token punctuation">,</span> Parcel data<span class="token punctuation">,</span> Parcel reply<span class="token punctuation">,</span> <span class="token keyword">int</span> flags<span class="token punctuation">)</span> <span class="token keyword">throws</span> RemoteException <span class="token punctuation">{</span>
+        Binder<span class="token punctuation">.</span><span class="token function">checkParcel</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">,</span> code<span class="token punctuation">,</span> data<span class="token punctuation">,</span> <span class="token string">"Unreasonably large binder buffer"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token function">transactNative</span><span class="token punctuation">(</span>code<span class="token punctuation">,</span> data<span class="token punctuation">,</span> reply<span class="token punctuation">,</span> flags<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+所以就会执行<span class="token function">transactNative</span><span class="token punctuation">(</span>code<span class="token punctuation">,</span> data<span class="token punctuation">,</span> reply<span class="token punctuation">,</span> flags<span class="token punctuation">)</span><span class="token punctuation">;</span>本质为<span class="token keyword">native</span>方法，
+<span class="token keyword">public</span> <span class="token keyword">native</span> <span class="token keyword">boolean</span> <span class="token function">transactNative</span><span class="token punctuation">(</span><span class="token keyword">int</span> code<span class="token punctuation">,</span> Parcel data<span class="token punctuation">,</span> Parcel reply<span class="token punctuation">,</span><span class="token keyword">int</span> flags<span class="token punctuation">)</span> <span class="token keyword">throws</span> RemoteException<span class="token punctuation">;</span>
+当数据传递进去了之后，就会回调服务端的onTransact方法会被调用，也就是IBinderTest<span class="token punctuation">.</span>Stub服务端的对象中的
+<span class="token annotation punctuation">@Override</span>
+<span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">onTransact</span><span class="token punctuation">(</span><span class="token keyword">int</span> code<span class="token punctuation">,</span> android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>Parcel data<span class="token punctuation">,</span> android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>Parcel reply<span class="token punctuation">,</span> <span class="token keyword">int</span> flags<span class="token punctuation">)</span>
+    <span class="token keyword">throws</span> android<span class="token punctuation">.</span>os<span class="token punctuation">.</span>RemoteException <span class="token punctuation">{</span>
+    <span class="token keyword">switch</span> <span class="token punctuation">(</span>code<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">case</span> INTERFACE_TRANSACTION<span class="token operator">:</span> <span class="token punctuation">{</span>
+        reply<span class="token punctuation">.</span><span class="token function">writeString</span><span class="token punctuation">(</span>DESCRIPTOR<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">case</span> TRANSACTION_testBinder<span class="token operator">:</span> <span class="token punctuation">{</span>
+        data<span class="token punctuation">.</span><span class="token function">enforceInterface</span><span class="token punctuation">(</span>DESCRIPTOR<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">testBinder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//这边就会执行到服务端中的testBinder();这个函数，至此服务端的那个真正的方法被调用了</span>
+        reply<span class="token punctuation">.</span><span class="token function">writeNoException</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">case</span> TRANSACTION_getBinderString<span class="token operator">:</span> <span class="token punctuation">{</span>
+        data<span class="token punctuation">.</span><span class="token function">enforceInterface</span><span class="token punctuation">(</span>DESCRIPTOR<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>String _result <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">getBinderString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        reply<span class="token punctuation">.</span><span class="token function">writeNoException</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        reply<span class="token punctuation">.</span><span class="token function">writeString</span><span class="token punctuation">(</span>_result<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> <span class="token keyword">super</span><span class="token punctuation">.</span><span class="token function">onTransact</span><span class="token punctuation">(</span>code<span class="token punctuation">,</span> data<span class="token punctuation">,</span> reply<span class="token punctuation">,</span> flags<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">case</span> TRANSACTION_testBinder<span class="token operator">:</span> <span class="token punctuation">{</span>
+        data<span class="token punctuation">.</span><span class="token function">enforceInterface</span><span class="token punctuation">(</span>DESCRIPTOR<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">testBinder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//这边就会执行到服务端中的testBinder();这个函数，至此服务端的那个真正的方法被调用了</span>
+        reply<span class="token punctuation">.</span><span class="token function">writeNoException</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+当访问的代码被调用完成了之后，客户端从_reply中取出RPC过程的返回结果。最后返回_reply中的数据。
+</code></pre>
+<p>Binder调用流程图,这里的IActivityManager 就是一个充当中间人，代理的作用，由他来告知，真正执行者，执行特定的动作<br><img src="/uploads/Binder调用流程图.png" alt="结果显示"></p>
+<p>创建的IBinder对象是怎么样注入IBinder驱动中的</p>
+<pre class=" language-java"><code class="language-java"><span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">onCreate</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// TODO Auto-generated method stub</span>
+        binder <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">MyBinder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">super</span><span class="token punctuation">.</span><span class="token function">onCreate</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">class</span> <span class="token class-name">MyBinder</span> <span class="token keyword">extends</span> <span class="token class-name">IBinderTest<span class="token punctuation">.</span>Stub</span>
+
+    当创建binder <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">MyBinder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>的时候，就会执行父类的Binder的构造函数
+      <span class="token operator">*</span> Default constructor initializes the object<span class="token punctuation">.</span>
+     <span class="token operator">*</span><span class="token operator">/</span>
+    <span class="token keyword">public</span> <span class="token function">Binder</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>FIND_POTENTIAL_LEAKS<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">final</span> Class<span class="token operator">&lt;</span><span class="token operator">?</span> <span class="token keyword">extends</span> <span class="token class-name">Binder</span><span class="token operator">></span> klass <span class="token operator">=</span> <span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>klass<span class="token punctuation">.</span><span class="token function">isAnonymousClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">||</span> klass<span class="token punctuation">.</span><span class="token function">isMemberClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">||</span> klass<span class="token punctuation">.</span><span class="token function">isLocalClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span>
+                    <span class="token punctuation">(</span>klass<span class="token punctuation">.</span><span class="token function">getModifiers</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> Modifier<span class="token punctuation">.</span>STATIC<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                Log<span class="token punctuation">.</span><span class="token function">w</span><span class="token punctuation">(</span>TAG<span class="token punctuation">,</span> <span class="token string">"The following Binder class should be static or leaks might occur: "</span> <span class="token operator">+</span>
+                    klass<span class="token punctuation">.</span><span class="token function">getCanonicalName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    构造函数中的 <span class="token function">init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 为<span class="token keyword">private</span> <span class="token keyword">native</span> <span class="token keyword">final</span> <span class="token keyword">void</span> <span class="token function">init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> ，就是这里完成注册的<span class="token punctuation">,</span>所以IBinder驱动会持有对应的对象，所以能回调回服务端，也能传递内容
+</code></pre>
+<p>ServiceManager，ActivityManager跟IPC进程间的联系</p>
+<pre class=" language-java"><code class="language-java"> 还记得有这样的代码
+ <span class="token keyword">int</span> res <span class="token operator">=</span> ActivityManagerNative<span class="token punctuation">.</span><span class="token function">getDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">bindService</span><span class="token punctuation">(</span>
+                mMainThread<span class="token punctuation">.</span><span class="token function">getApplicationThread</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">getActivityToken</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                service<span class="token punctuation">,</span> service<span class="token punctuation">.</span><span class="token function">resolveTypeIfNeeded</span><span class="token punctuation">(</span><span class="token function">getContentResolver</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                sd<span class="token punctuation">,</span> flags<span class="token punctuation">,</span> user<span class="token punctuation">.</span><span class="token function">getIdentifier</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+其中 ActivityManagerNative<span class="token punctuation">.</span><span class="token function">getDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span>为
+ <span class="token keyword">static</span> <span class="token keyword">public</span> IActivityManager <span class="token function">getDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> gDefault<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+ <span class="token punctuation">}</span>
+ 调用gDefault<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span>就会执行到下面的crate函数
+ <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">final</span> Singleton<span class="token operator">&lt;</span>IActivityManager<span class="token operator">></span> gDefault <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Singleton</span><span class="token operator">&lt;</span>IActivityManager<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">protected</span> IActivityManager <span class="token function">create</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            IBinder b <span class="token operator">=</span> ServiceManager<span class="token punctuation">.</span><span class="token function">getService</span><span class="token punctuation">(</span><span class="token string">"activity"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                Log<span class="token punctuation">.</span><span class="token function">v</span><span class="token punctuation">(</span><span class="token string">"ActivityManager"</span><span class="token punctuation">,</span> <span class="token string">"default service binder = "</span> <span class="token operator">+</span> b<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            IActivityManager am <span class="token operator">=</span> <span class="token function">asInterface</span><span class="token punctuation">(</span>b<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                Log<span class="token punctuation">.</span><span class="token function">v</span><span class="token punctuation">(</span><span class="token string">"ActivityManager"</span><span class="token punctuation">,</span> <span class="token string">"default service = "</span> <span class="token operator">+</span> am<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">return</span> am<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+ <span class="token punctuation">}</span><span class="token punctuation">;</span>
+ ```java
+
+ 中有这样的代码  IBinder b <span class="token operator">=</span> ServiceManager<span class="token punctuation">.</span><span class="token function">getService</span><span class="token punctuation">(</span><span class="token string">"activity"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>下面是ServiceManager的源码，以及注释
+ 大致就是说返回一个服务的引用，通知特定的名字来查找，如果要查找的服务不存在的话，就会得到一个null的对象
+
+ ```java
+ <span class="token comment" spellcheck="true">/**
+     * Returns a reference to a service with the given name.
+     *
+     * @param name the name of the service to get
+     * @return a reference to the service, or &lt;code>null&lt;/code> if the service doesn't exist
+     */</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> IBinder <span class="token function">getService</span><span class="token punctuation">(</span>String name<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> null<span class="token punctuation">;</span>
+
+ 而且可以在ActivityManagerService中可以这样的代码，添加了服务
+ <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">setSystemProcess</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            ServiceManager<span class="token punctuation">.</span><span class="token function">addService</span><span class="token punctuation">(</span>Context<span class="token punctuation">.</span>ACTIVITY_SERVICE<span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">,</span> <span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            ServiceManager<span class="token punctuation">.</span><span class="token function">addService</span><span class="token punctuation">(</span>ProcessStats<span class="token punctuation">.</span>SERVICE_NAME<span class="token punctuation">,</span> mProcessStats<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            ServiceManager<span class="token punctuation">.</span><span class="token function">addService</span><span class="token punctuation">(</span><span class="token string">"meminfo"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">MemBinder</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            ServiceManager<span class="token punctuation">.</span><span class="token function">addService</span><span class="token punctuation">(</span><span class="token string">"gfxinfo"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">GraphicsBinder</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            ServiceManager<span class="token punctuation">.</span><span class="token function">addService</span><span class="token punctuation">(</span><span class="token string">"dbinfo"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">DbBinder</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>MONITOR_CPU_USAGE<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                ServiceManager<span class="token punctuation">.</span><span class="token function">addService</span><span class="token punctuation">(</span><span class="token string">"cpuinfo"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">CpuBinder</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            ServiceManager<span class="token punctuation">.</span><span class="token function">addService</span><span class="token punctuation">(</span><span class="token string">"permission"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">PermissionController</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>下面为ServiceManager的作用,保存了系统服务<br><img src="/uploads/ServiceManager的作用.png" alt="结果显示"><br>当执行 IActivityManager am = asInterface(b);的时候</p>
+<pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">/**
+ * Cast a Binder object into an activity manager interface, generating
+ * a proxy if needed.
+*/</span>
+<span class="token keyword">static</span> <span class="token keyword">public</span> IActivityManager <span class="token function">asInterface</span><span class="token punctuation">(</span>IBinder obj<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>obj <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> null<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token comment" spellcheck="true">//这里跟我们自己创建的AIDL中的方式是一样的，如果要访问的服务如果在当前进程的话，就直接返回，queryLocalInterface就是在本地查找</span>
+        IActivityManager in <span class="token operator">=</span>
+            <span class="token punctuation">(</span>IActivityManager<span class="token punctuation">)</span>obj<span class="token punctuation">.</span><span class="token function">queryLocalInterface</span><span class="token punctuation">(</span>descriptor<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>in <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> in<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token comment" spellcheck="true">//如果在本地没有查找到的话，就执行下面的这里，为其他进程的服务</span>
+        <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">ActivityManagerProxy</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>如果这个service是在当前的进程的话，IActivityManager in = (IActivityManager)obj.queryLocalInterface(descriptor);这边就得到一个IActivityManager对象<br>下面为这个接口的实现类，这里返回的是一个ActivityManagerService对象<br><img src="/uploads/IActivityManager的实现类.png" alt="结果显示"><br>ActivityManagerService的类的继承关系为，所以可以看出他本身就是一个AIDL方式中的Stub类</p>
+<pre><code>public final class ActivityManagerService extends ActivityManagerNative
+public abstract class ActivityManagerNative extends Binder implements IActivityManager
+public interface IActivityManager extends IInterface
+</code></pre><p>总结：<br>IPC中的一种方式为AIDL，服务端要提供接口指定提供了什么功能，服务端要继承自动生成aidl文件类中的Stub，为一个IBinder对象，通过onBind函数，给系统返回一个<br>IBinder引用，远程的客户端通过服务端提供的aidl文件，在调用onBindService方法可以得到远程的IBinder引用，通过调用asInterface(binder),获得服务提供的接口对象<br>asInterface内部可以区分是否为在本进程内，如果是在本进程就直接返回当前的引用，如果是远程的就通过Proxy持有这个远程的Ibinder对象，客户端通过操作这个Proxy来调用<br>远程服务端中对应的方法</p>
+
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">AheadSnail</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://aheadsnail.github.io/2017/12/21/android-ibinder-ji-zhi-li-jie/">https://aheadsnail.github.io/2017/12/21/android-ibinder-ji-zhi-li-jie/</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">AheadSnail</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Android/">
+                                    <span class="chip bg-color">Android</span>
+                                </a>
+                            
+                                <a href="/tags/IBinder/">
+                                    <span class="chip bg-color">IBinder</span>
+                                </a>
+                            
+                                <a href="/tags/IPC/">
+                                    <span class="chip bg-color">IPC</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2017/12/26/ui-xing-neng-you-hua/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/16.jpg" class="responsive-img" alt="UI性能优化">
+                        
+                        <span class="card-title">UI性能优化</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                             Android UI性能优化
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2017-12-26
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            AheadSnail
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Android/">
+                        <span class="chip bg-color">Android</span>
+                    </a>
+                    
+                    <a href="/tags/UI/">
+                        <span class="chip bg-color">UI</span>
+                    </a>
+                    
+                    <a href="/tags/性能优化/">
+                        <span class="chip bg-color">性能优化</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2017/12/12/traceview-fen-xi-ui-qia-dun/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/2.jpg" class="responsive-img" alt="traceView 分析UI卡顿">
+                        
+                        <span class="card-title">traceView 分析UI卡顿</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            使用traceView分析UI卡顿
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2017-12-12
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            AheadSnail
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Android/">
+                        <span class="chip bg-color">Android</span>
+                    </a>
+                    
+                    <a href="/tags/traceView/">
+                        <span class="chip bg-color">traceView</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="503838841"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='random'
+                   preload='auto'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 0px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2019-2021</span>
+            
+            <span id="year">2019</span>
+            <a href="/about" target="_blank">AheadSnail</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/blinkfox" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:1181062873@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=1181062873" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 1181062873" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    <!--腾讯兔小巢-->
+    
+    
+
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>

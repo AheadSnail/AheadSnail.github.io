@@ -1,0 +1,1980 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="Aria2 Bt 辅助 Http下载实现, AheadSnail&#39;s blog">
+    <meta name="description" content>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>Aria2 Bt 辅助 Http下载实现 | AheadSnail&#39;s blog</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<link rel="alternate" href="/atom.xml" title="AheadSnail's blog" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">AheadSnail&#39;s blog</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/contact" class="waves-effect waves-light">
+      
+      <i class="fas fa-comments" style="zoom: 0.6;"></i>
+      
+      <span>留言板</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">AheadSnail&#39;s blog</div>
+        <div class="logo-desc">
+            
+            Never really desperate, only the lost of the soul.
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/contact" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-comments"></i>
+			
+			留言板
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/blinkfox/hexo-theme-matery" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/blinkfox/hexo-theme-matery" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/7.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">Aria2 Bt 辅助 Http下载实现</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        padding: 35px 0 15px 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        padding-bottom: 30px;
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Aria2/">
+                                <span class="chip bg-color">Aria2</span>
+                            </a>
+                        
+                            <a href="/tags/NDK/">
+                                <span class="chip bg-color">NDK</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2019-03-11
+                </div>
+                
+
+                
+
+                
+
+                
+
+                
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><blockquote>
+<p>Aria2 Bt 辅助 Http下载实现</p>
+</blockquote>
+<a id="more"></a>
+<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><blockquote>
+<p>上一年12月份的时候将修改后的Aria2 移植到Window 上面，做了一个简单的下载器，看看下载的情况，大体测试了一个月左右，虽然 Bt 下载表现的不错，每天都能省下一半多的流量，但是通过下载的成功率用户的留存，发现都普遍低于传统的Http下载，大体的原因有，Bt 获取到Peer的过程存在不确定性，比如 Tracker服务器挂掉，虽然有Dht实现，但是dht 寻找可用的节点太慢，再次就是就算获取到了Peer也无法确定哪些Peer是有效的，也即是有哪些Peer是支持打洞的，哪些是不支持的，而且目前对于要连接的Peer数量还有限制，再次就是Bt的下载速度是跟同一时刻用户量有关的，如果同一时刻用户量大的化那么Bt的下载速度就会上升，相反Bt下载速度就会极低，这就会影响用户的使用，影响用户的留存等，针对这种情况，我去分析了解下 英雄联盟(LOL) 下载器，发现他是通过Bt 辅助 Http来实现的</p>
+</blockquote>
+<p>LOL 下载器效果<br><img src="/uploads/Aria2Bt辅助Http下载/LOL下载器.png" alt="结果显示"><br>通过观察可以发现蓝色的为Http 下载的速度，这里估计实现了限速，因为从不会超过400kb/s，后面红色的为Bt下载的速度，由于实现了Bt 辅助Http下载，对用户的体验就会更好，用户不会因为没有速度或者下载速度太低导致的不想下载，这个可以通过Http下载来解决，对应Bt 下载算一种额外的收益，所以基于这种Bt 辅助 Http下载才是最终的实现</p>
+<p>下面是我基于Aria2实现的效果<br><img src="/uploads/Aria2Bt辅助Http下载/Aria2Bt辅助Http下载实现.png" alt="结果显示"></p>
+<h3 id="Bt辅助Http下载实现难点"><a href="#Bt辅助Http下载实现难点" class="headerlink" title="Bt辅助Http下载实现难点"></a>Bt辅助Http下载实现难点</h3><blockquote>
+<p>1.由于采用的是Aria2，原本是不支持Bt 跟Http 想结合下载的，他们俩个是完全不相关的<br>2.原本的Http下载由于一开始不知道要下载的内容的长度所以第一个请求是获取要下载内容的长度的，知道之后才会进行文件的预分配，而对于Bt下载来说由于存在Bt种子，一开始就知道了要下载内容的长度所以直接就进行文件的分配，所以当我们结合实现的化，可以省掉Http的第一个请求下载长度的request，对于文件分配，也只需要一方来执行文件的分配,这里由Bt来分配，Http不分配文件，直接跳过<br>3.资源片的问题，怎么动态的调整Bt和Http下载块的索引<br>4.文件描述符的问题，如果有多个地方文件描述法访问同一个文件，轮流的往这个文件读写内容，可能会导致读写的错误，<br>5.Bt跟Http通信的问题，比如Http 下载完应该告诉Bt 当前块下载完了，BT 此时应该发送have 消息等<br>6.相应的进度的保存，也即是当前下载的长度，下次进来应该继续下载<br>7.多文件的下载实现</p>
+</blockquote>
+<h3 id="Bt辅助Http-难点解决方案"><a href="#Bt辅助Http-难点解决方案" class="headerlink" title="Bt辅助Http 难点解决方案"></a>Bt辅助Http 难点解决方案</h3><p>1.由于采用的是Aria2，原本是不支持Bt 跟Http 想结合下载的，他们俩个是完全不相关的</p>
+<pre class=" language-C"><code class="language-C">我们可以在RequestGroup 中添加另一个RequestGroup
+//当前RequestGroup 绑定的另一个RequestGroup 对象
+std::shared_ptr<RequestGroup> otherRequest_;
+
+//并提供对应的get，set 方法,设置其他下载的请求
+void RequestGroup::setOtherRequestGroup(std::shared_ptr<RequestGroup>& otherRequest)
+{
+    otherRequest_ = otherRequest;
+}
+
+std::shared_ptr<RequestGroup>& RequestGroup::getOtherRequestGroup()
+{
+    return otherRequest_;
+}
+
+//注意对于Http的下载请求，这里就不需要添加到RequestGroupMan中了 ,而是这里要完成Bt任务跟Http任务的绑定,这边由于采用的是智能指针，而且是局部变量所以不能使用引用
+//addRequestGroup(result.front(), e.get(), 0);
+btGroup->setOtherRequestGroup(result.front());
+//注意这里是互相持有的状态
+result.front()->setOtherRequestGroup(btGroup);
+</code></pre>
+<p>2.在Http 不请求对应的下载内容的长度的时候，直接知道 要下载的总长度，这个我们可以通过Bt下载获取到对应的信息</p>
+<pre class=" language-C"><code class="language-C">//在创建 Bt辅助 Http 下载任务的时候, 将Bt的FileEntry设置到Http中
+result.front()->getDownloadContext()->setFileEntries(btContext->getFileEntries().begin(), btContext->getFileEntries().end());
+//将Http 要下载的 url 保存 , 对于Bt 来说 FileEntry 中的uri 为空，而 Http下载来说 FileEntry 中的 uri 集合为存储要下载的地址 这里只是下载单个文件，多个文件要额外的处理
+//result.front()->getDownloadContext()->getFirstFileEntry()->setUris(uris);
+//将Bt 所拥有的Hash 字段 也一起保存到 Http 下载中，这样当Http下载完成的时候，也可以用于校验,也即是 Http 下载也拥有了Bt 的校验功能
+result.front()->getDownloadContext()->setPieceHashes(btContext->getPieceHashType(),btContext->getPieceHashes().begin(),btContext->getPieceHashes().end());
+
+由于我们Http下载任务是绑定在Bt上面，所以我们需要手动的执行这个Http RequestGroup,而且我们知道一个Bt 任务的初始化，是在Bt.setUp函数中执行的，所以我们可以在这个方法中添加下面的逻辑
+
+//这里要判断是否是Bt辅助Http下载 TODO  执行Http的初始化操作等
+auto& httpRequestGroup = requestGroup->getOtherRequestGroup();
+if(httpRequestGroup)
+{
+  //初始化PieceStorage等成员变量,这里传递Bt对应的 BitfieldMan对象，这样对于Http，和Bt下载来说，就可以共用这个对象, Diskadaptor 为写文件的对象，这里也要共用
+  httpRequestGroup->initPieceStorage(pieceStorage->getBitfieldMan(),pieceStorage->getDiskAdaptor());
+  LOGD("BtSetup httpRequestGroup  processCheckIntegrityEntry begin ");
+
+  //检查是否本地的下载进度文件，加载进度文件，决定当前要下载的长度，或者本身就下载完成了
+  auto checkEntry = httpRequestGroup->createCheckIntegrityEntry(false);
+  if (checkEntry) {
+     //第三个参数表示， 对于 Http下载 没有必要再次的分配文件的大小
+     httpRequestGroup->processCheckIntegrityEntry(commands, std::move(checkEntry), e,false);
+  }
+  LOGD("BtSetup httpRequestGroup processCheckIntegrityEntry init finish");
+}
+</code></pre>
+<p>针对 问题3,4 我们可以简单的让Http RequestGroup 共享 Bt 对应的对象，因为通过源码分析他们在这方面是相同的处理</p>
+<pre class=" language-C"><code class="language-C">httpRequestGroup->initPieceStorage(pieceStorage->getBitfieldMan(),pieceStorage->getDiskAdaptor());
+
+//初始化PieceStorage
+void RequestGroup::initPieceStorage(const std::shared_ptr<BitfieldMan>& bitfieldMan,const std::shared_ptr<DiskAdaptor>& diskAdaptor)
+{
+    ...
+    //构建一个DefaultPieceStorage 对象，调用对应的构造函数完成初始化,内部会创建对应的 BitfieldMan 对象，以及 DiskWriterFactory 引用对象等 TODO
+    auto ps = std::make_shared<DefaultPieceStorage>(downloadContext_, option_.get());
+    //如果bitfieldMan不为空
+    if(bitfieldMan)
+    {
+       ps->setSharedBitfiledMan(bitfieldMan);
+    }
+    ....
+    //TODO 如果 diskAdaptor 不为空，说明是Bt 辅助 Http 下载 TODO 保存Bt 传递过来的 DiskAdaptor对象 ，这个对象负责写文件的操作 ,这样就没有必要执行  initStorage 操作
+    if(diskAdaptor)
+    {
+       tempPieceStorage->setDiskAdaptor(diskAdaptor);
+    } else{
+       //执行初始化操作 ,默认 tempPieceStorage 对象为  DefaultPieceStorage TODO Bt对象传递到Http 对象
+       tempPieceStorage->initStorage();
+    }
+    ....
+}
+</code></pre>
+<p>针对怎么样避开Http RequestGroup 不执行文件的分配</p>
+<pre class=" language-C"><code class="language-C">//检查是否本地的下载进度文件，加载进度文件，决定当前要下载的长度，或者本身就下载完成了
+auto checkEntry = httpRequestGroup->createCheckIntegrityEntry(false);
+if (checkEntry) {
+    //第三个参数表示， 对于 Http下载 没有必要再次的分配文件的大小
+    httpRequestGroup->processCheckIntegrityEntry(commands, std::move(checkEntry), e,false);
+}
+
+//添加对应的 StreamFileAllocationEntry 对象，用于检查是否需要分配文件
+void StreamCheckIntegrityEntry::onDownloadIncomplete(std::vector<std::unique_ptr<Command>>& commands, DownloadEngine* e,bool isNeedCheckFileSize)
+{
+  //为 DefaultStorage 对象
+  auto& ps = getRequestGroup()->getPieceStorage();
+  ps->onDownloadIncomplete();
+
+  //hash-check-only 选项 默认为 false
+  if (getRequestGroup()->getOption()->getAsBool(PREF_HASH_CHECK_ONLY)) {
+     return;
+  }
+
+  //处理文件的提前分配
+  proceedFileAllocation(commands, make_unique<StreamFileAllocationEntry>(getRequestGroup(), popNextCommand()), e,isNeedCheckFileSize);
+}
+
+
+//处理文件的提前分配
+void CheckIntegrityEntry::proceedFileAllocation(std::vector<std::unique_ptr<Command>>& commands, std::unique_ptr<FileAllocationEntry> entry, DownloadEngine* e,bool isNeedCheckFileSize)
+{
+  //isNeedCheckFileSize 默认为true，只有在 Bt 辅助 Http 下载的时候，这里会设置为false，此时不用再次的检查
+  if(!isNeedCheckFileSize)
+  {
+      //文件已经分配完成，直接跳过分配文件的操作
+      LOGD("CheckIntegrityEntry proceedFileAllocation !isNeedCheckFileSize no Need FileAllocation prepareForNextAction");
+      entry->prepareForNextAction(commands, e);
+      return;
+  }
+
+  //判断是否需要文件分配,比如是否分配完成了等
+  if (getRequestGroup()->needsFileAllocation()) {
+    //如果需要，就将entry添加到fileAllocationMan_ ,  FileAllocationMan 这个为全局唯一的 负责管理文件的分配 typedef SequentialPicker<FileAllocationEntry> FileAllocationMan;
+    // 这里的entry 实体为 StreamFileAllocationEntry 类型  ,如果这里需要分配文件，这里会将entry 转移到  entries_ 集合中
+    e->getFileAllocationMan()->pushEntry(std::move(entry));
+  }
+  else {
+    //文件已经分配完成，直接跳过分配文件的操作
+    LOGD("CheckIntegrityEntry proceedFileAllocation no Need FileAllocation prepareForNextAction");
+    entry->prepareForNextAction(commands, e);
+  }
+}
+
+原本的逻辑是会执行 getRequestGroup()->needsFileAllocation() 函数，动态的根据目标文件的实际长度来决定是否需要文件
+//判断是否需要文件分配
+bool RequestGroup::needsFileAllocation() const
+{
+  //pieceStorage_->getDiskAdaptor()->fileAllocationIterator() 这里每次调用都会构建一个新的对象
+  //PREF_NO_FILE_ALLOCATION_LIMIT 对大小小于SIZE的文件不进行文件分配。 您可以附加K或M（1K = 1024，1M = 1024K）。 默认：5M
+  return isFileAllocationEnabled() && option_->getAsLLInt(PREF_NO_FILE_ALLOCATION_LIMIT) <= getTotalLength() && !pieceStorage_->getDiskAdaptor()->fileAllocationIterator()->finished();
+}
+
+pieceStorage_->getDiskAdaptor()->fileAllocationIterator()函数实现
+
+//每次调用这个方法，都会重新的构建一个 FileAllocationIterator 对象 返回回去，而且此时还要获取到当前目标文件的大小 通过 size() 函数
+std::unique_ptr<FileAllocationIterator>
+AbstractSingleDiskAdaptor::fileAllocationIterator()
+{
+  switch (getFileAllocationMethod()) {
+#ifdef HAVE_SOME_FALLOCATE
+  case (DiskAdaptor::FILE_ALLOC_FALLOC):
+    return make_unique<FallocFileAllocationIterator>(diskWriter_.get(), size(),
+                                                     totalLength_);
+#endif // HAVE_SOME_FALLOCATE
+  case (DiskAdaptor::FILE_ALLOC_TRUNC):
+    return make_unique<TruncFileAllocationIterator>(diskWriter_.get(), size(), totalLength_);
+  default:
+    //默认会构建一个 AdaptiveFileAllocationIterator 对象  size() 获取到当前目标文件的实际长度，也即是在原本的长度上进行分配,totalLength_ 总的目标长度
+    return make_unique<AdaptiveFileAllocationIterator>(diskWriter_.get(), size(), totalLength_);
+  }
+}
+
+而第二个参数获取到当前目标文件的实际大小是通过
+//获取到当前目标文件的实际大小
+int64_t AbstractSingleDiskAdaptor::size()
+{
+    int64_t fileSize = File(getFilePath()).size();
+    //LOGD("AbstractSingleDiskAdaptor getFile Size path %s fileSize == %lld",getFilePath().c_str(),fileSize);
+    return fileSize;
+}
+
+int64_t File::size()
+{
+#ifdef __MINGW32__
+  // _wstat cannot be used for symlink.  It always returns 0.  Quoted
+  // from https://msdn.microsoft.com/en-us/library/14h5k7ff.aspx:
+  //
+  //   _wstat does not work with Windows Vista symbolic links. In
+  //   these cases, _wstat will always report a file size of 0. _stat
+  //   does work correctly with symbolic links.
+  auto hn = openFile(name_);
+  if (hn == INVALID_HANDLE_VALUE) {
+    return 0;
+  }
+  LARGE_INTEGER fileSize;
+  const auto rv = GetFileSizeEx(hn, &fileSize);
+  CloseHandle(hn);
+  return rv ? fileSize.QuadPart : 0;
+#else  // !__MINGW32__
+  a2_struct_stat fstat;
+  if (fillStat(fstat) < 0) {
+    return 0;
+  }
+  return fstat.st_size;
+#endif // !__MINGW32__
+}
+
+但是按照我的观察，在确保目标文件路径是正确的情况下，这里获取到的长度确有时候获取不到，有时候又可以获取到，为了避免这种麻烦，所以我增加了一个参数 isNeedCheckFileSize，直接跳过
+</code></pre>
+<p>针对 6.相应的进度的保存，也即是当前下载的长度，下次进来应该继续下载</p>
+<pre class=" language-C"><code class="language-C">原本Http跟Bt 下载都是有进度保存的，而且会每隔一段时间触发一次进度的保存，而且使用的都是 DefaultBtProgressInfoFile ，所以我们完全没有必要俩边都保存，我的做法不调用原本要调用的
+//保存进度对象的引用
+setProgressInfoFile(progressInfoFile);
+
+这样对于Http下载内部就会持有一个空的进度保存对象
+progressInfoFile_(std::make_shared<NullProgressInfoFile>()),//首先构造一个NullProgressInfoFile对象，调用对应的构造函数，并将引用赋值给progressInfoFile_
+
+这个对象是不会进行任何的操作的
+class NullProgressInfoFile : public BtProgressInfoFile {
+public:
+  virtual ~NullProgressInfoFile() = default;
+
+  virtual std::string getFilename() CXX11_OVERRIDE { return A2STR::NIL; }
+
+  virtual bool exists() CXX11_OVERRIDE { return false; }
+
+  virtual void save() CXX11_OVERRIDE {}
+
+  virtual void load() CXX11_OVERRIDE {}
+
+  virtual void removeFile() CXX11_OVERRIDE {}
+
+  virtual void updateFilename() CXX11_OVERRIDE {}
+};
+</code></pre>
+<p>针对 5.Bt跟Http通信的问题，比如Http 下载完应该告诉Bt 当前块下载完了，BT 此时应该发送have 消息等,我们可以在Http 下载完一块的时候，手动的通知Bt</p>
+<pre class=" language-C"><code class="language-C">//标识当前  segment 已经下载完成了， 要告知 PieceStorage 当前这块piece 下载完成了,然后从  usedSegmentEntries_ 集合中移除这个元素
+bool SegmentMan::completeSegment(cuid_t cuid, const std::shared_ptr<Segment>& segment,std::shared_ptr<PieceStorage> btPieceStorage)
+{
+  //告知PieceStorage 当前这块piece 下载完成了
+  pieceStorage_->completePiece(segment->getPiece());
+  //将当前下载完的piece添加到 已经下载完的集合中
+  pieceStorage_->advertisePiece(cuid, segment->getPiece()->getIndex(), global::wallclock());
+
+  //TODO 由于BT跟Http下载不使用同一个DefaultPieceStorage对象，所以当Http下载完，要手动的通知Bt下载完成,Bt才能走原本的逻辑发送他当前拥有的Piece
+  if(btPieceStorage)
+  {
+      btPieceStorage->advertisePiece(cuid, segment->getPiece()->getIndex(), global::wallclock());
+      LOGD("SegmentMan completeSegment tell bt piece %d is DownloadSuccess",segment->getPiece()->getIndex());
+  }
+
+  //然后从  usedSegmentEntries_ 集合中 移除 当前下载成功的 Segment
+  auto itr = std::find_if(usedSegmentEntries_.begin(), usedSegmentEntries_.end(), FindSegmentEntry(segment));
+  //没有找到，返回false
+  if (itr == usedSegmentEntries_.end()) {
+    return false;
+  }
+  else {
+    //找到了移除这个 元素
+    usedSegmentEntries_.erase(itr);
+    return true;
+  }
+}
+
+在DownloadCommand中有这样的逻辑
+//针对Http，ftp，sftp下载的Comand基类的执行
+bool DownloadCommand::executeInternal()
+{
+  ...
+  //如果一块完成了,对应的也即是以piece
+  if (segmentPartComplete) {
+    //判断是否这个piece 块下载完成了
+    if (segment->complete() || segment->getLength() == 0) {
+      // If segment->getLength() == 0, the server doesn't provide
+      // content length, but the client detected that download
+      // completed.
+      //打印The download for one segment completed successfully 下载一块完整的信息
+      LOGD(MSG_SEGMENT_DOWNLOAD_COMPLETED, getCuid());
+      {
+        //TODO 获取到期望的Hash值,这个只有Bt才有 pieceHash 值，也即是只有种子才要对比是否hash值相等,当然对应Bt辅助Http下载来说，我们在前面就将Bt的Hash字段保存到了 Http下载实体里面
+        //TODO 这样Http也可以既有 校验的功能，前提是 对应Bt下载的piece 长度一定要跟Http下载一样，默认Http下载为1M
+        const std::string& expectedPieceHash = getDownloadContext()->getPieceHash(segment->getIndex());
+
+        // pieceHashValidationEnabled_ 默认为 true ?
+        if (pieceHashValidationEnabled_ && !expectedPieceHash.empty()) {
+          if (
+#ifdef ENABLE_BITTORRENT
+              // TODO Is this necessary?   确保不为种子下载， 貌似种子下载不通过 DownloadCommand来触发
+              (!getPieceStorage()->isEndGame() || !getDownloadContext()->hasAttribute(CTX_ATTR_BT)) && //如果当前piece 已经计算过hash 值了
+#endif // ENABLE_BITTORRENT
+            segment->isHashCalculated()) {
+            //LOGD("DownloadCommand Hash is available! index=%lu", static_cast<unsigned long>(segment->getIndex()));
+            //检验hash值,segment->getDigest() 为当前piece 所对应的hash值 ,检验不通过会发生异常
+            validatePieceHash(segment, expectedPieceHash, segment->getDigest());
+          }
+          else {
+            //当前piece 还没有校验过 hash 值 当前完成计算，然后比较hash值
+            try {
+              std::string actualHash = segment->getPiece()->getDigestWithWrCache(segment->getSegmentLength(), diskAdaptor);
+              validatePieceHash(segment, expectedPieceHash, actualHash);
+            }
+            catch (RecoverableException& e) {
+              //比较出现了异常，清除处理
+              segment->clear(getPieceStorage()->getWrDiskCache());
+              getSegmentMan()->cancelSegment(getCuid());
+              throw;
+            }
+          }
+        }
+        else {
+            //对应Http下载来说，不用检验
+            LOGD("DownloadCommand expectedPieceHash empty done validatePieceHash segmentPartComplete");
+            completeSegment(getCuid(), segment);
+        }
+      }
+    }
+    ...
+}
+
+原本的Http下载来说由于不具备种子文件，所以没有办法校验Piece值，但是我们通过Bt 辅助 Http 下载来说我们是有种子文件的，所以我们完全可以让Http下载也走Piece的校验
+//TODO 将Bt 所拥有的Hash 字段 也一起保存到 Http 下载中，这样当Http下载完成的时候，也可以用于校验,也即是 Http 下载也拥有了Bt 的校验功能
+result.front()->getDownloadContext()->setPieceHashes(btContext->getPieceHashType(),btContext->getPieceHashes().begin(),btContext->getPieceHashes().end());
+</code></pre>
+<p>针对 Bt辅助 Http下载 暂停，恢复，移除也要做特殊的处理，特殊在我们需要控制对应的Http RequestGroup的行为</p>
+<pre class=" language-C"><code class="language-C">//forcePause 代表是否强制暂停,默认的为false
+bool pauseRequestGroup(const std::shared_ptr<RequestGroup>& group, bool reserved, bool forcePause)
+{
+  if ((reserved && !group->isPauseRequested()) || (!reserved && !group->isForceHaltRequested() && ((forcePause && group->isHaltRequested() && group->isPauseRequested()) || (!group->isHaltRequested() && !group->isPauseRequested())))) {
+    if (!reserved) {
+      // Call setHaltRequested before setPauseRequested because  setHaltRequested calls setPauseRequested(false) internally.
+      //如果是强制暂停
+      if (forcePause) {
+          //如果当前任务还有额外的任务，说明是Bt 辅助 Http 下载，暂停的时候，要手动的暂停Http 下载
+          if(group->getOtherRequestGroup())
+          {
+              group->getOtherRequestGroup()->setForceHaltRequested(true, RequestGroup::NONE);
+          }
+          //设置当前的请求强制停止
+          group->setForceHaltRequested(true, RequestGroup::NONE);
+      }
+      else {
+          //如果当前任务还有额外的任务，说明是Bt 辅助 Http 下载，暂停的时候，要手动的暂停Http 下载
+          if(group->getOtherRequestGroup())
+          {
+              group->getOtherRequestGroup()->setHaltRequested(true, RequestGroup::NONE);
+          }
+          //设置当前请求停止
+          group->setHaltRequested(true, RequestGroup::NONE);
+      }
+    }
+
+    //如果当前任务还有额外的任务，说明是Bt 辅助 Http 下载，暂停的时候，要手动的暂停Http 下载
+    if(group->getOtherRequestGroup())
+    {
+        //设置为暂停的状态
+       group->getOtherRequestGroup()->setPauseRequested(true);
+    }
+    //设置当前的group的状态为暂停状态
+    group->setPauseRequested(true);
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
+可以看到这里只是通过设置一个状态，那么这个状态是哪里出发的呢
+
+//移除停止的请求组 requetGroup
+void RequestGroupMan::removeStoppedGroup(DownloadEngine* e)
+{
+  size_t numPrev = requestGroups_.size();//获取到当前的请求组的数量
+  //检查当前正在请求的 任务组集合 requestGroups_ 将处于暂停的任务，添加到  reservedGroups_ 中
+  requestGroups_.remove_if(ProcessStoppedRequestGroup(e, reservedGroups_));
+  //打印当前停止的数量
+  size_t numRemoved = numPrev - requestGroups_.size();
+  if (numRemoved > 0) {
+    LOGD("%lu RequestGroup(s) deleted.", static_cast<unsigned long>(numRemoved));
+  }
+}
+
+是通过RequestGroupMan 执行对应的 removeStoppedGroup 函数执行相应的操作,而至于哪里调用 FillRequestGroupCommand command执行的时候触发，这个command只有在引擎退出的时候才会销毁
+所以会一直触发这个函数检查对应的状态
+
+//返回值代表当前RequestGroup是否停止成功，如果为false代表当前 RequestGroup 没有停止成功，比如当前RequestGroup还有Command没有销毁，必须要等待都销毁才返回true
+//所以当返回为false的时候，并不会从 当前正在请求的集合里面销毁，会下次再次触发检查
+bool operator()(const RequestGroupList::value_type& group)
+{
+   if(group->getOtherRequestGroup())
+   {
+      //TODO 多次处理是否会有问题
+      bool checkResult = checkStopProcess(group->getOtherRequestGroup(),true);
+      LOGD("ProcessStoppedRequestGroup extraRequestGroup checkStopProcess finish");
+      if(checkResult)
+      {
+         return checkStopProcess(group,false);
+      }
+      return checkResult;
+   }else{
+      //普通的下载
+      return checkStopProcess(group,false);
+   }
+}
+
+bool checkStopProcess(const RequestGroupList::value_type &group,bool isExtraGroup) {
+            //如果当前任务组的 Command数量为0 ,代表内部的Command都销毁了,才能执行后面的暂停等操作
+            if (group->getNumCommand() == 0) {
+                collectStat(group);
+                const std::shared_ptr<DownloadContext> &dctx = group->getDownloadContext();
+
+                //TODO  对于 Bt 辅助 Http 下载 ，不应该调用 decreaseNumActive 减少当前的任务数量，因为对于额外的任务，是我们启动的，并没有走原本的逻辑
+                if(!isExtraGroup)
+                {
+                    if (!group->isSeedOnlyEnabled()) {
+                        e_->getRequestGroupMan()->decreaseNumActive();
+                    }
+                }
+
+                // DownloadContext::resetDownloadStopTime() is only called when
+                // download completed. If
+                // DownloadContext::getDownloadStopTime().isZero() is true, then
+                // there is a possibility that the download is error or
+                // in-progress and resetDownloadStopTime() is not called. So
+                // call it here.
+                //首先重置下载停止的时间
+                if (dctx->getDownloadStopTime().isZero()) {
+                    dctx->resetDownloadStopTime();
+                }
+
+                try {
+                    //TODO Bt 辅助 Http 下载，进度的保存交给 Bt的RequestGroup来处理
+                    if(!isExtraGroup)
+                    {
+                        //关闭当前任务组的文件
+                        group->closeFile();
+                        //如果当前任务组为暂停的状态
+                        if (group->isPauseRequested()) {
+                            if (!group->isRestartRequested()) {
+                                A2_LOG_NOTICE(fmt(_("Download GID#%s paused"), GroupId::toHex(group->getGID()).c_str()));
+                            }
+                            //保存进度文件
+                            group->saveControlFile();
+                        } else if (group->downloadFinished() && !group->getDownloadContext()->isChecksumVerificationNeeded()) {//如果到了这里就说明当前任务不为暂停的状态,并且下载已经完成了,也即是因为完成了导致停止
+                            group->applyLastModifiedTimeToLocalFiles();
+                            group->reportDownloadFinished();
+                            //如果当前任务组 下载完成了，移除进度文件，
+                            if (group->allDownloadFinished() &&
+                                !group->getOption()->getAsBool(PREF_FORCE_SAVE)) {
+                                group->removeControlFile();
+                                saveSignature(group);
+                            } else {
+                                //当前任务组还没有全部下载完，保存进度
+                                group->saveControlFile();
+                            }
+
+                            std::vector<std::shared_ptr<RequestGroup>> nextGroups;
+                            group->postDownloadProcessing(nextGroups);
+                            if (!nextGroups.empty()) {
+                                //A2_LOG_DEBUG(fmt("Adding %lu RequestGroups as a result of"" PostDownloadHandler.", static_cast<unsigned long>(nextGroups.size())));
+                                e_->getRequestGroupMan()->insertReservedGroup(0, nextGroups);
+                            }
+#ifdef ENABLE_BITTORRENT
+                            // For in-memory download (e.g., Magnet URI), the
+                            // FileEntry::getPath() does not return actual file path, so
+                            // we don't remove it.
+                            if (group->getOption()->getAsBool(PREF_BT_REMOVE_UNSELECTED_FILE) &&
+                                !group->inMemoryDownload() && dctx->hasAttribute(CTX_ATTR_BT)) {
+                                A2_LOG_INFO(fmt(MSG_REMOVING_UNSELECTED_FILE, GroupId::toHex(group->getGID()).c_str()));
+                                const std::vector<std::shared_ptr<FileEntry>> &files = dctx->getFileEntries();
+                                for (auto &file : files) {
+                                    if (!file->isRequested()) {
+                                        if (File(file->getPath()).remove()) {
+                                            A2_LOG_INFO(fmt(MSG_FILE_REMOVED, file->getPath().c_str()));
+                                        } else {
+                                            A2_LOG_INFO(fmt(MSG_FILE_COULD_NOT_REMOVED, file->getPath().c_str()));
+                                        }
+                                    }
+                                }
+                            }
+#endif // ENABLE_BITTORRENT
+                        } else {
+                            //保存进度文件
+                            LOGD(_("Download GID#%s not complete: %s"), GroupId::toHex(group->getGID()).c_str(), group->getDownloadContext()->getBasePath().c_str());
+                            group->saveControlFile();
+                        }
+                    }
+                }
+                catch (RecoverableException &ex) {
+                    A2_LOG_ERROR_EX(EX_EXCEPTION_CAUGHT, ex);
+                }
+
+                //如果当前任务组为暂停状态
+                if (group->isPauseRequested()) {
+                    //重新的设置当前任务组的状态为   默认的状态 即为 STATE_WAITING
+                    group->setState(RequestGroup::STATE_WAITING);
+                    //TODO 然后将当前暂停的任务，再次的添加到了 reservedGroups_ 集合中,下次 FillRequestGroupCommand的时候会再次的检查时候有必要执行任务,Bt辅助 Http下载 ，额外的 RequestGroup不应该添加到这个集合中
+                    if(!isExtraGroup)
+                    {
+                        reservedGroups_.push_front(group->getGID(), group);
+                    }
+
+                    //释放当前任务组的 运行时资源
+                    group->releaseRuntimeResource(e_);
+                    //设置不为强制停止
+                    group->setForceHaltRequested(false);
+
+                    //更改参数配置
+                    auto pendingOption = group->getPendingOption();
+                    if (pendingOption) {
+                        changeOption(group, *pendingOption, e_);
+                    }
+
+                    if (group->isRestartRequested()) {
+                        group->setPauseRequested(false);
+                    } else {
+                        //TODO 通知暂停的事件, Bt 辅助 Http下载 额外的 RequestGroup 不应该触发回调
+                        if(!isExtraGroup)
+                        {
+                            util::executeHookByOptName(group, e_->getOption(), PREF_ON_DOWNLOAD_PAUSE);
+                            notifyDownloadEvent(EVENT_ON_DOWNLOAD_PAUSE, group);
+                        }
+                    }
+                    // TODO Should we have to prepend spend uris to remaining uris
+                    // in case PREF_REUSE_URI is disabled?
+                } else {
+                    // TODO 如果到了这里就为退出的事件，比如当前正在点击移除的操作， 这里我们应该要将 彼此双方的RequestGroup引用置为0 TODO 要不然对应的RequestGroup 不会执行销毁,造成内存泄漏
+                    //将额外的RequestGroup 引用置为null,这里只有在真正退出的时候，才能重置掉他们之间的引用
+                    if(group->isHaltRequested())
+                    {
+                        group->resetOtherRequestGroup();
+                        LOGD("RequestGroupMan checkStopProcess !isPauseRequested resetOtherRequestGroup");
+                    }
+                    // 通知暂停的事件, Bt 辅助 Http下载 额外的 RequestGroup 不应该触发回调，
+                    if(!isExtraGroup)
+                    {
+                        //当前RequestGroup 要停止了，根据当前任务组的信息，封装成一个DownloadResult对象
+                        std::shared_ptr<DownloadResult> dr = group->createDownloadResult();
+                        //添加到下载结果集合中
+                        e_->getRequestGroupMan()->addDownloadResult(dr);
+                        executeStopHook(group, e_->getOption(), dr->result);
+                    }
+                    //释放当前任务组的 运行时资源
+                    group->releaseRuntimeResource(e_);
+                    LOGD("RequestGroupMan checkStopProcess !isPauseRequested releaseRuntimeResource");
+                }
+
+                group->setRestartRequested(false);
+                group->setPendingOption(nullptr);
+                //返回true，当前请求 停止成功
+                return true;
+            }
+            return false;
+}
+
+对于删除任务来说是类似的操作
+//移除指定gid 对应的RequestGroup，force 代表是否强制执行
+int removeDownload(Session* session, A2Gid gid, bool force)
+{
+  auto& e = session->context->reqinfo->getDownloadEngine();
+  //根据gid 从 当前正在请求的集合，等待的集合中找到对应的RequestGroup
+  std::shared_ptr<RequestGroup> group = e->getRequestGroupMan()->findGroup(gid);
+  if (group) {
+    //如果当前任务正在下载
+    if (group->getState() == RequestGroup::STATE_ACTIVE) {
+      if (force) {
+        //如果当前任务还有额外的任务，说明是Bt 辅助 Http 下载，移除的时候，要设置额外的任务为强制退出的状态
+        if(group->getOtherRequestGroup())
+        {
+           group->getOtherRequestGroup()->setForceHaltRequested(true, RequestGroup::USER_REQUEST);
+        }
+        group->setForceHaltRequested(true, RequestGroup::USER_REQUEST);
+      }
+      else {
+        //如果当前任务还有额外的任务，说明是Bt 辅助 Http 下载，移除的时候，要设置额外的任务为退出的状态
+        if(group->getOtherRequestGroup())
+        {
+            group->getOtherRequestGroup()->setHaltRequested(true, RequestGroup::USER_REQUEST);
+        }
+        group->setHaltRequested(true, RequestGroup::USER_REQUEST);
+      }
+      e->setRefreshInterval(std::chrono::milliseconds(0));
+    }
+    else {
+      //如果当前任务不处于下载中，比如暂停中，那么直接简单的 在 RequestGroupMan 中移除当前gid 对应的 RequestGroup
+      if (group->isDependencyResolved()) {
+        e->getRequestGroupMan()->removeReservedGroup(gid);
+      }
+      else {
+        return -1;
+      }
+    }
+  }
+  else {
+    return -1;
+  }
+  return 0;
+}
+</code></pre>
+<p>在 HttpRequestCommand 中有这样的逻辑</p>
+<pre class=" language-C"><code class="language-C">//command执行
+bool HttpRequestCommand::executeInternal()
+{
+    ...
+    LOGD("CUID#%" PRId64 " !getSegments().empty(), getSegments.size() %d",getCuid(),getSegments().size());
+    //如果当前请求的 segments_ 集合不为空, 这种情况针对的是上一次请求下载的片段的内容下载完成了，之后重新的获取到下一次要请求piece对应的Segment(跟cuid 绑定),同时添加到了 usedSegmentEntries_ 集合中
+    //父类AbstractCommand 会调用  sm->getInFlightSegment(segments_, getCuid()); 将当前cuid 对应的segment 获取到,这里就开始请求这个piece 对应的内容
+      for (auto& segment : getSegments()) {
+        //确保当前连接 outstandingHttpRequests_ 正在请求的集合中，没有跟当前Segment 同样的元素，防止重复请求
+        if (!httpConnection_->isIssued(segment)) {
+          //找到了没有下载过的segment
+          int64_t endOffset = 0;
+          // FTP via HTTP proxy does not support end byte marker 不是ftp下载
+          if (getRequest()->getProtocol() != "ftp" && getRequestGroup()->getTotalLength() > 0 && getPieceStorage()) {
+            //TODO 获取到当前要下载的piece 索引,也即是返回当前索引对应的下一个终止的索引 这里会尽力的获取到连续没有下载的Piece 比如 1到5中，五已经下载过，那么这里返回的就是 5，也即是要下载 2,3,4的内容
+            //TODO 由于前面有连接池的使用，所以可以改成只是下载多片,或者只是单纯的下载一片,由于DownloadCommand prepareForNextSegment 的逻辑，这里不能过多的请求下载的内容，防止造成浪费，浪费用户的带宽
+            //TODO 所以对于 Bt 辅助 Http 下载来说，这里最好就是请求一个Piece数据的长度
+
+            //判断是否为Bt 辅助 Http 下载
+            if(getRequestGroup()->getOtherRequestGroup())
+            {
+                //获取到对应的终止位置,对于Bt辅助Http 下载这里每次请求只是请求一个Piece的长度
+                endOffset = std::min(getFileEntry()->getLength(), getFileEntry()->gtoloff(static_cast<int64_t>(segment->getSegmentLength()) * (segment->getIndex() + 1)));
+                LOGD("CUID#%" PRId64 " Bt Segment getIdex %d nextIdex %d endOffset %lld ",getCuid(),segment->getIndex(),(segment->getIndex() + 1),endOffset);
+            } else{
+                //原本 Http 下载的逻辑
+                size_t nextIndex = getPieceStorage()->getNextUsedIndex(segment->getIndex());
+                endOffset = std::min(getFileEntry()->getLength(), getFileEntry()->gtoloff(static_cast<int64_t>(segment->getSegmentLength()) * nextIndex));
+                LOGD("CUID#%" PRId64 "Http Segment getIdex %d nextIdex %d endOffset %lld ",getCuid(),segment->getIndex(),nextIndex,endOffset);
+            }
+          }
+          //由于当前的 segments_ 不为空，所以这里传递的Segment不为空
+          httpConnection_->sendRequest(createHttpRequest(getRequest(), getFileEntry(), segment, getOption(), getRequestGroup(), getDownloadEngine(), proxyRequest_, endOffset));
+    }
+    ...
+}
+
+原本的逻辑是尽可能的下载长的内容，这样估计是可以减少重新请求，但是对于我们Bt 辅助 Http下载来说，我们不应该一次性请求那么多的内容，因为完全有可能客户端请求的长度，此时Bt 已经拥有了
+这块的内容，那么就会导致Http 相冲突的内容直接抛去掉,具体体现在
+bool DownloadCommand::prepareForNextSegment()
+{
+      ....
+      //TODO 如果到了这里就是说当前请求返回的内容，还有内容没有解析完,所以尝试的获取到下一个piece 用来存储剩下的内容,在调用getSegmentWithIndex 的时候，就已经将当前的Segment添加到了 usedSegmentEntries_ 集合
+      // 接下来 会在 sm->getInFlightSegment(segments_, getCuid()); 根据当前的cuid 就可以获取到当前的nextSegmentm,这里会检查 tempSegment->getIndex() + 1 的内容是否已经下载完，或者正在使用,如果已经下载
+      //完成，或者正在使用，这里会返回一个null的
+      std::shared_ptr<Segment> nextSegment = getSegmentMan()->getSegmentWithIndex(getCuid(), tempSegment->getIndex() + 1);
+
+      //如果获取为空，尝试从下面获取,这是尝试的从正在下载的 Segment 集合 usedSegmentEntries_ 中 寻找 状态为 空闲的 piece 索引,然后尝试的获取到对应的Segment
+      if (!nextSegment) {
+          nextSegment = getSegmentMan()->getCleanSegmentIfOwnerIsIdle(getCuid(), tempSegment->getIndex() + 1);
+          //LOGD("DownloadCommand::prepareForNextSegment getSegmentWithIndex nextSegmentIndex %d is Use getCleanSegmentIfOwnerIsIdle index %d",tempSegment->getIndex() + 1,nextSegment->getIndex());
+      }
+
+      //TODO 如果 nextSegment 为空，或者nextSegment 当前已经写了一部分的内容 ,注意如果当前Http请求的内容还有多，但是此时这一片的内容刚好Bt在使用，那么Http 会直接丢掉此时接收的内容剩余长度,所以对于Bt辅助Http下载
+      //TODO 来说Http下载请求的范围不应该过长，防止造成浪费,
+      if (!nextSegment || nextSegment->getWrittenLength() > 0) {
+        // If nextSegment->getWrittenLength() > 0, current socket must
+        // be closed because writing incoming data at
+        // nextSegment->getWrittenLength() corrupts file.
+        LOGD("CUID#%" PRId64 " DownloadCommand prepareForNextSegment !nextSegment %d hadUse prepareForRetry",getCuid(),tempSegment->getIndex()+1);
+        return prepareForRetry(0);
+      }
+      else {
+        //如果获取到 下一个piece 不为空，再次的触发,注意当前的请求并没有销毁掉，
+        LOGD("DownloadCommand getSegmentWithIndex next %d piece data not Empty continue procee Data",tempSegment->getIndex()+1);
+        checkSocketRecvBuffer();
+        addCommandSelf();
+        return false;
+      }    
+      ....
+}
+</code></pre>
+<p>针对Bt 辅助 Http 多文件下载</p>
+<pre class=" language-C"><code class="language-C">//TODO 定义一个集合用来存储我们传递的url,注意这里支持 多文件的下载，所以这里的对应的Http下载集合的顺序一定要跟Bt 种子文件的顺序保持一致，单文件就直接改为一个url 既可
+std::vector<std::string> uris = {"http://112.90.50.248/dlied1.qq.com/lol/dltools/LOL_V4.1.2.2_FULL_0_tgod_signed.exe?mkey=5c6bbfd8d20df528&f=580c&cip=210.13.211.221&proto=http",
+"http://dl.360safe.com/setup_11.5.0.2001m.exe"};
+jobQueue.push(std::unique_ptr<Job>(new BtAuxiliaryHttpDownloadJob(std::move(uris),std::move(torrentUri), std::move(gloableOptions),downloadJavaId)));
+
+
+//将当前Bt 下载的FileEntry 相应的设置上 Http 下载的uri
+const std::vector<std::shared_ptr<FileEntry>>& fileEntries = btContext->getFileEntries();
+int index = 0;
+for (auto& entry : fileEntries) {
+      std::vector<std::string> itemUri = {uris.at(index)};
+      entry->setUris(itemUri);
+      index++;
+}
+
+要注意对于Http下载来说，是通过 uris 来指定要请求的地址集合,也即是FileEntry 中的 uris_ 字段
+
+//请求地址 队列.这个代表 当前 还没有被 请求的 的uri 地址的集合
+std::deque<std::string> uris_;
+而对于Bt 下载来说，是没有设置值，所以对于 Bt 辅助 Http下载来说，我们需要手动的设置对应的下载uris
+
+
+//TODO 确保Bt的分片长度，确保要为1M ,由于Http的下载 PieceLength 默认为1M，所以这边要统一处理
+if(btContext->getPieceLength() != requestOption->getAsInt(PREF_PIECE_LENGTH))
+{
+    LOGD("addBtHttpDownload Bt PieceLength no equal http PieceLength return");
+    return -1;
+}
+
+//TODO 要确保Http 的uri 下载的 地址 跟 Bt 包含的下载文件大小一样
+if(uris.size() != btContext->getFileEntries().size())
+{
+   LOGD("uris.size() != btContext->getFileEntries().size() return");
+   return -1;
+}
+</code></pre>
+<p>还有就是在当Http下载完最后一块内容的时候，这里要手动触发处于做种的状态，也即是告诉Bt 当前可以做种了</p>
+<pre class=" language-C"><code class="language-C">//TODO 通知完成了当前块的下载,这里要注意，对于Bt 辅助 Http下载来说， 由于 Bt 跟 Http下载 分别拥有自己的 DefaultPieceStorage对象，俩者共用的只是 BitfiledMan对象，所以如果最后一个Piece的数据给
+//TODO Http下载完成，那么就不会触发下载完成的回调，所以这边要手动的处理下
+void DefaultPieceStorage::completePiece(const std::shared_ptr<Piece>& piece)
+{
+    ...
+    //当前下载为Bt 下载
+    if (downloadContext_->hasAttribute(CTX_ATTR_BT)) {
+      if (!bittorrent::getTorrentAttrs(downloadContext_)->metadata.empty()) {
+#ifdef __MINGW32__
+        // On Windows, if aria2 opens files with GENERIC_WRITE access
+        // right, some programs cannot open them aria2 is seeding. To
+        // avoid this situation, re-open the files with read-only
+        // enabled.
+        A2_LOG_INFO("Closing files and re-open them with read-only mode"
+                    " enabled.");
+        diskAdaptor_->closeFile();
+        diskAdaptor_->enableReadOnly();
+        diskAdaptor_->openFile();
+#endif // __MINGW32__
+        //获取到当前种子的RequestGroup对象
+        auto group = downloadContext_->getOwnerRequestGroup();
+        util::executeHookByOptName(group, option_, PREF_ON_BT_DOWNLOAD_COMPLETE);
+        //回调通知下载完成
+        SingletonHolder<Notifier>::instance()->notifyDownloadEvent(EVENT_ON_BT_DOWNLOAD_COMPLETE, group);
+        LOGD("DefaultPieceStorage::completePiece EVENT_ON_BT_DOWNLOAD_COMPLETE");
+        //做种的流程
+        group->enableSeedOnly();
+      }
+    } else{
+        //当前下载为非Bt 下载
+        auto group = downloadContext_->getOwnerRequestGroup();
+        //如果当前为Bt 辅助 Http下载,我们手动的触发 Bt的应有的回调
+        if(group->getOtherRequestGroup())
+        {
+            util::executeHookByOptName(group->getOtherRequestGroup(), option_, PREF_ON_BT_DOWNLOAD_COMPLETE);
+            //回调通知下载完成
+            SingletonHolder<Notifier>::instance()->notifyDownloadEvent(EVENT_ON_BT_DOWNLOAD_COMPLETE, group->getOtherRequestGroup());
+            LOGD("DefaultPieceStorage::completePiece group->getOtherRequestGroup EVENT_ON_BT_DOWNLOAD_COMPLETE");
+            //做种的流程
+            group->getOtherRequestGroup()->enableSeedOnly();
+        }
+    }
+    ...
+}
+</code></pre>
+
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">AheadSnail</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://aheadsnail.github.io/2019/03/11/aria2-bt-fu-zhu-http-xia-zai-shi-xian/">https://aheadsnail.github.io/2019/03/11/aria2-bt-fu-zhu-http-xia-zai-shi-xian/</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">AheadSnail</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Aria2/">
+                                    <span class="chip bg-color">Aria2</span>
+                                </a>
+                            
+                                <a href="/tags/NDK/">
+                                    <span class="chip bg-color">NDK</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2019/03/12/matrix-trace-canary-yuan-ma-fen-xi/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/17.jpg" class="responsive-img" alt="Matrix Trace Canary 源码分析">
+                        
+                        <span class="card-title">Matrix Trace Canary 源码分析</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            概述
+Matrix Trace Canary 源码分析
+
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2019-03-12
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            AheadSnail
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Android/">
+                        <span class="chip bg-color">Android</span>
+                    </a>
+                    
+                    <a href="/tags/Matrix/">
+                        <span class="chip bg-color">Matrix</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2018/12/15/c-zhi-neng-zhi-zhen/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/15.jpg" class="responsive-img" alt="C++智能指针">
+                        
+                        <span class="card-title">C++智能指针</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            概述
+C++智能指针
+
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2018-12-15
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            AheadSnail
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/C/">
+                        <span class="chip bg-color">C++</span>
+                    </a>
+                    
+                    <a href="/tags/智能指针/">
+                        <span class="chip bg-color">智能指针</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="503838841"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='random'
+                   preload='auto'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 0px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2019-2021</span>
+            
+            <span id="year">2019</span>
+            <a href="/about" target="_blank">AheadSnail</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/blinkfox" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:1181062873@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=1181062873" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 1181062873" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    <!--腾讯兔小巢-->
+    
+    
+
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>
