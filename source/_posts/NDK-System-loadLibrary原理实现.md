@@ -4,10 +4,7 @@ date: 2017-10-04 17:58:11
 tags: [Android,NDK,SystemLoad]
 description: NDK System.loadLibrary原理实现
 ---
-
-NDK System.loadLibrary原理实现
-<!--more-->
-
+### 简介
 1.首先我们在java代码里面写了这样的代码
 ```java
  static
@@ -201,7 +198,6 @@ public DexPathList(ClassLoader definingContext, String dexPath,
         }
     }
  ```
- 
  **加载so**
  ===
  ```java
