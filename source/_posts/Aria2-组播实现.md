@@ -37,7 +37,7 @@ Bt组播协议内容
 
 首先要开启这个选项，默认是关闭的，如果要打开，可以动态的设置这个选项 gloableOptions.push_back(std::pair<std::string,std::string> ("bt-enable-lpd","true"));
 
-```CPP
+```cpp
 //设置是否本地发现,如果设置为tru的化，就可以在同一个局域网下载，默认是关闭的,还有不能为私有的种子
 if (option->getAsBool(PREF_BT_ENABLE_LPD) && btReg->getTcpPort() && (metadataGetMode || !torrentAttrs->privateTorrent)) {
     //如果还没有构建，进行初始化,这里要注意的是对应LpdMessageReciver的对象是全局的，是单例的存在，他作用于所有的种子
@@ -82,7 +82,7 @@ if (option->getAsBool(PREF_BT_ENABLE_LPD) && btReg->getTcpPort() && (metadataGet
 
 上面的逻辑就是，判断是否支持本地发现，如果支持，当前还没有进行初始化的化，执行对应的初始化，会构建LpdMessageReceiver ，用于接受所有种子文件对应的本地发现消息
 
-```CPP
+```cpp
 auto receiver = std::make_shared<LpdMessageReceiver>(LPD_MULTICAST_ADDR, LPD_MULTICAST_PORT);
 constexpr const char LPD_MULTICAST_ADDR[] = "239.192.152.143";
 constexpr uint16_t LPD_MULTICAST_PORT = 6771;
@@ -118,7 +118,7 @@ bool LpdMessageReceiver::init(const std::string& localAddr)
 
 当前主机加入组播
 
-```CPP
+```cpp
 void SocketCore::joinMulticastGroup(const std::string& multicastAddr, uint16_t multicastPort, const std::string& localAddr)
 {
   //将  multicastAddr 转成 in_addr
@@ -161,7 +161,7 @@ else{
 ```
 如果初始化完成，则将LpdMessageReciever对象保存到BtRegister中，这个对象是唯一的,前面有介绍,之后构建LpdReceiveMessageCommand 对象，这个command 是用来接受Lpd的消息的，这个对象也是
 作用于所有的种子，并且这个对象会一直处于运行中，也即是一直处于接受lpd的消息
-```CPP
+```cpp
 bool LpdReceiveMessageCommand::execute()
 {
   //只有引擎退出的时候，这个对象才会被销毁
@@ -204,7 +204,7 @@ if (btReg->getLpdMessageReceiver()) {
 
 ```
 首先获取到当前种子对应的hash值，然后获取到对应的bt端口号，由于这里我做了utp的支持，所以相应的这个端口号也要设置成udp监听的那个端口号
-```CPP
+```cpp
 //构建当前种子对应的LpdMessageDispatcher 对象  这里应该要修改，因为  btReg->getTcpPort()  代表当前服务端监听的tcp端口号，如果是utp实现的化，这里要换成我们的udp端口号
 auto dispatcher = std::make_shared<LpdMessageDispatcher>(std::string(&infoHash[0], &infoHash[INFO_HASH_LENGTH]), port, LPD_MULTICAST_ADDR, LPD_MULTICAST_PORT);
 constexpr const char LPD_MULTICAST_ADDR[] = "239.192.152.143";
@@ -242,7 +242,7 @@ bool LpdMessageDispatcher::init(const std::string& localAddr, unsigned char ttl,
 //初始化成功，构建  LpdDispatchMessageCommand 对象，然后添加到engine中 这也是对应的每一个种子文件对应的一个对象
 auto cmd = make_unique<LpdDispatchMessageCommand>(e->newCUID(), dispatcher, e);
 这个对象主要用来针对当前的种子文件，发送对应的组播消息，组播协议中每5分钟就要发送对应消息，这样其他刚加入的主机才有机会收到这个消息，当然也不能发送的太频繁，会引起阻塞,检验是5分钟
-```CPP
+```cpp
 //command命令的执行
 bool LpdDispatchMessageCommand::execute()
 {
@@ -291,7 +291,7 @@ bool LpdMessageDispatcher::isAnnounceReady() const
 
 ```
 上面的逻辑就是判断是否有必要再次发送lpd消息，当时间间隔到达了5分钟就发送一个lpd消息，就会触发  dispatcher_->sendMessage()
-```CPP
+```cpp
 //发送消息 ，将创建的LPD消息发送到 组指定的  multicastAddress_   multicastPort_ 上 这样在这个组的其他主机就可以接收到消息了
 bool LpdMessageDispatcher::sendMessage()
 {
@@ -324,7 +324,7 @@ std::string createLpdRequest(const std::string& multicastAddress, uint16_t multi
 ```
 这样当前种子的lpd消息就发送出去了，可以看出来协议的内容跟bt协议的一样,携带了当前种子对应的hash值，已经本地监听的端口号,所以如果要支持utp的化，我们只要改这个值为我们udp监听的端口号就好
 对于本地发现消息的接受端，就是前面介绍的LpdReceiveMessageCommand 来统一的接受所有的本地发现的消息,
-```CPP
+```cpp
 bool LpdReceiveMessageCommand::execute()
 {
   //只有引擎退出的时候，这个对象才会被销毁

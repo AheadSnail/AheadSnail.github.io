@@ -38,22 +38,22 @@ aria2是一款用于下载文件的工具。支持的协议是HTTP（S），FTP�
   ● libtool
 
 上面需要的包安装完之后，进入到下载下来的源码目录里面这里使用的是最新版Github上面的Maste分支的内容 然后运行以下命令生成构建程序所需的配置脚本和其他文件：
-```bash
+```shell
 $ autoreconf -i
 ```
 
 您还需要Sphinx来构建手册页。如果您正在为Mac OS X构建aria2，请查看make-release-os.mk GNU Make makefile。 构建aria2的最快方法是首先运行configure脚本：
-```bash
+```shell
 $ ./configure
 ```
 
 要建立静态链接的aria2，请使用ARIA2_STATIC=yes 命令行选项：
-```bash
+```shell
 $ ./configure ARIA2_STATIC = yes
 ```
 
 配置完成后，运行make以编译该程序：
-```bash
+```shell
 $ make
 ```
 
@@ -70,7 +70,7 @@ $ make
   ● 新建一个 setup.sh 脚本，来执行环境的安装和相关依赖库的编译
   ● #! /bin/bash
 
-```bash
+```shell
 改成 x86_64-w64-mingw32 来编译64位版本 这个要对应的为你在Linux上面安装的Mingw64对应的 是64还是32位系统
 安装mingW64可以通过 sudo apt-get install mingw-w64-x86-64-dev 来完成安装
 export HOST=x86_64-w64-mingw32
@@ -80,7 +80,7 @@ downloads.
 RUN sed -ie 's/archive\.ubuntu/jp.archive.ubuntu/g' /etc/apt/sources.list
 ```
 安装编译环境 后面的其实就是将官网上面介绍的那样，要安装的软件包，这里只不过是讲这些要安装的软件包通过脚本文件的形势来编译，这样的好处是不用一个一个的执行，可以通过脚本文件，一下子执行完成
-```bash
+```shell
 apt-get update && \
 apt-get install -y make binutils autoconf automake autotools-dev libtool pkg-config git curl dpkg-dev gcc-mingw-w64 autopoint libcppunit-dev libxml2-dev libgcrypt11-dev lzip
 
@@ -181,7 +181,7 @@ test -z "$PREFIX" && PREFIX=/usr/local/$HOST
 
 新建一个 build.sh 来编译 Aria2 库
 
-```bash
+```shell
 #! /bin/bash
 # 改成 x86_64-w64-mingw32 来编译64位版本
 export HOST=x86_64-w64-mingw32
@@ -198,7 +198,7 @@ cd aria2 && autoreconf -i && ./mingw-config && make install && $HOST-strip /usr/
 编译的系统为Ubuntu16.04
 
 下面是build-libraries.sh的脚本，用来保证编译android的时候，需要的库等
-```bash
+```shell
 #!/bin/bash
 
 if [[ $ANDROID_HOME == "" ]];then
@@ -290,7 +290,7 @@ CXXFLAGS=$CFLAGS
 ```
 
 下面是build-ndk-toolchain.sh的脚本，用来保证ndk的环境，主要官网介绍最好用ndk-41b以上的版本
-```bash
+```shell
 #!/bin/bash
 
 mkdir -p /opt/NDK
@@ -328,7 +328,7 @@ mkdir -p usr/local/lib/pkgconfig
 
 ### Android X86编译
 要注意的是Aria2 也是支持X86平台的编译的,首先是构建X86下面的交叉编译链
-```bash
+```shell
 #!/bin/sh
 export NDK=/opt/android-ndk-r14b
 export ANDROID_HOME=/opt/android-ndk-r14b
@@ -341,7 +341,7 @@ mkdir -p usr/local/lib/pkgconfig
 ```
 
 之后其他的外部库编译脚本文件稍微的改动就可以,比如 编译Care库，脚本文件就要变成这样，其他的类似
-```bash
+```shell
 #!/bin/bash
 
 C_ARES=https://c-ares.haxx.se/download/c-ares-1.13.0.tar.gz
@@ -377,7 +377,7 @@ echo "build libCars complete!"
 ```
 
 编译OpenSSL库，脚本文件就要变成这样，注意 CROSS_COMPILE=$TOOLCHAIN/bin/i686-linux-android- 这里已经不是Arm的了，相应的要为x86
-```bash
+```shell
 OPENSSL=https://www.openssl.org/source/openssl-1.0.2m.tar.gz
 DOWNLOADER="wget -c"
 
@@ -413,7 +413,7 @@ echo "build openssl complete!"
 ```
 
 由于没有设置ANDROID_HOME 环境变量，对应的Aria2源码中的android-config文件就要变成
-```bash
+```shell
 ANDROID_HOME=/opt/android-ndk-r14b
 TOOLCHAIN=$ANDROID_HOME/toolchainX86
 
@@ -442,7 +442,7 @@ PATH=$TOOLCHAIN/bin:$PATH
 ```
 
 Aria2源码中的android-make文件就要变成
-```bash
+```shell
 ANDROID_HOME=/opt/android-ndk-r14b
 TOOLCHAIN=$ANDROID_HOME/toolchainX86
 PATH=$TOOLCHAIN/bin:$PATH

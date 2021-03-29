@@ -11,7 +11,7 @@ description:  Aria2 JNI代码的优化
 
 由于下载的所有的内容，都是通过Aria2下载库提供的，然后通过JNI将这些信息封装成一个对象然后返回给java层代码，让java层代码刷新显示，先看看之前刷新代码的逻辑
 
-```CPP
+```cpp
 auto start = std::chrono::steady_clock::now();
 for(;;){
     //执行事件轮询和操作, 如果|模式|是 ：c：macro：`RUN_DEFAULT`，这个函数在没有下载时返回 留下来处理。 在这种情况下，这个函数返回0。
@@ -67,7 +67,7 @@ public void downloadInfoChange(final ArrayList<DownloadEntity> entities)
 
 先看看downloadInfoChangeCallBackForAndroid 函数的实现
 
-```CPP
+```cpp
 /**
  * 回调执行Android中的downloadInfoChange
  * @param vector 传递的是引用
@@ -109,7 +109,7 @@ void downloadInfoChangeCallBackForAndroid(std::vector<DownloadStatus>& vector){
 
 ### 验证JNI对象跟java层对象是同一个
 
-```CPP
+```cpp
 首先讲解下JNI中多线程对象共享的问题，由于我们想免去中间生成的对象，那我们就必须将java层的对象在JNI中持有，由于我们JNI中还有一个子线程，所以就涉及到了多线程的问题
 //保存java层对应的下载实体类
 static std::vector<jobject> downloadEntitys;
@@ -142,7 +142,7 @@ NDK开发，一般出现的错误，都是很难定位的，如果单纯的是�
 
 ![结果显示](/uploads/Aria优化/全局引用的作用.png)
 
-```CPP
+```cpp
 所以之前添加的代码，只要改成这样就可以了，后面在子线程中获取到对应的值就不会出现问题了
 jobject globalRefObj = env->NewGlobalRef(entity);
 //首先保存java层的下载实体类
@@ -199,7 +199,7 @@ LOGD("entity hashCode %d",hashCode);
 
 ![结果显示](/uploads/Aria优化/hashCode结果.png)
 
-```CPP
+```cpp
 可以看得出来，JNI中传递的对象跟java层是一样的， 使用了全局引用之后，我们可以再次的查看一下最后得到的对象是否是hashCode一样的
 下面是验证的代码
 
@@ -227,7 +227,7 @@ LOGD("global entity hashCode %d",globalHashCode);
 
 ### 代码的优化
 
-```CPP
+```cpp
 前面已经验证了是同一个对象，那下面代码改起来就非常简单了
 void downloadInfoChangeCallBackForAndroid(std::vector<DownloadStatusMode>& vector){
     JNIEnv *env;

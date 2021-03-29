@@ -51,7 +51,7 @@ Aria收到rpc的请求开始响应对应的内容
 
 ### Rpc源码分析
 #### 首先要开启Rpc的支持
-```CPP
+```cpp
 //设置允许rpc访问
 gloableOptions.push_back(std::pair<std::string,std::string> ("enable-rpc","true"));
 //设置rpc的监听端口
@@ -61,7 +61,7 @@ gloableOptions.push_back(std::pair<std::string,std::string> ("rpc-listen-all","t
 ```
 
 #### 创建Tcp Socket监听端口
-```CPP
+```cpp
 //构建对应的ipv4,ipv6
 static int families[] = {AF_INET, AF_INET6};
 size_t familiesLength = op->getAsBool(PREF_DISABLE_IPV6) ? 1 : 2;
@@ -153,7 +153,7 @@ bool HttpListenCommand::execute()
 ```
 
 #### 服务端响应请求
-```CPP
+```cpp
 也即是会执行到这里
 if (serverSocket_->isReadable(0)) {
     //利用tcp的Accept函数，返回当前连接的socketCore对象
@@ -649,7 +649,7 @@ bool AbstractHttpServerResponseCommand::execute()
 
 #### 长连接的支持
 当数据发送完之后，会执行 afterSend(httpServer_, e_); 这个函数会由具体的子类来实现，比如当前是HttpServerResponseCommand，所以会执行对应的函数
-```CPP
+```cpp
 void HttpServerResponseCommand::afterSend(const std::shared_ptr<HttpServer>& httpServer, DownloadEngine* e)
 {
   //判断是否支持长连接,如果支持长连接，这里会构建一个 HttpServerCommand 用于后面的通信

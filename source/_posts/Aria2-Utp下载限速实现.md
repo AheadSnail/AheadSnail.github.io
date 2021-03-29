@@ -108,8 +108,7 @@ getSpeed_Bps 函数实现为
 
 
 ### Aria2 下载速度统计源码分析
-```CPP
-
+```cpp
 首先是开启对应的速度监控器
 //设置最大的下载速度, 由于utp采用的是udp的原因，如果做限速处理的化，无法达到tcp限速的效果，所以下载不支持限速
 gloableOptions.push_back(std::pair<std::string,std::string> ("max-download-limit","50k"));
@@ -372,7 +371,7 @@ int SpeedCalc::calculateSpeed()
 ```
 
 ### Aria2 Utp限速实现
-```CPP
+```cpp
 我们可以参考transmission的做法，实现Utp的限速处理
 
 由于我们的限速针对是整个任务，不是单个peer，也不是全局的速度监控，为什么是整个任务，不是单个peer呢，如果限制了单个peer的化，如果此时有好些人连接上这个用户，也会把用户的带宽吃掉，如果设置到
@@ -583,7 +582,7 @@ utp_sendAck函数实现,这内部会获取到当前滑动窗口的大小，如�
 ![结果显示](/uploads/Utp下载限速/utp_sendAck函数实现.png)
 
 相应的我们可以在
-```CPP
+```cpp
 bool PeerConnection::receiveMessage(unsigned char* data, size_t& dataLength)
 {
     ...

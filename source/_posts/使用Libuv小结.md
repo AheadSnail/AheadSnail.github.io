@@ -5,11 +5,8 @@ date: 2020-06-29 10:26:32
 tags: [bt,libuv]
 description:  使用Libuv小结
 ---
-
 ### 简介
-重写Bt项目在Linux下面已经差不多已经接近尾声，后续在Linux下面测试稳定后，就要移植到Android上面，这篇文章主要介绍重写的使用Libuv中要注意的问题
-
-关于libuv的介绍，可以查看这个链接
+重写Bt项目在Linux下面已经差不多已经接近尾声，后续在Linux下面测试稳定后，就要移植到Android上面，这篇文章主要介绍重写的使用Libuv中要注意的问题，关于libuv的介绍，可以查看这个链接
 https://github.com/libuv/libuv
 libuv是一个支持多平台的异步IO库。它主要是为了node.js而开发的，但是也可以用于Luvit, Julia, pyuv及其他软件。 
 > 1.libuv是使用C标准写的
