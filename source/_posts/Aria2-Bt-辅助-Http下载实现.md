@@ -5,13 +5,6 @@ date: 2019-03-11 16:41:21
 tags: [NDK,Aria2]
 description:  Aria2 Bt 辅助 Http下载实现
 ---
-
-### 概述
-
-> Aria2 Bt 辅助 Http下载实现
-
-<!--more-->
-
 ### 简介
 > 上一年12月份的时候将修改后的Aria2 移植到Window 上面，做了一个简单的下载器，看看下载的情况，大体测试了一个月左右，虽然 Bt 下载表现的不错，每天都能省下一半多的流量，但是通过下载的成功率用户的留存，发现都普遍低于传统的Http下载，大体的原因有，Bt 获取到Peer的过程存在不确定性，比如 Tracker服务器挂掉，虽然有Dht实现，但是dht 寻找可用的节点太慢，再次就是就算获取到了Peer也无法确定哪些Peer是有效的，也即是有哪些Peer是支持打洞的，哪些是不支持的，而且目前对于要连接的Peer数量还有限制，再次就是Bt的下载速度是跟同一时刻用户量有关的，如果同一时刻用户量大的化那么Bt的下载速度就会上升，相反Bt下载速度就会极低，这就会影响用户的使用，影响用户的留存等，针对这种情况，我去分析了解下 英雄联盟(LOL) 下载器，发现他是通过Bt 辅助 Http来实现的
 
@@ -35,7 +28,7 @@ LOL 下载器效果
 
 ### Bt辅助Http 难点解决方案
 1.由于采用的是Aria2，原本是不支持Bt 跟Http 想结合下载的，他们俩个是完全不相关的
-```C
+```CPP
 我们可以在RequestGroup 中添加另一个RequestGroup
 //当前RequestGroup 绑定的另一个RequestGroup 对象
 std::shared_ptr<RequestGroup> otherRequest_;
@@ -59,7 +52,7 @@ result.front()->setOtherRequestGroup(btGroup);
 ```
 
 2.在Http 不请求对应的下载内容的长度的时候，直接知道 要下载的总长度，这个我们可以通过Bt下载获取到对应的信息
-```C
+```CPP
 //在创建 Bt辅助 Http 下载任务的时候, 将Bt的FileEntry设置到Http中
 result.front()->getDownloadContext()->setFileEntries(btContext->getFileEntries().begin(), btContext->getFileEntries().end());
 //将Http 要下载的 url 保存 , 对于Bt 来说 FileEntry 中的uri 为空，而 Http下载来说 FileEntry 中的 uri 集合为存储要下载的地址 这里只是下载单个文件，多个文件要额外的处理
@@ -87,7 +80,7 @@ if(httpRequestGroup)
 }
 ```
 针对 问题3,4 我们可以简单的让Http RequestGroup 共享 Bt 对应的对象，因为通过源码分析他们在这方面是相同的处理
-```C
+```CPP
 httpRequestGroup->initPieceStorage(pieceStorage->getBitfieldMan(),pieceStorage->getDiskAdaptor());
 
 //初始化PieceStorage
@@ -115,7 +108,7 @@ void RequestGroup::initPieceStorage(const std::shared_ptr<BitfieldMan>& bitfield
 ```
 
 针对怎么样避开Http RequestGroup 不执行文件的分配
-```C
+```CPP
 //检查是否本地的下载进度文件，加载进度文件，决定当前要下载的长度，或者本身就下载完成了
 auto checkEntry = httpRequestGroup->createCheckIntegrityEntry(false);
 if (checkEntry) {
@@ -232,7 +225,7 @@ int64_t File::size()
 但是按照我的观察，在确保目标文件路径是正确的情况下，这里获取到的长度确有时候获取不到，有时候又可以获取到，为了避免这种麻烦，所以我增加了一个参数 isNeedCheckFileSize，直接跳过
 ```
 针对 6.相应的进度的保存，也即是当前下载的长度，下次进来应该继续下载
-```C
+```CPP
 原本Http跟Bt 下载都是有进度保存的，而且会每隔一段时间触发一次进度的保存，而且使用的都是 DefaultBtProgressInfoFile ，所以我们完全没有必要俩边都保存，我的做法不调用原本要调用的
 //保存进度对象的引用
 setProgressInfoFile(progressInfoFile);
@@ -259,7 +252,7 @@ public:
 };
 ```
 针对 5.Bt跟Http通信的问题，比如Http 下载完应该告诉Bt 当前块下载完了，BT 此时应该发送have 消息等,我们可以在Http 下载完一块的时候，手动的通知Bt
-```C
+```CPP
 //标识当前  segment 已经下载完成了， 要告知 PieceStorage 当前这块piece 下载完成了,然后从  usedSegmentEntries_ 集合中移除这个元素
 bool SegmentMan::completeSegment(cuid_t cuid, const std::shared_ptr<Segment>& segment,std::shared_ptr<PieceStorage> btPieceStorage)
 {
@@ -348,7 +341,7 @@ bool DownloadCommand::executeInternal()
 result.front()->getDownloadContext()->setPieceHashes(btContext->getPieceHashType(),btContext->getPieceHashes().begin(),btContext->getPieceHashes().end());
 ```
 针对 Bt辅助 Http下载 暂停，恢复，移除也要做特殊的处理，特殊在我们需要控制对应的Http RequestGroup的行为
-```C
+```CPP
 //forcePause 代表是否强制暂停,默认的为false
 bool pauseRequestGroup(const std::shared_ptr<RequestGroup>& group, bool reserved, bool forcePause)
 {
@@ -624,7 +617,7 @@ int removeDownload(Session* session, A2Gid gid, bool force)
 }
 ```
 在 HttpRequestCommand 中有这样的逻辑
-```C
+```CPP
 //command执行
 bool HttpRequestCommand::executeInternal()
 {
@@ -698,7 +691,7 @@ bool DownloadCommand::prepareForNextSegment()
 }
 ```
 针对Bt 辅助 Http 多文件下载
-```C
+```CPP
 //TODO 定义一个集合用来存储我们传递的url,注意这里支持 多文件的下载，所以这里的对应的Http下载集合的顺序一定要跟Bt 种子文件的顺序保持一致，单文件就直接改为一个url 既可
 std::vector<std::string> uris = {"http://112.90.50.248/dlied1.qq.com/lol/dltools/LOL_V4.1.2.2_FULL_0_tgod_signed.exe?mkey=5c6bbfd8d20df528&f=580c&cip=210.13.211.221&proto=http",
 "http://dl.360safe.com/setup_11.5.0.2001m.exe"};
@@ -737,7 +730,7 @@ if(uris.size() != btContext->getFileEntries().size())
 
 ```
 还有就是在当Http下载完最后一块内容的时候，这里要手动触发处于做种的状态，也即是告诉Bt 当前可以做种了
-```C
+```CPP
 //TODO 通知完成了当前块的下载,这里要注意，对于Bt 辅助 Http下载来说， 由于 Bt 跟 Http下载 分别拥有自己的 DefaultPieceStorage对象，俩者共用的只是 BitfiledMan对象，所以如果最后一个Piece的数据给
 //TODO Http下载完成，那么就不会触发下载完成的回调，所以这边要手动的处理下
 void DefaultPieceStorage::completePiece(const std::shared_ptr<Piece>& piece)
