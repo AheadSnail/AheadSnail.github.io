@@ -497,11 +497,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><blockquote>
-<p> Aria2源码分析</p>
-</blockquote>
-<a id="more"></a>
-<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><blockquote>
+                <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><blockquote>
 <p>之前文章分析过，怎么样使用Aria2，以及对应的编译，如果只是做为简单的使用的化，估计早就已经解决了问题，先说说使用这个项目的原由吧，就是公司想节省带宽，比如在下载游戏，下载视频等方面,所以可以使用p2p技术，而Aria2是p2p开源中最火的一个，也是最多start数的一个，所以采用了这个开源库，但是由于Aria2 不具备打洞的方案，他原本是采用tcp的方式来传输内容，而像有些种子工具,比如Utorrent是具备这种打洞技术的，采用了utp的协议，而这个utp的库也是由Utorrent开源的，不足的是，这个库并没有开源，但是linux下面的p2p工具 transmission是具备utp，tcp协议的，而且是开源的所以就要去阅读transmission的源码，查看他对应的utp以及tcp有什么不同点，在发的数据方面，这里就直接告诉大家答案，对于这俩种协议在发数据的时候，并没有任何的区别,由于要设计到修改源码，就有必要对Aria2的源码有一定深度的认识，要不然是改不动的</p>
 </blockquote>
 <h3 id="P2P技术"><a href="#P2P技术" class="headerlink" title="P2P技术"></a>P2P技术</h3><p><code>p2p</code>也叫做变态下载，何为变态就是同一时刻当下载的人越多，速度就越快， p2p为什么能节省带宽，也就是本身你要从服务器下载的资源，可以直接从其他的用户那里获取到，由其他的用户提供带宽，下面说下p2p大致的工作流程</p>
@@ -513,7 +509,7 @@
 <p><a href="http://bittorrent.org/beps/bep_0000.html" target="_blank" rel="noopener">http://bittorrent.org/beps/bep_0000.html</a></p>
 </blockquote>
 <h3 id="Aria2源码分析"><a href="#Aria2源码分析" class="headerlink" title="Aria2源码分析"></a>Aria2源码分析</h3><p>由于涉及到的源码比较多，这里不做详细的介绍,这里主要介绍下对应的类是干什么用的，哪些对象是共用的，哪些是自己独有的</p>
-<pre class=" language-C++"><code class="language-C++">1.DownloadEngine  首先这个类是所有种子公有的一个类，也即是只会有一个对象的存在 
+<pre class=" language-CPP"><code class="language-CPP">1.DownloadEngine  首先这个类是所有种子公有的一个类，也即是只会有一个对象的存在 
 他内部含有这俩个成员，这里面存放各种command，DownLoadEngine负责执行他们
 std::deque<std::unique_ptr<Command>> routineCommands_;
 std::deque<std::unique_ptr<Command>> commands_;
@@ -1252,9 +1248,7 @@ bool DHTInteractionCommand::execute()
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概述
- Aria2移植utp
-
+                            
                         
                     </div>
                     <div class="publish-info">

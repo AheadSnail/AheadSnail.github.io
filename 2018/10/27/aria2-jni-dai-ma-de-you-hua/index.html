@@ -497,15 +497,11 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><blockquote>
-<p>Aria2 JNI代码的优化</p>
-</blockquote>
-<a id="more"></a>
-<h3 id="问题的引出"><a href="#问题的引出" class="headerlink" title="问题的引出"></a>问题的引出</h3><blockquote>
+                <h3 id="问题的引出"><a href="#问题的引出" class="headerlink" title="问题的引出"></a>问题的引出</h3><blockquote>
 <p> 前几天有一个需求是当Bt下载在一段时间之内当平均的下载速度小于某一个值的时候，要自动的切换成传统的Http下载，当然也要提供一个可以外部手动切换的功能，考虑到每一个下载任务都要做监听就会去考虑性能的问题，而且之前老大发现这个程序挺耗电量的，所以就去考虑下性能的问题</p>
 </blockquote>
 <p>由于下载的所有的内容，都是通过Aria2下载库提供的，然后通过JNI将这些信息封装成一个对象然后返回给java层代码，让java层代码刷新显示，先看看之前刷新代码的逻辑</p>
-<pre class=" language-C++"><code class="language-C++">auto start = std::chrono::steady_clock::now();
+<pre class=" language-CPP"><code class="language-CPP">auto start = std::chrono::steady_clock::now();
 for(;;){
     //执行事件轮询和操作, 如果|模式|是 ：c：macro：`RUN_DEFAULT`，这个函数在没有下载时返回 留下来处理。 在这种情况下，这个函数返回0。
     //如果|模式| 是：c：macro：`RUN_ONCE`，这个函数返回之后  在当前的实现中，事件轮询1秒内超时。如果函数返回0则代表出现了异常.否则，返回1，表示该 调用者必须调用此函数一次或多次完成下载。
@@ -553,7 +549,7 @@ for(;;){
 <span class="token punctuation">}</span>
 </code></pre>
 <p>先看看downloadInfoChangeCallBackForAndroid 函数的实现</p>
-<pre class=" language-C++"><code class="language-C++">/**
+<pre class=" language-CPP"><code class="language-CPP">/**
  * 回调执行Android中的downloadInfoChange
  * @param vector 传递的是引用
  */
@@ -590,7 +586,7 @@ void downloadInfoChangeCallBackForAndroid(std::vector<DownloadStatus>& vector){
 <blockquote>
 <p>针对上面的俩个问题，其实只要做到JNI层也能够持有java层对应的引用，这样在JNI层能改变对应的状态，java层也能改变对应的状态，而且对应的另一边都能够获取改变之后的值，这样就解决了第二个问题,如果这个问题解决了，那对于第一个问题，那也简单了，我们可以在JNI中使用一个集合保存对应的java 实体引用，当要刷新界面的时候，我们通过修改实体的值，当修改完成之后，我们通过java层改变界面,当然这个的前提是JNI中持有了java同一个引用对象</p>
 </blockquote>
-<h3 id="验证JNI对象跟java层对象是同一个"><a href="#验证JNI对象跟java层对象是同一个" class="headerlink" title="验证JNI对象跟java层对象是同一个"></a>验证JNI对象跟java层对象是同一个</h3><pre class=" language-C++"><code class="language-C++">首先讲解下JNI中多线程对象共享的问题，由于我们想免去中间生成的对象，那我们就必须将java层的对象在JNI中持有，由于我们JNI中还有一个子线程，所以就涉及到了多线程的问题
+<h3 id="验证JNI对象跟java层对象是同一个"><a href="#验证JNI对象跟java层对象是同一个" class="headerlink" title="验证JNI对象跟java层对象是同一个"></a>验证JNI对象跟java层对象是同一个</h3><pre class=" language-CPP"><code class="language-CPP">首先讲解下JNI中多线程对象共享的问题，由于我们想免去中间生成的对象，那我们就必须将java层的对象在JNI中持有，由于我们JNI中还有一个子线程，所以就涉及到了多线程的问题
 //保存java层对应的下载实体类
 static std::vector<jobject> downloadEntitys;
 当执行添加下载的时候，简单的将这个对象保存
@@ -614,7 +610,7 @@ for(jobject objz : downloadEntitys)
 <p><img src="/uploads/Aria优化/JNI多线程错误定位.png" alt="结果显示"></p>
 <p>通过上面的错误，我们可以找到对应的错误在哪一行，出现这个问题的原因是多线程的问题，在多线程环境下，我们的对象应该使用GlobalReference来创建，也即是全局引用的意思,下面是关于他的介绍</p>
 <p><img src="/uploads/Aria优化/全局引用的作用.png" alt="结果显示"></p>
-<pre class=" language-C++"><code class="language-C++">所以之前添加的代码，只要改成这样就可以了，后面在子线程中获取到对应的值就不会出现问题了
+<pre class=" language-CPP"><code class="language-CPP">所以之前添加的代码，只要改成这样就可以了，后面在子线程中获取到对应的值就不会出现问题了
 jobject globalRefObj = env->NewGlobalRef(entity);
 //首先保存java层的下载实体类
 downloadEntitys.push_back(globalRefObj);
@@ -667,7 +663,7 @@ LOGD("entity hashCode %d",hashCode);
 </code></pre>
 <p>打印的结果为：</p>
 <p><img src="/uploads/Aria优化/hashCode结果.png" alt="结果显示"></p>
-<pre class=" language-C++"><code class="language-C++">可以看得出来，JNI中传递的对象跟java层是一样的， 使用了全局引用之后，我们可以再次的查看一下最后得到的对象是否是hashCode一样的
+<pre class=" language-CPP"><code class="language-CPP">可以看得出来，JNI中传递的对象跟java层是一样的， 使用了全局引用之后，我们可以再次的查看一下最后得到的对象是否是hashCode一样的
 下面是验证的代码
 
 jclass objClass = env->GetObjectClass(entity);
@@ -687,7 +683,7 @@ LOGD("global entity hashCode %d",globalHashCode);
 <p>打印的结果为：</p>
 <p><img src="/uploads/Aria优化/全局引用也是同一个对象.png" alt="结果显示"></p>
 <p>如果你还存在怀疑，最简单粗暴的直接在JNI子线程中改变全局对象的属性，然后在java层获取这个属性的值，这里就不验证了，我之前验证是一样的，那既然是同一个引用的化，那处理起来就非常简单了<br>我们可以在JNI中或者在java层都可以改变这个对象，而且另一边都可以正确的获取到改变之后的值</p>
-<h3 id="代码的优化"><a href="#代码的优化" class="headerlink" title="代码的优化"></a>代码的优化</h3><pre class=" language-C++"><code class="language-C++">前面已经验证了是同一个对象，那下面代码改起来就非常简单了
+<h3 id="代码的优化"><a href="#代码的优化" class="headerlink" title="代码的优化"></a>代码的优化</h3><pre class=" language-CPP"><code class="language-CPP">前面已经验证了是同一个对象，那下面代码改起来就非常简单了
 void downloadInfoChangeCallBackForAndroid(std::vector<DownloadStatusMode>& vector){
     JNIEnv *env;
     jVM->GetEnv((void**) &env, JNI_VERSION_1_4);
@@ -1297,9 +1293,7 @@ void downloadInfoChangeCallBackForAndroid(std::vector<DownloadStatusMode>& vecto
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概述
-Aria2 打洞介绍以及对应的源码实现
-
+                            
                         
                     </div>
                     <div class="publish-info">
@@ -1352,9 +1346,7 @@ Aria2 打洞介绍以及对应的源码实现
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概述
-Aria2 组播实现
-
+                            
                         
                     </div>
                     <div class="publish-info">

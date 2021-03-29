@@ -497,8 +497,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <p>RecycleView 嵌套使用的時候，RecycleView滑动冲突<br><a id="more"></a></p>
-<h1 id="RecycleView嵌套滑动的冲突"><a href="#RecycleView嵌套滑动的冲突" class="headerlink" title="RecycleView嵌套滑动的冲突"></a>RecycleView嵌套滑动的冲突</h1><p>1.当一个大的RecycleView中的item也是一个RecycleView的时候，滑动的时候，就会出现滑动不顺畅，比如我在子的RecycleView中斜着滑动的时候，<br>为什么是里面的RecycleView 获取到了事件，可以左右滑动，上下滑动的时候，为什么是外面的RecycleView获取到了事件，可以上下滑动？</p>
+                <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>RecycleView嵌套滑动的冲突<br>1.当一个大的RecycleView中的item也是一个RecycleView的时候，滑动的时候，就会出现滑动不顺畅，比如我在子的RecycleView中斜着滑动的时候，<br>为什么是里面的RecycleView 获取到了事件，可以左右滑动，上下滑动的时候，为什么是外面的RecycleView获取到了事件，可以上下滑动？</p>
 <p>首先查看我们的RecycleView的继承关系，发现他是继承了ViewGroup的，事件的传递是从外层往里面传递的</p>
 <pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">RecyclerView</span> <span class="token keyword">extends</span> <span class="token class-name">ViewGroup</span> <span class="token keyword">implements</span> <span class="token class-name">ScrollingView</span><span class="token punctuation">,</span> NestedScrollingChild
 </code></pre>
@@ -1331,7 +1330,7 @@
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            View的事件传递的源码解析，也对一些疑问做了下解答
+                            
                         
                     </div>
                     <div class="publish-info">

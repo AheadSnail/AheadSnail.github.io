@@ -493,11 +493,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><blockquote>
-<p>Matrix SQLite Lint源码解析</p>
-</blockquote>
-<a id="more"></a>
-<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><blockquote>
+                <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><blockquote>
 <p>前面分析了Matrix 中 IO Canary 模块，了解了对应的检测原理实现，本文继续分析 SQLite Lint 模块,在分析这块内容的时候最好知道对于SQLite Lint的性能主要检测的内容有哪些,这个可以参考这篇文章<br><a href="https://mp.weixin.qq.com/s/laUgOmAcMiZIOfM2sWrQgw" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/laUgOmAcMiZIOfM2sWrQgw</a><br>文中介绍到他可以在我们开发，测试或者灰度阶段就可以发现隐藏的问题，既然要检测sql语句，那么就设计到了怎么收集App运行时的sql执行信息，包括执行语句、创建的表信息等。其中表相关信息可以通过 pragma 命令得到。对于执行语句，有两种情况<br>a）DB 框架提供了回调接口。比如微信使用的是 WCDB ，很容易就可以通过MMDataBase.setSQLiteTrace 注册回调拿到这些信息。<br>b）若使用 Android 默认的 DB 框架，SQLiteLint 提供了一种无侵入的获取到执行的sql语句及耗时等信息的方式。通过hook的技巧，向 SQLite3 C 层的   api sqlite3_profile 方法注册回调，<br>也能拿到分析所需的信息，从而无需开发者额外的打点统计代码。但是通过我阅读源码发现这个hook在7.0以上存在问题，源码的demo也并没有使用这种方式，而是通过一种通知的方式，也即是开发者将要检测的sql语句直接传递给SQLiteLint<br>对于检测的选项这里包括：<br>1.检测索引使用问题<br>2.检测冗余索引问题<br>3.检测 select * 问题<br>4.检测 Autoincrement 问题<br>5.检测建议使用 prepared statement<br>至于为什么要检测这些内容，具体可以查看上面的连接，文章中已经介绍的很清楚了，甚至包括了检测的标准</p>
 </blockquote>
 <h3 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h3><p>在SQLite Lint页面中包含了下面的检测<br><img src="/uploads/Matrix Trace分析/SqliteLint检测的条目.png" alt="结果显示"></p>
@@ -2919,9 +2915,7 @@ extern <span class="token string">"C"</span> <span class="token punctuation">{</
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概述
-Matrix Resource Cannary 源码解析
-
+                            
                         
                     </div>
                     <div class="publish-info">
@@ -2970,9 +2964,7 @@ Matrix Resource Cannary 源码解析
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概述
-Matrix IO Canary源码解析
-
+                            
                         
                     </div>
                     <div class="publish-info">

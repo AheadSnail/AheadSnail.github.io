@@ -497,11 +497,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><blockquote>
-<p>Aria2,transmission 速度统计原理以及Utp下载限速实现</p>
-</blockquote>
-<a id="more"></a>
-<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>前面一篇中介绍了Aria2 tcp下载，上传限速的原理，并且对utp的的限速也做了大概的分析，对应上传限速来说，本身是没有任何的区别，但对于utp的下载限速来说前面分析到按理来说是做不到真正意义上的限速，但是我观察发现transmission是可以实现utp的下载限速的，所以这篇文章会先去分析下transmission中utp限速的原理，以及Aria2中速度的计算，之后再将transmission中utp的限速原理，相应的修改到Aria2，实现真正意义上的utp限速</p>
+                <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>前面一篇中介绍了Aria2 tcp下载，上传限速的原理，并且对utp的的限速也做了大概的分析，对应上传限速来说，本身是没有任何的区别，但对于utp的下载限速来说前面分析到按理来说是做不到真正意义上的限速，但是我观察发现transmission是可以实现utp的下载限速的，所以这篇文章会先去分析下transmission中utp限速的原理，以及Aria2中速度的计算，之后再将transmission中utp的限速原理，相应的修改到Aria2，实现真正意义上的utp限速</p>
 <h3 id="transmission限速演示"><a href="#transmission限速演示" class="headerlink" title="transmission限速演示"></a>transmission限速演示</h3><p>首先要开启对应的限速配置，对应的就是<br><img src="/uploads/Utp下载限速/transmission限速配置.png" alt="结果显示"><br>上面是设置为允许限速，并且限速的大小为50k，结果显示为<br><img src="/uploads/Utp下载限速/transmission限速的结果.png" alt="结果显示"><br>可以看到transmission是可以做到下载限速的，而且是采用utp库来实现的，前面有说过，utp是模拟实现tcp，对于utp库使用者来说不用去管理类似的udp丢包，包的顺序等问题，具有tcp的滑动窗口，拥塞控制等而实现utp的下载限速就是要使用到滑动窗口这个特性，这个特性是告知对方我当前所能接收的容量，你不应该发送大于这个值的内容，想想也是，要想做到真正意义上的下载限速，只有控制发送方才能做到</p>
 <p>要想检测分析utp发送的内容，可以通过Wireshake检测到,至于要想看到utp的兼容的信息，可以这样配置 下载一个 utp.lua 放到wireshark/plugins/2.6/目录下把bt-utp的端口改回去，比方说0 然后就可以看了<br><img src="/uploads/Utp下载限速/检测utp滑动窗口.png" alt="结果显示"></p>
 <h3 id="transmission源码分析"><a href="#transmission源码分析" class="headerlink" title="transmission源码分析"></a>transmission源码分析</h3><p>首先要开启对应的限速配置，对应的就是<br><img src="/uploads/Utp下载限速/transmission限速配置.png" alt="结果显示"><br>之后解析这个配置<br><img src="/uploads/Utp下载限速/解析限速配置.png" alt="结果显示"><br>tr_sessionLimitSpeed函数实现<br><img src="/uploads/Utp下载限速/limitSpeed函数实现.png" alt="结果显示"><br>session中含有这俩个成员变量<br><img src="/uploads/Utp下载限速/session下载配置.png" alt="结果显示"><br>updateBandwidth函数实现<br><img src="/uploads/Utp下载限速/全局下载速度控制.png" alt="结果显示"><br>tr_bandwidth 结构体定义为<br><img src="/uploads/Utp下载限速/tr_bandwidth结构体定义.png" alt="结果显示"><br>要注意这里的bandwidth为session中的bandwidth成员变量,也即是这是一个全局的速度监控器对象，对于Bt下载来说，有三个速度监控器对象，一个是全局的速度监控器对象，也即是监测所有种子下载速度的所以相应的也有全局的下载限速，还有对于当个任务的速度监控对象，也即是对一个种子的速度监控，相应的也有当个任务的下载限速，最后一个是针对当前peer的速度监控，相应的也有对应的限速设置</p>
@@ -522,7 +518,7 @@
 <blockquote>
 <p><a href="http://aria2.github.io/manual/en/html/aria2c.html" target="_blank" rel="noopener">http://aria2.github.io/manual/en/html/aria2c.html</a></p>
 </blockquote>
-<h3 id="Aria2-下载速度统计源码分析"><a href="#Aria2-下载速度统计源码分析" class="headerlink" title="Aria2 下载速度统计源码分析"></a>Aria2 下载速度统计源码分析</h3><pre class=" language-C++"><code class="language-C++">
+<h3 id="Aria2-下载速度统计源码分析"><a href="#Aria2-下载速度统计源码分析" class="headerlink" title="Aria2 下载速度统计源码分析"></a>Aria2 下载速度统计源码分析</h3><pre class=" language-CPP"><code class="language-CPP">
 首先是开启对应的速度监控器
 //设置最大的下载速度, 由于utp采用的是udp的原因，如果做限速处理的化，无法达到tcp限速的效果，所以下载不支持限速
 gloableOptions.push_back(std::pair<std::string,std::string> ("max-download-limit","50k"));
@@ -783,7 +779,7 @@ int SpeedCalc::calculateSpeed()
 
 也即是求平均值的意思,这就是Aria2 判断是否超过了限制的实现，也即是Aria2 统计速度实现
 </code></pre>
-<h3 id="Aria2-Utp限速实现"><a href="#Aria2-Utp限速实现" class="headerlink" title="Aria2 Utp限速实现"></a>Aria2 Utp限速实现</h3><pre class=" language-C++"><code class="language-C++">我们可以参考transmission的做法，实现Utp的限速处理
+<h3 id="Aria2-Utp限速实现"><a href="#Aria2-Utp限速实现" class="headerlink" title="Aria2 Utp限速实现"></a>Aria2 Utp限速实现</h3><pre class=" language-CPP"><code class="language-CPP">我们可以参考transmission的做法，实现Utp的限速处理
 
 由于我们的限速针对是整个任务，不是单个peer，也不是全局的速度监控，为什么是整个任务，不是单个peer呢，如果限制了单个peer的化，如果此时有好些人连接上这个用户，也会把用户的带宽吃掉，如果设置到
 整个任务的化，就不会存在这个问题，所有连接上这个用户共享最大的限速值，这样才能保障带宽，所以我们将 bytesLeft 放到 RequestGroup ,并有三个对应的方法操作这个变量
@@ -986,7 +982,7 @@ void DownloadContext::updateDownload(size_t bytes)
 <p>utp_PBDrained函数实现,内部会调用send_ack<br><img src="/uploads/Utp下载限速/utp_PBDrained函数实现.png" alt="结果显示"></p>
 <p>utp_sendAck函数实现,这内部会获取到当前滑动窗口的大小，如果不这样处理的化，会导致滑动窗口的设置太慢，会出现问题<br><img src="/uploads/Utp下载限速/utp_sendAck函数实现.png" alt="结果显示"></p>
 <p>相应的我们可以在</p>
-<pre class=" language-C++"><code class="language-C++">bool PeerConnection::receiveMessage(unsigned char* data, size_t& dataLength)
+<pre class=" language-CPP"><code class="language-CPP">bool PeerConnection::receiveMessage(unsigned char* data, size_t& dataLength)
 {
     ...
     //缓冲区中有内容才要拷贝
@@ -1548,9 +1544,7 @@ void DownloadContext::updateDownload(size_t bytes)
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概述
-Aria2 添加 natpmp,upnp 协议支持
-
+                            
                         
                     </div>
                     <div class="publish-info">
@@ -1607,9 +1601,7 @@ Aria2 添加 natpmp,upnp 协议支持
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概述
-Aria2 限速原理以及Utp限速处理
-
+                            
                         
                     </div>
                     <div class="publish-info">

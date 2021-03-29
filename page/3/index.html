@@ -402,9 +402,10 @@
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                概述
-Aria2 限速原理以及Utp限速处理
+                                简介绝大多数的Bt下载都含有限速的功能，包括限制上传的速度，以及下载的速度，更有甚者拿限速来要求用户充值会员，比如百度网盘下载，迅雷等，
+为什么我们需要去限速
 
+因为我们使用Aria2下载只会在用户的下载过程中去贡献带宽，至于为什么只在下载
                             
                         </div>
                         <div class="publish-info">
@@ -455,9 +456,9 @@ Aria2 限速原理以及Utp限速处理
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                概述
-Aria2 RPC 实现机制
+                                简介RPC(Remote Procedure Call Protocol)–远程过程调用协议
 
+它是一种通过网络从远程计算机程序上请求服务，而不需要了解底层网络技术的协议。RPC协议假定某些传输协议的存在，如TCP或UDP，为通信程序之间携
                             
                         </div>
                         <div class="publish-info">
@@ -508,9 +509,8 @@ Aria2 RPC 实现机制
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                概述
-Aria2 打洞介绍以及对应的源码实现
-
+                                打洞需知
+ 我们前面辛辛苦苦移植了utp就是为了打洞，而打洞就会有成功或者失败，在做这个项目之前就有必要去调查下我们用户打洞可以成功的概率，而STUN就可以检测用户的网络类型，判断那些是不可以打洞那些是可以打洞成功  在了解STUN之前，我
                             
                         </div>
                         <div class="publish-info">
@@ -561,9 +561,8 @@ Aria2 打洞介绍以及对应的源码实现
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                概述
-Aria2 JNI代码的优化
-
+                                问题的引出
+ 前几天有一个需求是当Bt下载在一段时间之内当平均的下载速度小于某一个值的时候，要自动的切换成传统的Http下载，当然也要提供一个可以外部手动切换的功能，考虑到每一个下载任务都要做监听就会去考虑性能的问题，而且之前老大发现这个程
                             
                         </div>
                         <div class="publish-info">
@@ -614,9 +613,8 @@ Aria2 JNI代码的优化
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                概述
-Aria2 组播实现
-
+                                组播
+ 组播协议允许将一台主机发送的数据通过网络路由器和交换机复制到多个加入此组播的主机，是一种一对多的通讯方式。组播协议与现在广泛使用的单播协议的不同之处在于，一个主机用单播协议向n个主机发送相同的数据时，发送主机需要分别向n个主机发送，
                             
                         </div>
                         <div class="publish-info">
@@ -667,9 +665,10 @@ Aria2 组播实现
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                概述
- Aria2移植utp
+                                简介先来了解下打洞的基础知识:
+点对点穿透 需要实现的是对NAT的穿透。想实现NAT的穿透，当然要先了解NAT到底是什么，以及NAT是用来干什么的。
 
+NAT全称Network Address Translation，意思是网络地址转换，在
                             
                         </div>
                         <div class="publish-info">
@@ -720,9 +719,8 @@ Aria2 组播实现
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                概述
- Aria2源码分析
-
+                                简介
+之前文章分析过，怎么样使用Aria2，以及对应的编译，如果只是做为简单的使用的化，估计早就已经解决了问题，先说说使用这个项目的原由吧，就是公司想节省带宽，比如在下载游戏，下载视频等方面,所以可以使用p2p技术，而Aria2是p2p开源
                             
                         </div>
                         <div class="publish-info">

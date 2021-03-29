@@ -497,8 +497,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <p>View的事件传递的源码解析，也对一些疑问做了下解答<br><a id="more"></a></p>
-<h1 id="View的事件传递的源码解析"><a href="#View的事件传递的源码解析" class="headerlink" title="View的事件传递的源码解析"></a>View的事件传递的源码解析</h1><p>我们就从Activity的中的下面的来触发，方法都为public的，说明是给别人调用的，我们就从这里出发</p>
+                <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>View的事件传递的源码解析<br>我们就从Activity的中的下面的来触发，方法都为public的，说明是给别人调用的，我们就从这里出发</p>
 <pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">dispatchTouchEvent</span><span class="token punctuation">(</span>MotionEvent ev<span class="token punctuation">)</span> <span class="token punctuation">{</span>
     <span class="token keyword">if</span> <span class="token punctuation">(</span>ev<span class="token punctuation">.</span><span class="token function">getAction</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> MotionEvent<span class="token punctuation">.</span>ACTION_DOWN<span class="token punctuation">)</span> <span class="token punctuation">{</span>
         <span class="token function">onUserInteraction</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -1534,7 +1533,7 @@ ViewGroup中的实现为
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            RecycleView 嵌套使用的時候，RecycleView滑动冲突
+                            
                         
                     </div>
                     <div class="publish-info">

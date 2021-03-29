@@ -493,11 +493,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><blockquote>
-<p>Matrix IO Canary源码解析</p>
-</blockquote>
-<a id="more"></a>
-<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><blockquote>
+                <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><blockquote>
 <p>前面分析了Matrix 中 Trace Canary 模块，了解了对应的检测原理实现，本文继续分析 IO Canary 模块,在分析这块内容的时候最好知道对于IO的性能主要检测的内容有哪些，这个可以参考极客时间的Android 开发高手 张绍文大佬 写的  11 | I/O优化（下）：如何监控线上I/O操作，里面说到检测的方式采用Native的hook，没有采用java的hook，是因为无法监控到native代码，性能极差，甚至由于采用java hook 要对应的做兼容处理，所以相比之下采用native hook,监测文件的操作函数，比如open,read,write,close通过hook这些函数我们可以拿到对应的信息，比如hook open函数，我们可以拿到操作的文件名，fd，文件的原始大小等，hook read,write可以得到对应的读写次数，读写总大小，使用buffer大小，读写总耗时等，而对于要检测的内容包括下面几种<br>1.主线程的Io操作<br>2.读写Buff过小<br>3.重复读<br>4.资源泄漏</p>
 </blockquote>
 <h3 id="读写Buff过小检测的原因"><a href="#读写Buff过小检测的原因" class="headerlink" title="读写Buff过小检测的原因"></a>读写Buff过小检测的原因</h3><p>其他检测的点，估计大家都觉得理所当然，这里解释下为啥要检测Buff过小的原因,我们知道，对于文件系统是以block为单位读写，对于磁盘是以page 为单位读写，看起来即使我们在应用程序上面使用<br>很小的Buffer，在底层应该差别不大，那是不是这样呢？<br><img src="/uploads/Matrix Trace分析/Io文件Buff使用.png" alt="结果显示"><br>虽然后面俩次系统调用的时间的确会少一些，但是也会有一定的耗时，如果我们的Buffer太小，会导致多次无用的系统调用和内存拷贝，导致read/write的次数增多，从而影响性能，那多大的Buff Size<br>合适呢，一般为4KB,在实际应用中，ObjectOutputStream 就是一个很好的例子，ObjectOutputStream使用的buff size非常小，如果我们使用BufferInputStream或者ByteArrayOutputStream后整体的性能,会有非常明显的提升,下面是检测的结果<br><img src="/uploads/Matrix Trace分析/ObjectOutputSteam读写性能.png" alt="结果显示"><br>所以检测读写Buff过小是非常重要的</p>
@@ -2601,9 +2597,7 @@ mGuard<span class="token punctuation">.</span><span class="token function">warnI
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概述
-Matrix SQLite Lint源码解析
-
+                            
                         
                     </div>
                     <div class="publish-info">
@@ -2652,9 +2646,7 @@ Matrix SQLite Lint源码解析
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概述
-Matrix Trace Canary 源码分析
-
+                            
                         
                     </div>
                     <div class="publish-info">

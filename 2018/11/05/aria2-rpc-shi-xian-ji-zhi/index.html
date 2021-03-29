@@ -497,11 +497,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><blockquote>
-<p>Aria2 RPC 实现机制</p>
-</blockquote>
-<a id="more"></a>
-<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>RPC(Remote Procedure Call Protocol)–远程过程调用协议</p>
+                <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>RPC(Remote Procedure Call Protocol)–远程过程调用协议</p>
 <blockquote>
 <p>它是一种通过网络从远程计算机程序上请求服务，而不需要了解底层网络技术的协议。RPC协议假定某些传输协议的存在，如TCP或UDP，为通信程序之间携带信息数据。在OSI网络通信模型中，<br>RPC跨越了传输层和应用层。RPC使得开发包括网络分布式多程序在内的应用程序更加容易。</p>
 </blockquote>
@@ -527,14 +523,14 @@
 <p>Aria收到rpc的请求开始响应对应的内容<br><img src="/uploads/Aria2Rpc实现/Aria2收到rpc请求.png" alt="结果显示"></p>
 <p>至于我怎么知道rpc要发送的内容 可以查看官网 <a href="http://aria2.github.io/manual/en/html/aria2c.html" target="_blank" rel="noopener">http://aria2.github.io/manual/en/html/aria2c.html</a><br><img src="/uploads/Aria2Rpc实现/官网rpc支持的内容.png" alt="结果显示"></p>
 <p>当然这里包括了很多的rpc的请求，反正对于一个下载器来说，这些api是完全够用的，下面来分析下具体的源码实现</p>
-<h3 id="Rpc源码分析"><a href="#Rpc源码分析" class="headerlink" title="Rpc源码分析"></a>Rpc源码分析</h3><h4 id="首先要开启Rpc的支持"><a href="#首先要开启Rpc的支持" class="headerlink" title="首先要开启Rpc的支持"></a>首先要开启Rpc的支持</h4><pre class=" language-C++"><code class="language-C++">//设置允许rpc访问
+<h3 id="Rpc源码分析"><a href="#Rpc源码分析" class="headerlink" title="Rpc源码分析"></a>Rpc源码分析</h3><h4 id="首先要开启Rpc的支持"><a href="#首先要开启Rpc的支持" class="headerlink" title="首先要开启Rpc的支持"></a>首先要开启Rpc的支持</h4><pre class=" language-CPP"><code class="language-CPP">//设置允许rpc访问
 gloableOptions.push_back(std::pair<std::string,std::string> ("enable-rpc","true"));
 //设置rpc的监听端口
 gloableOptions.push_back(std::pair<std::string,std::string> ("rpc-listen-port","7800"));
 //设置监听所有，这样如果不是在同一个局域网的时候，可以通过对方的ip来连接
 gloableOptions.push_back(std::pair<std::string,std::string> ("rpc-listen-all","true"));
 </code></pre>
-<h4 id="创建Tcp-Socket监听端口"><a href="#创建Tcp-Socket监听端口" class="headerlink" title="创建Tcp Socket监听端口"></a>创建Tcp Socket监听端口</h4><pre class=" language-C++"><code class="language-C++">//构建对应的ipv4,ipv6
+<h4 id="创建Tcp-Socket监听端口"><a href="#创建Tcp-Socket监听端口" class="headerlink" title="创建Tcp Socket监听端口"></a>创建Tcp Socket监听端口</h4><pre class=" language-CPP"><code class="language-CPP">//构建对应的ipv4,ipv6
 static int families[] = {AF_INET, AF_INET6};
 size_t familiesLength = op->getAsBool(PREF_DISABLE_IPV6) ? 1 : 2;
 
@@ -613,14 +609,14 @@ bool HttpListenCommand::execute()
 }
 </code></pre>
 <h4 id="客户端发起一个请求"><a href="#客户端发起一个请求" class="headerlink" title="客户端发起一个请求"></a>客户端发起一个请求</h4><p>假设此时使用postMan发送了一个rpc的请求，请求的内容为</p>
-<pre class=" language-json"><code class="language-json"><span class="token punctuation">{</span>
- <span class="token property">"jsonrpc"</span><span class="token operator">:</span><span class="token string">"2.0"</span><span class="token punctuation">,</span>
- <span class="token property">"id"</span><span class="token operator">:</span><span class="token string">"ttrtrtrtrtrt"</span><span class="token punctuation">,</span>
- <span class="token property">"method"</span><span class="token operator">:</span><span class="token string">"aria2.addUri"</span><span class="token punctuation">,</span>
- <span class="token property">"params"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token string">"https://github.com/aria2/aria2/archive/release-1.33.0.zip"</span><span class="token punctuation">]</span><span class="token punctuation">]</span>
-<span class="token punctuation">}</span>
+<pre class=" language-JSON"><code class="language-JSON">{
+ "jsonrpc":"2.0",
+ "id":"ttrtrtrtrtrt",
+ "method":"aria2.addUri",
+ "params":[["https://github.com/aria2/aria2/archive/release-1.33.0.zip"]]
+}
 </code></pre>
-<h4 id="服务端响应请求"><a href="#服务端响应请求" class="headerlink" title="服务端响应请求"></a>服务端响应请求</h4><pre class=" language-C++"><code class="language-C++">也即是会执行到这里
+<h4 id="服务端响应请求"><a href="#服务端响应请求" class="headerlink" title="服务端响应请求"></a>服务端响应请求</h4><pre class=" language-CPP"><code class="language-CPP">也即是会执行到这里
 if (serverSocket_->isReadable(0)) {
     //利用tcp的Accept函数，返回当前连接的socketCore对象
     std::shared_ptr<SocketCore> socket(serverSocket_->acceptConnection());
@@ -1111,7 +1107,7 @@ bool AbstractHttpServerResponseCommand::execute()
 </code></pre>
 <p>上面的逻辑也是比较简单的，这样数据就发送出去了，这样另一端就收到了内容，这里是postman收到的内容为<br><img src="/uploads/Aria2Rpc实现/rpc收到的内容.png" alt="结果显示"></p>
 <h4 id="长连接的支持"><a href="#长连接的支持" class="headerlink" title="长连接的支持"></a>长连接的支持</h4><p>当数据发送完之后，会执行 afterSend(httpServer<em>, e</em>); 这个函数会由具体的子类来实现，比如当前是HttpServerResponseCommand，所以会执行对应的函数</p>
-<pre class=" language-C++"><code class="language-C++">void HttpServerResponseCommand::afterSend(const std::shared_ptr<HttpServer>& httpServer, DownloadEngine* e)
+<pre class=" language-CPP"><code class="language-CPP">void HttpServerResponseCommand::afterSend(const std::shared_ptr<HttpServer>& httpServer, DownloadEngine* e)
 {
   //判断是否支持长连接,如果支持长连接，这里会构建一个 HttpServerCommand 用于后面的通信
   if (httpServer->supportsPersistentConnection()) {
@@ -1650,9 +1646,7 @@ bool AbstractHttpServerResponseCommand::execute()
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概述
-Aria2 限速原理以及Utp限速处理
-
+                            
                         
                     </div>
                     <div class="publish-info">
@@ -1705,9 +1699,7 @@ Aria2 限速原理以及Utp限速处理
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概述
-Aria2 打洞介绍以及对应的源码实现
-
+                            
                         
                     </div>
                     <div class="publish-info">

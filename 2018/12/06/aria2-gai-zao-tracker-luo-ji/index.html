@@ -493,15 +493,11 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><blockquote>
-<p>Aria2 改造Tracker逻辑</p>
-</blockquote>
-<a id="more"></a>
-<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><blockquote>
+                <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><blockquote>
 <p>最近在使用Aria2的时候，发现了一个问题，Aira2中的Tracker 地址请求是独立的，也即不是并发的请求的，对于一个种子有多个Tracker 的时候，当第一个主机跟第一个Tracker 地址连接上之后，对于其他的Tracker 地址，Aria2不会进行连接了，如果第一个Tracker地址请求失败的时候，才会去连接第二个Tracker地址，以此类推那么就会出现这样的情况，比如：用户A连接上TrackerA的地址，用户B一开始连接不上Tracker A的地址，那么用户B连接Tracker B的地址，而且连接上了，此时用户A就无法知道用户B的存在，按理来说，对于同一个种子，应该要彼此知道对方的存在，才能更好的实现连接的效果，也即是Tracker 之间应该存在沟通,而相比Utorrent 就做的很好，下面是他的效果</p>
 </blockquote>
 <p>Utorrent Trakcer 实现的效果<br><img src="/uploads/Aria2Tracker改造/UtorrentTracker.png" alt="结果显示"><br>可以看到对于Utorrent 中的Tracker 是并发执行的，每一个Trakcer 都有自己的下一次刷新的时间，对于各过Tracker之间也是存在通信的，可以按照上面的做法去验证，幸运的是对于开源的Bt下载，还有linux 下面的Transmission，我们可以看看他们是怎么实现的</p>
-<h3 id="Transmission-Trakcer分析"><a href="#Transmission-Trakcer分析" class="headerlink" title="Transmission Trakcer分析"></a>Transmission Trakcer分析</h3><pre class=" language-C"><code class="language-C">//这个函数的执行是在libEvent线程执行的
+<h3 id="Transmission-Trakcer分析"><a href="#Transmission-Trakcer分析" class="headerlink" title="Transmission Trakcer分析"></a>Transmission Trakcer分析</h3><pre class=" language-CPP"><code class="language-CPP">//这个函数的执行是在libEvent线程执行的
 static void tr_sessionInitImpl(void * vdata) {
     tr_variant settings;
     ...    
@@ -1129,7 +1125,7 @@ static void torrentAddAnnounce(tr_torrent * tor, tr_announce_event e,
 <h3 id="Transmission-Trakcer总结"><a href="#Transmission-Trakcer总结" class="headerlink" title="Transmission Trakcer总结"></a>Transmission Trakcer总结</h3><blockquote>
 <p>首先是允许的Tracker并发数量最大为48，这是针对所有的种子的设置，如果当前正在运行的数量达到了这个最大值设置，后面要执行tracker请求的，要等待，并且有是一个定时器，当定时器触发的时候，会判断所有种子的各自对应的tracker是否应该执行，而判断是否应该执行，是通过当前Tracker中的事件队列是否不为空，当前Tracker 没有正在执行Tracker请求，事件触发的时间点要小于当前的时间，这些条件都满足的化，当前的这个tracker就允许执行，在种子初始化的时候，就会为当前种子的所有Tracker 都添加一个START的事件，所以，对于新的种子，第一次执行Tracker连接的时候，默认都会执行Tracker的连接这是并发执行的，Tracker执行连接的时候，会设置标识当前正在执行请求，对于请求失败的Tracker，比如超时，或者出现了异常，错误等，会再次的添加这个事件到事件队列中，只是这次事件的触发时间是未来的一个时间这个会根据当前Tracker的失败次数来决定的，失败次数越多，这个时间会越久,对于成功的请求，也会添加一个事件到事件队列中，这个时候Tracker触发的时间点取的是Tracker服务器返回的时间，当一个种子下载完成的时候每一个Tracker都会添加一个COMPLETE的事件，并且事件触发的时间点为当前的事件，如果当前tracker正好处于空闲的状态，那么这个COMPLETE的事件会立刻执行请求，如果当前tracker还处于请求中，那么要等待当前的事件处理完毕，才会发送这个COMPLETE事件，对于Transmission中的 Tracker 沟通，个人理解就是通过开始的时候，并发请求每一个Tracker，当种子下载完成的时候，又告知每一个Tracker，当前我已经下载完成了，这样所有的Tracker服务器都会知道我这个节点下载完成了，这样就可以做到 不同的Trakcer 服务器的用户也能知道哪里可以下载</p>
 </blockquote>
-<h3 id="Aria2-Trakcer分析"><a href="#Aria2-Trakcer分析" class="headerlink" title="Aria2 Trakcer分析"></a>Aria2 Trakcer分析</h3><pre class=" language-C++"><code class="language-C++">
+<h3 id="Aria2-Trakcer分析"><a href="#Aria2-Trakcer分析" class="headerlink" title="Aria2 Trakcer分析"></a>Aria2 Trakcer分析</h3><pre class=" language-CPP"><code class="language-CPP">
 Aria2 Tracker的逻辑都是由  TrackerWatcherCommand 来触发的,相比于 transmission，Aria2 的做法是每一个种子文件就一个对应的TrackerWatcherCommand对象，再分析这个command对象之前，
 先看一下DefaultBtAnnounce 这个对象，这个对象用于管理Tracker的请求，做到任何时刻都会只有一个请求正在执行，下面是他的初始化函数
 
@@ -1338,7 +1334,7 @@ void AnnounceList::resetIterator()
 <h3 id="Aria2-Trakcer总结"><a href="#Aria2-Trakcer总结" class="headerlink" title="Aria2 Trakcer总结"></a>Aria2 Trakcer总结</h3><blockquote>
 <p>根据上面的分析，大概可以知道Aria2 ，Tracker的逻辑，首先是同一时刻只能有一个Tracker请求正在执行，而且当一个Tracker请求成功之后，会重置currentTier<em>，currentTracker</em> 重新的指向头部，导致下次又触发Tracker执行的时候，还是请求他，导致后面的Tracker根本没有机会执行，对于当前请求失败的Trakcer，才会有机会执行下一个Tracker</p>
 </blockquote>
-<h3 id="Aria2-Trakcer-改造"><a href="#Aria2-Trakcer-改造" class="headerlink" title="Aria2 Trakcer 改造"></a>Aria2 Trakcer 改造</h3><pre class=" language-C++"><code class="language-C++">//首先是  AnnounceList 初始化,参数为当前种子下载 announce-list, list, 可选, 可选的tracker服务器地址
+<h3 id="Aria2-Trakcer-改造"><a href="#Aria2-Trakcer-改造" class="headerlink" title="Aria2 Trakcer 改造"></a>Aria2 Trakcer 改造</h3><pre class=" language-CPP"><code class="language-CPP">//首先是  AnnounceList 初始化,参数为当前种子下载 announce-list, list, 可选, 可选的tracker服务器地址
 AnnounceList::AnnounceList(const std::vector<std::vector<std::string>>& announceList)
 {
   //配置种子的tracker 列表

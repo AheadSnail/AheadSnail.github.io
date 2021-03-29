@@ -497,11 +497,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><blockquote>
-<p>Aria2 打洞介绍以及对应的源码实现</p>
-</blockquote>
-<a id="more"></a>
-<h3 id="打洞需知"><a href="#打洞需知" class="headerlink" title="打洞需知"></a>打洞需知</h3><blockquote>
+                <h3 id="打洞需知"><a href="#打洞需知" class="headerlink" title="打洞需知"></a>打洞需知</h3><blockquote>
 <p> 我们前面辛辛苦苦移植了utp就是为了打洞，而打洞就会有成功或者失败，在做这个项目之前就有必要去调查下我们用户打洞可以成功的概率，而STUN就可以检测用户的网络类型，判断那些是不可以打洞那些是可以打洞成功  在了解STUN之前，我们需要了解NAT的种类。</p>
 </blockquote>
 <p>NAT对待UDP的实现方式有4种，分别如下：<br><code>Full Cone NAT</code></p>
@@ -533,7 +529,7 @@
 <h3 id="Aria2打洞的实现"><a href="#Aria2打洞的实现" class="headerlink" title="Aria2打洞的实现"></a>Aria2打洞的实现</h3><blockquote>
 <p> 由于打洞<strong>首先</strong>要有一个服务器，这个服务器主要是用来告知对方的公网的ip和端口号，而我们的tracker服务器做的就是这个工作，tracker服务器会每隔一段时间返回当前已经连接上服务器的所用用户对应的外网ip和端口号<br><strong>第二</strong>打洞要使用udp，而我们移植的utp就是udp的实现，只是在udp的基础上添加了类似于tcp的逻辑，比如丢包重发，拥塞控制，滑动窗口等，使我们使用起来不用管理这些细节<br><strong>第三</strong>打洞要同时发起连接，由于很难做到同时，所以对应的应该要有一个重试的机制 虽然utp连接就是一个重试的过程，默认是20秒超时，但是为了可以控制，在移植utp的时候，我也增加了utp的重试机制,具体前面有介绍，最后就是同时连接了,这里我们就要针对原先的从tracker服务器返回peer列表的时候增加一点操作了，当收到tracker服务器返回的peer列表就直接执行连接操作,这里我们在保证原有的逻辑不改变的情况下，增加了一个临时的队列，存储了peer下次应该连接的时候，当时间到的时候，这个peer就应该执行连接操作，所以这里要算出对应的主机下一次触发连接的时间下面是大概的思路<br>满足下次peer触发tracker时间 &gt;= 当前系统时间)的元素：为他们新建队列，按照(下次peer触发tracker时间)进行排序，当元素满足（下次peer触发tracker时间 &lt;= 当前系统时间）时，进行addPeer相应的tracker服务端应该记录下每一个用户连接tracker的开始时间，下面是对应的代码实现</p>
 </blockquote>
-<pre class=" language-C++"><code class="language-C++">//从tracker服务器获取到peer之后，统一调用这个方法添加peer，内部完成对应的addPeer逻辑
+<pre class=" language-CPP"><code class="language-CPP">//从tracker服务器获取到peer之后，统一调用这个方法添加peer，内部完成对应的addPeer逻辑
 void DefaultPeerStorage::addPeerList(std::vector<std::shared_ptr<PeerNodeInfo>>& nodeInfos,std::chrono::seconds interval)
 {
     //当下次tracker再次返回peer的时候，应该要清除这个缓冲的集合，因为按理来说，应该在下次tracker触发的时候，应该要把所有的peer执行连接操作
@@ -1131,9 +1127,7 @@ addPeer(std::make_shared<Peer>(nodeInfo->getIpAddr(),nodeInfo->getPort()));
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概述
-Aria2 RPC 实现机制
-
+                            
                         
                     </div>
                     <div class="publish-info">
@@ -1186,9 +1180,7 @@ Aria2 RPC 实现机制
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概述
-Aria2 JNI代码的优化
-
+                            
                         
                     </div>
                     <div class="publish-info">

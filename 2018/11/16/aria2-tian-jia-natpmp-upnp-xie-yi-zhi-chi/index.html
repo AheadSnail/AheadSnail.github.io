@@ -501,11 +501,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><blockquote>
-<p>Aria2 添加 natpmp,upnp 协议支持</p>
-</blockquote>
-<a id="more"></a>
-<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>什么是UPnp</p>
+                <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>什么是UPnp</p>
 <blockquote>
 <p>所谓 UPnP ，就是“通用的即插即用” ，注意是通用的，虽然很容易和 Windows 的即插即用混淆，但这肯定不是微软的专利！现在大部分的路由器都支持这个功能，只是默认情况下没有打开而已(基于安全考虑)。请管理员手动打开这个支持选项。</p>
 </blockquote>
@@ -537,7 +533,7 @@
 <p>查看路由器，映射的结果为,可以看到这里既有tcp，也有udp<br><img src="/uploads/upnp协议支持/transmission端口隐射的结果.png" alt="结果显示"></p>
 <p>参数选项解析<br><img src="/uploads/upnp协议支持/参数选项解析.png" alt="结果显示"></p>
 <p>tr_sessionSetPortForwardingEnabled函数实现<br><img src="/uploads/upnp协议支持/SetPortForwardEnabled函数实现.png" alt="结果显示"></p>
-<pre class=" language-C++"><code class="language-C++">这里的shared是在前面初始化session的时候就执行了初始化，下面是调用的过程
+<pre class=" language-CPP"><code class="language-CPP">这里的shared是在前面初始化session的时候就执行了初始化，下面是调用的过程
 
 //构建一个tr_shared 对象，赋值默认的成员变量,赋值给session中的shared,这个shared成员保存了upnp,pmp对应的对象
 session->shared = tr_sharedInit(session);
@@ -947,7 +943,7 @@ static void set_evtimer_from_status(tr_shared * s) {
     }
 }
 </code></pre>
-<h3 id="Aria2-移植upnp-pmp"><a href="#Aria2-移植upnp-pmp" class="headerlink" title="Aria2 移植upnp,pmp"></a>Aria2 移植upnp,pmp</h3><pre class=" language-Cmake"><code class="language-Cmake">首先我们需要将这俩个库引进来，对应的CmakeList中添加要编译的内容
+<h3 id="Aria2-移植upnp-pmp"><a href="#Aria2-移植upnp-pmp" class="headerlink" title="Aria2 移植upnp,pmp"></a>Aria2 移植upnp,pmp</h3><pre class=" language-CPP"><code class="language-CPP">首先我们需要将这俩个库引进来，对应的CmakeList中添加要编译的内容
 
 #添加头文件的查找目录
 include_directories(${CMAKE_SOURCE_DIR}/src/main/cpp/src/includes
@@ -999,7 +995,7 @@ add_library( # Sets the name of the library.
             )
 </code></pre>
 <p>CmakeList目录结构<br><img src="/uploads/upnp协议支持/CmakeList目录结构.png" alt="结果显示"><br>transmission中代码为C风格，这里要改成C++11的方式  ，接下来就是对应的移植了</p>
-<pre class=" language-C++"><code class="language-C++">首先 我们也要搞一个开关配置，具体怎么添加，可以参照源码原本的添加过程
+<pre class=" language-CPP"><code class="language-CPP">首先 我们也要搞一个开关配置，具体怎么添加，可以参照源码原本的添加过程
 //设置允许端口隐射
 gloableOptions.push_back(std::pair<std::string,std::string> ("bt-enable-port-forward","true"));
 
@@ -1217,7 +1213,7 @@ if(e->getOption()->getAsBool(PREF_ENABLE_PORT_FORWARD))
 <h3 id="Aria2-释放操作"><a href="#Aria2-释放操作" class="headerlink" title="Aria2 释放操作"></a>Aria2 释放操作</h3><blockquote>
 <p>由于我们采用的是智能指针，所以不用关心对象的销毁动作，比如 BtPortForward ，我们把他保存到了 BtRegistery中，这样当BtRegistery销毁的时候，这个BtPortForward的引用才会变成0,进而完成它的销毁操作,又因为  BtPortForward 中以智能指针的方式持有 BtUpnp,BtNatpmp 的引用，所以对应 BtUpnp,BtNatpmp 只要以智能指针的方式初始化，之后设置到这个对象中，对应这俩个对象也不用管理销毁的操作</p>
 </blockquote>
-<pre class=" language-C++"><code class="language-C++">//对应的 upnp的协议的 对象指针
+<pre class=" language-CPP"><code class="language-CPP">//对应的 upnp的协议的 对象指针
 std::shared_ptr<BtUpnp> _upnp;
 //对应的 pmp 协议的 对象指针
 std::shared_ptr<BtNatpmp> _natpmp;
@@ -1852,9 +1848,7 @@ scrcpy 使用以及编译
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概述
-Aria2,transmission 速度统计原理以及Utp下载限速实现
-
+                            
                         
                     </div>
                     <div class="publish-info">

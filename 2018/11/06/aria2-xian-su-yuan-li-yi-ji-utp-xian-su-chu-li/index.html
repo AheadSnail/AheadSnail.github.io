@@ -497,11 +497,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><blockquote>
-<p>Aria2 限速原理以及Utp限速处理</p>
-</blockquote>
-<a id="more"></a>
-<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>绝大多数的Bt下载都含有限速的功能，包括限制上传的速度，以及下载的速度，更有甚者拿限速来要求用户充值会员，比如百度网盘下载，迅雷等，</p>
+                <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>绝大多数的Bt下载都含有限速的功能，包括限制上传的速度，以及下载的速度，更有甚者拿限速来要求用户充值会员，比如百度网盘下载，迅雷等，</p>
 <p>为什么我们需要去限速</p>
 <blockquote>
 <p>因为我们使用Aria2下载只会在用户的下载过程中去贡献带宽，至于为什么只在下载过程中贡献带宽,考虑到了俩点一点是目前手机在下载完安装包之后，都会提示用户删掉安装包， 其次 如果用户下载完了，还在后台一直的做种，或多或少的导致耗电量的增加等，所以只考虑在下载过程中贡献带宽，所以就有必要去调整对应的下载速度，以及上传的速度，使他在下载的时候长一点，进而 增加贡献带宽的概率还有一点就是如果我们不限制下载速度的化，那么会导致某些网速很快的用户直接把我们的带宽吃掉，导致其他的用户下载变慢，所以要做一个<code>平衡</code>做到大家的下载速度都不会相差太远</p>
@@ -513,12 +509,12 @@
 </blockquote>
 <p>下载限速参数设置<br><img src="/uploads/Aria2Rpc实现/Aria2限速支持.png" alt="结果显示"></p>
 <p>相应的上传速度的参数设置<br><img src="/uploads/Aria2Rpc实现/Aria2上传限速支持.png" alt="结果显示"></p>
-<h3 id="限速处理源码分析"><a href="#限速处理源码分析" class="headerlink" title="限速处理源码分析"></a>限速处理源码分析</h3><h4 id="首先要开启限速的支持"><a href="#首先要开启限速的支持" class="headerlink" title="首先要开启限速的支持"></a>首先要开启限速的支持</h4><pre class=" language-C++"><code class="language-C++">//设置最大的下载速度, 由于utp采用的是udp的原因，如果做限速处理的化，无法达到tcp限速的效果，所以下载不支持限速
+<h3 id="限速处理源码分析"><a href="#限速处理源码分析" class="headerlink" title="限速处理源码分析"></a>限速处理源码分析</h3><h4 id="首先要开启限速的支持"><a href="#首先要开启限速的支持" class="headerlink" title="首先要开启限速的支持"></a>首先要开启限速的支持</h4><pre class=" language-CPP"><code class="language-CPP">//设置最大的下载速度, 由于utp采用的是udp的原因，如果做限速处理的化，无法达到tcp限速的效果，所以下载不支持限速
 gloableOptions.push_back(std::pair<std::string,std::string> ("max-download-limit","50k"));
 //设置最大的上传速度
 gloableOptions.push_back(std::pair<std::string,std::string> ("max-upload-limit","100k"));
 </code></pre>
-<h4 id="参数的解析使用"><a href="#参数的解析使用" class="headerlink" title="参数的解析使用"></a>参数的解析使用</h4><pre class=" language-C++"><code class="language-C++">
+<h4 id="参数的解析使用"><a href="#参数的解析使用" class="headerlink" title="参数的解析使用"></a>参数的解析使用</h4><pre class=" language-CPP"><code class="language-CPP">
 首先会在创建对应的RequestGroup 中解析，然后设置maxDownloadSpeedLimit_ ，maxUploadSpeedLimit_ 保存值
 
 //创建请求组的构造函数,传递的参数一个为当前请求gid，一个为当前请求组的选项
@@ -565,7 +561,7 @@ bool RequestGroup::doesUploadSpeedExceed()
 }
 </code></pre>
 <h4 id="下载速度限制"><a href="#下载速度限制" class="headerlink" title="下载速度限制"></a>下载速度限制</h4><p>具体的使用doesDownloadSpeedExceed只有俩个地方，而且都只作用在Bt下载请求内容的时候,先来看第一处PeerInteractionCommand ,他的父类为 PeerAbstractCommand,主要完成超时的处理</p>
-<pre class=" language-C++"><code class="language-C++">//command 命令的执行
+<pre class=" language-CPP"><code class="language-CPP">//command 命令的执行
 bool PeerInteractionCommand::executeInternal()
 {
     ...
@@ -642,7 +638,7 @@ size_t DefaultBtInteractive::receiveMessages()
 <p>真正的接收消息的地方是在 btMessageReceiver_-&gt;receiveMessage(); 这里就不看具体的细节了， 可以看到上面的逻辑在接受消息之前会判断当前的是否超过了设置的下载速度，如果超过了就直接break掉所以当前本应该要接收的消息就没有立刻的接受了，而是等到了下次的接收，这里要注意这里并没有抛弃掉当前应该要接收的内容，而是根本就没有去接收，下次等到条件满足了再去接收数据，这样做是可以的主要是因为tcp的特性，tcp是一个<code>长连接</code>，所以可以做到这点</p>
 </blockquote>
 <h4 id="上传速度限制"><a href="#上传速度限制" class="headerlink" title="上传速度限制"></a>上传速度限制</h4><p>对应上传速度的使用，只有在DefaultBtMessageDispatcher 有做对应的处理</p>
-<pre class=" language-C++"><code class="language-C++">void DefaultBtMessageDispatcher::sendMessagesInternal()
+<pre class=" language-CPP"><code class="language-CPP">void DefaultBtMessageDispatcher::sendMessagesInternal()
 {
   auto tempQueue = std::vector<std::unique_ptr<BtMessage>>{};
   //从messsageQueue中移除先前添加进去的消息
@@ -1418,9 +1414,7 @@ void DefaultBtMessageDispatcher::sendMessagesInternal()
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概述
-Aria2,transmission 速度统计原理以及Utp下载限速实现
-
+                            
                         
                     </div>
                     <div class="publish-info">
@@ -1473,9 +1467,7 @@ Aria2,transmission 速度统计原理以及Utp下载限速实现
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概述
-Aria2 RPC 实现机制
-
+                            
                         
                     </div>
                     <div class="publish-info">

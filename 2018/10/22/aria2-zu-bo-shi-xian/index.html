@@ -497,11 +497,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><blockquote>
-<p>Aria2 组播实现</p>
-</blockquote>
-<a id="more"></a>
-<h3 id="组播"><a href="#组播" class="headerlink" title="组播"></a>组播</h3><blockquote>
+                <h3 id="组播"><a href="#组播" class="headerlink" title="组播"></a>组播</h3><blockquote>
 <p> 组播协议允许将一台主机发送的数据通过网络路由器和交换机复制到多个加入此组播的主机，是一种一对多的通讯方式。组播协议与现在广泛使用的单播协议的不同之处在于，一个主机用单播协议向n个主机发送相同的数据时，发送主机需要分别向n个主机发送，共发送n次。一个主机用组播协议向n个主机发送相同的数据时，只要发送1次，其数据由网络中的路由器和交换机逐级进行复制并发送给各个接收方，这样既节省服务器资源也节省网络主干的带宽资源。与广播协议相比，只有组播接收方向路由器发出请求后，网络路由器才复制一份数据给接收方，从而节省接收方的带宽。而广播方式无论接收方是否需要，网络设备都将所有广播信息向所有设备发送，从而大量占据接收方的接入带宽。</p>
 </blockquote>
 <p>大概的工作方式类似于</p>
@@ -517,7 +513,7 @@
 <p><img src="/uploads/Aria2Utp/Bt组播协议.png" alt="结果显示"></p>
 <p>可以看出Bt本地发现协议发送的内容中有俩个比较重要的字段，一个是hash值，代表当前种子文件的hash值，可以根据这个hash值判断是否是自己需要的 port: 对方bt 监听的端口号，得到了这个端口号，就可以直接的跟对方通信了</p>
 <h3 id="源码实现"><a href="#源码实现" class="headerlink" title="源码实现"></a>源码实现</h3><p>首先要开启这个选项，默认是关闭的，如果要打开，可以动态的设置这个选项 gloableOptions.push_back(std::pair<std::string,std::string> (“bt-enable-lpd”,”true”));</std::string,std::string></p>
-<pre class=" language-C++"><code class="language-C++">//设置是否本地发现,如果设置为tru的化，就可以在同一个局域网下载，默认是关闭的,还有不能为私有的种子
+<pre class=" language-CPP"><code class="language-CPP">//设置是否本地发现,如果设置为tru的化，就可以在同一个局域网下载，默认是关闭的,还有不能为私有的种子
 if (option->getAsBool(PREF_BT_ENABLE_LPD) && btReg->getTcpPort() && (metadataGetMode || !torrentAttrs->privateTorrent)) {
     //如果还没有构建，进行初始化,这里要注意的是对应LpdMessageReciver的对象是全局的，是单例的存在，他作用于所有的种子
     if (!btReg->getLpdMessageReceiver()) {
@@ -558,7 +554,7 @@ if (option->getAsBool(PREF_BT_ENABLE_LPD) && btReg->getTcpPort() && (metadataGet
 }
 </code></pre>
 <p>上面的逻辑就是，判断是否支持本地发现，如果支持，当前还没有进行初始化的化，执行对应的初始化，会构建LpdMessageReceiver ，用于接受所有种子文件对应的本地发现消息</p>
-<pre class=" language-C++"><code class="language-C++">auto receiver = std::make_shared<LpdMessageReceiver>(LPD_MULTICAST_ADDR, LPD_MULTICAST_PORT);
+<pre class=" language-CPP"><code class="language-CPP">auto receiver = std::make_shared<LpdMessageReceiver>(LPD_MULTICAST_ADDR, LPD_MULTICAST_PORT);
 constexpr const char LPD_MULTICAST_ADDR[] = "239.192.152.143";
 constexpr uint16_t LPD_MULTICAST_PORT = 6771;
 也就刚好对应bt协议中组播的ip和端口号的设置
@@ -591,7 +587,7 @@ bool LpdMessageReceiver::init(const std::string& localAddr)
 }
 </code></pre>
 <p>当前主机加入组播</p>
-<pre class=" language-C++"><code class="language-C++">void SocketCore::joinMulticastGroup(const std::string& multicastAddr, uint16_t multicastPort, const std::string& localAddr)
+<pre class=" language-CPP"><code class="language-CPP">void SocketCore::joinMulticastGroup(const std::string& multicastAddr, uint16_t multicastPort, const std::string& localAddr)
 {
   //将  multicastAddr 转成 in_addr
   in_addr multiAddr;
@@ -632,7 +628,7 @@ else{
 }
 </code></pre>
 <p>如果初始化完成，则将LpdMessageReciever对象保存到BtRegister中，这个对象是唯一的,前面有介绍,之后构建LpdReceiveMessageCommand 对象，这个command 是用来接受Lpd的消息的，这个对象也是<br>作用于所有的种子，并且这个对象会一直处于运行中，也即是一直处于接受lpd的消息</p>
-<pre class=" language-C++"><code class="language-C++">bool LpdReceiveMessageCommand::execute()
+<pre class=" language-CPP"><code class="language-CPP">bool LpdReceiveMessageCommand::execute()
 {
   //只有引擎退出的时候，这个对象才会被销毁
   if (e_->getRequestGroupMan()->downloadFinished() || e_->isHaltRequested()) {
@@ -673,7 +669,7 @@ if (btReg->getLpdMessageReceiver()) {
 }
 </code></pre>
 <p>首先获取到当前种子对应的hash值，然后获取到对应的bt端口号，由于这里我做了utp的支持，所以相应的这个端口号也要设置成udp监听的那个端口号</p>
-<pre class=" language-C++"><code class="language-C++">//构建当前种子对应的LpdMessageDispatcher 对象  这里应该要修改，因为  btReg->getTcpPort()  代表当前服务端监听的tcp端口号，如果是utp实现的化，这里要换成我们的udp端口号
+<pre class=" language-CPP"><code class="language-CPP">//构建当前种子对应的LpdMessageDispatcher 对象  这里应该要修改，因为  btReg->getTcpPort()  代表当前服务端监听的tcp端口号，如果是utp实现的化，这里要换成我们的udp端口号
 auto dispatcher = std::make_shared<LpdMessageDispatcher>(std::string(&infoHash[0], &infoHash[INFO_HASH_LENGTH]), port, LPD_MULTICAST_ADDR, LPD_MULTICAST_PORT);
 constexpr const char LPD_MULTICAST_ADDR[] = "239.192.152.143";
 constexpr uint16_t LPD_MULTICAST_PORT = 6771;
@@ -707,7 +703,7 @@ bool LpdMessageDispatcher::init(const std::string& localAddr, unsigned char ttl,
 }
 </code></pre>
 <p>首先构建一个udp的soketCore，然后加入这个组播,然后针对当前的这个种子文件，构建一个LpdDispatchMessageCommand 消息对象<br>//初始化成功，构建  LpdDispatchMessageCommand 对象，然后添加到engine中 这也是对应的每一个种子文件对应的一个对象<br>auto cmd = make_unique<lpddispatchmessagecommand>(e-&gt;newCUID(), dispatcher, e);<br>这个对象主要用来针对当前的种子文件，发送对应的组播消息，组播协议中每5分钟就要发送对应消息，这样其他刚加入的主机才有机会收到这个消息，当然也不能发送的太频繁，会引起阻塞,检验是5分钟</lpddispatchmessagecommand></p>
-<pre class=" language-C++"><code class="language-C++">//command命令的执行
+<pre class=" language-CPP"><code class="language-CPP">//command命令的执行
 bool LpdDispatchMessageCommand::execute()
 {
   //如果当前的种子是退出状态，返回true，回收这个对象，注意这里不是引擎退出，而是当前的种子
@@ -754,7 +750,7 @@ bool LpdMessageDispatcher::isAnnounceReady() const
 }
 </code></pre>
 <p>上面的逻辑就是判断是否有必要再次发送lpd消息，当时间间隔到达了5分钟就发送一个lpd消息，就会触发  dispatcher_-&gt;sendMessage()</p>
-<pre class=" language-C++"><code class="language-C++">//发送消息 ，将创建的LPD消息发送到 组指定的  multicastAddress_   multicastPort_ 上 这样在这个组的其他主机就可以接收到消息了
+<pre class=" language-CPP"><code class="language-CPP">//发送消息 ，将创建的LPD消息发送到 组指定的  multicastAddress_   multicastPort_ 上 这样在这个组的其他主机就可以接收到消息了
 bool LpdMessageDispatcher::sendMessage()
 {
   return socket_->writeData(request_.c_str(), request_.size(), multicastAddress_, multicastPort_) == (ssize_t)request_.size();
@@ -785,7 +781,7 @@ std::string createLpdRequest(const std::string& multicastAddress, uint16_t multi
 }
 </code></pre>
 <p>这样当前种子的lpd消息就发送出去了，可以看出来协议的内容跟bt协议的一样,携带了当前种子对应的hash值，已经本地监听的端口号,所以如果要支持utp的化，我们只要改这个值为我们udp监听的端口号就好<br>对于本地发现消息的接受端，就是前面介绍的LpdReceiveMessageCommand 来统一的接受所有的本地发现的消息,</p>
-<pre class=" language-C++"><code class="language-C++">bool LpdReceiveMessageCommand::execute()
+<pre class=" language-CPP"><code class="language-CPP">bool LpdReceiveMessageCommand::execute()
 {
   //只有引擎退出的时候，这个对象才会被销毁
   if (e_->getRequestGroupMan()->downloadFinished() || e_->isHaltRequested()) {
@@ -1468,9 +1464,7 @@ else {
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概述
-Aria2 JNI代码的优化
-
+                            
                         
                     </div>
                     <div class="publish-info">
@@ -1523,9 +1517,7 @@ Aria2 JNI代码的优化
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概述
- Aria2移植utp
-
+                            
                         
                     </div>
                     <div class="publish-info">
