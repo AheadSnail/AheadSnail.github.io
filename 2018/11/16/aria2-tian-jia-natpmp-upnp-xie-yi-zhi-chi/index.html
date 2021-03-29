@@ -501,7 +501,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>什么是UPnp</p>
+                <p>什么是UPnp</p>
 <blockquote>
 <p>所谓 UPnP ，就是“通用的即插即用” ，注意是通用的，虽然很容易和 Windows 的即插即用混淆，但这肯定不是微软的专利！现在大部分的路由器都支持这个功能，只是默认情况下没有打开而已(基于安全考虑)。请管理员手动打开这个支持选项。</p>
 </blockquote>
@@ -533,737 +533,737 @@
 <p>查看路由器，映射的结果为,可以看到这里既有tcp，也有udp<br><img src="/uploads/upnp协议支持/transmission端口隐射的结果.png" alt="结果显示"></p>
 <p>参数选项解析<br><img src="/uploads/upnp协议支持/参数选项解析.png" alt="结果显示"></p>
 <p>tr_sessionSetPortForwardingEnabled函数实现<br><img src="/uploads/upnp协议支持/SetPortForwardEnabled函数实现.png" alt="结果显示"></p>
-<pre class=" language-CPP"><code class="language-CPP">这里的shared是在前面初始化session的时候就执行了初始化，下面是调用的过程
+<pre class=" language-cpp"><code class="language-cpp">这里的shared是在前面初始化session的时候就执行了初始化，下面是调用的过程
 
-//构建一个tr_shared 对象，赋值默认的成员变量,赋值给session中的shared,这个shared成员保存了upnp,pmp对应的对象
-session->shared = tr_sharedInit(session);
+<span class="token comment" spellcheck="true">//构建一个tr_shared 对象，赋值默认的成员变量,赋值给session中的shared,这个shared成员保存了upnp,pmp对应的对象</span>
+session<span class="token operator">-</span><span class="token operator">></span>shared <span class="token operator">=</span> <span class="token function">tr_sharedInit</span><span class="token punctuation">(</span>session<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-/***
+<span class="token comment" spellcheck="true">/***
  **** 分配 tr_shared 内存空间，赋初值
- ***/
-tr_shared *
-tr_sharedInit(tr_session * session) {
-    //分配一块内存空间tr_shared
-    tr_shared * s = tr_new0(tr_shared, 1);
-    //赋初值
-    s->session = session;
-    //默认是不允许的
-    s->isEnabled = false;
-    //开始的状态为 TR_PORT_UNMAPPED 为没有 mapped
-    s->upnpStatus = TR_PORT_UNMAPPED;
-    s->natpmpStatus = TR_PORT_UNMAPPED;
-    ..
-    return s;
-}
+ ***/</span>
+tr_shared <span class="token operator">*</span>
+<span class="token function">tr_sharedInit</span><span class="token punctuation">(</span>tr_session <span class="token operator">*</span> session<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//分配一块内存空间tr_shared</span>
+    tr_shared <span class="token operator">*</span> s <span class="token operator">=</span> <span class="token function">tr_new0</span><span class="token punctuation">(</span>tr_shared<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//赋初值</span>
+    s<span class="token operator">-</span><span class="token operator">></span>session <span class="token operator">=</span> session<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//默认是不允许的</span>
+    s<span class="token operator">-</span><span class="token operator">></span>isEnabled <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//开始的状态为 TR_PORT_UNMAPPED 为没有 mapped</span>
+    s<span class="token operator">-</span><span class="token operator">></span>upnpStatus <span class="token operator">=</span> TR_PORT_UNMAPPED<span class="token punctuation">;</span>
+    s<span class="token operator">-</span><span class="token operator">></span>natpmpStatus <span class="token operator">=</span> TR_PORT_UNMAPPED<span class="token punctuation">;</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token keyword">return</span> s<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
 而tr_shared 结构体定义为
 
-//保存了端口隐射的状态跟对象
-struct tr_shared {
-    //是否可以用
-    bool isEnabled;
-    //标识是否正在关闭
-    bool isShuttingDown;
-    //标识是否要做端口检查
-    bool doPortCheck;
+<span class="token comment" spellcheck="true">//保存了端口隐射的状态跟对象</span>
+<span class="token keyword">struct</span> tr_shared <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//是否可以用</span>
+    <span class="token keyword">bool</span> isEnabled<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//标识是否正在关闭</span>
+    <span class="token keyword">bool</span> isShuttingDown<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//标识是否要做端口检查</span>
+    <span class="token keyword">bool</span> doPortCheck<span class="token punctuation">;</span>
 
-    // 对应的 pmp 协议状态
-    tr_port_forwarding natpmpStatus;
-    // 对应的 upnc 协议状态
-    tr_port_forwarding upnpStatus;
+    <span class="token comment" spellcheck="true">// 对应的 pmp 协议状态</span>
+    tr_port_forwarding natpmpStatus<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">// 对应的 upnc 协议状态</span>
+    tr_port_forwarding upnpStatus<span class="token punctuation">;</span>
 
-    //对应的 upnp的协议的 对象指针
-    tr_upnp * upnp;
-    //对应的 pmp 协议的 对象指针
-    tr_natpmp * natpmp;
-    //session引用
-    tr_session * session;
-    //定时器对象
-    struct event * timer;
-};
+    <span class="token comment" spellcheck="true">//对应的 upnp的协议的 对象指针</span>
+    tr_upnp <span class="token operator">*</span> upnp<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//对应的 pmp 协议的 对象指针</span>
+    tr_natpmp <span class="token operator">*</span> natpmp<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//session引用</span>
+    tr_session <span class="token operator">*</span> session<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//定时器对象</span>
+    <span class="token keyword">struct</span> event <span class="token operator">*</span> timer<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
 
 继续回到这个函数
-//设置port Forward 是否允许 设置是否允许内网端口隐射
-void tr_sessionSetPortForwardingEnabled(tr_session * session, bool enabled) {
-    struct port_forwarding_data * d;
-    //构建一个port_forwarding_data 对象 分配内存空间
-    d = tr_new0(struct port_forwarding_data, 1);
-    //完成赋值操作 ，
-    d->shared = session->shared;
-    //默认初始的时候为false
-    d->enabled = enabled;
-    //切换到libEvent线程执行 回调函数setPortForwardingEnabled,这里的d为传递的参数
-    tr_runInEventThread(session, setPortForwardingEnabled, d);
-}
+<span class="token comment" spellcheck="true">//设置port Forward 是否允许 设置是否允许内网端口隐射</span>
+<span class="token keyword">void</span> <span class="token function">tr_sessionSetPortForwardingEnabled</span><span class="token punctuation">(</span>tr_session <span class="token operator">*</span> session<span class="token punctuation">,</span> <span class="token keyword">bool</span> enabled<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">struct</span> port_forwarding_data <span class="token operator">*</span> d<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//构建一个port_forwarding_data 对象 分配内存空间</span>
+    d <span class="token operator">=</span> <span class="token function">tr_new0</span><span class="token punctuation">(</span><span class="token keyword">struct</span> port_forwarding_data<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//完成赋值操作 ，</span>
+    d<span class="token operator">-</span><span class="token operator">></span>shared <span class="token operator">=</span> session<span class="token operator">-</span><span class="token operator">></span>shared<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//默认初始的时候为false</span>
+    d<span class="token operator">-</span><span class="token operator">></span>enabled <span class="token operator">=</span> enabled<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//切换到libEvent线程执行 回调函数setPortForwardingEnabled,这里的d为传递的参数</span>
+    <span class="token function">tr_runInEventThread</span><span class="token punctuation">(</span>session<span class="token punctuation">,</span> setPortForwardingEnabled<span class="token punctuation">,</span> d<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
 tr_runInEventThread 这个会执行现成的切换，当切换成功之后会执行setPortForwardingEnabled 函数，d为传递的参数
 
-//函数是在libEvent中执行, vdata的类型为 struct port_forwarding_data
-static void setPortForwardingEnabled(void * vdata) {
-    struct port_forwarding_data * data = vdata;
-    //将data enable值赋值给 shared 的 enable ,如果是为true的话，就创建一个定时器，赋值给shared 中的time成员
-    tr_sharedTraversalEnable(data->shared, data->enabled);
-    //释放data内存
-    tr_free(data);
-}
+<span class="token comment" spellcheck="true">//函数是在libEvent中执行, vdata的类型为 struct port_forwarding_data</span>
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">setPortForwardingEnabled</span><span class="token punctuation">(</span><span class="token keyword">void</span> <span class="token operator">*</span> vdata<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">struct</span> port_forwarding_data <span class="token operator">*</span> data <span class="token operator">=</span> vdata<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//将data enable值赋值给 shared 的 enable ,如果是为true的话，就创建一个定时器，赋值给shared 中的time成员</span>
+    <span class="token function">tr_sharedTraversalEnable</span><span class="token punctuation">(</span>data<span class="token operator">-</span><span class="token operator">></span>shared<span class="token punctuation">,</span> data<span class="token operator">-</span><span class="token operator">></span>enabled<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//释放data内存</span>
+    <span class="token function">tr_free</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-//如果当前isEnable为真，赋值给shared 中的isEnabled成员，而且创建一个定时器，赋值
-void tr_sharedTraversalEnable(tr_shared * s, bool isEnabled) {
-    //如果当前isEnabled为真，完成赋值操作赋值给  isEnabled ，并且开启定时器
-    if ((s->isEnabled = isEnabled))
-    {
-        //开启定时器
-        start_timer(s);
-    }
-    else
-    {
-        //如果不可以用停止 端口隐射
-        stop_forwarding(s);
-    }
-}
+<span class="token comment" spellcheck="true">//如果当前isEnable为真，赋值给shared 中的isEnabled成员，而且创建一个定时器，赋值</span>
+<span class="token keyword">void</span> <span class="token function">tr_sharedTraversalEnable</span><span class="token punctuation">(</span>tr_shared <span class="token operator">*</span> s<span class="token punctuation">,</span> <span class="token keyword">bool</span> isEnabled<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//如果当前isEnabled为真，完成赋值操作赋值给  isEnabled ，并且开启定时器</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>s<span class="token operator">-</span><span class="token operator">></span>isEnabled <span class="token operator">=</span> isEnabled<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//开启定时器</span>
+        <span class="token function">start_timer</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">else</span>
+    <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//如果不可以用停止 端口隐射</span>
+        <span class="token function">stop_forwarding</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
-//开启定时器
-static void start_timer(tr_shared * s) {
-    //构建一个定时器，同时赋值给timer成员,当定时器触发的时候，会回调执行 onTimer 函数
-    s->timer = evtimer_new(s->session->event_base, onTimer, s);
+<span class="token comment" spellcheck="true">//开启定时器</span>
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">start_timer</span><span class="token punctuation">(</span>tr_shared <span class="token operator">*</span> s<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//构建一个定时器，同时赋值给timer成员,当定时器触发的时候，会回调执行 onTimer 函数</span>
+    s<span class="token operator">-</span><span class="token operator">></span>timer <span class="token operator">=</span> <span class="token function">evtimer_new</span><span class="token punctuation">(</span>s<span class="token operator">-</span><span class="token operator">></span>session<span class="token operator">-</span><span class="token operator">></span>event_base<span class="token punctuation">,</span> onTimer<span class="token punctuation">,</span> s<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    //根据tr_shared 状态来设置定时器的时间间隔
-    set_evtimer_from_status(s);
-}
+    <span class="token comment" spellcheck="true">//根据tr_shared 状态来设置定时器的时间间隔</span>
+    <span class="token function">set_evtimer_from_status</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-//端口隐射定时器触发函数 ,也即是这个函数会被多次的触发，就看这个定时器设置的时间,而关键点就是在 natPulse
-static void onTimer(evutil_socket_t fd UNUSED, short what UNUSED,void * vshared) {
-    tr_shared * s = vshared;
+<span class="token comment" spellcheck="true">//端口隐射定时器触发函数 ,也即是这个函数会被多次的触发，就看这个定时器设置的时间,而关键点就是在 natPulse</span>
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">onTimer</span><span class="token punctuation">(</span>evutil_socket_t fd UNUSED<span class="token punctuation">,</span> <span class="token keyword">short</span> what UNUSED<span class="token punctuation">,</span><span class="token keyword">void</span> <span class="token operator">*</span> vshared<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    tr_shared <span class="token operator">*</span> s <span class="token operator">=</span> vshared<span class="token punctuation">;</span>
 
-    //参数校验
-    assert(s);
-    assert(s->timer);
+    <span class="token comment" spellcheck="true">//参数校验</span>
+    <span class="token function">assert</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">assert</span><span class="token punctuation">(</span>s<span class="token operator">-</span><span class="token operator">></span>timer<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    /* do something */
-    natPulse(s, s->doPortCheck);
+    <span class="token comment" spellcheck="true">/* do something */</span>
+    <span class="token function">natPulse</span><span class="token punctuation">(</span>s<span class="token punctuation">,</span> s<span class="token operator">-</span><span class="token operator">></span>doPortCheck<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    //将doPortCheck置位false
-    s->doPortCheck = false;
+    <span class="token comment" spellcheck="true">//将doPortCheck置位false</span>
+    s<span class="token operator">-</span><span class="token operator">></span>doPortCheck <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
 
-    /* set up the timer for the next pulse */
-    //根据不同的状态决定定时器触发的时间
-    set_evtimer_from_status(s);
-}
+    <span class="token comment" spellcheck="true">/* set up the timer for the next pulse */</span>
+    <span class="token comment" spellcheck="true">//根据不同的状态决定定时器触发的时间</span>
+    <span class="token function">set_evtimer_from_status</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-static void natPulse(tr_shared * s, bool do_check) {
-    int oldStatus;
-    int newStatus;
-    tr_port public_peer_port;
-    //获取到局域网的端口，也即是Bt指定的监听端口
-    const tr_port private_peer_port = s->session->private_peer_port;
-    //判断是否允许,当前是要允许，并且没有正在关闭
-    const int is_enabled = s->isEnabled && !s->isShuttingDown;
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">natPulse</span><span class="token punctuation">(</span>tr_shared <span class="token operator">*</span> s<span class="token punctuation">,</span> <span class="token keyword">bool</span> do_check<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">int</span> oldStatus<span class="token punctuation">;</span>
+    <span class="token keyword">int</span> newStatus<span class="token punctuation">;</span>
+    tr_port public_peer_port<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//获取到局域网的端口，也即是Bt指定的监听端口</span>
+    <span class="token keyword">const</span> tr_port private_peer_port <span class="token operator">=</span> s<span class="token operator">-</span><span class="token operator">></span>session<span class="token operator">-</span><span class="token operator">></span>private_peer_port<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//判断是否允许,当前是要允许，并且没有正在关闭</span>
+    <span class="token keyword">const</span> <span class="token keyword">int</span> is_enabled <span class="token operator">=</span> s<span class="token operator">-</span><span class="token operator">></span>isEnabled <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>s<span class="token operator">-</span><span class="token operator">></span>isShuttingDown<span class="token punctuation">;</span>
 
-    //如果为空，创建对应的pmp对象
-    if (s->natpmp == NULL)
-    {
-       s->natpmp = tr_natpmpInit();
-    }
+    <span class="token comment" spellcheck="true">//如果为空，创建对应的pmp对象</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>s<span class="token operator">-</span><span class="token operator">></span>natpmp <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+       s<span class="token operator">-</span><span class="token operator">></span>natpmp <span class="token operator">=</span> <span class="token function">tr_natpmpInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    //如果为空，创建对应的upnp 对象
-    if (s->upnp == NULL)
-    {
-       s->upnp = tr_upnpInit();
-    }
+    <span class="token comment" spellcheck="true">//如果为空，创建对应的upnp 对象</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>s<span class="token operator">-</span><span class="token operator">></span>upnp <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+       s<span class="token operator">-</span><span class="token operator">></span>upnp <span class="token operator">=</span> <span class="token function">tr_upnpInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    //获取到老的状态
-    oldStatus = tr_sharedTraversalStatus(s);
+    <span class="token comment" spellcheck="true">//获取到老的状态</span>
+    oldStatus <span class="token operator">=</span> <span class="token function">tr_sharedTraversalStatus</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    //pmp 完成内网的端口隐射， 隐射完成之后， public_peer_port 接受公网的端口
-    s->natpmpStatus = tr_natpmpPulse(s->natpmp, private_peer_port, is_enabled,&public_peer_port);
+    <span class="token comment" spellcheck="true">//pmp 完成内网的端口隐射， 隐射完成之后， public_peer_port 接受公网的端口</span>
+    s<span class="token operator">-</span><span class="token operator">></span>natpmpStatus <span class="token operator">=</span> <span class="token function">tr_natpmpPulse</span><span class="token punctuation">(</span>s<span class="token operator">-</span><span class="token operator">></span>natpmp<span class="token punctuation">,</span> private_peer_port<span class="token punctuation">,</span> is_enabled<span class="token punctuation">,</span><span class="token operator">&amp;</span>public_peer_port<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    //如果pmp 隐射成功
-    if (s->natpmpStatus == TR_PORT_MAPPED)
-    {
-        //session保存pmp 隐射完成之后外网的端口号
-        s->session->public_peer_port = public_peer_port;
-    }
-    //执行 upnp的隐射
-    s->upnpStatus = tr_upnpPulse(s->upnp, private_peer_port, is_enabled,    do_check);
-    //获取到最新的状态
-    newStatus = tr_sharedTraversalStatus(s);
+    <span class="token comment" spellcheck="true">//如果pmp 隐射成功</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>s<span class="token operator">-</span><span class="token operator">></span>natpmpStatus <span class="token operator">==</span> TR_PORT_MAPPED<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//session保存pmp 隐射完成之后外网的端口号</span>
+        s<span class="token operator">-</span><span class="token operator">></span>session<span class="token operator">-</span><span class="token operator">></span>public_peer_port <span class="token operator">=</span> public_peer_port<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//执行 upnp的隐射</span>
+    s<span class="token operator">-</span><span class="token operator">></span>upnpStatus <span class="token operator">=</span> <span class="token function">tr_upnpPulse</span><span class="token punctuation">(</span>s<span class="token operator">-</span><span class="token operator">></span>upnp<span class="token punctuation">,</span> private_peer_port<span class="token punctuation">,</span> is_enabled<span class="token punctuation">,</span>    do_check<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//获取到最新的状态</span>
+    newStatus <span class="token operator">=</span> <span class="token function">tr_sharedTraversalStatus</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    //发生状态的变化，打印
-    if (newStatus != oldStatus)
-    {
-       printf("Port Forwarding State changed \n");
-    }
-}
+    <span class="token comment" spellcheck="true">//发生状态的变化，打印</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>newStatus <span class="token operator">!=</span> oldStatus<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+       <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"Port Forwarding State changed \n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
-第一次 upnp为空，执行 tr_natpmpInit();
+第一次 upnp为空，执行 <span class="token function">tr_natpmpInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-//pmp 协议初始化
-struct tr_natpmp*
-tr_natpmpInit (void)
-{
-    //分配内存空间
-    struct tr_natpmp * nat;
-    nat = tr_new0 (struct tr_natpmp, 1);
-    //默认的状态为 pmp 发现状态
-    nat->state = TR_NATPMP_DISCOVER;
-    nat->public_port = 0;
-    nat->private_port = 0;
-    //对应的socket为空
-    nat->natpmp.s = TR_BAD_SOCKET; /* socket */
-    return nat;
-}
+<span class="token comment" spellcheck="true">//pmp 协议初始化</span>
+<span class="token keyword">struct</span> tr_natpmp<span class="token operator">*</span>
+<span class="token function">tr_natpmpInit</span> <span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//分配内存空间</span>
+    <span class="token keyword">struct</span> tr_natpmp <span class="token operator">*</span> nat<span class="token punctuation">;</span>
+    nat <span class="token operator">=</span> <span class="token function">tr_new0</span> <span class="token punctuation">(</span><span class="token keyword">struct</span> tr_natpmp<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//默认的状态为 pmp 发现状态</span>
+    nat<span class="token operator">-</span><span class="token operator">></span>state <span class="token operator">=</span> TR_NATPMP_DISCOVER<span class="token punctuation">;</span>
+    nat<span class="token operator">-</span><span class="token operator">></span>public_port <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    nat<span class="token operator">-</span><span class="token operator">></span>private_port <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//对应的socket为空</span>
+    nat<span class="token operator">-</span><span class="token operator">></span>natpmp<span class="token punctuation">.</span>s <span class="token operator">=</span> TR_BAD_SOCKET<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">/* socket */</span>
+    <span class="token keyword">return</span> nat<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
 而tr_natpmp 结构体定义为
-struct tr_natpmp
-{
-    //标识是否已经发现
-    bool              has_discovered;
-    //标识是否已经mapped
-    bool              is_mapped;
-    //隐射完成之后 得到的外网端口号
-    tr_port           public_port;
-    //隐射的内网端口号
-    tr_port           private_port;
-    time_t            renew_time;
-    //下一个command 发送的时间
-    time_t            command_time;
-    //pmp 当前的状态
-    tr_natpmp_state   state;
-    //真正的pmp 库对象
-    natpmp_t          natpmp;
-};
+<span class="token keyword">struct</span> tr_natpmp
+<span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//标识是否已经发现</span>
+    <span class="token keyword">bool</span>              has_discovered<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//标识是否已经mapped</span>
+    <span class="token keyword">bool</span>              is_mapped<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//隐射完成之后 得到的外网端口号</span>
+    tr_port           public_port<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//隐射的内网端口号</span>
+    tr_port           private_port<span class="token punctuation">;</span>
+    time_t            renew_time<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//下一个command 发送的时间</span>
+    time_t            command_time<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//pmp 当前的状态</span>
+    tr_natpmp_state   state<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//真正的pmp 库对象</span>
+    natpmp_t          natpmp<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
 
 所以初始化，只是分配块内存空间，变为默认值
 
-tr_upnpInit();
+<span class="token function">tr_upnpInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-/**
+<span class="token comment" spellcheck="true">/**
  *** 初始化操作
- **/
-tr_upnp*
-tr_upnpInit(void) {
-    tr_upnp * ret = tr_new0(tr_upnp, 1);
+ **/</span>
+tr_upnp<span class="token operator">*</span>
+<span class="token function">tr_upnpInit</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    tr_upnp <span class="token operator">*</span> ret <span class="token operator">=</span> <span class="token function">tr_new0</span><span class="token punctuation">(</span>tr_upnp<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    ret->state = TR_UPNP_DISCOVER;
-    ret->port = -1;
-    return ret;
-}
-struct tr_upnp {
-    //标识是否发现
-    bool hasDiscovered;
-    struct UPNPUrls urls;
-    struct IGDdatas data;
-    int port;
-    char lanaddr[16];
-    //标识是否隐射完成
-    unsigned int isMapped;
-    //upnp的状态
-    tr_upnp_state state;
-};
+    ret<span class="token operator">-</span><span class="token operator">></span>state <span class="token operator">=</span> TR_UPNP_DISCOVER<span class="token punctuation">;</span>
+    ret<span class="token operator">-</span><span class="token operator">></span>port <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> ret<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">struct</span> tr_upnp <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//标识是否发现</span>
+    <span class="token keyword">bool</span> hasDiscovered<span class="token punctuation">;</span>
+    <span class="token keyword">struct</span> UPNPUrls urls<span class="token punctuation">;</span>
+    <span class="token keyword">struct</span> IGDdatas data<span class="token punctuation">;</span>
+    <span class="token keyword">int</span> port<span class="token punctuation">;</span>
+    <span class="token keyword">char</span> lanaddr<span class="token punctuation">[</span><span class="token number">16</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//标识是否隐射完成</span>
+    <span class="token keyword">unsigned</span> <span class="token keyword">int</span> isMapped<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//upnp的状态</span>
+    tr_upnp_state state<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
 所以初始化，只是分配块内存空间，变为默认值
 
-而 这个才是关键 tr_natpmpPulse(s->natpmp, private_peer_port, is_enabled,&public_peer_port);
-//pmp 完成隐射
-int tr_natpmpPulse (struct tr_natpmp * nat, tr_port private_port, bool is_enabled, tr_port * public_port)
-{
-    int ret;
+而 这个才是关键 <span class="token function">tr_natpmpPulse</span><span class="token punctuation">(</span>s<span class="token operator">-</span><span class="token operator">></span>natpmp<span class="token punctuation">,</span> private_peer_port<span class="token punctuation">,</span> is_enabled<span class="token punctuation">,</span><span class="token operator">&amp;</span>public_peer_port<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">//pmp 完成隐射</span>
+<span class="token keyword">int</span> <span class="token function">tr_natpmpPulse</span> <span class="token punctuation">(</span><span class="token keyword">struct</span> tr_natpmp <span class="token operator">*</span> nat<span class="token punctuation">,</span> tr_port private_port<span class="token punctuation">,</span> <span class="token keyword">bool</span> is_enabled<span class="token punctuation">,</span> tr_port <span class="token operator">*</span> public_port<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">int</span> ret<span class="token punctuation">;</span>
 
-    //如果is_enabled 为true，当前的状态处于TR_NATPMP_DISCOVER
-    if (is_enabled && (nat->state == TR_NATPMP_DISCOVER))
-    {
-        //首先执行pmp初始化操作
-        int val = initnatpmp (&nat->natpmp, 0, 0);
-        printf("initnatpmp %d \n",val);
-        //logVal ("initnatpmp", val);
-        val = sendpublicaddressrequest (&nat->natpmp);
-        //logVal ("sendpublicaddressrequest", val);
-        printf("sendpublicaddressrequest %d \n", val);
-        nat->state = val < 0 ? TR_NATPMP_ERR : TR_NATPMP_RECV_PUB;
-        //标识发现完成
-        nat->has_discovered = true;
-        //赋值 command_time ，也即是下一个command发送的时间
-        setCommandTime (nat);
-    }
-    //如果上面一个步骤没有出现错误 默认状态为 TR_NATPMP_RECV_PUB ，再判断当前的时间是否到了可以发送下一个command的时间
-    if ((nat->state == TR_NATPMP_RECV_PUB) && canSendCommand (nat))
-    {
-        natpmpresp_t response;
-        //调用pmp函数，得到结果
-        const int val = readnatpmpresponseorretry (&nat->natpmp, &response);
-        //logVal ("readnatpmpresponseorretry", val);
-        //printf ("readnatpmpresponseorretry %d \n", val);
-        //如果结果大于0，打印的得到的外网的ip
-        if (val >= 0)
-        {
-            char str[128];
-            evutil_inet_ntop (AF_INET, &response.pnu.publicaddress.addr, str, sizeof (str));
-            //tr_logAddNamedInfo (getKey (), _("Found public address \"%s\""), str);
-            printf ("Port Forwarding (NAT-PMP)  Found public address %s \n", str);
-            //同时状态为 TR_NATPMP_IDLE
-            nat->state = TR_NATPMP_IDLE;
-        }
-        else if (val != NATPMP_TRYAGAIN)
-        {
-            //出现了错误
-            nat->state = TR_NATPMP_ERR;
-        }
-    }
+    <span class="token comment" spellcheck="true">//如果is_enabled 为true，当前的状态处于TR_NATPMP_DISCOVER</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>is_enabled <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span>nat<span class="token operator">-</span><span class="token operator">></span>state <span class="token operator">==</span> TR_NATPMP_DISCOVER<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//首先执行pmp初始化操作</span>
+        <span class="token keyword">int</span> val <span class="token operator">=</span> <span class="token function">initnatpmp</span> <span class="token punctuation">(</span><span class="token operator">&amp;</span>nat<span class="token operator">-</span><span class="token operator">></span>natpmp<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"initnatpmp %d \n"</span><span class="token punctuation">,</span>val<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//logVal ("initnatpmp", val);</span>
+        val <span class="token operator">=</span> <span class="token function">sendpublicaddressrequest</span> <span class="token punctuation">(</span><span class="token operator">&amp;</span>nat<span class="token operator">-</span><span class="token operator">></span>natpmp<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//logVal ("sendpublicaddressrequest", val);</span>
+        <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"sendpublicaddressrequest %d \n"</span><span class="token punctuation">,</span> val<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        nat<span class="token operator">-</span><span class="token operator">></span>state <span class="token operator">=</span> val <span class="token operator">&lt;</span> <span class="token number">0</span> <span class="token operator">?</span> TR_NATPMP_ERR <span class="token operator">:</span> TR_NATPMP_RECV_PUB<span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//标识发现完成</span>
+        nat<span class="token operator">-</span><span class="token operator">></span>has_discovered <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//赋值 command_time ，也即是下一个command发送的时间</span>
+        <span class="token function">setCommandTime</span> <span class="token punctuation">(</span>nat<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//如果上面一个步骤没有出现错误 默认状态为 TR_NATPMP_RECV_PUB ，再判断当前的时间是否到了可以发送下一个command的时间</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>nat<span class="token operator">-</span><span class="token operator">></span>state <span class="token operator">==</span> TR_NATPMP_RECV_PUB<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token function">canSendCommand</span> <span class="token punctuation">(</span>nat<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        natpmpresp_t response<span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//调用pmp函数，得到结果</span>
+        <span class="token keyword">const</span> <span class="token keyword">int</span> val <span class="token operator">=</span> <span class="token function">readnatpmpresponseorretry</span> <span class="token punctuation">(</span><span class="token operator">&amp;</span>nat<span class="token operator">-</span><span class="token operator">></span>natpmp<span class="token punctuation">,</span> <span class="token operator">&amp;</span>response<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//logVal ("readnatpmpresponseorretry", val);</span>
+        <span class="token comment" spellcheck="true">//printf ("readnatpmpresponseorretry %d \n", val);</span>
+        <span class="token comment" spellcheck="true">//如果结果大于0，打印的得到的外网的ip</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>val <span class="token operator">>=</span> <span class="token number">0</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token keyword">char</span> str<span class="token punctuation">[</span><span class="token number">128</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+            <span class="token function">evutil_inet_ntop</span> <span class="token punctuation">(</span>AF_INET<span class="token punctuation">,</span> <span class="token operator">&amp;</span>response<span class="token punctuation">.</span>pnu<span class="token punctuation">.</span>publicaddress<span class="token punctuation">.</span>addr<span class="token punctuation">,</span> str<span class="token punctuation">,</span> <span class="token keyword">sizeof</span> <span class="token punctuation">(</span>str<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">//tr_logAddNamedInfo (getKey (), _("Found public address \"%s\""), str);</span>
+            <span class="token function">printf</span> <span class="token punctuation">(</span><span class="token string">"Port Forwarding (NAT-PMP)  Found public address %s \n"</span><span class="token punctuation">,</span> str<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">//同时状态为 TR_NATPMP_IDLE</span>
+            nat<span class="token operator">-</span><span class="token operator">></span>state <span class="token operator">=</span> TR_NATPMP_IDLE<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>val <span class="token operator">!=</span> NATPMP_TRYAGAIN<span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">//出现了错误</span>
+            nat<span class="token operator">-</span><span class="token operator">></span>state <span class="token operator">=</span> TR_NATPMP_ERR<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
 
-    //判断是否需要删除之前的隐射
-    if ((nat->state == TR_NATPMP_IDLE) || (nat->state == TR_NATPMP_ERR))
-    {
-        //is_mapped 代表之前已经隐射成功过，如果是这样，就要先删除之前的隐射
-        if (nat->is_mapped && (!is_enabled || (nat->private_port != private_port)))
-        {
-            nat->state = TR_NATPMP_SEND_UNMAP;
-        }
-    }
+    <span class="token comment" spellcheck="true">//判断是否需要删除之前的隐射</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>nat<span class="token operator">-</span><span class="token operator">></span>state <span class="token operator">==</span> TR_NATPMP_IDLE<span class="token punctuation">)</span> <span class="token operator">||</span> <span class="token punctuation">(</span>nat<span class="token operator">-</span><span class="token operator">></span>state <span class="token operator">==</span> TR_NATPMP_ERR<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//is_mapped 代表之前已经隐射成功过，如果是这样，就要先删除之前的隐射</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>nat<span class="token operator">-</span><span class="token operator">></span>is_mapped <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span><span class="token operator">!</span>is_enabled <span class="token operator">||</span> <span class="token punctuation">(</span>nat<span class="token operator">-</span><span class="token operator">></span>private_port <span class="token operator">!=</span> private_port<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            nat<span class="token operator">-</span><span class="token operator">></span>state <span class="token operator">=</span> TR_NATPMP_SEND_UNMAP<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
 
-    //判断是否需要删除之前的隐射 并且当前的时间达到了下一个command执行的时间
-    if ((nat->state == TR_NATPMP_SEND_UNMAP) && canSendCommand (nat))
-    {
-        //调用pmp库 发起端口隐射
-        const int val = sendnewportmappingrequest (&nat->natpmp, NATPMP_PROTOCOL_TCP,
-                                                   nat->private_port,
-                                                   nat->public_port,
-                                                   0);
-        //logVal ("sendnewportmappingrequest", val);
-        printf("sendnewportmappingrequest %d \n", val);
-        //赋值状态
-        nat->state = val < 0 ? TR_NATPMP_ERR : TR_NATPMP_RECV_UNMAP;
-        //标识下一个command 执行的时间
-        setCommandTime (nat);
-    }
-    ...
-}
+    <span class="token comment" spellcheck="true">//判断是否需要删除之前的隐射 并且当前的时间达到了下一个command执行的时间</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>nat<span class="token operator">-</span><span class="token operator">></span>state <span class="token operator">==</span> TR_NATPMP_SEND_UNMAP<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token function">canSendCommand</span> <span class="token punctuation">(</span>nat<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//调用pmp库 发起端口隐射</span>
+        <span class="token keyword">const</span> <span class="token keyword">int</span> val <span class="token operator">=</span> <span class="token function">sendnewportmappingrequest</span> <span class="token punctuation">(</span><span class="token operator">&amp;</span>nat<span class="token operator">-</span><span class="token operator">></span>natpmp<span class="token punctuation">,</span> NATPMP_PROTOCOL_TCP<span class="token punctuation">,</span>
+                                                   nat<span class="token operator">-</span><span class="token operator">></span>private_port<span class="token punctuation">,</span>
+                                                   nat<span class="token operator">-</span><span class="token operator">></span>public_port<span class="token punctuation">,</span>
+                                                   <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//logVal ("sendnewportmappingrequest", val);</span>
+        <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"sendnewportmappingrequest %d \n"</span><span class="token punctuation">,</span> val<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//赋值状态</span>
+        nat<span class="token operator">-</span><span class="token operator">></span>state <span class="token operator">=</span> val <span class="token operator">&lt;</span> <span class="token number">0</span> <span class="token operator">?</span> TR_NATPMP_ERR <span class="token operator">:</span> TR_NATPMP_RECV_UNMAP<span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//标识下一个command 执行的时间</span>
+        <span class="token function">setCommandTime</span> <span class="token punctuation">(</span>nat<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 
-tr_upnpPulse(s->upnp, private_peer_port, is_enabled,    do_check);
-//doPortCheck 代表是否需要隐射，如果为false代表不需要隐射，执行验证
-int tr_upnpPulse(tr_upnp * handle, int port, int isEnabled, int doPortCheck) {
-    int ret;
+<span class="token function">tr_upnpPulse</span><span class="token punctuation">(</span>s<span class="token operator">-</span><span class="token operator">></span>upnp<span class="token punctuation">,</span> private_peer_port<span class="token punctuation">,</span> is_enabled<span class="token punctuation">,</span>    do_check<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">//doPortCheck 代表是否需要隐射，如果为false代表不需要隐射，执行验证</span>
+<span class="token keyword">int</span> <span class="token function">tr_upnpPulse</span><span class="token punctuation">(</span>tr_upnp <span class="token operator">*</span> handle<span class="token punctuation">,</span> <span class="token keyword">int</span> port<span class="token punctuation">,</span> <span class="token keyword">int</span> isEnabled<span class="token punctuation">,</span> <span class="token keyword">int</span> doPortCheck<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">int</span> ret<span class="token punctuation">;</span>
 
-    //默认的状态 为 TR_UPNP_DISCOVER
-    if (isEnabled && (handle->state == TR_UPNP_DISCOVER)) {
-        struct UPNPDev * devlist;
+    <span class="token comment" spellcheck="true">//默认的状态 为 TR_UPNP_DISCOVER</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>isEnabled <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span>handle<span class="token operator">-</span><span class="token operator">></span>state <span class="token operator">==</span> TR_UPNP_DISCOVER<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">struct</span> UPNPDev <span class="token operator">*</span> devlist<span class="token punctuation">;</span>
 
-        //执行upnp的发现,主要用来搜索局域网中所有的UPNP设备
-        devlist = tr_upnpDiscover(2000);
+        <span class="token comment" spellcheck="true">//执行upnp的发现,主要用来搜索局域网中所有的UPNP设备</span>
+        devlist <span class="token operator">=</span> <span class="token function">tr_upnpDiscover</span><span class="token punctuation">(</span><span class="token number">2000</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        errno = 0;
-        //获取有效的IGD
-        if (UPNP_GetValidIGD(devlist, &handle->urls, &handle->data,handle->lanaddr, sizeof(handle->lanaddr)) == UPNP_IGD_VALID_CONNECTED) {
-            //tr_logAddNamedInfo(getKey(),    _( "Found Internet Gateway Device \"%s\""),handle->urls.controlURL);
-            printf("Port Forwarding (UPnP) Found Internet Gateway Device %s \n",handle->urls.controlURL);
-            //tr_logAddNamedInfo(getKey(), _( "Local Address is \"%s\""),handle->lanaddr);
-            printf("Port Forwarding (UPnP) Local Address is %s \n",handle->lanaddr);
-            //赋值状态为TR_UPNP_IDLE
-            handle->state = TR_UPNP_IDLE;
-            //当前已经执行了发现
-            handle->hasDiscovered = true;
-        } else {
-            //出现了错误
-            handle->state = TR_UPNP_ERR;
-            //获取无效的IGD,也即是你的路由器不支持
-            //tr_logAddNamedDbg(getKey(),    "UPNP_GetValidIGD failed (errno %d - %s)", errno,    tr_strerror (errno));
-            printf("Port Forwarding (UPnP) UPNP_GetValidIGD failed (errno %d - %s) \n", errno,    tr_strerror (errno));
-            //tr_logAddNamedDbg(getKey(),"If your router supports UPnP, please make sure UPnP is enabled!");
-            printf("Port Forwarding (UPnP) If your router supports UPnP, please make sure UPnP is enabled! \n");
-        }
-        freeUPNPDevlist(devlist);
-    }
+        errno <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//获取有效的IGD</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">UPNP_GetValidIGD</span><span class="token punctuation">(</span>devlist<span class="token punctuation">,</span> <span class="token operator">&amp;</span>handle<span class="token operator">-</span><span class="token operator">></span>urls<span class="token punctuation">,</span> <span class="token operator">&amp;</span>handle<span class="token operator">-</span><span class="token operator">></span>data<span class="token punctuation">,</span>handle<span class="token operator">-</span><span class="token operator">></span>lanaddr<span class="token punctuation">,</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>handle<span class="token operator">-</span><span class="token operator">></span>lanaddr<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">==</span> UPNP_IGD_VALID_CONNECTED<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">//tr_logAddNamedInfo(getKey(),    _( "Found Internet Gateway Device \"%s\""),handle->urls.controlURL);</span>
+            <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"Port Forwarding (UPnP) Found Internet Gateway Device %s \n"</span><span class="token punctuation">,</span>handle<span class="token operator">-</span><span class="token operator">></span>urls<span class="token punctuation">.</span>controlURL<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">//tr_logAddNamedInfo(getKey(), _( "Local Address is \"%s\""),handle->lanaddr);</span>
+            <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"Port Forwarding (UPnP) Local Address is %s \n"</span><span class="token punctuation">,</span>handle<span class="token operator">-</span><span class="token operator">></span>lanaddr<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">//赋值状态为TR_UPNP_IDLE</span>
+            handle<span class="token operator">-</span><span class="token operator">></span>state <span class="token operator">=</span> TR_UPNP_IDLE<span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">//当前已经执行了发现</span>
+            handle<span class="token operator">-</span><span class="token operator">></span>hasDiscovered <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">//出现了错误</span>
+            handle<span class="token operator">-</span><span class="token operator">></span>state <span class="token operator">=</span> TR_UPNP_ERR<span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">//获取无效的IGD,也即是你的路由器不支持</span>
+            <span class="token comment" spellcheck="true">//tr_logAddNamedDbg(getKey(),    "UPNP_GetValidIGD failed (errno %d - %s)", errno,    tr_strerror (errno));</span>
+            <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"Port Forwarding (UPnP) UPNP_GetValidIGD failed (errno %d - %s) \n"</span><span class="token punctuation">,</span> errno<span class="token punctuation">,</span>    <span class="token function">tr_strerror</span> <span class="token punctuation">(</span>errno<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">//tr_logAddNamedDbg(getKey(),"If your router supports UPnP, please make sure UPnP is enabled!");</span>
+            <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"Port Forwarding (UPnP) If your router supports UPnP, please make sure UPnP is enabled! \n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token function">freeUPNPDevlist</span><span class="token punctuation">(</span>devlist<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    //判断当前是否需要关掉之前隐射的关系
-    if (handle->state == TR_UPNP_IDLE) {
-        if (handle->isMapped && (!isEnabled || (handle->port != port)))
-        {
-            handle->state = TR_UPNP_UNMAP;
-        }
-    }
-    //如果当前已经完成了隐射，判断是否需要检查端口
-    if (isEnabled && handle->isMapped && doPortCheck) {
-        //upnp 端口隐射，这里有tcp，udp,检查tcp 或者 udp
-        if ((tr_upnpGetSpecificPortMappingEntry(handle, "TCP") != UPNPCOMMAND_SUCCESS) || (tr_upnpGetSpecificPortMappingEntry(handle, "UDP") != UPNPCOMMAND_SUCCESS)) {
-            //出现了错误，标识没有隐射完成
-            //tr_logAddNamedInfo(getKey(), _("Port %d isn't forwarded"),    handle->port);
-            printf("Port Forwarding (UPnP) Port %d isn't forwarded \n",handle->port);
-            //如果tcp，udp检查都有问题，标识没有隐射成功
-            handle->isMapped = false;
-        }
-    }
+    <span class="token comment" spellcheck="true">//判断当前是否需要关掉之前隐射的关系</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>handle<span class="token operator">-</span><span class="token operator">></span>state <span class="token operator">==</span> TR_UPNP_IDLE<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>handle<span class="token operator">-</span><span class="token operator">></span>isMapped <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span><span class="token operator">!</span>isEnabled <span class="token operator">||</span> <span class="token punctuation">(</span>handle<span class="token operator">-</span><span class="token operator">></span>port <span class="token operator">!=</span> port<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            handle<span class="token operator">-</span><span class="token operator">></span>state <span class="token operator">=</span> TR_UPNP_UNMAP<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//如果当前已经完成了隐射，判断是否需要检查端口</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>isEnabled <span class="token operator">&amp;&amp;</span> handle<span class="token operator">-</span><span class="token operator">></span>isMapped <span class="token operator">&amp;&amp;</span> doPortCheck<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//upnp 端口隐射，这里有tcp，udp,检查tcp 或者 udp</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">tr_upnpGetSpecificPortMappingEntry</span><span class="token punctuation">(</span>handle<span class="token punctuation">,</span> <span class="token string">"TCP"</span><span class="token punctuation">)</span> <span class="token operator">!=</span> UPNPCOMMAND_SUCCESS<span class="token punctuation">)</span> <span class="token operator">||</span> <span class="token punctuation">(</span><span class="token function">tr_upnpGetSpecificPortMappingEntry</span><span class="token punctuation">(</span>handle<span class="token punctuation">,</span> <span class="token string">"UDP"</span><span class="token punctuation">)</span> <span class="token operator">!=</span> UPNPCOMMAND_SUCCESS<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">//出现了错误，标识没有隐射完成</span>
+            <span class="token comment" spellcheck="true">//tr_logAddNamedInfo(getKey(), _("Port %d isn't forwarded"),    handle->port);</span>
+            <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"Port Forwarding (UPnP) Port %d isn't forwarded \n"</span><span class="token punctuation">,</span>handle<span class="token operator">-</span><span class="token operator">></span>port<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">//如果tcp，udp检查都有问题，标识没有隐射成功</span>
+            handle<span class="token operator">-</span><span class="token operator">></span>isMapped <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
 
-    //删除隐射
-    if (handle->state == TR_UPNP_UNMAP) {
-        //删除tcp ，udp隐射
-        tr_upnpDeletePortMapping(handle, "TCP", handle->port);
-        tr_upnpDeletePortMapping(handle, "UDP", handle->port);
+    <span class="token comment" spellcheck="true">//删除隐射</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>handle<span class="token operator">-</span><span class="token operator">></span>state <span class="token operator">==</span> TR_UPNP_UNMAP<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//删除tcp ，udp隐射</span>
+        <span class="token function">tr_upnpDeletePortMapping</span><span class="token punctuation">(</span>handle<span class="token punctuation">,</span> <span class="token string">"TCP"</span><span class="token punctuation">,</span> handle<span class="token operator">-</span><span class="token operator">></span>port<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">tr_upnpDeletePortMapping</span><span class="token punctuation">(</span>handle<span class="token punctuation">,</span> <span class="token string">"UDP"</span><span class="token punctuation">,</span> handle<span class="token operator">-</span><span class="token operator">></span>port<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        //tr_logAddNamedInfo(getKey(),_("Stopping port forwarding through \"%s\", service \"%s\""),handle->urls.controlURL, handle->data.first.servicetype);
-        printf("Port Forwarding (UPnP) Stopping port forwarding through %s service %s \n",handle->urls.controlURL, handle->data.first.servicetype);
-        //删除隐射，通知状态，比如port为-1
-        handle->isMapped = 0;
-        handle->state = TR_UPNP_IDLE;
-        handle->port = -1;
-    }
-    ...
-}
+        <span class="token comment" spellcheck="true">//tr_logAddNamedInfo(getKey(),_("Stopping port forwarding through \"%s\", service \"%s\""),handle->urls.controlURL, handle->data.first.servicetype);</span>
+        <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"Port Forwarding (UPnP) Stopping port forwarding through %s service %s \n"</span><span class="token punctuation">,</span>handle<span class="token operator">-</span><span class="token operator">></span>urls<span class="token punctuation">.</span>controlURL<span class="token punctuation">,</span> handle<span class="token operator">-</span><span class="token operator">></span>data<span class="token punctuation">.</span>first<span class="token punctuation">.</span>servicetype<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//删除隐射，通知状态，比如port为-1</span>
+        handle<span class="token operator">-</span><span class="token operator">></span>isMapped <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        handle<span class="token operator">-</span><span class="token operator">></span>state <span class="token operator">=</span> TR_UPNP_IDLE<span class="token punctuation">;</span>
+        handle<span class="token operator">-</span><span class="token operator">></span>port <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 
-这俩个函数涉及到的内容比较多，具体去看源码的实现,下面看set_evtimer_from_status ，这个函数会设计到定时器的时间设置
+这俩个函数涉及到的内容比较多，具体去看源码的实现<span class="token punctuation">,</span>下面看set_evtimer_from_status ，这个函数会设计到定时器的时间设置
 
-//根据状态来决定定时器的时间间隔
-static void set_evtimer_from_status(tr_shared * s) {
-    int sec = 0, msec = 0;
+<span class="token comment" spellcheck="true">//根据状态来决定定时器的时间间隔</span>
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">set_evtimer_from_status</span><span class="token punctuation">(</span>tr_shared <span class="token operator">*</span> s<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">int</span> sec <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> msec <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
 
-    /* when to wake up again */
-    switch (tr_sharedTraversalStatus(s)) {
-    case TR_PORT_MAPPED:
-        //如果当前我们已经隐射成功了，那么20分钟之后再来检查
-        /* if we're mapped, everything is fine... check back in 20 minutes
-         * to renew the port forwarding if it's expired */
-        //将doPortCheck置位true
-        s->doPortCheck = true;
-        sec = 60 * 20;
-        break;
+    <span class="token comment" spellcheck="true">/* when to wake up again */</span>
+    <span class="token keyword">switch</span> <span class="token punctuation">(</span><span class="token function">tr_sharedTraversalStatus</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">case</span> TR_PORT_MAPPED<span class="token operator">:</span>
+        <span class="token comment" spellcheck="true">//如果当前我们已经隐射成功了，那么20分钟之后再来检查</span>
+        <span class="token comment" spellcheck="true">/* if we're mapped, everything is fine... check back in 20 minutes
+         * to renew the port forwarding if it's expired */</span>
+        <span class="token comment" spellcheck="true">//将doPortCheck置位true</span>
+        s<span class="token operator">-</span><span class="token operator">></span>doPortCheck <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+        sec <span class="token operator">=</span> <span class="token number">60</span> <span class="token operator">*</span> <span class="token number">20</span><span class="token punctuation">;</span>
+        <span class="token keyword">break</span><span class="token punctuation">;</span>
 
-    case TR_PORT_ERROR:
-        //如果出现了错误，那么60秒之后再来
-        /* some kind of an error. wait 60 seconds and retry */
-        sec = 60;
-        break;
+    <span class="token keyword">case</span> TR_PORT_ERROR<span class="token operator">:</span>
+        <span class="token comment" spellcheck="true">//如果出现了错误，那么60秒之后再来</span>
+        <span class="token comment" spellcheck="true">/* some kind of an error. wait 60 seconds and retry */</span>
+        sec <span class="token operator">=</span> <span class="token number">60</span><span class="token punctuation">;</span>
+        <span class="token keyword">break</span><span class="token punctuation">;</span>
 
-    default:
-        /* in progress. pulse frequently. */
-        msec = 333000;
-        break;
-    }
+    <span class="token keyword">default</span><span class="token operator">:</span>
+        <span class="token comment" spellcheck="true">/* in progress. pulse frequently. */</span>
+        msec <span class="token operator">=</span> <span class="token number">333000</span><span class="token punctuation">;</span>
+        <span class="token keyword">break</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    //添加定时器
-    if (s->timer != NULL)
-    {
-        tr_timerAdd(s->timer, sec, msec);
-    }
-}
+    <span class="token comment" spellcheck="true">//添加定时器</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>s<span class="token operator">-</span><span class="token operator">></span>timer <span class="token operator">!=</span> <span class="token constant">NULL</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token function">tr_timerAdd</span><span class="token punctuation">(</span>s<span class="token operator">-</span><span class="token operator">></span>timer<span class="token punctuation">,</span> sec<span class="token punctuation">,</span> msec<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </code></pre>
-<h3 id="Aria2-移植upnp-pmp"><a href="#Aria2-移植upnp-pmp" class="headerlink" title="Aria2 移植upnp,pmp"></a>Aria2 移植upnp,pmp</h3><pre class=" language-CPP"><code class="language-CPP">首先我们需要将这俩个库引进来，对应的CmakeList中添加要编译的内容
+<h3 id="Aria2-移植upnp-pmp"><a href="#Aria2-移植upnp-pmp" class="headerlink" title="Aria2 移植upnp,pmp"></a>Aria2 移植upnp,pmp</h3><pre class=" language-cpp"><code class="language-cpp">首先我们需要将这俩个库引进来，对应的CmakeList中添加要编译的内容
 
 #添加头文件的查找目录
-include_directories(${CMAKE_SOURCE_DIR}/src/main/cpp/src/includes
-                    ${CMAKE_SOURCE_DIR}/src/main/cpp/src/includes/libutp
-                    ${CMAKE_SOURCE_DIR}/src/main/cpp/src/includes/libnatpmp
-                    ${CMAKE_SOURCE_DIR}/src/main/cpp/src/includes/miniupnp
-                    ${CMAKE_SOURCE_DIR}/src/main/cpp/third/includes )
+<span class="token function">include_directories</span><span class="token punctuation">(</span>$<span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span><span class="token operator">/</span>src<span class="token operator">/</span>main<span class="token operator">/</span>cpp<span class="token operator">/</span>src<span class="token operator">/</span>includes
+                    $<span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span><span class="token operator">/</span>src<span class="token operator">/</span>main<span class="token operator">/</span>cpp<span class="token operator">/</span>src<span class="token operator">/</span>includes<span class="token operator">/</span>libutp
+                    $<span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span><span class="token operator">/</span>src<span class="token operator">/</span>main<span class="token operator">/</span>cpp<span class="token operator">/</span>src<span class="token operator">/</span>includes<span class="token operator">/</span>libnatpmp
+                    $<span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span><span class="token operator">/</span>src<span class="token operator">/</span>main<span class="token operator">/</span>cpp<span class="token operator">/</span>src<span class="token operator">/</span>includes<span class="token operator">/</span>miniupnp
+                    $<span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span><span class="token operator">/</span>src<span class="token operator">/</span>main<span class="token operator">/</span>cpp<span class="token operator">/</span>third<span class="token operator">/</span>includes <span class="token punctuation">)</span>
 
-...
-set(libnatpmp
-        ${My_ARIC_SRC}/libnatpmp/getgateway.c
-        ${My_ARIC_SRC}/libnatpmp/natpmp.c
-        ${My_ARIC_SRC}/libnatpmp/wingettimeofday.c )
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token function">set</span><span class="token punctuation">(</span>libnatpmp
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libnatpmp<span class="token operator">/</span>getgateway<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libnatpmp<span class="token operator">/</span>natpmp<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libnatpmp<span class="token operator">/</span>wingettimeofday<span class="token punctuation">.</span>c <span class="token punctuation">)</span>
 
-set(libupnp
-        ${My_ARIC_SRC}/miniupnp/connecthostport.c
-        ${My_ARIC_SRC}/miniupnp/igd_desc_parse.c
-        ${My_ARIC_SRC}/miniupnp/minisoap.c
-        ${My_ARIC_SRC}/miniupnp/minissdpc.c
-        ${My_ARIC_SRC}/miniupnp/miniupnpc.c
-        ${My_ARIC_SRC}/miniupnp/miniwget.c
-        ${My_ARIC_SRC}/miniupnp/minixml.c
-        ${My_ARIC_SRC}/miniupnp/portlistingparse.c
-        ${My_ARIC_SRC}/miniupnp/receivedata.c
-        ${My_ARIC_SRC}/miniupnp/upnpcommands.c
-        ${My_ARIC_SRC}/miniupnp/upnpreplyparse.c )
+<span class="token function">set</span><span class="token punctuation">(</span>libupnp
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>miniupnp<span class="token operator">/</span>connecthostport<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>miniupnp<span class="token operator">/</span>igd_desc_parse<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>miniupnp<span class="token operator">/</span>minisoap<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>miniupnp<span class="token operator">/</span>minissdpc<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>miniupnp<span class="token operator">/</span>miniupnpc<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>miniupnp<span class="token operator">/</span>miniwget<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>miniupnp<span class="token operator">/</span>minixml<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>miniupnp<span class="token operator">/</span>portlistingparse<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>miniupnp<span class="token operator">/</span>receivedata<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>miniupnp<span class="token operator">/</span>upnpcommands<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>miniupnp<span class="token operator">/</span>upnpreplyparse<span class="token punctuation">.</span>c <span class="token punctuation">)</span>
 
 #之后，添加编译        
 
-add_library( # Sets the name of the library.
+<span class="token function">add_library</span><span class="token punctuation">(</span> # Sets the name of the library<span class="token punctuation">.</span>
              Aria
 
-             # Sets the library as a shared library.
+             <span class="token macro property"># Sets the library as a shared library.</span>
              SHARED
 
-            ${AriaSrc}
-            ${am__append_1_4}
-            ${am__append_6_22}
-            ${am__append_23_29}
-            ${am__append_30}
-            ${am__append_31}
-            ${wslay_Src}
-            ${libutp}
-            ${libnatpmp}
-            ${libupnp}
+            $<span class="token punctuation">{</span>AriaSrc<span class="token punctuation">}</span>
+            $<span class="token punctuation">{</span>am__append_1_4<span class="token punctuation">}</span>
+            $<span class="token punctuation">{</span>am__append_6_22<span class="token punctuation">}</span>
+            $<span class="token punctuation">{</span>am__append_23_29<span class="token punctuation">}</span>
+            $<span class="token punctuation">{</span>am__append_30<span class="token punctuation">}</span>
+            $<span class="token punctuation">{</span>am__append_31<span class="token punctuation">}</span>
+            $<span class="token punctuation">{</span>wslay_Src<span class="token punctuation">}</span>
+            $<span class="token punctuation">{</span>libutp<span class="token punctuation">}</span>
+            $<span class="token punctuation">{</span>libnatpmp<span class="token punctuation">}</span>
+            $<span class="token punctuation">{</span>libupnp<span class="token punctuation">}</span>
 
             #自己的源码文件
-            src/main/cpp/Aria2AndroidJni.cpp
-            )
+            src<span class="token operator">/</span>main<span class="token operator">/</span>cpp<span class="token operator">/</span>Aria2AndroidJni<span class="token punctuation">.</span>cpp
+            <span class="token punctuation">)</span>
 </code></pre>
 <p>CmakeList目录结构<br><img src="/uploads/upnp协议支持/CmakeList目录结构.png" alt="结果显示"><br>transmission中代码为C风格，这里要改成C++11的方式  ，接下来就是对应的移植了</p>
-<pre class=" language-CPP"><code class="language-CPP">首先 我们也要搞一个开关配置，具体怎么添加，可以参照源码原本的添加过程
-//设置允许端口隐射
-gloableOptions.push_back(std::pair<std::string,std::string> ("bt-enable-port-forward","true"));
+<pre class=" language-cpp"><code class="language-cpp">首先 我们也要搞一个开关配置，具体怎么添加，可以参照源码原本的添加过程
+<span class="token comment" spellcheck="true">//设置允许端口隐射</span>
+gloableOptions<span class="token punctuation">.</span><span class="token function">push_back</span><span class="token punctuation">(</span>std<span class="token operator">::</span>pair<span class="token operator">&lt;</span>std<span class="token operator">::</span>string<span class="token punctuation">,</span>std<span class="token operator">::</span>string<span class="token operator">></span> <span class="token punctuation">(</span><span class="token string">"bt-enable-port-forward"</span><span class="token punctuation">,</span><span class="token string">"true"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-对于这种端口映射，我们并不是针对单个种子，而是针对所有的种子，这样都可以共用这个隐射,所以我们的初始化，放在Dht初始化
+对于这种端口映射，我们并不是针对单个种子，而是针对所有的种子，这样都可以共用这个隐射<span class="token punctuation">,</span>所以我们的初始化，放在Dht初始化
 
-//判断是否允许端口隐射
-if(e->getOption()->getAsBool(PREF_ENABLE_PORT_FORWARD))
-{
-    //构建一个共享的智能指针对象交给BtRegister保存，这样当BtRegistry销毁的时候，这个对象就会被销毁了
-    auto portForward = std::make_shared<BtPortForward>();
-    //将BtPortForward 对象保存在 BtRegister中，这样当BtRegister销毁的时候，这个对象才会被销毁 由于 make_shared 引用为0 才会销毁
-    e->getBtRegistry()->setBtPortForward(portForward);
+<span class="token comment" spellcheck="true">//判断是否允许端口隐射</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span>e<span class="token operator">-</span><span class="token operator">></span><span class="token function">getOption</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">getAsBool</span><span class="token punctuation">(</span>PREF_ENABLE_PORT_FORWARD<span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//构建一个共享的智能指针对象交给BtRegister保存，这样当BtRegistry销毁的时候，这个对象就会被销毁了</span>
+    <span class="token keyword">auto</span> portForward <span class="token operator">=</span> std<span class="token operator">::</span>make_shared<span class="token operator">&lt;</span>BtPortForward<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//将BtPortForward 对象保存在 BtRegister中，这样当BtRegister销毁的时候，这个对象才会被销毁 由于 make_shared 引用为0 才会销毁</span>
+    e<span class="token operator">-</span><span class="token operator">></span><span class="token function">getBtRegistry</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">setBtPortForward</span><span class="token punctuation">(</span>portForward<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    //构建BtPortForwardCommand对象，调用对应的构造函数完成初始化 用于监听端口隐射变化
-    auto c = make_unique<BtPortForwardCommand>(e->newCUID(), e);
-    c->setBtPortForward(portForward);
-    //添加到commands集合中 ,move之后，这个对象就转移了不可以用了
-    tempCommands.push_back(std::move(c));
-}
+    <span class="token comment" spellcheck="true">//构建BtPortForwardCommand对象，调用对应的构造函数完成初始化 用于监听端口隐射变化</span>
+    <span class="token keyword">auto</span> c <span class="token operator">=</span> make_unique<span class="token operator">&lt;</span>BtPortForwardCommand<span class="token operator">></span><span class="token punctuation">(</span>e<span class="token operator">-</span><span class="token operator">></span><span class="token function">newCUID</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    c<span class="token operator">-</span><span class="token operator">></span><span class="token function">setBtPortForward</span><span class="token punctuation">(</span>portForward<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//添加到commands集合中 ,move之后，这个对象就转移了不可以用了</span>
+    tempCommands<span class="token punctuation">.</span><span class="token function">push_back</span><span class="token punctuation">(</span>std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>c<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
 我们的BtPortForward 就相当于transmission 中的tr_shared对象
- //端口隐射
-class BtPortForward {
-private:
-    //标识是否允许
-    bool isEnabled;
+ <span class="token comment" spellcheck="true">//端口隐射</span>
+<span class="token keyword">class</span> <span class="token class-name">BtPortForward</span> <span class="token punctuation">{</span>
+<span class="token keyword">private</span><span class="token operator">:</span>
+    <span class="token comment" spellcheck="true">//标识是否允许</span>
+    <span class="token keyword">bool</span> isEnabled<span class="token punctuation">;</span>
 
-    //标识是否正在关闭
-    bool isShuttingDown;
+    <span class="token comment" spellcheck="true">//标识是否正在关闭</span>
+    <span class="token keyword">bool</span> isShuttingDown<span class="token punctuation">;</span>
 
-    //标识是否需要端口检查
-    bool doPortCheck;
+    <span class="token comment" spellcheck="true">//标识是否需要端口检查</span>
+    <span class="token keyword">bool</span> doPortCheck<span class="token punctuation">;</span>
 
-    //pmp 协议 状态
-    BtPortForwarding natpmpStatus_;
+    <span class="token comment" spellcheck="true">//pmp 协议 状态</span>
+    BtPortForwarding natpmpStatus_<span class="token punctuation">;</span>
 
-    //upnp 协议状态
-    BtPortForwarding upnpStatus_;
+    <span class="token comment" spellcheck="true">//upnp 协议状态</span>
+    BtPortForwarding upnpStatus_<span class="token punctuation">;</span>
 
-    //对应的 upnp的协议的 对象指针
-    std::shared_ptr<BtUpnp> _upnp;
-    //对应的 pmp 协议的 对象指针
-    std::shared_ptr<BtNatpmp> _natpmp;
-}
+    <span class="token comment" spellcheck="true">//对应的 upnp的协议的 对象指针</span>
+    std<span class="token operator">::</span>shared_ptr<span class="token operator">&lt;</span>BtUpnp<span class="token operator">></span> _upnp<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//对应的 pmp 协议的 对象指针</span>
+    std<span class="token operator">::</span>shared_ptr<span class="token operator">&lt;</span>BtNatpmp<span class="token operator">></span> _natpmp<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
 对于transmission的 定时器我们采用 Command
-class BtPortForwardCommand : public Command {
-private:
-    DownloadEngine* e_;
-    std::shared_ptr<BtPortForward> portForward_;
-    //检查的时间点
-    Timer checkPoint_;
-    //刷新的时间点
-    std::chrono::milliseconds refreshInterval_;
+<span class="token keyword">class</span> <span class="token class-name">BtPortForwardCommand</span> <span class="token operator">:</span> <span class="token keyword">public</span> Command <span class="token punctuation">{</span>
+<span class="token keyword">private</span><span class="token operator">:</span>
+    DownloadEngine<span class="token operator">*</span> e_<span class="token punctuation">;</span>
+    std<span class="token operator">::</span>shared_ptr<span class="token operator">&lt;</span>BtPortForward<span class="token operator">></span> portForward_<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//检查的时间点</span>
+    Timer checkPoint_<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//刷新的时间点</span>
+    std<span class="token operator">::</span>chrono<span class="token operator">::</span>milliseconds refreshInterval_<span class="token punctuation">;</span>
 
-    int tr_sharedTraversalStatus();
-    void natPulse(bool status);
-    void set_evtimer_from_status();
-public:
+    <span class="token keyword">int</span> <span class="token function">tr_sharedTraversalStatus</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">void</span> <span class="token function">natPulse</span><span class="token punctuation">(</span><span class="token keyword">bool</span> status<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">void</span> <span class="token function">set_evtimer_from_status</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">public</span><span class="token operator">:</span>
 
-    BtPortForwardCommand(cuid_t cuid, DownloadEngine* e);
+    <span class="token function">BtPortForwardCommand</span><span class="token punctuation">(</span>cuid_t cuid<span class="token punctuation">,</span> DownloadEngine<span class="token operator">*</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    virtual bool execute() CXX11_OVERRIDE;
+    <span class="token keyword">virtual</span> <span class="token keyword">bool</span> <span class="token function">execute</span><span class="token punctuation">(</span><span class="token punctuation">)</span> CXX11_OVERRIDE<span class="token punctuation">;</span>
 
-    void setBtPortForward(const std::shared_ptr<BtPortForward>& portForward);
-};
+    <span class="token keyword">void</span> <span class="token function">setBtPortForward</span><span class="token punctuation">(</span><span class="token keyword">const</span> std<span class="token operator">::</span>shared_ptr<span class="token operator">&lt;</span>BtPortForward<span class="token operator">></span><span class="token operator">&amp;</span> portForward<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
 
 所以我们的command execute代码可以这样写
 
-//command命令的执行,用来执行校验端口隐射
-bool BtPortForwardCommand::execute() {
-    //当前引擎退出的还是才会回收这个command对象
-    if (e_->getRequestGroupMan()->downloadFinished() || e_->isHaltRequested()) {
-        //LOGD("BtPortForwardCommand return true");
-        return true;
-    }
+<span class="token comment" spellcheck="true">//command命令的执行,用来执行校验端口隐射</span>
+<span class="token keyword">bool</span> BtPortForwardCommand<span class="token operator">::</span><span class="token function">execute</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//当前引擎退出的还是才会回收这个command对象</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getRequestGroupMan</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">downloadFinished</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">||</span> e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">isHaltRequested</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//LOGD("BtPortForwardCommand return true");</span>
+        <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    //检查是否到了刷新的时间点
-    if(checkPoint_.difference(global::wallclock()) >= refreshInterval_)
-    {
-        //重置刷新的时间
-        checkPoint_ = global::wallclock();
+    <span class="token comment" spellcheck="true">//检查是否到了刷新的时间点</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>checkPoint_<span class="token punctuation">.</span><span class="token function">difference</span><span class="token punctuation">(</span>global<span class="token operator">::</span><span class="token function">wallclock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">>=</span> refreshInterval_<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//重置刷新的时间</span>
+        checkPoint_ <span class="token operator">=</span> global<span class="token operator">::</span><span class="token function">wallclock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        LOGD("BtPortForwardCommand::execute time to exec");
+        <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"BtPortForwardCommand::execute time to exec"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        /* do something */
-        natPulse(portForward_->getDoPortCheckStatus());
+        <span class="token comment" spellcheck="true">/* do something */</span>
+        <span class="token function">natPulse</span><span class="token punctuation">(</span>portForward_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getDoPortCheckStatus</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        //将doPortCheck置位false
-        portForward_->setDoPortCheckStatus(false);
+        <span class="token comment" spellcheck="true">//将doPortCheck置位false</span>
+        portForward_<span class="token operator">-</span><span class="token operator">></span><span class="token function">setDoPortCheckStatus</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        //根据不同的状态决定定时器触发的时间
-        set_evtimer_from_status();
-    }
-    //下次再触发检查
-    e_->addRoutineCommand(std::unique_ptr<Command>(this));
-    return false;
-}
+        <span class="token comment" spellcheck="true">//根据不同的状态决定定时器触发的时间</span>
+        <span class="token function">set_evtimer_from_status</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//下次再触发检查</span>
+    e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">addRoutineCommand</span><span class="token punctuation">(</span>std<span class="token operator">::</span>unique_ptr<span class="token operator">&lt;</span>Command<span class="token operator">></span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-/**
+<span class="token comment" spellcheck="true">/**
  * 依据情况更改检查端口的时间点
-*/
-void BtPortForwardCommand::set_evtimer_from_status() {
+*/</span>
+<span class="token keyword">void</span> BtPortForwardCommand<span class="token operator">::</span><span class="token function">set_evtimer_from_status</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
 
-    int msec = 0;
-    /* when to wake up again */
-    switch (tr_sharedTraversalStatus()) {
-        case TR_PORT_MAPPED:
-            //如果当前我们已经隐射成功了，那么20分钟之后再来检查
-            /* if we're mapped, everything is fine... check back in 20 minutes
-             * to renew the port forwarding if it's expired */
-            //将doPortCheck置位true
-            portForward_->setDoPortCheckStatus(true);
-            msec = 60 * 20 * 1000;
-            break;
+    <span class="token keyword">int</span> msec <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">/* when to wake up again */</span>
+    <span class="token keyword">switch</span> <span class="token punctuation">(</span><span class="token function">tr_sharedTraversalStatus</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">case</span> TR_PORT_MAPPED<span class="token operator">:</span>
+            <span class="token comment" spellcheck="true">//如果当前我们已经隐射成功了，那么20分钟之后再来检查</span>
+            <span class="token comment" spellcheck="true">/* if we're mapped, everything is fine... check back in 20 minutes
+             * to renew the port forwarding if it's expired */</span>
+            <span class="token comment" spellcheck="true">//将doPortCheck置位true</span>
+            portForward_<span class="token operator">-</span><span class="token operator">></span><span class="token function">setDoPortCheckStatus</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            msec <span class="token operator">=</span> <span class="token number">60</span> <span class="token operator">*</span> <span class="token number">20</span> <span class="token operator">*</span> <span class="token number">1000</span><span class="token punctuation">;</span>
+            <span class="token keyword">break</span><span class="token punctuation">;</span>
 
-        case TR_PORT_ERROR:
-            //如果出现了错误，那么60秒之后再来
-            /* some kind of an error. wait 60 seconds and retry */
-            msec = 60 * 1000;
-            break;
+        <span class="token keyword">case</span> TR_PORT_ERROR<span class="token operator">:</span>
+            <span class="token comment" spellcheck="true">//如果出现了错误，那么60秒之后再来</span>
+            <span class="token comment" spellcheck="true">/* some kind of an error. wait 60 seconds and retry */</span>
+            msec <span class="token operator">=</span> <span class="token number">60</span> <span class="token operator">*</span> <span class="token number">1000</span><span class="token punctuation">;</span>
+            <span class="token keyword">break</span><span class="token punctuation">;</span>
 
-        default:
-            /* in progress. pulse frequently. */
-            msec = 333000;
-            break;
-    }
-    LOGD("BtPortForwardCommand::set_evtimer_from_status msec %d",msec);
-    //看情况的更改下次检查的刷新时间点
-    refreshInterval_ = std::chrono::milliseconds(msec);
-}
+        <span class="token keyword">default</span><span class="token operator">:</span>
+            <span class="token comment" spellcheck="true">/* in progress. pulse frequently. */</span>
+            msec <span class="token operator">=</span> <span class="token number">333000</span><span class="token punctuation">;</span>
+            <span class="token keyword">break</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"BtPortForwardCommand::set_evtimer_from_status msec %d"</span><span class="token punctuation">,</span>msec<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//看情况的更改下次检查的刷新时间点</span>
+    refreshInterval_ <span class="token operator">=</span> std<span class="token operator">::</span>chrono<span class="token operator">::</span><span class="token function">milliseconds</span><span class="token punctuation">(</span>msec<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-BtNatpmp 对象就跟 transmission 中的 struct tr_natpmp,只不过我们把他封装起来，比如 natPmpPulse
+BtNatpmp 对象就跟 transmission 中的 <span class="token keyword">struct</span> tr_natpmp<span class="token punctuation">,</span>只不过我们把他封装起来，比如 natPmpPulse
 
-class BtNatpmp {
-private:
-    //标识是否已经发现
-    bool has_discovered;
-    //标识是否已经mapped
-    bool is_mapped;
-    //隐射完成之后 得到的外网端口号
-    int public_port_;
-    //隐射的内网端口号
-    int private_port_;
+<span class="token keyword">class</span> <span class="token class-name">BtNatpmp</span> <span class="token punctuation">{</span>
+<span class="token keyword">private</span><span class="token operator">:</span>
+    <span class="token comment" spellcheck="true">//标识是否已经发现</span>
+    <span class="token keyword">bool</span> has_discovered<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//标识是否已经mapped</span>
+    <span class="token keyword">bool</span> is_mapped<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//隐射完成之后 得到的外网端口号</span>
+    <span class="token keyword">int</span> public_port_<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//隐射的内网端口号</span>
+    <span class="token keyword">int</span> private_port_<span class="token punctuation">;</span>
 
-    unsigned int renew_time;
-    //下一个command 发送的时间
-    unsigned int  command_time;
-    //pmp 当前的状态
-    tr_natpmp_state state;
-    //真正的pmp 库对象
-    natpmp_t natpmp;
+    <span class="token keyword">unsigned</span> <span class="token keyword">int</span> renew_time<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//下一个command 发送的时间</span>
+    <span class="token keyword">unsigned</span> <span class="token keyword">int</span>  command_time<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//pmp 当前的状态</span>
+    tr_natpmp_state state<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//真正的pmp 库对象</span>
+    natpmp_t natpmp<span class="token punctuation">;</span>
 
-    void setCommandTime ();
+    <span class="token keyword">void</span> <span class="token function">setCommandTime</span> <span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    bool canSendCommand ();
+    <span class="token keyword">bool</span> <span class="token function">canSendCommand</span> <span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-public:
+<span class="token keyword">public</span><span class="token operator">:</span>
 
-    BtNatpmp();
+    <span class="token function">BtNatpmp</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    ~BtNatpmp();
+    <span class="token operator">~</span><span class="token function">BtNatpmp</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    int natPmpPulse(int private_port,bool is_enable,int * public_port);.
-}
+    <span class="token keyword">int</span> <span class="token function">natPmpPulse</span><span class="token punctuation">(</span><span class="token keyword">int</span> private_port<span class="token punctuation">,</span><span class="token keyword">bool</span> is_enable<span class="token punctuation">,</span><span class="token keyword">int</span> <span class="token operator">*</span> public_port<span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 
-BtUpnp 对象就跟 transmission 中的struct tr_upnp ,只不过我们把他封装起来，比如 tr_upnpPulse
+BtUpnp 对象就跟 transmission 中的<span class="token keyword">struct</span> tr_upnp <span class="token punctuation">,</span>只不过我们把他封装起来，比如 tr_upnpPulse
 
-class BtUpnp {
-private:
-    //标识是否发现
-    bool hasDiscovered;
+<span class="token keyword">class</span> <span class="token class-name">BtUpnp</span> <span class="token punctuation">{</span>
+<span class="token keyword">private</span><span class="token operator">:</span>
+    <span class="token comment" spellcheck="true">//标识是否发现</span>
+    <span class="token keyword">bool</span> hasDiscovered<span class="token punctuation">;</span>
 
-    struct UPNPUrls urls;
+    <span class="token keyword">struct</span> UPNPUrls urls<span class="token punctuation">;</span>
 
-    struct IGDdatas data;
-    //上一次upnp 隐射的本地局域网
-    int port_;
+    <span class="token keyword">struct</span> IGDdatas data<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//上一次upnp 隐射的本地局域网</span>
+    <span class="token keyword">int</span> port_<span class="token punctuation">;</span>
 
-    char lanaddr[16];
+    <span class="token keyword">char</span> lanaddr<span class="token punctuation">[</span><span class="token number">16</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
 
-    //标识是否隐射完成
-    bool isMapped;
+    <span class="token comment" spellcheck="true">//标识是否隐射完成</span>
+    <span class="token keyword">bool</span> isMapped<span class="token punctuation">;</span>
 
-    //upnp的状态
-    tr_upnp_state state;
+    <span class="token comment" spellcheck="true">//upnp的状态</span>
+    tr_upnp_state state<span class="token punctuation">;</span>
 
-    struct UPNPDev * tr_upnpDiscover(int msec);
+    <span class="token keyword">struct</span> UPNPDev <span class="token operator">*</span> <span class="token function">tr_upnpDiscover</span><span class="token punctuation">(</span><span class="token keyword">int</span> msec<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    int tr_upnpGetSpecificPortMappingEntry(const char * proto);
+    <span class="token keyword">int</span> <span class="token function">tr_upnpGetSpecificPortMappingEntry</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span> proto<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    int tr_upnpAddPortMapping(const char * proto, int port, const char * desc);
+    <span class="token keyword">int</span> <span class="token function">tr_upnpAddPortMapping</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span> proto<span class="token punctuation">,</span> <span class="token keyword">int</span> port<span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span> desc<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    void tr_upnpDeletePortMapping( const char * proto, int port);
+    <span class="token keyword">void</span> <span class="token function">tr_upnpDeletePortMapping</span><span class="token punctuation">(</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span> proto<span class="token punctuation">,</span> <span class="token keyword">int</span> port<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-public:
-    BtUpnp();
+<span class="token keyword">public</span><span class="token operator">:</span>
+    <span class="token function">BtUpnp</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    ~BtUpnp();
+    <span class="token operator">~</span><span class="token function">BtUpnp</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    int tr_upnpPulse(int port, int isEnabled, int doPortCheck);
-};
+    <span class="token keyword">int</span> <span class="token function">tr_upnpPulse</span><span class="token punctuation">(</span><span class="token keyword">int</span> port<span class="token punctuation">,</span> <span class="token keyword">int</span> isEnabled<span class="token punctuation">,</span> <span class="token keyword">int</span> doPortCheck<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
 
 再次回到初始化的地方
-//判断是否允许端口隐射，端口隐射是针对所有的种子，并不是针对单个种子
-if(e->getOption()->getAsBool(PREF_ENABLE_PORT_FORWARD))
-{
-    //构建一个共享的智能指针对象交给BtRegister保存，这样当BtRegistry销毁的时候，这个对象就会被销毁了
-    auto portForward = std::make_shared<BtPortForward>();
-    //将BtPortForward 对象保存在 BtRegister中，这样当BtRegister销毁的时候，这个对象才会被销毁 由于 make_shared 引用为0 才会销毁
-    e->getBtRegistry()->setBtPortForward(portForward);
-    ...
-}
+<span class="token comment" spellcheck="true">//判断是否允许端口隐射，端口隐射是针对所有的种子，并不是针对单个种子</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span>e<span class="token operator">-</span><span class="token operator">></span><span class="token function">getOption</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">getAsBool</span><span class="token punctuation">(</span>PREF_ENABLE_PORT_FORWARD<span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//构建一个共享的智能指针对象交给BtRegister保存，这样当BtRegistry销毁的时候，这个对象就会被销毁了</span>
+    <span class="token keyword">auto</span> portForward <span class="token operator">=</span> std<span class="token operator">::</span>make_shared<span class="token operator">&lt;</span>BtPortForward<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//将BtPortForward 对象保存在 BtRegister中，这样当BtRegister销毁的时候，这个对象才会被销毁 由于 make_shared 引用为0 才会销毁</span>
+    e<span class="token operator">-</span><span class="token operator">></span><span class="token function">getBtRegistry</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">setBtPortForward</span><span class="token punctuation">(</span>portForward<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h3 id="Aria2-释放操作"><a href="#Aria2-释放操作" class="headerlink" title="Aria2 释放操作"></a>Aria2 释放操作</h3><blockquote>
 <p>由于我们采用的是智能指针，所以不用关心对象的销毁动作，比如 BtPortForward ，我们把他保存到了 BtRegistery中，这样当BtRegistery销毁的时候，这个BtPortForward的引用才会变成0,进而完成它的销毁操作,又因为  BtPortForward 中以智能指针的方式持有 BtUpnp,BtNatpmp 的引用，所以对应 BtUpnp,BtNatpmp 只要以智能指针的方式初始化，之后设置到这个对象中，对应这俩个对象也不用管理销毁的操作</p>
 </blockquote>
-<pre class=" language-CPP"><code class="language-CPP">//对应的 upnp的协议的 对象指针
-std::shared_ptr<BtUpnp> _upnp;
-//对应的 pmp 协议的 对象指针
-std::shared_ptr<BtNatpmp> _natpmp;
+<pre class=" language-cpp"><code class="language-cpp"><span class="token comment" spellcheck="true">//对应的 upnp的协议的 对象指针</span>
+std<span class="token operator">::</span>shared_ptr<span class="token operator">&lt;</span>BtUpnp<span class="token operator">></span> _upnp<span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">//对应的 pmp 协议的 对象指针</span>
+std<span class="token operator">::</span>shared_ptr<span class="token operator">&lt;</span>BtNatpmp<span class="token operator">></span> _natpmp<span class="token punctuation">;</span>
 
-//如果为空，创建对应的pmp对象
-if (!portForward_->getNatPmp())
-{
-    portForward_->setBtNatpmp(std::make_shared<BtNatpmp>());
-}
+<span class="token comment" spellcheck="true">//如果为空，创建对应的pmp对象</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>portForward_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getNatPmp</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    portForward_<span class="token operator">-</span><span class="token operator">></span><span class="token function">setBtNatpmp</span><span class="token punctuation">(</span>std<span class="token operator">::</span>make_shared<span class="token operator">&lt;</span>BtNatpmp<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-//如果为空，创建对应的upnp 对象
-if (!portForward_->getBtUpnp())
-{
-    portForward_->setBtUpnp(std::make_shared<BtUpnp>());
-}
+<span class="token comment" spellcheck="true">//如果为空，创建对应的upnp 对象</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>portForward_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getBtUpnp</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    portForward_<span class="token operator">-</span><span class="token operator">></span><span class="token function">setBtUpnp</span><span class="token punctuation">(</span>std<span class="token operator">::</span>make_shared<span class="token operator">&lt;</span>BtUpnp<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
 相应的我们可以在这俩个对象的虚构函数中，完成销毁的操作，比如退出的时候，删除之前的隐射关系
 
-BtNatpmp::~BtNatpmp()
-{
-    if(is_mapped)
-    {
-        //判断是否需要删除之前的隐射 并且当前的时间达到了下一个command执行的时间
-        const int val = sendnewportmappingrequest (&natpmp, NATPMP_PROTOCOL_TCP, private_port_, public_port_, 0);
-        LOGD("is_mapped BtNatpmp::~BtNatpmp delete Port Forward", val);
-    }
-    closenatpmp (&natpmp);
-    //LOGD("BtNatpmp 虚构函数执行");
-}
+BtNatpmp<span class="token operator">::</span><span class="token operator">~</span><span class="token function">BtNatpmp</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>is_mapped<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//判断是否需要删除之前的隐射 并且当前的时间达到了下一个command执行的时间</span>
+        <span class="token keyword">const</span> <span class="token keyword">int</span> val <span class="token operator">=</span> <span class="token function">sendnewportmappingrequest</span> <span class="token punctuation">(</span><span class="token operator">&amp;</span>natpmp<span class="token punctuation">,</span> NATPMP_PROTOCOL_TCP<span class="token punctuation">,</span> private_port_<span class="token punctuation">,</span> public_port_<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"is_mapped BtNatpmp::~BtNatpmp delete Port Forward"</span><span class="token punctuation">,</span> val<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token function">closenatpmp</span> <span class="token punctuation">(</span><span class="token operator">&amp;</span>natpmp<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//LOGD("BtNatpmp 虚构函数执行");</span>
+<span class="token punctuation">}</span>
 
-BtUpnp::~BtUpnp()
-{
-    if(isMapped)
-    {
-        //删除隐射
-        tr_upnpDeletePortMapping("TCP", port_);
-        tr_upnpDeletePortMapping("UDP", port_);
-        //tr_logAddNamedInfo(getKey(),_("Stopping port forwarding through \"%s\", service \"%s\""),handle->urls.controlURL, handle->data.first.servicetype);
-        LOGD("BtUpnp::~BtUpnp Stopping port forwarding through %s service %s \n", urls.controlURL, data.first.servicetype);
-        //删除隐射，通知状态，比如port为-1
-        isMapped = false;
-        state = TR_UPNP_IDLE;
-        port_ = -1;
-    }
-    if (hasDiscovered)
-    {
-        FreeUPNPUrls(&urls);
-    }
-    //LOGD("BtUpnp 虚构函数执行");
-}
+BtUpnp<span class="token operator">::</span><span class="token operator">~</span><span class="token function">BtUpnp</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>isMapped<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//删除隐射</span>
+        <span class="token function">tr_upnpDeletePortMapping</span><span class="token punctuation">(</span><span class="token string">"TCP"</span><span class="token punctuation">,</span> port_<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">tr_upnpDeletePortMapping</span><span class="token punctuation">(</span><span class="token string">"UDP"</span><span class="token punctuation">,</span> port_<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//tr_logAddNamedInfo(getKey(),_("Stopping port forwarding through \"%s\", service \"%s\""),handle->urls.controlURL, handle->data.first.servicetype);</span>
+        <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"BtUpnp::~BtUpnp Stopping port forwarding through %s service %s \n"</span><span class="token punctuation">,</span> urls<span class="token punctuation">.</span>controlURL<span class="token punctuation">,</span> data<span class="token punctuation">.</span>first<span class="token punctuation">.</span>servicetype<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//删除隐射，通知状态，比如port为-1</span>
+        isMapped <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+        state <span class="token operator">=</span> TR_UPNP_IDLE<span class="token punctuation">;</span>
+        port_ <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>hasDiscovered<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token function">FreeUPNPUrls</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>urls<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//LOGD("BtUpnp 虚构函数执行");</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <p>Aria2 移植成功<br><img src="/uploads/upnp协议支持/Aria2 移植成功.png" alt="结果显示"><br>比如当我们程序退出的时候查看释放的过程<br><img src="/uploads/upnp协议支持/Aria2删除隐射.png" alt="结果显示"><br>在路由器上查看是否释放成功<br><img src="/uploads/upnp协议支持/查看Aria2释放映射是否成功.png" alt="结果显示"></p>
 

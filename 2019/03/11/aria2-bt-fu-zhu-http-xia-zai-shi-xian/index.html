@@ -493,7 +493,8 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><blockquote>
+                <p>背景</p>
+<blockquote>
 <p>上一年12月份的时候将修改后的Aria2 移植到Window 上面，做了一个简单的下载器，看看下载的情况，大体测试了一个月左右，虽然 Bt 下载表现的不错，每天都能省下一半多的流量，但是通过下载的成功率用户的留存，发现都普遍低于传统的Http下载，大体的原因有，Bt 获取到Peer的过程存在不确定性，比如 Tracker服务器挂掉，虽然有Dht实现，但是dht 寻找可用的节点太慢，再次就是就算获取到了Peer也无法确定哪些Peer是有效的，也即是有哪些Peer是支持打洞的，哪些是不支持的，而且目前对于要连接的Peer数量还有限制，再次就是Bt的下载速度是跟同一时刻用户量有关的，如果同一时刻用户量大的化那么Bt的下载速度就会上升，相反Bt下载速度就会极低，这就会影响用户的使用，影响用户的留存等，针对这种情况，我去分析了解下 英雄联盟(LOL) 下载器，发现他是通过Bt 辅助 Http来实现的</p>
 </blockquote>
 <p>LOL 下载器效果<br><img src="/uploads/Aria2Bt辅助Http下载/LOL下载器.png" alt="结果显示"><br>通过观察可以发现蓝色的为Http 下载的速度，这里估计实现了限速，因为从不会超过400kb/s，后面红色的为Bt下载的速度，由于实现了Bt 辅助Http下载，对用户的体验就会更好，用户不会因为没有速度或者下载速度太低导致的不想下载，这个可以通过Http下载来解决，对应Bt 下载算一种额外的收益，所以基于这种Bt 辅助 Http下载才是最终的实现</p>
@@ -1809,9 +1810,7 @@ std<span class="token operator">::</span>deque<span class="token operator">&lt;<
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概述
-C++智能指针
-
+                            
                         
                     </div>
                     <div class="publish-info">

@@ -497,8 +497,8 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <p>内存泄漏<br><a id="more"></a></p>
-<h1 id="什么是内存泄漏"><a href="#什么是内存泄漏" class="headerlink" title="什么是内存泄漏"></a><strong>什么是内存泄漏</strong></h1><pre><code>在Android里，程序内存被分为2部分：native和dalvik，dalvik就是我们普通的Java使用内存，我们创建的对象是在这里面分配的，
+                <p>内存泄漏</p>
+<pre><code>在Android里，程序内存被分为2部分：native和dalvik，dalvik就是我们普通的Java使用内存，我们创建的对象是在这里面分配的，
 对于内存的限制是 native+dalvik 不能超过最大限制。android程序内存一般限制在16M，也有的是24M（早期的Android系统G1，就是只有16M）。具体看定制系统的设置，如果
 在有限的内存里面发生了内存泄漏，程序运行的越久，也就会越卡
 
@@ -552,91 +552,92 @@ java的GC内存回收机制：某对象不再有任何的引用的时候才会�
 命令行模式：
 </code></pre><p>当正常的情况下,即CommonUtils.getInstatnce(getApplicationContext())<br><img src="/uploads/正常app退出的时候情况.png" alt="结果显示"></p>
 <p>当正常的情况下,即CommonUtils.getInstatnce(this),这里就是泄漏了MainActivity<br><img src="/uploads/非正常的情况.png" alt="结果显示"></p>
-<h1 id="内存泄露经常出现的例子"><a href="#内存泄露经常出现的例子" class="headerlink" title="内存泄露经常出现的例子"></a><strong>内存泄露经常出现的例子</strong></h1><pre><code>内存泄露(Memory Leak)：
+<h1 id="内存泄露经常出现的例子"><a href="#内存泄露经常出现的例子" class="headerlink" title="内存泄露经常出现的例子"></a><strong>内存泄露经常出现的例子</strong></h1><pre class=" language-java"><code class="language-java">内存泄露<span class="token punctuation">(</span>Memory Leak<span class="token punctuation">)</span>：
     进程中某些对象已经没有使用价值了，但是他们却还可以直接或者间接地被引用到GC Root导致无法回收。
-    当内存泄露过多的时候，再加上应用本身占用的内存，日积月累最终就会导致内存溢出OOM.
+    当内存泄露过多的时候，再加上应用本身占用的内存，日积月累最终就会导致内存溢出OOM<span class="token punctuation">.</span>
 内存溢出（OOM）：    
     当应用占用的heap资源超过了Dalvik虚拟机分配的内存就会内存溢出。比如：加载大图片。
 
-1.静态变量引起的内存泄露
+<span class="token number">1</span><span class="token punctuation">.</span>静态变量引起的内存泄露
     当调用getInstance时，如果传入的context是Activity的context。只要这个单利没有被释放，那么这个
     Activity也不会被释放一直到进程退出才会释放。
-    public class CommUtil {
-        private static CommUtil instance;
-        private Context context;
-        private CommUtil(Context context){
-        this.context = context;
-        }
+    <span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">CommUtil</span> <span class="token punctuation">{</span>
+        <span class="token keyword">private</span> <span class="token keyword">static</span> CommUtil instance<span class="token punctuation">;</span>
+        <span class="token keyword">private</span> Context context<span class="token punctuation">;</span>
+        <span class="token keyword">private</span> <span class="token function">CommUtil</span><span class="token punctuation">(</span>Context context<span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>context <span class="token operator">=</span> context<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
 
-        public static CommUtil getInstance(Context mcontext){
-        if(instance == null){
-            instance = new CommUtil(mcontext);
-        }
-    //        else{
-    //            instance.setContext(mcontext);
-    //        }
-        return instance;
-        }
+        <span class="token keyword">public</span> <span class="token keyword">static</span> CommUtil <span class="token function">getInstance</span><span class="token punctuation">(</span>Context mcontext<span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span>instance <span class="token operator">==</span> null<span class="token punctuation">)</span><span class="token punctuation">{</span>
+            instance <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">CommUtil</span><span class="token punctuation">(</span>mcontext<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//        else{</span>
+    <span class="token comment" spellcheck="true">//            instance.setContext(mcontext);</span>
+    <span class="token comment" spellcheck="true">//        }</span>
+        <span class="token keyword">return</span> instance<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
 
-2.非静态内部类引起内存泄露
-(包括匿名内部类)
+<span class="token number">2</span><span class="token punctuation">.</span>非静态内部类引起内存泄露
+<span class="token punctuation">(</span>包括匿名内部类<span class="token punctuation">)</span>
     错误的示范：
 
-        public void loadData(){//隐士持有MainActivity实例。MainActivity.this.a
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-            while(true){
-                try {
-                //int b=a;
-                Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                e.printStackTrace();
-                }
-            }
-            }
-        }).start();
-        }
+        <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">loadData</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span><span class="token comment" spellcheck="true">//隐士持有MainActivity实例。MainActivity.this.a</span>
+        <span class="token keyword">new</span> <span class="token class-name">Thread</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Runnable</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token annotation punctuation">@Override</span>
+            <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">run</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">while</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+                <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">//int b=a;</span>
+                Thread<span class="token punctuation">.</span><span class="token function">sleep</span><span class="token punctuation">(</span><span class="token number">1000</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">InterruptedException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
     解决方案：
     将非静态内部类修改为静态内部类。
     （静态内部类不会隐士持有外部类）
 
 当使用软引用或者弱引用的时候，MainActivity难道很容易或者可以被GC回收吗？》
 GC回收的机制是什么？当MainActivity不被任何的对象引用。
-虽然Handler里面用的是软引用/弱引用，但是并不意味着不存在其他的对象引用该MainActivity。
+虽然Handler里面用的是软引用<span class="token operator">/</span>弱引用，但是并不意味着不存在其他的对象引用该MainActivity。
 我连MainActivity都被回收了，那他里面的Handler还玩个屁。
 
-3.不需要用的监听未移除会发生内存泄露
-    例子1：
-//        tv.setOnClickListener();//监听执行完回收对象
-        //add监听，放到集合里面
-        tv.getViewTreeObserver().addOnWindowFocusChangeListener(new ViewTreeObserver.OnWindowFocusChangeListener() {
-            @Override
-            public void onWindowFocusChanged(boolean b) {
-                //监听view的加载，view加载出来的时候，计算他的宽高等。
+<span class="token number">3</span><span class="token punctuation">.</span>不需要用的监听未移除会发生内存泄露
+    例子<span class="token number">1</span>：
+<span class="token comment" spellcheck="true">//        tv.setOnClickListener();//监听执行完回收对象</span>
+        <span class="token comment" spellcheck="true">//add监听，放到集合里面</span>
+        tv<span class="token punctuation">.</span><span class="token function">getViewTreeObserver</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">addOnWindowFocusChangeListener</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">ViewTreeObserver<span class="token punctuation">.</span>OnWindowFocusChangeListener</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token annotation punctuation">@Override</span>
+            <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">onWindowFocusChanged</span><span class="token punctuation">(</span><span class="token keyword">boolean</span> b<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">//监听view的加载，view加载出来的时候，计算他的宽高等。</span>
 
-                //计算完后，一定要移除这个监听
-                tv.getViewTreeObserver().removeOnWindowFocusChangeListener(this);
-            }
-        });
+                <span class="token comment" spellcheck="true">//计算完后，一定要移除这个监听</span>
+                tv<span class="token punctuation">.</span><span class="token function">getViewTreeObserver</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">removeOnWindowFocusChangeListener</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    例子2：
-            SensorManager sensorManager = getSystemService(SENSOR_SERVICE);
-        Sensor sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ALL);
-        sensorManager.registerListener(this,sensor,SensorManager.SENSOR_DELAY_FASTEST);
-        //不需要用的时候记得移除监听
-        sensorManager.unregisterListener(listener);
+    例子<span class="token number">2</span>：
+            SensorManager sensorManager <span class="token operator">=</span> <span class="token function">getSystemService</span><span class="token punctuation">(</span>SENSOR_SERVICE<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Sensor sensor <span class="token operator">=</span> sensorManager<span class="token punctuation">.</span><span class="token function">getDefaultSensor</span><span class="token punctuation">(</span>Sensor<span class="token punctuation">.</span>TYPE_ALL<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        sensorManager<span class="token punctuation">.</span><span class="token function">registerListener</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">,</span>sensor<span class="token punctuation">,</span>SensorManager<span class="token punctuation">.</span>SENSOR_DELAY_FASTEST<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//不需要用的时候记得移除监听</span>
+        sensorManager<span class="token punctuation">.</span><span class="token function">unregisterListener</span><span class="token punctuation">(</span>listener<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 
-4.资源未关闭引起的内存泄露情况
+<span class="token number">4</span><span class="token punctuation">.</span>资源未关闭引起的内存泄露情况
     比如：BroadCastReceiver、Cursor、Bitmap、IO流、自定义属性attribute
-attr.recycle()回收。
+attr<span class="token punctuation">.</span><span class="token function">recycle</span><span class="token punctuation">(</span><span class="token punctuation">)</span>回收。
 当不需要使用的时候，要记得及时释放资源。否则就会内存泄露。
 
-5.无限循环动画
+<span class="token number">5</span><span class="token punctuation">.</span>无限循环动画
 没有在onDestroy中停止动画，否则Activity就会变成泄露对象。
 比如：轮播图效果。
 </code></pre>
+
                 
             </div>
             <hr/>
