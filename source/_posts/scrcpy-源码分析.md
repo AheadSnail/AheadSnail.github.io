@@ -5,13 +5,6 @@ date: 2018-12-01 10:07:07
 tags: [scrcpy,NDK]
 description: scrcpy 源码分析
 ---
-
-### 概述
-
-> scrcpy 源码分析
-
-<!--more-->
-
 ### 简介
 > 前面一篇文章介绍了scrcpy 的使用，以及对应的编译，可以实现在Ubuntu 编译调试的客户端代码，这篇文章会介绍 简要的介绍下scrcpy的源码实现，在介绍scrcpy源码之前，可以查看 https://github.com/Genymobile/scrcpy/blob/master/DEVELOP.md 关于scrcpy的大概实现
 
@@ -26,7 +19,7 @@ description: scrcpy 源码分析
 
 
 ### 源码分析
-```C
+```cpp
 首先是客户端启动，也即是对应的main方法运行, 这里启动运行的时候，并没有传递任何的参数，所以 args代表默认的参数 
 
 int main(int argc, char *argv[]) {

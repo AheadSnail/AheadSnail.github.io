@@ -5,13 +5,6 @@ date: 2018-11-26 09:45:40
 tags: [scrcpy,NDK]
 description: scrcpy 使用以及编译
 ---
-
-### 概述
-
-> scrcpy 使用以及编译
-
-<!--more-->
-
 ### 简介
 > scrcpy 此应用程序提供USB（或通过TCP / IP）连接的Android设备的显示和控制。 它不需要任何root访问权限。 它适用于GNU / Linux，Windows和MacOS。而且最主要的是他是一个开源的应用，在github的地址为https://github.com/Genymobile/scrcpy start数量达到了9k多算是一个比较优秀的，值得去了解的一个应用
 
@@ -104,7 +97,7 @@ Meson的官网地址为  http://mesonbuild.com/Tutorial.html 以及基本的语�
 
 比如新建一个main.c 代码如下
 
-```C++
+```cpp
 #include <stdio.h>
 
 int main(int argc,char ** argv)
@@ -337,7 +330,7 @@ run_target('run', command: ['scripts/run-scrcpy.sh']) ，这个脚本主要用�
 ```
 ![结果显示](/uploads/scrcypy编译/scrpites脚本文件.png)
 这样meson.build配置完成，就会生成一个config.h 对应的内容为执行 app目录下面的meson.build 的配置
-```C++
+```cpp
 #pragma once
 
 #undef BUILD_DEBUG
@@ -399,7 +392,7 @@ include $(BUILD_SHARED_LIBRARY)
 ![结果显示](/uploads/scrcypy编译/SDL主MakeFile.png)
 
 下面是Android.mk文件的关键内容
-```MakeFile
+```makefile
 LOCAL_PATH := $(call my-dir)
 
 ###########################
@@ -537,7 +530,7 @@ externalNativeBuild {
 }
 ```
 CMakeLists.txt的内容为
-```Cmake
+```CMakeLists
 cmake_minimum_required(VERSION 3.4.1)
 
 #添加头文件的查找目录
