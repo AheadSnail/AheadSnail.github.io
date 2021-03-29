@@ -509,371 +509,371 @@
 </blockquote>
 <p>下载限速参数设置<br><img src="/uploads/Aria2Rpc实现/Aria2限速支持.png" alt="结果显示"></p>
 <p>相应的上传速度的参数设置<br><img src="/uploads/Aria2Rpc实现/Aria2上传限速支持.png" alt="结果显示"></p>
-<h3 id="限速处理源码分析"><a href="#限速处理源码分析" class="headerlink" title="限速处理源码分析"></a>限速处理源码分析</h3><h4 id="首先要开启限速的支持"><a href="#首先要开启限速的支持" class="headerlink" title="首先要开启限速的支持"></a>首先要开启限速的支持</h4><pre class=" language-CPP"><code class="language-CPP">//设置最大的下载速度, 由于utp采用的是udp的原因，如果做限速处理的化，无法达到tcp限速的效果，所以下载不支持限速
-gloableOptions.push_back(std::pair<std::string,std::string> ("max-download-limit","50k"));
-//设置最大的上传速度
-gloableOptions.push_back(std::pair<std::string,std::string> ("max-upload-limit","100k"));
+<h3 id="限速处理源码分析"><a href="#限速处理源码分析" class="headerlink" title="限速处理源码分析"></a>限速处理源码分析</h3><h4 id="首先要开启限速的支持"><a href="#首先要开启限速的支持" class="headerlink" title="首先要开启限速的支持"></a>首先要开启限速的支持</h4><pre class=" language-cpp"><code class="language-cpp"><span class="token comment" spellcheck="true">//设置最大的下载速度, 由于utp采用的是udp的原因，如果做限速处理的化，无法达到tcp限速的效果，所以下载不支持限速</span>
+gloableOptions<span class="token punctuation">.</span><span class="token function">push_back</span><span class="token punctuation">(</span>std<span class="token operator">::</span>pair<span class="token operator">&lt;</span>std<span class="token operator">::</span>string<span class="token punctuation">,</span>std<span class="token operator">::</span>string<span class="token operator">></span> <span class="token punctuation">(</span><span class="token string">"max-download-limit"</span><span class="token punctuation">,</span><span class="token string">"50k"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">//设置最大的上传速度</span>
+gloableOptions<span class="token punctuation">.</span><span class="token function">push_back</span><span class="token punctuation">(</span>std<span class="token operator">::</span>pair<span class="token operator">&lt;</span>std<span class="token operator">::</span>string<span class="token punctuation">,</span>std<span class="token operator">::</span>string<span class="token operator">></span> <span class="token punctuation">(</span><span class="token string">"max-upload-limit"</span><span class="token punctuation">,</span><span class="token string">"100k"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 </code></pre>
-<h4 id="参数的解析使用"><a href="#参数的解析使用" class="headerlink" title="参数的解析使用"></a>参数的解析使用</h4><pre class=" language-CPP"><code class="language-CPP">
+<h4 id="参数的解析使用"><a href="#参数的解析使用" class="headerlink" title="参数的解析使用"></a>参数的解析使用</h4><pre class=" language-cpp"><code class="language-cpp">
 首先会在创建对应的RequestGroup 中解析，然后设置maxDownloadSpeedLimit_ ，maxUploadSpeedLimit_ 保存值
 
-//创建请求组的构造函数,传递的参数一个为当前请求gid，一个为当前请求组的选项
-RequestGroup::RequestGroup(const std::shared_ptr<GroupId>& gid,
-                           const std::shared_ptr<Option>& option)
-    : belongsToGID_(0),//标识这个是属于一个请求组
-      gid_(gid),//当前请求组的唯一的id
-      option_(option),//将当前请求组对应的选项保存起来
-      progressInfoFile_(std::make_shared<NullProgressInfoFile>()),//首先构造一个NullProgressInfoFile对象，调用对应的构造函数，并将引用赋值给progressInfoFile_
-      uriSelector_(make_unique<InorderURISelector>()),//构造一个InorderURISelector对象，并将引用赋值给uriSelector_
-      requestGroupMan_(nullptr),
-#ifdef ENABLE_BITTORRENT
-      btRuntime_(nullptr),
-      peerStorage_(nullptr),
-#endif // ENABLE_BITTORRENT
-      followingGID_(0),
-      lastModifiedTime_(Time::null()),//上次修改的时间
-      timeout_(option->getAsInt(PREF_TIMEOUT)),//timeout 超时时间设置，默认为60秒，
-      state_(STATE_WAITING),//当前的状态，这里置为等待中
-      numConcurrentCommand_(option->getAsInt(PREF_SPLIT)),//split 默认值为5，这个值代表同时有多少个连接参与下载，即一个下载可以有多少个并发下载
-      numStreamConnection_(0),
-      numStreamCommand_(0),
-      numCommand_(0),
-      fileNotFoundCount_(0),//文件没有找到的个数
-      maxDownloadSpeedLimit_(option->getAsInt(PREF_MAX_DOWNLOAD_LIMIT)),//max-download-limit 代表最大下载的限制，这个可以改变的。。默认值为没有限制
-      maxUploadSpeedLimit_(option->getAsInt(PREF_MAX_UPLOAD_LIMIT)),//max-upload-limit 代表最大上传的限制  这个可以改变的。。默认值为没有限制
-      ....
-}
+<span class="token comment" spellcheck="true">//创建请求组的构造函数,传递的参数一个为当前请求gid，一个为当前请求组的选项</span>
+RequestGroup<span class="token operator">::</span><span class="token function">RequestGroup</span><span class="token punctuation">(</span><span class="token keyword">const</span> std<span class="token operator">::</span>shared_ptr<span class="token operator">&lt;</span>GroupId<span class="token operator">></span><span class="token operator">&amp;</span> gid<span class="token punctuation">,</span>
+                           <span class="token keyword">const</span> std<span class="token operator">::</span>shared_ptr<span class="token operator">&lt;</span>Option<span class="token operator">></span><span class="token operator">&amp;</span> option<span class="token punctuation">)</span>
+    <span class="token operator">:</span> <span class="token function">belongsToGID_</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token comment" spellcheck="true">//标识这个是属于一个请求组</span>
+      <span class="token function">gid_</span><span class="token punctuation">(</span>gid<span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token comment" spellcheck="true">//当前请求组的唯一的id</span>
+      <span class="token function">option_</span><span class="token punctuation">(</span>option<span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token comment" spellcheck="true">//将当前请求组对应的选项保存起来</span>
+      <span class="token function">progressInfoFile_</span><span class="token punctuation">(</span>std<span class="token operator">::</span>make_shared<span class="token operator">&lt;</span>NullProgressInfoFile<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token comment" spellcheck="true">//首先构造一个NullProgressInfoFile对象，调用对应的构造函数，并将引用赋值给progressInfoFile_</span>
+      <span class="token function">uriSelector_</span><span class="token punctuation">(</span>make_unique<span class="token operator">&lt;</span>InorderURISelector<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token comment" spellcheck="true">//构造一个InorderURISelector对象，并将引用赋值给uriSelector_</span>
+      <span class="token function">requestGroupMan_</span><span class="token punctuation">(</span><span class="token keyword">nullptr</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token macro property">#<span class="token directive keyword">ifdef</span> ENABLE_BITTORRENT</span>
+      <span class="token function">btRuntime_</span><span class="token punctuation">(</span><span class="token keyword">nullptr</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+      <span class="token function">peerStorage_</span><span class="token punctuation">(</span><span class="token keyword">nullptr</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token macro property">#<span class="token directive keyword">endif</span> </span><span class="token comment" spellcheck="true">// ENABLE_BITTORRENT</span>
+      <span class="token function">followingGID_</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+      <span class="token function">lastModifiedTime_</span><span class="token punctuation">(</span>Time<span class="token operator">::</span><span class="token function">null</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token comment" spellcheck="true">//上次修改的时间</span>
+      <span class="token function">timeout_</span><span class="token punctuation">(</span>option<span class="token operator">-</span><span class="token operator">></span><span class="token function">getAsInt</span><span class="token punctuation">(</span>PREF_TIMEOUT<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token comment" spellcheck="true">//timeout 超时时间设置，默认为60秒，</span>
+      <span class="token function">state_</span><span class="token punctuation">(</span>STATE_WAITING<span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token comment" spellcheck="true">//当前的状态，这里置为等待中</span>
+      <span class="token function">numConcurrentCommand_</span><span class="token punctuation">(</span>option<span class="token operator">-</span><span class="token operator">></span><span class="token function">getAsInt</span><span class="token punctuation">(</span>PREF_SPLIT<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token comment" spellcheck="true">//split 默认值为5，这个值代表同时有多少个连接参与下载，即一个下载可以有多少个并发下载</span>
+      <span class="token function">numStreamConnection_</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+      <span class="token function">numStreamCommand_</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+      <span class="token function">numCommand_</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+      <span class="token function">fileNotFoundCount_</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token comment" spellcheck="true">//文件没有找到的个数</span>
+      <span class="token function">maxDownloadSpeedLimit_</span><span class="token punctuation">(</span>option<span class="token operator">-</span><span class="token operator">></span><span class="token function">getAsInt</span><span class="token punctuation">(</span>PREF_MAX_DOWNLOAD_LIMIT<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token comment" spellcheck="true">//max-download-limit 代表最大下载的限制，这个可以改变的。。默认值为没有限制</span>
+      <span class="token function">maxUploadSpeedLimit_</span><span class="token punctuation">(</span>option<span class="token operator">-</span><span class="token operator">></span><span class="token function">getAsInt</span><span class="token punctuation">(</span>PREF_MAX_UPLOAD_LIMIT<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token comment" spellcheck="true">//max-upload-limit 代表最大上传的限制  这个可以改变的。。默认值为没有限制</span>
+      <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 
 并且在当前类中定义了对应的方法
 
-//判断当前的总下载是否超过了最大的下载速度
-bool RequestGroup::doesDownloadSpeedExceed()
-{
-  int spd = downloadContext_->getNetStat().calculateDownloadSpeed();
-  return maxDownloadSpeedLimit_ > 0 && maxDownloadSpeedLimit_ < spd;
-}
+<span class="token comment" spellcheck="true">//判断当前的总下载是否超过了最大的下载速度</span>
+<span class="token keyword">bool</span> RequestGroup<span class="token operator">::</span><span class="token function">doesDownloadSpeedExceed</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token keyword">int</span> spd <span class="token operator">=</span> downloadContext_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getNetStat</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">calculateDownloadSpeed</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">return</span> maxDownloadSpeedLimit_ <span class="token operator">></span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> maxDownloadSpeedLimit_ <span class="token operator">&lt;</span> spd<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-//判断当前的总上传是否超过了最大的上传速度
-bool RequestGroup::doesUploadSpeedExceed()
-{
-  int spd = downloadContext_->getNetStat().calculateUploadSpeed();
-  return maxUploadSpeedLimit_ > 0 && maxUploadSpeedLimit_ < spd;
-}
+<span class="token comment" spellcheck="true">//判断当前的总上传是否超过了最大的上传速度</span>
+<span class="token keyword">bool</span> RequestGroup<span class="token operator">::</span><span class="token function">doesUploadSpeedExceed</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token keyword">int</span> spd <span class="token operator">=</span> downloadContext_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getNetStat</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">calculateUploadSpeed</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">return</span> maxUploadSpeedLimit_ <span class="token operator">></span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> maxUploadSpeedLimit_ <span class="token operator">&lt;</span> spd<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h4 id="下载速度限制"><a href="#下载速度限制" class="headerlink" title="下载速度限制"></a>下载速度限制</h4><p>具体的使用doesDownloadSpeedExceed只有俩个地方，而且都只作用在Bt下载请求内容的时候,先来看第一处PeerInteractionCommand ,他的父类为 PeerAbstractCommand,主要完成超时的处理</p>
-<pre class=" language-CPP"><code class="language-CPP">//command 命令的执行
-bool PeerInteractionCommand::executeInternal()
-{
-    ...
-    //判断当前的上传以及下载是否超过了最大的速度限制,这里会更新Peer的超时时间设置
-    if (getDownloadEngine()->getRequestGroupMan()->doesOverallDownloadSpeedExceed() || requestGroup_->doesDownloadSpeedExceed()) {
-        //如果超过了,设置读不可写
-        disableReadCheckSocket();
-        //设置不检查
-        setNoCheck(true);
-        LOGD("PeerInteractionCommand DownloadSpeedExceed checkPoint_ reset");
-    }
-    ...
-}
+<pre class=" language-cpp"><code class="language-cpp"><span class="token comment" spellcheck="true">//command 命令的执行</span>
+<span class="token keyword">bool</span> PeerInteractionCommand<span class="token operator">::</span><span class="token function">executeInternal</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token comment" spellcheck="true">//判断当前的上传以及下载是否超过了最大的速度限制,这里会更新Peer的超时时间设置</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">getDownloadEngine</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">getRequestGroupMan</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">doesOverallDownloadSpeedExceed</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">||</span> requestGroup_<span class="token operator">-</span><span class="token operator">></span><span class="token function">doesDownloadSpeedExceed</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//如果超过了,设置读不可写</span>
+        <span class="token function">disableReadCheckSocket</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//设置不检查</span>
+        <span class="token function">setNoCheck</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"PeerInteractionCommand DownloadSpeedExceed checkPoint_ reset"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 
-//移除socektfd 读的检查 设置checkSocketIsReadable_ 标识为false
-void PeerAbstractCommand::disableReadCheckSocket()
-{
-  if (checkSocketIsReadable_) {
-    e_->deleteSocketForReadCheck(readCheckTarget_, this);
-    checkSocketIsReadable_ = false;
-    readCheckTarget_.reset();
-  }
-}
+<span class="token comment" spellcheck="true">//移除socektfd 读的检查 设置checkSocketIsReadable_ 标识为false</span>
+<span class="token keyword">void</span> PeerAbstractCommand<span class="token operator">::</span><span class="token function">disableReadCheckSocket</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>checkSocketIsReadable_<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">deleteSocketForReadCheck</span><span class="token punctuation">(</span>readCheckTarget_<span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    checkSocketIsReadable_ <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+    readCheckTarget_<span class="token punctuation">.</span><span class="token function">reset</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
-//设置不用检查超时
-void PeerAbstractCommand::setNoCheck(bool check) { noCheck_ = check; }
+<span class="token comment" spellcheck="true">//设置不用检查超时</span>
+<span class="token keyword">void</span> PeerAbstractCommand<span class="token operator">::</span><span class="token function">setNoCheck</span><span class="token punctuation">(</span><span class="token keyword">bool</span> check<span class="token punctuation">)</span> <span class="token punctuation">{</span> noCheck_ <span class="token operator">=</span> check<span class="token punctuation">;</span> <span class="token punctuation">}</span>
 
-这个超时的判断主要是用来更新超时的时间点，主要是通过上面的俩个方法，改变对应的标识,但是具体的使用，已经超时的机制使用是在父类的
+这个超时的判断主要是用来更新超时的时间点，主要是通过上面的俩个方法，改变对应的标识<span class="token punctuation">,</span>但是具体的使用，已经超时的机制使用是在父类的
 
-bool PeerAbstractCommand::execute()
-{
-  //exitBeforeExecute() 由具体的子类来实现， 可以用来检查种子是否下载完成，如果完成，回收对象使用，btRuntime_->isHalt(); 默认为false，当下载完成的时候由SeedCheckCommand::execute()触发，设置为true
-  if (exitBeforeExecute()) {
-    //下载完成的时候也会触发onAbort函数
-    onAbort();
-    return true;
-  }
-  try {
-    //readEventEnabled() 是检查socketfd 的是否可以读的结果       writeEventEnabled() 是检查socketfd 是否可以写的结果
-    if (noCheck_ || (checkSocketIsReadable_ && readEventEnabled()) || (checkSocketIsWritable_ && writeEventEnabled()) || hupEventEnabled()) {
-       checkPoint_ = global::wallclock();
-    }
-   ...
-}
+<span class="token keyword">bool</span> PeerAbstractCommand<span class="token operator">::</span><span class="token function">execute</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">//exitBeforeExecute() 由具体的子类来实现， 可以用来检查种子是否下载完成，如果完成，回收对象使用，btRuntime_->isHalt(); 默认为false，当下载完成的时候由SeedCheckCommand::execute()触发，设置为true</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">exitBeforeExecute</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//下载完成的时候也会触发onAbort函数</span>
+    <span class="token function">onAbort</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">try</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//readEventEnabled() 是检查socketfd 的是否可以读的结果       writeEventEnabled() 是检查socketfd 是否可以写的结果</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>noCheck_ <span class="token operator">||</span> <span class="token punctuation">(</span>checkSocketIsReadable_ <span class="token operator">&amp;&amp;</span> <span class="token function">readEventEnabled</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">||</span> <span class="token punctuation">(</span>checkSocketIsWritable_ <span class="token operator">&amp;&amp;</span> <span class="token function">writeEventEnabled</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">||</span> <span class="token function">hupEventEnabled</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+       checkPoint_ <span class="token operator">=</span> global<span class="token operator">::</span><span class="token function">wallclock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+   <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 
-由于执行了setNoCheck 函数，修改了noCheck_ 为true，所以上面的代码会执行 checkPoint_ = global::wallclock(); 修改了超时点的设置
+由于执行了setNoCheck 函数，修改了noCheck_ 为<span class="token boolean">true</span>，所以上面的代码会执行 checkPoint_ <span class="token operator">=</span> global<span class="token operator">::</span><span class="token function">wallclock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 修改了超时点的设置
 
 第二处使用的地方为 DefaultBtInteractive 也即是真正的接受消息的地方
 
-//接受消息
-size_t DefaultBtInteractive::receiveMessages()
-{
-  //当前还有多少条消息没有发送
-  size_t countOldOutstandingRequest = dispatcher_->countOutstandingRequest();
-  //代表接受到了多少条消息,这里的while(1) 的意思就是说，会一直的读取socekt的内容，也即是如果一次传递的内容超过了缓冲区的内容，也没关系，会在这里将全部的内容读取到，所以对应我们的
-  //utp来说，不用担心我们边处理数据，边收到内容
-  size_t msgcount = 0;
-  while (1) {
-    //如果当前的下载速度，超过了超过了最大的速度限制，直接退出while循环，下次再来读取内容
-    if (requestGroupMan_->doesOverallDownloadSpeedExceed() || downloadContext_->getOwnerRequestGroup()->doesDownloadSpeedExceed()) {
-      LOGD("DefaultBtInteractive downloadSpeedExceed break");
-      break;
-    }
-    //接受消息
-    auto message = btMessageReceiver_->receiveMessage();
-    if (!message) {
-       break;
-    }
-    ...
-}
+<span class="token comment" spellcheck="true">//接受消息</span>
+size_t DefaultBtInteractive<span class="token operator">::</span><span class="token function">receiveMessages</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">//当前还有多少条消息没有发送</span>
+  size_t countOldOutstandingRequest <span class="token operator">=</span> dispatcher_<span class="token operator">-</span><span class="token operator">></span><span class="token function">countOutstandingRequest</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//代表接受到了多少条消息,这里的while(1) 的意思就是说，会一直的读取socekt的内容，也即是如果一次传递的内容超过了缓冲区的内容，也没关系，会在这里将全部的内容读取到，所以对应我们的</span>
+  <span class="token comment" spellcheck="true">//utp来说，不用担心我们边处理数据，边收到内容</span>
+  size_t msgcount <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+  <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//如果当前的下载速度，超过了超过了最大的速度限制，直接退出while循环，下次再来读取内容</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>requestGroupMan_<span class="token operator">-</span><span class="token operator">></span><span class="token function">doesOverallDownloadSpeedExceed</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">||</span> downloadContext_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getOwnerRequestGroup</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">doesDownloadSpeedExceed</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"DefaultBtInteractive downloadSpeedExceed break"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">break</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//接受消息</span>
+    <span class="token keyword">auto</span> message <span class="token operator">=</span> btMessageReceiver_<span class="token operator">-</span><span class="token operator">></span><span class="token function">receiveMessage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>message<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+       <span class="token keyword">break</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <p>限速的根本是</p>
 <blockquote>
 <p>真正的接收消息的地方是在 btMessageReceiver_-&gt;receiveMessage(); 这里就不看具体的细节了， 可以看到上面的逻辑在接受消息之前会判断当前的是否超过了设置的下载速度，如果超过了就直接break掉所以当前本应该要接收的消息就没有立刻的接受了，而是等到了下次的接收，这里要注意这里并没有抛弃掉当前应该要接收的内容，而是根本就没有去接收，下次等到条件满足了再去接收数据，这样做是可以的主要是因为tcp的特性，tcp是一个<code>长连接</code>，所以可以做到这点</p>
 </blockquote>
 <h4 id="上传速度限制"><a href="#上传速度限制" class="headerlink" title="上传速度限制"></a>上传速度限制</h4><p>对应上传速度的使用，只有在DefaultBtMessageDispatcher 有做对应的处理</p>
-<pre class=" language-CPP"><code class="language-CPP">void DefaultBtMessageDispatcher::sendMessagesInternal()
-{
-  auto tempQueue = std::vector<std::unique_ptr<BtMessage>>{};
-  //从messsageQueue中移除先前添加进去的消息
-  while (!messageQueue_.empty()) {
-    //获取到messageQueue_ 中最前面的一个元素内容
-    auto msg = std::move(messageQueue_.front());
-    //移除集合messageQueue_中最前面的一个元素
-    messageQueue_.pop_front();
+<pre class=" language-cpp"><code class="language-cpp"><span class="token keyword">void</span> DefaultBtMessageDispatcher<span class="token operator">::</span><span class="token function">sendMessagesInternal</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token keyword">auto</span> tempQueue <span class="token operator">=</span> std<span class="token operator">::</span>vector<span class="token operator">&lt;</span>std<span class="token operator">::</span>unique_ptr<span class="token operator">&lt;</span>BtMessage<span class="token operator">>></span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//从messsageQueue中移除先前添加进去的消息</span>
+  <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token operator">!</span>messageQueue_<span class="token punctuation">.</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//获取到messageQueue_ 中最前面的一个元素内容</span>
+    <span class="token keyword">auto</span> msg <span class="token operator">=</span> std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>messageQueue_<span class="token punctuation">.</span><span class="token function">front</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//移除集合messageQueue_中最前面的一个元素</span>
+    messageQueue_<span class="token punctuation">.</span><span class="token function">pop_front</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    //如果当前是正在上传的消息
-    if (msg->isUploading()) {
-      if (requestGroupMan_->doesOverallUploadSpeedExceed() || downloadContext_->getOwnerRequestGroup()->doesUploadSpeedExceed()) {
-         tempQueue.push_back(std::move(msg));
-        continue;
-      }
-    }
+    <span class="token comment" spellcheck="true">//如果当前是正在上传的消息</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>msg<span class="token operator">-</span><span class="token operator">></span><span class="token function">isUploading</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>requestGroupMan_<span class="token operator">-</span><span class="token operator">></span><span class="token function">doesOverallUploadSpeedExceed</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">||</span> downloadContext_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getOwnerRequestGroup</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">doesUploadSpeedExceed</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+         tempQueue<span class="token punctuation">.</span><span class="token function">push_back</span><span class="token punctuation">(</span>std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>msg<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">continue</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
 
-    //这里只是创建对应的消息内容，然后填充到 socketBuffer_.pushBytes(std::move(data), std::move(progressUpdate))，也即是填充到缓冲区中
-    msg->send();
-  }
+    <span class="token comment" spellcheck="true">//这里只是创建对应的消息内容，然后填充到 socketBuffer_.pushBytes(std::move(data), std::move(progressUpdate))，也即是填充到缓冲区中</span>
+    msg<span class="token operator">-</span><span class="token operator">></span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
 
-  if (!tempQueue.empty()) {
-     messageQueue_.insert(std::begin(messageQueue_), std::make_move_iterator(std::begin(tempQueue)), std::make_move_iterator(std::end(tempQueue)));
-  }
-}
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>tempQueue<span class="token punctuation">.</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+     messageQueue_<span class="token punctuation">.</span><span class="token function">insert</span><span class="token punctuation">(</span>std<span class="token operator">::</span><span class="token function">begin</span><span class="token punctuation">(</span>messageQueue_<span class="token punctuation">)</span><span class="token punctuation">,</span> std<span class="token operator">::</span><span class="token function">make_move_iterator</span><span class="token punctuation">(</span>std<span class="token operator">::</span><span class="token function">begin</span><span class="token punctuation">(</span>tempQueue<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> std<span class="token operator">::</span><span class="token function">make_move_iterator</span><span class="token punctuation">(</span>std<span class="token operator">::</span><span class="token function">end</span><span class="token punctuation">(</span>tempQueue<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
-先来看看怎么样调用到这个方法  首先在PeerInteractionCommand,对应的case 为 WIRED 也即是到了最后一步互通资源状态
+先来看看怎么样调用到这个方法  首先在PeerInteractionCommand<span class="token punctuation">,</span>对应的<span class="token keyword">case</span> 为 WIRED 也即是到了最后一步互通资源状态
 
-//command 命令的执行
-bool PeerInteractionCommand::executeInternal()
-{
-    ...
-    case WIRED:
-      //互通对资源的意愿情况，包括interested、nointerested、choke、unchoke等4种  。 这边会一直的执行，下载，上传数据也是这里实现
-      btInteractive_->doInteractionProcessing();
+<span class="token comment" spellcheck="true">//command 命令的执行</span>
+<span class="token keyword">bool</span> PeerInteractionCommand<span class="token operator">::</span><span class="token function">executeInternal</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token keyword">case</span> WIRED<span class="token operator">:</span>
+      <span class="token comment" spellcheck="true">//互通对资源的意愿情况，包括interested、nointerested、choke、unchoke等4种  。 这边会一直的执行，下载，上传数据也是这里实现</span>
+      btInteractive_<span class="token operator">-</span><span class="token operator">></span><span class="token function">doInteractionProcessing</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-      //numReceivedMessage_     代表当前收到了多少条信息 ,就有必要保持连接 对于piece数据，如果只是收到了一小块的内容是不会发送这个消息的，只有完整的收到了一块数据
-      //才会发送这个保持连接的消息,也即是ack
-      if (btInteractive_->countReceivedMessageInIteration() > 0) {
-          updateKeepAlive();
-      }
+      <span class="token comment" spellcheck="true">//numReceivedMessage_     代表当前收到了多少条信息 ,就有必要保持连接 对于piece数据，如果只是收到了一小块的内容是不会发送这个消息的，只有完整的收到了一块数据</span>
+      <span class="token comment" spellcheck="true">//才会发送这个保持连接的消息,也即是ack</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>btInteractive_<span class="token operator">-</span><span class="token operator">></span><span class="token function">countReceivedMessageInIteration</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+          <span class="token function">updateKeepAlive</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
 
-      //判断当前的上传以及下载是否超过了最大的速度限制,这里会更新Peer的超时时间设置
-      if (getDownloadEngine()->getRequestGroupMan()->doesOverallDownloadSpeedExceed() || requestGroup_->doesDownloadSpeedExceed()) {
-         //如果超过了,设置读不可写
-         disableReadCheckSocket();
-         //设置不检查
-         setNoCheck(true);
-         LOGD("PeerInteractionCommand DownloadSpeedExceed checkPoint_ reset");
-      }
-      else {
-        setReadCheckSocket(getSocket());
-      }
-      done = true;
-      break;
-    }
-    ...
-}
+      <span class="token comment" spellcheck="true">//判断当前的上传以及下载是否超过了最大的速度限制,这里会更新Peer的超时时间设置</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">getDownloadEngine</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">getRequestGroupMan</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">doesOverallDownloadSpeedExceed</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">||</span> requestGroup_<span class="token operator">-</span><span class="token operator">></span><span class="token function">doesDownloadSpeedExceed</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+         <span class="token comment" spellcheck="true">//如果超过了,设置读不可写</span>
+         <span class="token function">disableReadCheckSocket</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+         <span class="token comment" spellcheck="true">//设置不检查</span>
+         <span class="token function">setNoCheck</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+         <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"PeerInteractionCommand DownloadSpeedExceed checkPoint_ reset"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+      <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        <span class="token function">setReadCheckSocket</span><span class="token punctuation">(</span><span class="token function">getSocket</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+      done <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+      <span class="token keyword">break</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 
-首先这个command会一直执行的，直到出现了错误，或者下载完成才会退出  btInteractive_->doInteractionProcessing(); 中有这样的实现
-// 互通对资源的意愿情况，包括interested、nointerested、choke、unchoke等4种。
-void DefaultBtInteractive::doInteractionProcessing()
-{    
-    ...
-    //LOGD("DefaultBtInteractive doInteractionProcessing");
-    //发送消息
-    sendPendingMessage();
-    ...
-}
+首先这个command会一直执行的，直到出现了错误，或者下载完成才会退出  btInteractive_<span class="token operator">-</span><span class="token operator">></span><span class="token function">doInteractionProcessing</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 中有这样的实现
+<span class="token comment" spellcheck="true">// 互通对资源的意愿情况，包括interested、nointerested、choke、unchoke等4种。</span>
+<span class="token keyword">void</span> DefaultBtInteractive<span class="token operator">::</span><span class="token function">doInteractionProcessing</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>    
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token comment" spellcheck="true">//LOGD("DefaultBtInteractive doInteractionProcessing");</span>
+    <span class="token comment" spellcheck="true">//发送消息</span>
+    <span class="token function">sendPendingMessage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 
-//发送等待中的消息 
-void DefaultBtInteractive::sendPendingMessage() { dispatcher_->sendMessages(); }
+<span class="token comment" spellcheck="true">//发送等待中的消息 </span>
+<span class="token keyword">void</span> DefaultBtInteractive<span class="token operator">::</span><span class="token function">sendPendingMessage</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> dispatcher_<span class="token operator">-</span><span class="token operator">></span><span class="token function">sendMessages</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token punctuation">}</span>
 
 而这个dispatcher就是 DefaultBtMessageDispatcher 所以会调用到对应的函数实现
 
-//执行消息的发送
-void DefaultBtMessageDispatcher::sendMessages()
-{
-   //A2_IOV_MAX 128 也即是如果内容还没有达到这个值，从消息队列中获取到消息，然后对应的创建对应的消息的内容，填充到缓冲区中，所以对应的peerConnection_->getBufferEntrySize() 就会加一
-  //所以这边的逻辑可以达到一种效果，当缓冲区的内容当前达到了128 当前不会再往里面添加，下次再来添加，当前应该要先执行发送的逻辑
-  if (peerConnection_->getBufferEntrySize() < A2_IOV_MAX) {
-      sendMessagesInternal();
-  }
-  //这里执行发送缓冲区的内容
-  peerConnection_->sendPendingData();
-}
+<span class="token comment" spellcheck="true">//执行消息的发送</span>
+<span class="token keyword">void</span> DefaultBtMessageDispatcher<span class="token operator">::</span><span class="token function">sendMessages</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+   <span class="token comment" spellcheck="true">//A2_IOV_MAX 128 也即是如果内容还没有达到这个值，从消息队列中获取到消息，然后对应的创建对应的消息的内容，填充到缓冲区中，所以对应的peerConnection_->getBufferEntrySize() 就会加一</span>
+  <span class="token comment" spellcheck="true">//所以这边的逻辑可以达到一种效果，当缓冲区的内容当前达到了128 当前不会再往里面添加，下次再来添加，当前应该要先执行发送的逻辑</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>peerConnection_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getBufferEntrySize</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&lt;</span> A2_IOV_MAX<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token function">sendMessagesInternal</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token comment" spellcheck="true">//这里执行发送缓冲区的内容</span>
+  peerConnection_<span class="token operator">-</span><span class="token operator">></span><span class="token function">sendPendingData</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-当数据包没有达到限制的时候，会调用sendMessagesInternal,而这个函数就是前面所说的，实际处理限制上传速度的地方,这里再次贴一下对应代码实现
+当数据包没有达到限制的时候，会调用sendMessagesInternal<span class="token punctuation">,</span>而这个函数就是前面所说的，实际处理限制上传速度的地方<span class="token punctuation">,</span>这里再次贴一下对应代码实现
 
-void DefaultBtMessageDispatcher::sendMessagesInternal()
-{
-  auto tempQueue = std::vector<std::unique_ptr<BtMessage>>{};
-  //从messsageQueue中移除先前添加进去的消息
-  while (!messageQueue_.empty()) {
-    //获取到messageQueue_ 中最前面的一个元素内容
-    auto msg = std::move(messageQueue_.front());
-    //移除集合messageQueue_中最前面的一个元素
-    messageQueue_.pop_front();
+<span class="token keyword">void</span> DefaultBtMessageDispatcher<span class="token operator">::</span><span class="token function">sendMessagesInternal</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token keyword">auto</span> tempQueue <span class="token operator">=</span> std<span class="token operator">::</span>vector<span class="token operator">&lt;</span>std<span class="token operator">::</span>unique_ptr<span class="token operator">&lt;</span>BtMessage<span class="token operator">>></span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//从messsageQueue中移除先前添加进去的消息</span>
+  <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token operator">!</span>messageQueue_<span class="token punctuation">.</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//获取到messageQueue_ 中最前面的一个元素内容</span>
+    <span class="token keyword">auto</span> msg <span class="token operator">=</span> std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>messageQueue_<span class="token punctuation">.</span><span class="token function">front</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//移除集合messageQueue_中最前面的一个元素</span>
+    messageQueue_<span class="token punctuation">.</span><span class="token function">pop_front</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    //如果当前是正在上传的消息
-    if (msg->isUploading()) {
-      if (requestGroupMan_->doesOverallUploadSpeedExceed() || downloadContext_->getOwnerRequestGroup()->doesUploadSpeedExceed()) {
-         tempQueue.push_back(std::move(msg));
-        continue;
-      }
-    }
+    <span class="token comment" spellcheck="true">//如果当前是正在上传的消息</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>msg<span class="token operator">-</span><span class="token operator">></span><span class="token function">isUploading</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>requestGroupMan_<span class="token operator">-</span><span class="token operator">></span><span class="token function">doesOverallUploadSpeedExceed</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">||</span> downloadContext_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getOwnerRequestGroup</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">doesUploadSpeedExceed</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+         tempQueue<span class="token punctuation">.</span><span class="token function">push_back</span><span class="token punctuation">(</span>std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>msg<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">continue</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
 
-    //这里只是创建对应的消息内容，然后填充到 socketBuffer_.pushBytes(std::move(data), std::move(progressUpdate))，也即是填充到缓冲区中
-    msg->send();
-  }
+    <span class="token comment" spellcheck="true">//这里只是创建对应的消息内容，然后填充到 socketBuffer_.pushBytes(std::move(data), std::move(progressUpdate))，也即是填充到缓冲区中</span>
+    msg<span class="token operator">-</span><span class="token operator">></span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
 
-  if (!tempQueue.empty()) {
-     messageQueue_.insert(std::begin(messageQueue_), std::make_move_iterator(std::begin(tempQueue)), std::make_move_iterator(std::end(tempQueue)));
-  }
-}
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>tempQueue<span class="token punctuation">.</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+     messageQueue_<span class="token punctuation">.</span><span class="token function">insert</span><span class="token punctuation">(</span>std<span class="token operator">::</span><span class="token function">begin</span><span class="token punctuation">(</span>messageQueue_<span class="token punctuation">)</span><span class="token punctuation">,</span> std<span class="token operator">::</span><span class="token function">make_move_iterator</span><span class="token punctuation">(</span>std<span class="token operator">::</span><span class="token function">begin</span><span class="token punctuation">(</span>tempQueue<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> std<span class="token operator">::</span><span class="token function">make_move_iterator</span><span class="token punctuation">(</span>std<span class="token operator">::</span><span class="token function">end</span><span class="token punctuation">(</span>tempQueue<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
-首先是messageQueue_ 这是一个消息的队列是一个未发送的消息队列，当要发送消息的时候，会先将消息添加到这个消息队列中，然后在这边执行消息的填充,这里看下msg->isUploading()代表的是什么意思
+首先是messageQueue_ 这是一个消息的队列是一个未发送的消息队列，当要发送消息的时候，会先将消息添加到这个消息队列中，然后在这边执行消息的填充<span class="token punctuation">,</span>这里看下msg<span class="token operator">-</span><span class="token operator">></span><span class="token function">isUploading</span><span class="token punctuation">(</span><span class="token punctuation">)</span>代表的是什么意思
 
-首先所有的Bt消息都是继承于这个AbstractBtMessage 基类 ，这个基类中定义了一个成员uploading_ 用来标识是否需要上传，默认的情况是false，下面看下什么时候会改成true
-class AbstractBtMessage : public BtMessage {
-private:
-  bool invalidate_;
-  //是否上传中，当我们给peer回应块的时候，这个值为true
-  bool uploading_;
-  ...  
-}
+首先所有的Bt消息都是继承于这个AbstractBtMessage 基类 ，这个基类中定义了一个成员uploading_ 用来标识是否需要上传，默认的情况是<span class="token boolean">false</span>，下面看下什么时候会改成<span class="token boolean">true</span>
+<span class="token keyword">class</span> <span class="token class-name">AbstractBtMessage</span> <span class="token operator">:</span> <span class="token keyword">public</span> BtMessage <span class="token punctuation">{</span>
+<span class="token keyword">private</span><span class="token operator">:</span>
+  <span class="token keyword">bool</span> invalidate_<span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//是否上传中，当我们给peer回应块的时候，这个值为true</span>
+  <span class="token keyword">bool</span> uploading_<span class="token punctuation">;</span>
+  <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>  
+<span class="token punctuation">}</span>
 
 首先看Bt消息接收创建的地方，具体的流程前面有分析过，这里直接分析 
 
-//根据接受过来的数据， 创建BtMessage  这里是解析对方 互通对资源的意愿情况，包括interested、nointerested、choke、unchoke等4种。
-std::unique_ptr<BtMessage>
-DefaultBtMessageFactory::createBtMessage(const unsigned char* data, size_t dataLength)
-{
-    ...
-    case BtRequestMessage::ID: {//创建request 类型的消息   也即是收到了对方的请求piece的消息
-      auto m = BtRequestMessage::create(data, dataLength);
-      if (!metadataGetMode_) {
-          m->setBtMessageValidator(make_unique<RangeBtMessageValidator>(static_cast<BtRequestMessage*>(m.get()), downloadContext_->getNumPieces(), pieceStorage_->getPieceLength(m->getIndex())));
-      }
-      msg = std::move(m);
-      break;
-    }
-    ...
-}
+<span class="token comment" spellcheck="true">//根据接受过来的数据， 创建BtMessage  这里是解析对方 互通对资源的意愿情况，包括interested、nointerested、choke、unchoke等4种。</span>
+std<span class="token operator">::</span>unique_ptr<span class="token operator">&lt;</span>BtMessage<span class="token operator">></span>
+DefaultBtMessageFactory<span class="token operator">::</span><span class="token function">createBtMessage</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">unsigned</span> <span class="token keyword">char</span><span class="token operator">*</span> data<span class="token punctuation">,</span> size_t dataLength<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token keyword">case</span> BtRequestMessage<span class="token operator">::</span>ID<span class="token operator">:</span> <span class="token punctuation">{</span><span class="token comment" spellcheck="true">//创建request 类型的消息   也即是收到了对方的请求piece的消息</span>
+      <span class="token keyword">auto</span> m <span class="token operator">=</span> BtRequestMessage<span class="token operator">::</span><span class="token function">create</span><span class="token punctuation">(</span>data<span class="token punctuation">,</span> dataLength<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>metadataGetMode_<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+          m<span class="token operator">-</span><span class="token operator">></span><span class="token function">setBtMessageValidator</span><span class="token punctuation">(</span>make_unique<span class="token operator">&lt;</span>RangeBtMessageValidator<span class="token operator">></span><span class="token punctuation">(</span><span class="token keyword">static_cast</span><span class="token operator">&lt;</span>BtRequestMessage<span class="token operator">*</span><span class="token operator">></span><span class="token punctuation">(</span>m<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> downloadContext_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getNumPieces</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> pieceStorage_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getPieceLength</span><span class="token punctuation">(</span>m<span class="token operator">-</span><span class="token operator">></span><span class="token function">getIndex</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+      msg <span class="token operator">=</span> std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>m<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">break</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 
 上面的逻辑我们直接分析 request消息类型，也即是收到了对方的请求piece的消息
 
-//解析传递过来的内容，然后构造对应的对象完成初始化
-std::unique_ptr<BtRequestMessage>
-BtRequestMessage::create(const unsigned char* data, size_t dataLength)
-{
-  return RangeBtMessage::create<BtRequestMessage>(data, dataLength);
-}
+<span class="token comment" spellcheck="true">//解析传递过来的内容，然后构造对应的对象完成初始化</span>
+std<span class="token operator">::</span>unique_ptr<span class="token operator">&lt;</span>BtRequestMessage<span class="token operator">></span>
+BtRequestMessage<span class="token operator">::</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">unsigned</span> <span class="token keyword">char</span><span class="token operator">*</span> data<span class="token punctuation">,</span> size_t dataLength<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token keyword">return</span> RangeBtMessage<span class="token operator">::</span>create<span class="token operator">&lt;</span>BtRequestMessage<span class="token operator">></span><span class="token punctuation">(</span>data<span class="token punctuation">,</span> dataLength<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
 在构建完这个消息对象之后，填充对应的参数 也即是会触发对应的doReceivedAction 函数
 
-//接受传递过来的内容，给peer对应的成员赋值
-void BtRequestMessage::doReceivedAction()
-{
-  //默认为fasle
-  if (isMetadataGetMode()) {
-    return;
-  }
-  //如果当前已经下载了这块的内容，并且本地不阻塞peer,
-  if (getPieceStorage()->hasPiece(getIndex()) && (!getPeer()->amChoking() || getPeer()->isInAmAllowedIndexSet(getIndex()))) {
-      //获取到接受到的内容，解析参数 然后 构建一个BtPieceMessage 对象，调用对应的构造函数完成初始化，然后添加到 messageQueue_ 队列中,等待发送
-      getBtMessageDispatcher()->addMessageToQueue(getBtMessageFactory()->createPieceMessage(getIndex(), getBegin(), getLength()));
-  }
-  else {
-    if (getPeer()->isFastExtensionEnabled()) {
-        getBtMessageDispatcher()->addMessageToQueue(getBtMessageFactory()->createRejectMessage(getIndex(), getBegin(), getLength()));
-    }
-  }
-}
+<span class="token comment" spellcheck="true">//接受传递过来的内容，给peer对应的成员赋值</span>
+<span class="token keyword">void</span> BtRequestMessage<span class="token operator">::</span><span class="token function">doReceivedAction</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">//默认为fasle</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isMetadataGetMode</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token comment" spellcheck="true">//如果当前已经下载了这块的内容，并且本地不阻塞peer,</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">getPieceStorage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">hasPiece</span><span class="token punctuation">(</span><span class="token function">getIndex</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">getPeer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">amChoking</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">||</span> <span class="token function">getPeer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">isInAmAllowedIndexSet</span><span class="token punctuation">(</span><span class="token function">getIndex</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token comment" spellcheck="true">//获取到接受到的内容，解析参数 然后 构建一个BtPieceMessage 对象，调用对应的构造函数完成初始化，然后添加到 messageQueue_ 队列中,等待发送</span>
+      <span class="token function">getBtMessageDispatcher</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">addMessageToQueue</span><span class="token punctuation">(</span><span class="token function">getBtMessageFactory</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">createPieceMessage</span><span class="token punctuation">(</span><span class="token function">getIndex</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">getBegin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">getLength</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">getPeer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">isFastExtensionEnabled</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">getBtMessageDispatcher</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">addMessageToQueue</span><span class="token punctuation">(</span><span class="token function">getBtMessageFactory</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">createRejectMessage</span><span class="token punctuation">(</span><span class="token function">getIndex</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">getBegin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">getLength</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
-也即是会执行 getBtMessageDispatcher()->addMessageToQueue(getBtMessageFactory()->createPieceMessage(getIndex(), getBegin(), getLength()));
+也即是会执行 <span class="token function">getBtMessageDispatcher</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">addMessageToQueue</span><span class="token punctuation">(</span><span class="token function">getBtMessageFactory</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">createPieceMessage</span><span class="token punctuation">(</span><span class="token function">getIndex</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">getBegin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">getLength</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-//构建一个BtPieceMessage消息，这个消息是响应peer请求index所指定块的
-//request消息包含index、begin、length三个字段。最后两个是字节偏移。length通常是2的指数除非是文件的最后一块。当前所有bt协议的实现版本中length的值是16kiB，关闭连接的request中length字段的值要大于16kiB
-std::unique_ptr<BtPieceMessage>
-DefaultBtMessageFactory::createPieceMessage(size_t index, int32_t begin,
-                                            int32_t length)
-{
-  //构建一个BtPieceMessage 对象，调用对应的构造函数完成初始化
-  auto msg = make_unique<BtPieceMessage>(index, begin, length);
-  //设置当前种子的下载上下文对象
-  msg->setDownloadContext(downloadContext_);
-  //配置公有的属性
-  setCommonProperty(msg.get());
-  return msg;
-}
+<span class="token comment" spellcheck="true">//构建一个BtPieceMessage消息，这个消息是响应peer请求index所指定块的</span>
+<span class="token comment" spellcheck="true">//request消息包含index、begin、length三个字段。最后两个是字节偏移。length通常是2的指数除非是文件的最后一块。当前所有bt协议的实现版本中length的值是16kiB，关闭连接的request中length字段的值要大于16kiB</span>
+std<span class="token operator">::</span>unique_ptr<span class="token operator">&lt;</span>BtPieceMessage<span class="token operator">></span>
+DefaultBtMessageFactory<span class="token operator">::</span><span class="token function">createPieceMessage</span><span class="token punctuation">(</span>size_t index<span class="token punctuation">,</span> int32_t begin<span class="token punctuation">,</span>
+                                            int32_t length<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">//构建一个BtPieceMessage 对象，调用对应的构造函数完成初始化</span>
+  <span class="token keyword">auto</span> msg <span class="token operator">=</span> make_unique<span class="token operator">&lt;</span>BtPieceMessage<span class="token operator">></span><span class="token punctuation">(</span>index<span class="token punctuation">,</span> begin<span class="token punctuation">,</span> length<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//设置当前种子的下载上下文对象</span>
+  msg<span class="token operator">-</span><span class="token operator">></span><span class="token function">setDownloadContext</span><span class="token punctuation">(</span>downloadContext_<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//配置公有的属性</span>
+  <span class="token function">setCommonProperty</span><span class="token punctuation">(</span>msg<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">return</span> msg<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-//响应对方peer请求index 所指定的块的内容 构造函数的初始化
-BtPieceMessage::BtPieceMessage(size_t index, int32_t begin, int32_t blockLength)
-    : AbstractBtMessage(ID, NAME),
-      index_(index),
-      begin_(begin),
-      blockLength_(blockLength),
-      data_(nullptr),
-      downloadContext_(nullptr),
-      peerStorage_(nullptr)
-{
-  //设置上传中  ，这个可以用来区分当前是解析下载的内容，还是用来传递内容
-  setUploading(true);
-}
+<span class="token comment" spellcheck="true">//响应对方peer请求index 所指定的块的内容 构造函数的初始化</span>
+BtPieceMessage<span class="token operator">::</span><span class="token function">BtPieceMessage</span><span class="token punctuation">(</span>size_t index<span class="token punctuation">,</span> int32_t begin<span class="token punctuation">,</span> int32_t blockLength<span class="token punctuation">)</span>
+    <span class="token operator">:</span> <span class="token function">AbstractBtMessage</span><span class="token punctuation">(</span>ID<span class="token punctuation">,</span> NAME<span class="token punctuation">)</span><span class="token punctuation">,</span>
+      <span class="token function">index_</span><span class="token punctuation">(</span>index<span class="token punctuation">)</span><span class="token punctuation">,</span>
+      <span class="token function">begin_</span><span class="token punctuation">(</span>begin<span class="token punctuation">)</span><span class="token punctuation">,</span>
+      <span class="token function">blockLength_</span><span class="token punctuation">(</span>blockLength<span class="token punctuation">)</span><span class="token punctuation">,</span>
+      <span class="token function">data_</span><span class="token punctuation">(</span><span class="token keyword">nullptr</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+      <span class="token function">downloadContext_</span><span class="token punctuation">(</span><span class="token keyword">nullptr</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+      <span class="token function">peerStorage_</span><span class="token punctuation">(</span><span class="token keyword">nullptr</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">//设置上传中  ，这个可以用来区分当前是解析下载的内容，还是用来传递内容</span>
+  <span class="token function">setUploading</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-看到没有，这里就会将这个变量标识为true，标识为是一个需要上传的消息，继续回到DefaultBtMessageDispatcher
-void DefaultBtMessageDispatcher::sendMessagesInternal()
-{
-  auto tempQueue = std::vector<std::unique_ptr<BtMessage>>{};
-  //从messsageQueue中移除先前添加进去的消息
-  while (!messageQueue_.empty()) {
-    //获取到messageQueue_ 中最前面的一个元素内容
-    auto msg = std::move(messageQueue_.front());
-    //移除集合messageQueue_中最前面的一个元素
-    messageQueue_.pop_front();
+看到没有，这里就会将这个变量标识为<span class="token boolean">true</span>，标识为是一个需要上传的消息，继续回到DefaultBtMessageDispatcher
+<span class="token keyword">void</span> DefaultBtMessageDispatcher<span class="token operator">::</span><span class="token function">sendMessagesInternal</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token keyword">auto</span> tempQueue <span class="token operator">=</span> std<span class="token operator">::</span>vector<span class="token operator">&lt;</span>std<span class="token operator">::</span>unique_ptr<span class="token operator">&lt;</span>BtMessage<span class="token operator">>></span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//从messsageQueue中移除先前添加进去的消息</span>
+  <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token operator">!</span>messageQueue_<span class="token punctuation">.</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//获取到messageQueue_ 中最前面的一个元素内容</span>
+    <span class="token keyword">auto</span> msg <span class="token operator">=</span> std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>messageQueue_<span class="token punctuation">.</span><span class="token function">front</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//移除集合messageQueue_中最前面的一个元素</span>
+    messageQueue_<span class="token punctuation">.</span><span class="token function">pop_front</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    //如果当前是正在上传的消息
-    if (msg->isUploading()) {
-      //如果当前的消息是一个上传的消息，并且当前的上传速度已经超过了设置，就会将当前的消息添加到临时队列tempQueue中，跳过当前的消息
-      if (requestGroupMan_->doesOverallUploadSpeedExceed() || downloadContext_->getOwnerRequestGroup()->doesUploadSpeedExceed()) {
-         tempQueue.push_back(std::move(msg));
-        continue;
-      }
-    }
+    <span class="token comment" spellcheck="true">//如果当前是正在上传的消息</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>msg<span class="token operator">-</span><span class="token operator">></span><span class="token function">isUploading</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token comment" spellcheck="true">//如果当前的消息是一个上传的消息，并且当前的上传速度已经超过了设置，就会将当前的消息添加到临时队列tempQueue中，跳过当前的消息</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>requestGroupMan_<span class="token operator">-</span><span class="token operator">></span><span class="token function">doesOverallUploadSpeedExceed</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">||</span> downloadContext_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getOwnerRequestGroup</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">doesUploadSpeedExceed</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+         tempQueue<span class="token punctuation">.</span><span class="token function">push_back</span><span class="token punctuation">(</span>std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>msg<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">continue</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
 
-    //这里只是创建对应的消息内容，然后填充到 socketBuffer_.pushBytes(std::move(data), std::move(progressUpdate))，也即是填充到缓冲区中
-    msg->send();
-  }
+    <span class="token comment" spellcheck="true">//这里只是创建对应的消息内容，然后填充到 socketBuffer_.pushBytes(std::move(data), std::move(progressUpdate))，也即是填充到缓冲区中</span>
+    msg<span class="token operator">-</span><span class="token operator">></span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
 
-  //将临时消息队列tempQueue  中的内容，添加回messageQueue_ 中
-  if (!tempQueue.empty()) {
-     messageQueue_.insert(std::begin(messageQueue_), std::make_move_iterator(std::begin(tempQueue)), std::make_move_iterator(std::end(tempQueue)));
-  }
-}
+  <span class="token comment" spellcheck="true">//将临时消息队列tempQueue  中的内容，添加回messageQueue_ 中</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>tempQueue<span class="token punctuation">.</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+     messageQueue_<span class="token punctuation">.</span><span class="token function">insert</span><span class="token punctuation">(</span>std<span class="token operator">::</span><span class="token function">begin</span><span class="token punctuation">(</span>messageQueue_<span class="token punctuation">)</span><span class="token punctuation">,</span> std<span class="token operator">::</span><span class="token function">make_move_iterator</span><span class="token punctuation">(</span>std<span class="token operator">::</span><span class="token function">begin</span><span class="token punctuation">(</span>tempQueue<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> std<span class="token operator">::</span><span class="token function">make_move_iterator</span><span class="token punctuation">(</span>std<span class="token operator">::</span><span class="token function">end</span><span class="token punctuation">(</span>tempQueue<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <p>上传限速的根本是</p>
 <blockquote>

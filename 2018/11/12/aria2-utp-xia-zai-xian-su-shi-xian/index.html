@@ -518,503 +518,502 @@
 <blockquote>
 <p><a href="http://aria2.github.io/manual/en/html/aria2c.html" target="_blank" rel="noopener">http://aria2.github.io/manual/en/html/aria2c.html</a></p>
 </blockquote>
-<h3 id="Aria2-下载速度统计源码分析"><a href="#Aria2-下载速度统计源码分析" class="headerlink" title="Aria2 下载速度统计源码分析"></a>Aria2 下载速度统计源码分析</h3><pre class=" language-CPP"><code class="language-CPP">
-首先是开启对应的速度监控器
-//设置最大的下载速度, 由于utp采用的是udp的原因，如果做限速处理的化，无法达到tcp限速的效果，所以下载不支持限速
-gloableOptions.push_back(std::pair<std::string,std::string> ("max-download-limit","50k"));
-//这是针对总的下载速度
-gloableOptions.push_back(std::pair<std::string,std::string> ("max-overall-download-limit","1M"));
+<h3 id="Aria2-下载速度统计源码分析"><a href="#Aria2-下载速度统计源码分析" class="headerlink" title="Aria2 下载速度统计源码分析"></a>Aria2 下载速度统计源码分析</h3><pre class=" language-cpp"><code class="language-cpp">首先是开启对应的速度监控器
+<span class="token comment" spellcheck="true">//设置最大的下载速度, 由于utp采用的是udp的原因，如果做限速处理的化，无法达到tcp限速的效果，所以下载不支持限速</span>
+gloableOptions<span class="token punctuation">.</span><span class="token function">push_back</span><span class="token punctuation">(</span>std<span class="token operator">::</span>pair<span class="token operator">&lt;</span>std<span class="token operator">::</span>string<span class="token punctuation">,</span>std<span class="token operator">::</span>string<span class="token operator">></span> <span class="token punctuation">(</span><span class="token string">"max-download-limit"</span><span class="token punctuation">,</span><span class="token string">"50k"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">//这是针对总的下载速度</span>
+gloableOptions<span class="token punctuation">.</span><span class="token function">push_back</span><span class="token punctuation">(</span>std<span class="token operator">::</span>pair<span class="token operator">&lt;</span>std<span class="token operator">::</span>string<span class="token punctuation">,</span>std<span class="token operator">::</span>string<span class="token operator">></span> <span class="token punctuation">(</span><span class="token string">"max-overall-download-limit"</span><span class="token punctuation">,</span><span class="token string">"1M"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 
 Aria2 速度监控也是有分三个对象的，一个是全局的速度监控器对象，对应的也即是
-class RequestGroupMan {
-private:
-  //全局的速度监控器对象
-  NetStat netStat_;
-}
+<span class="token keyword">class</span> <span class="token class-name">RequestGroupMan</span> <span class="token punctuation">{</span>
+<span class="token keyword">private</span><span class="token operator">:</span>
+  <span class="token comment" spellcheck="true">//全局的速度监控器对象</span>
+  NetStat netStat_<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-class NetStat {
-public:
-  enum STATUS {
-    IDLE,//空闲状态
-    ACTIVE,//活动状态
-  };
+<span class="token keyword">class</span> <span class="token class-name">NetStat</span> <span class="token punctuation">{</span>
+<span class="token keyword">public</span><span class="token operator">:</span>
+  <span class="token keyword">enum</span> STATUS <span class="token punctuation">{</span>
+    IDLE<span class="token punctuation">,</span><span class="token comment" spellcheck="true">//空闲状态</span>
+    ACTIVE<span class="token punctuation">,</span><span class="token comment" spellcheck="true">//活动状态</span>
+  <span class="token punctuation">}</span><span class="token punctuation">;</span>
 
-  NetStat();
-  ~NetStat();
-...
-private:
-  //用于计算下载的速度 ,默认是一个午参的构造函数
-  SpeedCalc downloadSpeed_;
-  //用户计算上传的速度
-  SpeedCalc uploadSpeed_;
-  //下载开始的时间
-  Timer downloadStartTime_;
-  //状态
-  STATUS status_;
-  //平均的下载速度
-  int avgDownloadSpeed_;
-  //平均的上传速度
-  int avgUploadSpeed_;
-  //session下载的长度
-  int64_t sessionDownloadLength_;
-  //session上传的长度
-  int64_t sessionUploadLength_;
-  ...
-}
+  <span class="token function">NetStat</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token operator">~</span><span class="token function">NetStat</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token keyword">private</span><span class="token operator">:</span>
+  <span class="token comment" spellcheck="true">//用于计算下载的速度 ,默认是一个午参的构造函数</span>
+  SpeedCalc downloadSpeed_<span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//用户计算上传的速度</span>
+  SpeedCalc uploadSpeed_<span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//下载开始的时间</span>
+  Timer downloadStartTime_<span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//状态</span>
+  STATUS status_<span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//平均的下载速度</span>
+  <span class="token keyword">int</span> avgDownloadSpeed_<span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//平均的上传速度</span>
+  <span class="token keyword">int</span> avgUploadSpeed_<span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//session下载的长度</span>
+  int64_t sessionDownloadLength_<span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//session上传的长度</span>
+  int64_t sessionUploadLength_<span class="token punctuation">;</span>
+  <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 NetStat内部含有俩个成员变量一个是针对下载的统计，一个是针对上传的统计
 
-class SpeedCalc {
-private:
-  //用来存储10秒之内的下载内容
-  std::deque<std::pair<Timer, size_t>> timeSlots_;
-  //下载开始的时间
-  Timer start_;
-  //用来统计总的下载大小
-  int64_t accumulatedLength_;
-  //用来统计10秒之内的下载大小
-  int64_t bytesWindow_;
-  //最大的下载速度
-  int maxSpeed_;
-  ...
-}
+<span class="token keyword">class</span> <span class="token class-name">SpeedCalc</span> <span class="token punctuation">{</span>
+<span class="token keyword">private</span><span class="token operator">:</span>
+  <span class="token comment" spellcheck="true">//用来存储10秒之内的下载内容</span>
+  std<span class="token operator">::</span>deque<span class="token operator">&lt;</span>std<span class="token operator">::</span>pair<span class="token operator">&lt;</span>Timer<span class="token punctuation">,</span> size_t<span class="token operator">>></span> timeSlots_<span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//下载开始的时间</span>
+  Timer start_<span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//用来统计总的下载大小</span>
+  int64_t accumulatedLength_<span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//用来统计10秒之内的下载大小</span>
+  int64_t bytesWindow_<span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//最大的下载速度</span>
+  <span class="token keyword">int</span> maxSpeed_<span class="token punctuation">;</span>
+  <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 
 任务的速度监控器对象，也即是针对每一个下载任务都会有一个DownloadContext的存在
-class DownloadContext {
-private:
-  ...
-  NetStat netStat_;
-  ...
-}
+<span class="token keyword">class</span> <span class="token class-name">DownloadContext</span> <span class="token punctuation">{</span>
+<span class="token keyword">private</span><span class="token operator">:</span>
+  <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+  NetStat netStat_<span class="token punctuation">;</span>
+  <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 
 peer速度监控器对象，也即是点对点的速度监控器对象，也即是最小的速度监控器对象了
-class Peer {
-private:
-  //代表当前peer 资源的情况，比如是否阻塞，感兴趣，等状态的封装
-  std::unique_ptr<PeerSessionResource> res_;
-  ...
-}
+<span class="token keyword">class</span> <span class="token class-name">Peer</span> <span class="token punctuation">{</span>
+<span class="token keyword">private</span><span class="token operator">:</span>
+  <span class="token comment" spellcheck="true">//代表当前peer 资源的情况，比如是否阻塞，感兴趣，等状态的封装</span>
+  std<span class="token operator">::</span>unique_ptr<span class="token operator">&lt;</span>PeerSessionResource<span class="token operator">></span> res_<span class="token punctuation">;</span>
+  <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 
 而PeerSessionResource 成员含有netStat_速度监控器对象
-class PeerSessionResource {
-private:
-  ...
-  NetStat netStat_;
-}
+<span class="token keyword">class</span> <span class="token class-name">PeerSessionResource</span> <span class="token punctuation">{</span>
+<span class="token keyword">private</span><span class="token operator">:</span>
+  <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+  NetStat netStat_<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-其实Aria2做法更加简单的，他限速的处理只针对piece数据才会统计分析，对于其他的消息不做处理,下面来分析下Aria2 接收到Piece Data的逻辑
+其实Aria2做法更加简单的，他限速的处理只针对piece数据才会统计分析，对于其他的消息不做处理<span class="token punctuation">,</span>下面来分析下Aria2 接收到Piece Data的逻辑
 
-//接受传递过来的内容，这里既是 接受到了peer传递回来的我们需要的pieceIndex 所对应的块的内容
-void BtPieceMessage::doReceivedAction()
-{
-  //默认为false
-  if (isMetadataGetMode()) {
-      return;
-  }
+<span class="token comment" spellcheck="true">//接受传递过来的内容，这里既是 接受到了peer传递回来的我们需要的pieceIndex 所对应的块的内容</span>
+<span class="token keyword">void</span> BtPieceMessage<span class="token operator">::</span><span class="token function">doReceivedAction</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">//默认为false</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isMetadataGetMode</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">return</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
 
-  auto slot = getBtMessageDispatcher()->getOutstandingRequest(index_, begin_, blockLength_);
-  //更新下载的速度,这是针对当前peer的
-  getPeer()->updateDownload(blockLength_);
-  //更新下载的速度，这是针对当前这一个种子的速度
-  downloadContext_->updateDownload(blockLength_);
-  ...  
-}
+  <span class="token keyword">auto</span> slot <span class="token operator">=</span> <span class="token function">getBtMessageDispatcher</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">getOutstandingRequest</span><span class="token punctuation">(</span>index_<span class="token punctuation">,</span> begin_<span class="token punctuation">,</span> blockLength_<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//更新下载的速度,这是针对当前peer的</span>
+  <span class="token function">getPeer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">updateDownload</span><span class="token punctuation">(</span>blockLength_<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//更新下载的速度，这是针对当前这一个种子的速度</span>
+  downloadContext_<span class="token operator">-</span><span class="token operator">></span><span class="token function">updateDownload</span><span class="token punctuation">(</span>blockLength_<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>  
+<span class="token punctuation">}</span>
 
 首先更新Peer的速度监控器对象
 
-//更新下载的速度，针对当前的peer
-void Peer::updateDownload(int32_t bytes)
-{
-  assert(res_);
-  res_->updateDownload(bytes);
-}
+<span class="token comment" spellcheck="true">//更新下载的速度，针对当前的peer</span>
+<span class="token keyword">void</span> Peer<span class="token operator">::</span><span class="token function">updateDownload</span><span class="token punctuation">(</span>int32_t bytes<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token function">assert</span><span class="token punctuation">(</span>res_<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  res_<span class="token operator">-</span><span class="token operator">></span><span class="token function">updateDownload</span><span class="token punctuation">(</span>bytes<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
 接着更新当前任务的速度监控器对象，以及全局的速度监控器对象
 
-//更新下载的速度，这是针对当前一个种子任务总的下载速度
-void DownloadContext::updateDownload(size_t bytes)
-{
-  //LOGD("DownloadContext updateDownload bytes %u \n",bytes);
-  //这是当前这个任务的下载速度
-  netStat_.updateDownload(bytes);
+<span class="token comment" spellcheck="true">//更新下载的速度，这是针对当前一个种子任务总的下载速度</span>
+<span class="token keyword">void</span> DownloadContext<span class="token operator">::</span><span class="token function">updateDownload</span><span class="token punctuation">(</span>size_t bytes<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">//LOGD("DownloadContext updateDownload bytes %u \n",bytes);</span>
+  <span class="token comment" spellcheck="true">//这是当前这个任务的下载速度</span>
+  netStat_<span class="token punctuation">.</span><span class="token function">updateDownload</span><span class="token punctuation">(</span>bytes<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-  //这是全局的下载速度
-  RequestGroupMan* rgman = ownerRequestGroup_->getRequestGroupMan();
-  if (rgman) {
-     rgman->getNetStat().updateDownload(bytes);
-  }
-}
+  <span class="token comment" spellcheck="true">//这是全局的下载速度</span>
+  RequestGroupMan<span class="token operator">*</span> rgman <span class="token operator">=</span> ownerRequestGroup_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getRequestGroupMan</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>rgman<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+     rgman<span class="token operator">-</span><span class="token operator">></span><span class="token function">getNetStat</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">updateDownload</span><span class="token punctuation">(</span>bytes<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
 下面来分析下updateDownload 的函数实现
-void NetStat::updateDownload(size_t bytes)
-{
-  downloadSpeed_.update(bytes);
-  sessionDownloadLength_ += bytes;
-}
+<span class="token keyword">void</span> NetStat<span class="token operator">::</span><span class="token function">updateDownload</span><span class="token punctuation">(</span>size_t bytes<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  downloadSpeed_<span class="token punctuation">.</span><span class="token function">update</span><span class="token punctuation">(</span>bytes<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  sessionDownloadLength_ <span class="token operator">+</span><span class="token operator">=</span> bytes<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-会调用到downloadSpeed_.update(bytes); 
+会调用到downloadSpeed_<span class="token punctuation">.</span><span class="token function">update</span><span class="token punctuation">(</span>bytes<span class="token punctuation">)</span><span class="token punctuation">;</span> 
 
-//更新下载的总和
-void SpeedCalc::update(size_t bytes)
-{
-  const auto& now = global::wallclock();
-  //保证队列的内容是10秒钟之内的值
-  removeStaleTimeSlot(now);
-  //如果当前队列为空 或者 当前队列的最后一个元素添加的时间跟当前的时间间隔为一秒的化，就直接往队列里面添加一个元素对pair
-  if (timeSlots_.empty() || std::chrono::duration_cast<std::chrono::seconds>(timeSlots_.back().first.difference(now)) >= 1_s) {
-     timeSlots_.push_back(std::make_pair(now, bytes));
-  }
-  else {
-    //这里就是最后一个元素时间跟当前时间还没有一秒，那就直接累加，这样做就是也即是统计一秒的下载量了
-    timeSlots_.back().second += bytes;
-  }
-  //更新下载的总和
-  bytesWindow_ += bytes;
-  accumulatedLength_ += bytes;
-}
+<span class="token comment" spellcheck="true">//更新下载的总和</span>
+<span class="token keyword">void</span> SpeedCalc<span class="token operator">::</span><span class="token function">update</span><span class="token punctuation">(</span>size_t bytes<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token keyword">const</span> <span class="token keyword">auto</span><span class="token operator">&amp;</span> now <span class="token operator">=</span> global<span class="token operator">::</span><span class="token function">wallclock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//保证队列的内容是10秒钟之内的值</span>
+  <span class="token function">removeStaleTimeSlot</span><span class="token punctuation">(</span>now<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//如果当前队列为空 或者 当前队列的最后一个元素添加的时间跟当前的时间间隔为一秒的化，就直接往队列里面添加一个元素对pair</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>timeSlots_<span class="token punctuation">.</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">||</span> std<span class="token operator">::</span>chrono<span class="token operator">::</span>duration_cast<span class="token operator">&lt;</span>std<span class="token operator">::</span>chrono<span class="token operator">::</span>seconds<span class="token operator">></span><span class="token punctuation">(</span>timeSlots_<span class="token punctuation">.</span><span class="token function">back</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>first<span class="token punctuation">.</span><span class="token function">difference</span><span class="token punctuation">(</span>now<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">>=</span> 1_s<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+     timeSlots_<span class="token punctuation">.</span><span class="token function">push_back</span><span class="token punctuation">(</span>std<span class="token operator">::</span><span class="token function">make_pair</span><span class="token punctuation">(</span>now<span class="token punctuation">,</span> bytes<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//这里就是最后一个元素时间跟当前时间还没有一秒，那就直接累加，这样做就是也即是统计一秒的下载量了</span>
+    timeSlots_<span class="token punctuation">.</span><span class="token function">back</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>second <span class="token operator">+</span><span class="token operator">=</span> bytes<span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token comment" spellcheck="true">//更新下载的总和</span>
+  bytesWindow_ <span class="token operator">+</span><span class="token operator">=</span> bytes<span class="token punctuation">;</span>
+  accumulatedLength_ <span class="token operator">+</span><span class="token operator">=</span> bytes<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
 removeStaleTimeSlot函数实现
 
-//下面可以做到只统计10秒的内容
-void SpeedCalc::removeStaleTimeSlot(const Timer& now)
-{
-  //当前统计的队列不为空，可以做到只统计10秒之内的内容
-  while (!timeSlots_.empty()) {
-    //constexpr auto WINDOW_TIME = 10_s;  也即是如果第一次添加的时间跟当前的时间间隔小于10秒的化，直接退出,也即是统计时间最少也要有10秒钟的间隔
-    if (timeSlots_[0].first.difference(now) <= WINDOW_TIME) {
-       break;
-    }
-    //大于10秒, bytesWindow_ 减去要弹出的元素的值 ,这里防止队列太多,也即是只统计10秒的内容
-    bytesWindow_ -= timeSlots_[0].second;
-    //弹出第一个
-    timeSlots_.pop_front();
-  }
-}
+<span class="token comment" spellcheck="true">//下面可以做到只统计10秒的内容</span>
+<span class="token keyword">void</span> SpeedCalc<span class="token operator">::</span><span class="token function">removeStaleTimeSlot</span><span class="token punctuation">(</span><span class="token keyword">const</span> Timer<span class="token operator">&amp;</span> now<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">//当前统计的队列不为空，可以做到只统计10秒之内的内容</span>
+  <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token operator">!</span>timeSlots_<span class="token punctuation">.</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//constexpr auto WINDOW_TIME = 10_s;  也即是如果第一次添加的时间跟当前的时间间隔小于10秒的化，直接退出,也即是统计时间最少也要有10秒钟的间隔</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>timeSlots_<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>first<span class="token punctuation">.</span><span class="token function">difference</span><span class="token punctuation">(</span>now<span class="token punctuation">)</span> <span class="token operator">&lt;=</span> WINDOW_TIME<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+       <span class="token keyword">break</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//大于10秒, bytesWindow_ 减去要弹出的元素的值 ,这里防止队列太多,也即是只统计10秒的内容</span>
+    bytesWindow_ <span class="token operator">-</span><span class="token operator">=</span> timeSlots_<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>second<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//弹出第一个</span>
+    timeSlots_<span class="token punctuation">.</span><span class="token function">pop_front</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
-从函数的实现可以知道，Aria2最多统计最近10秒之内的下载情况，接下来分析下怎么判断是否超过了限制
-//判断当前的上传以及下载是否超过了最大的速度限制,这里会更新Peer的超时时间设置
-if (getDownloadEngine()->getRequestGroupMan()->doesOverallDownloadSpeedExceed() || requestGroup_->doesDownloadSpeedExceed()) {
-    ...
-}
+从函数的实现可以知道，Aria2最多统计最近<span class="token number">10</span>秒之内的下载情况，接下来分析下怎么判断是否超过了限制
+<span class="token comment" spellcheck="true">//判断当前的上传以及下载是否超过了最大的速度限制,这里会更新Peer的超时时间设置</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">getDownloadEngine</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">getRequestGroupMan</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">doesOverallDownloadSpeedExceed</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">||</span> requestGroup_<span class="token operator">-</span><span class="token operator">></span><span class="token function">doesDownloadSpeedExceed</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 
 对应的函数实现为
 
-//判断全局的下载速度是否超过了最大的设置值
-bool RequestGroupMan::doesOverallDownloadSpeedExceed()
-{
-  return maxOverallDownloadSpeedLimit_ > 0 && maxOverallDownloadSpeedLimit_ < netStat_.calculateDownloadSpeed();
-}
+<span class="token comment" spellcheck="true">//判断全局的下载速度是否超过了最大的设置值</span>
+<span class="token keyword">bool</span> RequestGroupMan<span class="token operator">::</span><span class="token function">doesOverallDownloadSpeedExceed</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token keyword">return</span> maxOverallDownloadSpeedLimit_ <span class="token operator">></span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> maxOverallDownloadSpeedLimit_ <span class="token operator">&lt;</span> netStat_<span class="token punctuation">.</span><span class="token function">calculateDownloadSpeed</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
 
-//判断当前的任务zong1下载是否超过了最大的下载速度
-bool RequestGroup::doesDownloadSpeedExceed()
-{
-  int spd = downloadContext_->getNetStat().calculateDownloadSpeed();
-  return maxDownloadSpeedLimit_ > 0 && maxDownloadSpeedLimit_ < spd;
-}
+<span class="token comment" spellcheck="true">//判断当前的任务zong1下载是否超过了最大的下载速度</span>
+<span class="token keyword">bool</span> RequestGroup<span class="token operator">::</span><span class="token function">doesDownloadSpeedExceed</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token keyword">int</span> spd <span class="token operator">=</span> downloadContext_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getNetStat</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">calculateDownloadSpeed</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">return</span> maxDownloadSpeedLimit_ <span class="token operator">></span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> maxDownloadSpeedLimit_ <span class="token operator">&lt;</span> spd<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-//RequestGroupMan 构造函数的定义 ,第一个参数传递为定义的请求组集合
-RequestGroupMan::RequestGroupMan(
-    std::vector<std::shared_ptr<RequestGroup>> requestGroups,
-    int maxConcurrentDownloads, const Option* option)
-    : maxConcurrentDownloads_(maxConcurrentDownloads),//标识最多支持多少个并发的下载
-    ...
-    maxOverallDownloadSpeedLimit_(option->getAsInt(PREF_MAX_OVERALL_DOWNLOAD_LIMIT)),//最大的下载速度限制 ,可以通过配置选项改变
-    maxOverallUploadSpeedLimit_(option->getAsInt(PREF_MAX_OVERALL_UPLOAD_LIMIT)),//最大的上传速度限制，可以通过配置选项改变
-    ...
-}
+<span class="token comment" spellcheck="true">//RequestGroupMan 构造函数的定义 ,第一个参数传递为定义的请求组集合</span>
+RequestGroupMan<span class="token operator">::</span><span class="token function">RequestGroupMan</span><span class="token punctuation">(</span>
+    std<span class="token operator">::</span>vector<span class="token operator">&lt;</span>std<span class="token operator">::</span>shared_ptr<span class="token operator">&lt;</span>RequestGroup<span class="token operator">>></span> requestGroups<span class="token punctuation">,</span>
+    <span class="token keyword">int</span> maxConcurrentDownloads<span class="token punctuation">,</span> <span class="token keyword">const</span> Option<span class="token operator">*</span> option<span class="token punctuation">)</span>
+    <span class="token operator">:</span> <span class="token function">maxConcurrentDownloads_</span><span class="token punctuation">(</span>maxConcurrentDownloads<span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token comment" spellcheck="true">//标识最多支持多少个并发的下载</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token function">maxOverallDownloadSpeedLimit_</span><span class="token punctuation">(</span>option<span class="token operator">-</span><span class="token operator">></span><span class="token function">getAsInt</span><span class="token punctuation">(</span>PREF_MAX_OVERALL_DOWNLOAD_LIMIT<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token comment" spellcheck="true">//最大的下载速度限制 ,可以通过配置选项改变</span>
+    <span class="token function">maxOverallUploadSpeedLimit_</span><span class="token punctuation">(</span>option<span class="token operator">-</span><span class="token operator">></span><span class="token function">getAsInt</span><span class="token punctuation">(</span>PREF_MAX_OVERALL_UPLOAD_LIMIT<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token comment" spellcheck="true">//最大的上传速度限制，可以通过配置选项改变</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 
 也即是我们设置的 这是针对总的下载速度
-gloableOptions.push_back(std::pair<std::string,std::string> ("max-overall-download-limit","1M"));
+gloableOptions<span class="token punctuation">.</span><span class="token function">push_back</span><span class="token punctuation">(</span>std<span class="token operator">::</span>pair<span class="token operator">&lt;</span>std<span class="token operator">::</span>string<span class="token punctuation">,</span>std<span class="token operator">::</span>string<span class="token operator">></span> <span class="token punctuation">(</span><span class="token string">"max-overall-download-limit"</span><span class="token punctuation">,</span><span class="token string">"1M"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-//创建请求组的构造函数,传递的参数一个为当前请求gid，一个为当前请求组的选项
-RequestGroup::RequestGroup(const std::shared_ptr<GroupId>& gid,
-                           const std::shared_ptr<Option>& option)
-    : belongsToGID_(0),//标识这个是属于一个请求组
-    ...
-    maxDownloadSpeedLimit_(option->getAsInt(PREF_MAX_DOWNLOAD_LIMIT)),//max-download-limit 代表最大下载的限制，这个可以改变的。。默认值为没有限制
-    maxUploadSpeedLimit_(option->getAsInt(PREF_MAX_UPLOAD_LIMIT)),//max-upload-limit 代表最大上传的限制  这个可以改变的。。默认值为没有限制
-    ...
-}
+<span class="token comment" spellcheck="true">//创建请求组的构造函数,传递的参数一个为当前请求gid，一个为当前请求组的选项</span>
+RequestGroup<span class="token operator">::</span><span class="token function">RequestGroup</span><span class="token punctuation">(</span><span class="token keyword">const</span> std<span class="token operator">::</span>shared_ptr<span class="token operator">&lt;</span>GroupId<span class="token operator">></span><span class="token operator">&amp;</span> gid<span class="token punctuation">,</span>
+                           <span class="token keyword">const</span> std<span class="token operator">::</span>shared_ptr<span class="token operator">&lt;</span>Option<span class="token operator">></span><span class="token operator">&amp;</span> option<span class="token punctuation">)</span>
+    <span class="token operator">:</span> <span class="token function">belongsToGID_</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token comment" spellcheck="true">//标识这个是属于一个请求组</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token function">maxDownloadSpeedLimit_</span><span class="token punctuation">(</span>option<span class="token operator">-</span><span class="token operator">></span><span class="token function">getAsInt</span><span class="token punctuation">(</span>PREF_MAX_DOWNLOAD_LIMIT<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token comment" spellcheck="true">//max-download-limit 代表最大下载的限制，这个可以改变的。。默认值为没有限制</span>
+    <span class="token function">maxUploadSpeedLimit_</span><span class="token punctuation">(</span>option<span class="token operator">-</span><span class="token operator">></span><span class="token function">getAsInt</span><span class="token punctuation">(</span>PREF_MAX_UPLOAD_LIMIT<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token comment" spellcheck="true">//max-upload-limit 代表最大上传的限制  这个可以改变的。。默认值为没有限制</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 
 也即是我们设置的  设置当前任务的最大的下载速度
-gloableOptions.push_back(std::pair<std::string,std::string> ("max-download-limit","50k"));
+gloableOptions<span class="token punctuation">.</span><span class="token function">push_back</span><span class="token punctuation">(</span>std<span class="token operator">::</span>pair<span class="token operator">&lt;</span>std<span class="token operator">::</span>string<span class="token punctuation">,</span>std<span class="token operator">::</span>string<span class="token operator">></span> <span class="token punctuation">(</span><span class="token string">"max-download-limit"</span><span class="token punctuation">,</span><span class="token string">"50k"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-所以判断是否超过了速度也是非常简单的，判断是否有设置对应的选项配置 比如 max-download-limit，或者 max-overall-download-limit,如果没有，那么默认为0，那么doesOverallDownloadSpeedExceed，或者 doesDownloadSpeedExceed默认返回false
+所以判断是否超过了速度也是非常简单的，判断是否有设置对应的选项配置 比如 max<span class="token operator">-</span>download<span class="token operator">-</span>limit，或者 max<span class="token operator">-</span>overall<span class="token operator">-</span>download<span class="token operator">-</span>limit<span class="token punctuation">,</span>如果没有，那么默认为<span class="token number">0</span>，那么doesOverallDownloadSpeedExceed，或者 doesDownloadSpeedExceed默认返回<span class="token boolean">false</span>
 如果有配置的化，那么就要根据当前的下载统计情况跟这个值做比较，当前速度获取是通过 calculateDownloadSpeed 实现
 
-/**
+<span class="token comment" spellcheck="true">/**
  * Returns current download speed in byte per sec.
  * 计算下载的进度
- */
-int NetStat::calculateDownloadSpeed()
-{
-   return downloadSpeed_.calculateSpeed();
-}
+ */</span>
+<span class="token keyword">int</span> NetStat<span class="token operator">::</span><span class="token function">calculateDownloadSpeed</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+   <span class="token keyword">return</span> downloadSpeed_<span class="token punctuation">.</span><span class="token function">calculateSpeed</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-//计算下载的速度
-int SpeedCalc::calculateSpeed()
-{
-  //获取到当前的时间
-  const auto& now = global::wallclock();
-  //保证队列的内容是10秒钟之内的值
-  removeStaleTimeSlot(now);
-  //统计的队列不为空
-  if (timeSlots_.empty()) {
-      return 0;
-  }
+<span class="token comment" spellcheck="true">//计算下载的速度</span>
+<span class="token keyword">int</span> SpeedCalc<span class="token operator">::</span><span class="token function">calculateSpeed</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">//获取到当前的时间</span>
+  <span class="token keyword">const</span> <span class="token keyword">auto</span><span class="token operator">&amp;</span> now <span class="token operator">=</span> global<span class="token operator">::</span><span class="token function">wallclock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//保证队列的内容是10秒钟之内的值</span>
+  <span class="token function">removeStaleTimeSlot</span><span class="token punctuation">(</span>now<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//统计的队列不为空</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>timeSlots_<span class="token punctuation">.</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
 
-  //统计队列的大小
-  auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(timeSlots_[0].first.difference(now)).count();
-  if (elapsed <= 0) {
-    elapsed = 1;
-  }
+  <span class="token comment" spellcheck="true">//统计队列的大小</span>
+  <span class="token keyword">auto</span> elapsed <span class="token operator">=</span> std<span class="token operator">::</span>chrono<span class="token operator">::</span>duration_cast<span class="token operator">&lt;</span>std<span class="token operator">::</span>chrono<span class="token operator">::</span>milliseconds<span class="token operator">></span><span class="token punctuation">(</span>timeSlots_<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>first<span class="token punctuation">.</span><span class="token function">difference</span><span class="token punctuation">(</span>now<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">count</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>elapsed <span class="token operator">&lt;=</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    elapsed <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
 
-  //计算速度,由于timeSlots_ 队列里面的元素都是一秒添加的，所以timeSlots_队列的大小也即是还有多少秒
-  int speed = bytesWindow_ * 1000 / elapsed;
-  //更新最大的速度值
-  maxSpeed_ = std::max(speed, maxSpeed_);
-  return speed;
-}
+  <span class="token comment" spellcheck="true">//计算速度,由于timeSlots_ 队列里面的元素都是一秒添加的，所以timeSlots_队列的大小也即是还有多少秒</span>
+  <span class="token keyword">int</span> speed <span class="token operator">=</span> bytesWindow_ <span class="token operator">*</span> <span class="token number">1000</span> <span class="token operator">/</span> elapsed<span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//更新最大的速度值</span>
+  maxSpeed_ <span class="token operator">=</span> std<span class="token operator">::</span><span class="token function">max</span><span class="token punctuation">(</span>speed<span class="token punctuation">,</span> maxSpeed_<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">return</span> speed<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-也即是求平均值的意思,这就是Aria2 判断是否超过了限制的实现，也即是Aria2 统计速度实现
+也即是求平均值的意思<span class="token punctuation">,</span>这就是Aria2 判断是否超过了限制的实现，也即是Aria2 统计速度实现
 </code></pre>
-<h3 id="Aria2-Utp限速实现"><a href="#Aria2-Utp限速实现" class="headerlink" title="Aria2 Utp限速实现"></a>Aria2 Utp限速实现</h3><pre class=" language-CPP"><code class="language-CPP">我们可以参考transmission的做法，实现Utp的限速处理
+<h3 id="Aria2-Utp限速实现"><a href="#Aria2-Utp限速实现" class="headerlink" title="Aria2 Utp限速实现"></a>Aria2 Utp限速实现</h3><pre class=" language-cpp"><code class="language-cpp">我们可以参考transmission的做法，实现Utp的限速处理
 
 由于我们的限速针对是整个任务，不是单个peer，也不是全局的速度监控，为什么是整个任务，不是单个peer呢，如果限制了单个peer的化，如果此时有好些人连接上这个用户，也会把用户的带宽吃掉，如果设置到
-整个任务的化，就不会存在这个问题，所有连接上这个用户共享最大的限速值，这样才能保障带宽，所以我们将 bytesLeft 放到 RequestGroup ,并有三个对应的方法操作这个变量
+整个任务的化，就不会存在这个问题，所有连接上这个用户共享最大的限速值，这样才能保障带宽，所以我们将 bytesLeft 放到 RequestGroup <span class="token punctuation">,</span>并有三个对应的方法操作这个变量
 
-class RequestGroup {
-privae:
-  enum HaltReason { NONE, SHUTDOWN_SIGNAL, USER_REQUEST };
-  //代表当前RequestGroup 可以允许接收的大小
-  int bytesLeft;
-  ... 
+<span class="token keyword">class</span> <span class="token class-name">RequestGroup</span> <span class="token punctuation">{</span>
+privae<span class="token operator">:</span>
+  <span class="token keyword">enum</span> HaltReason <span class="token punctuation">{</span> NONE<span class="token punctuation">,</span> SHUTDOWN_SIGNAL<span class="token punctuation">,</span> USER_REQUEST <span class="token punctuation">}</span><span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//代表当前RequestGroup 可以允许接收的大小</span>
+  <span class="token keyword">int</span> bytesLeft<span class="token punctuation">;</span>
+  <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span> 
 
-public:  
-  //重置BytesLeft 也即是重置滑动窗口的大小
-  void resetBytesLeft();
+<span class="token keyword">public</span><span class="token operator">:</span>  
+  <span class="token comment" spellcheck="true">//重置BytesLeft 也即是重置滑动窗口的大小</span>
+  <span class="token keyword">void</span> <span class="token function">resetBytesLeft</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-  //更新滑动窗口的大小
-  void updateBytesLeft(int pieceDataLength);
+  <span class="token comment" spellcheck="true">//更新滑动窗口的大小</span>
+  <span class="token keyword">void</span> <span class="token function">updateBytesLeft</span><span class="token punctuation">(</span><span class="token keyword">int</span> pieceDataLength<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-  //获取到当前允许的滑动窗口的大小
-  int getBytesLeft();
-  ...
-}
+  <span class="token comment" spellcheck="true">//获取到当前允许的滑动窗口的大小</span>
+  <span class="token keyword">int</span> <span class="token function">getBytesLeft</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 
 对应的函数实现为
 
-//重置 bytesLeft，参照transmission 每500毫秒重置这个值为默认的限速的值
-void RequestGroup::resetBytesLeft()
-{
-    bytesLeft = maxDownloadSpeedLimit_;
-}
+<span class="token comment" spellcheck="true">//重置 bytesLeft，参照transmission 每500毫秒重置这个值为默认的限速的值</span>
+<span class="token keyword">void</span> RequestGroup<span class="token operator">::</span><span class="token function">resetBytesLeft</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    bytesLeft <span class="token operator">=</span> maxDownloadSpeedLimit_<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-//更新滑动窗口的大小
-void RequestGroup::updateBytesLeft(int pieceDataLength)
-{
-    //获取到最小值
-    int minValue = bytesLeft > pieceDataLength ? pieceDataLength : bytesLeft;
-    bytesLeft -= minValue;
-}
+<span class="token comment" spellcheck="true">//更新滑动窗口的大小</span>
+<span class="token keyword">void</span> RequestGroup<span class="token operator">::</span><span class="token function">updateBytesLeft</span><span class="token punctuation">(</span><span class="token keyword">int</span> pieceDataLength<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//获取到最小值</span>
+    <span class="token keyword">int</span> minValue <span class="token operator">=</span> bytesLeft <span class="token operator">></span> pieceDataLength <span class="token operator">?</span> pieceDataLength <span class="token operator">:</span> bytesLeft<span class="token punctuation">;</span>
+    bytesLeft <span class="token operator">-</span><span class="token operator">=</span> minValue<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-//获取到当前允许的滑动窗口的大小
-int RequestGroup::getBytesLeft()
-{
-    return bytesLeft;
-}
+<span class="token comment" spellcheck="true">//获取到当前允许的滑动窗口的大小</span>
+<span class="token keyword">int</span> RequestGroup<span class="token operator">::</span><span class="token function">getBytesLeft</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">return</span> bytesLeft<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-接下来就是重置这个byteLeft触发，transmission是每隔500毫秒触发一次更新,由于是针对当前整个下载任务的，我们可以将这部分代码写到 TrackerWatcherCommand
-class TrackerWatcherCommand : public Command {
-private:
-  ...    
-  //超时重置 RequestGroup 的bytesLeft
-  Timer checkPoint_;
-  //每隔多少毫秒重置一次
-  std::chrono::milliseconds refreshInterval_;
-  ...
-}
+接下来就是重置这个byteLeft触发，transmission是每隔<span class="token number">500</span>毫秒触发一次更新<span class="token punctuation">,</span>由于是针对当前整个下载任务的，我们可以将这部分代码写到 TrackerWatcherCommand
+<span class="token keyword">class</span> <span class="token class-name">TrackerWatcherCommand</span> <span class="token operator">:</span> <span class="token keyword">public</span> Command <span class="token punctuation">{</span>
+<span class="token keyword">private</span><span class="token operator">:</span>
+  <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>    
+  <span class="token comment" spellcheck="true">//超时重置 RequestGroup 的bytesLeft</span>
+  Timer checkPoint_<span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//每隔多少毫秒重置一次</span>
+  std<span class="token operator">::</span>chrono<span class="token operator">::</span>milliseconds refreshInterval_<span class="token punctuation">;</span>
+  <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 
-TrackerWatcherCommand::TrackerWatcherCommand(cuid_t cuid, RequestGroup* requestGroup, DownloadEngine* e)
-    : Command(cuid),
-      requestGroup_(requestGroup),
-      e_(e),
-      udpTrackerClient_(e_->getBtRegistry()->getUDPTrackerClient()),
-      checkPoint_(global::wallclock()), //检查的时间点
-      refreshInterval_(std::chrono::milliseconds(1000)) // 重置滑动窗口的设置
-{
-    ...
-}
+TrackerWatcherCommand<span class="token operator">::</span><span class="token function">TrackerWatcherCommand</span><span class="token punctuation">(</span>cuid_t cuid<span class="token punctuation">,</span> RequestGroup<span class="token operator">*</span> requestGroup<span class="token punctuation">,</span> DownloadEngine<span class="token operator">*</span> e<span class="token punctuation">)</span>
+    <span class="token operator">:</span> <span class="token function">Command</span><span class="token punctuation">(</span>cuid<span class="token punctuation">)</span><span class="token punctuation">,</span>
+      <span class="token function">requestGroup_</span><span class="token punctuation">(</span>requestGroup<span class="token punctuation">)</span><span class="token punctuation">,</span>
+      <span class="token function">e_</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span><span class="token punctuation">,</span>
+      <span class="token function">udpTrackerClient_</span><span class="token punctuation">(</span>e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getBtRegistry</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">getUDPTrackerClient</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+      <span class="token function">checkPoint_</span><span class="token punctuation">(</span>global<span class="token operator">::</span><span class="token function">wallclock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token comment" spellcheck="true">//检查的时间点</span>
+      <span class="token function">refreshInterval_</span><span class="token punctuation">(</span>std<span class="token operator">::</span>chrono<span class="token operator">::</span><span class="token function">milliseconds</span><span class="token punctuation">(</span><span class="token number">1000</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token comment" spellcheck="true">// 重置滑动窗口的设置</span>
+<span class="token punctuation">{</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 
-//Command命令的执行
-bool TrackerWatcherCommand::execute()
-{
-  //如果当前的请求是 强制暂停。这里要注意这里是针对当前的请求,如果当前requestGroup不是退出的状态是不会进入里面的
-  if (requestGroup_->isForceHaltRequested()) {
-    //如果目前的trackerRequest对象为空，则直接返回true，那么这个对象就要被销毁掉
-    if (!trackerRequest_) {
-      return true;
-    }
-    else if (trackerRequest_->stopped() || trackerRequest_->success()) {//当前是暂停的状态
-      return true;
-    }
-    else {
-      trackerRequest_->stop(e_);
-      e_->setRefreshInterval(std::chrono::milliseconds(0));
-      e_->addCommand(std::unique_ptr<Command>(this));
-      return false;
-    }
-  }
+<span class="token comment" spellcheck="true">//Command命令的执行</span>
+<span class="token keyword">bool</span> TrackerWatcherCommand<span class="token operator">::</span><span class="token function">execute</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">//如果当前的请求是 强制暂停。这里要注意这里是针对当前的请求,如果当前requestGroup不是退出的状态是不会进入里面的</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>requestGroup_<span class="token operator">-</span><span class="token operator">></span><span class="token function">isForceHaltRequested</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//如果目前的trackerRequest对象为空，则直接返回true，那么这个对象就要被销毁掉</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>trackerRequest_<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>trackerRequest_<span class="token operator">-</span><span class="token operator">></span><span class="token function">stopped</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">||</span> trackerRequest_<span class="token operator">-</span><span class="token operator">></span><span class="token function">success</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token comment" spellcheck="true">//当前是暂停的状态</span>
+      <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">else</span> <span class="token punctuation">{</span>
+      trackerRequest_<span class="token operator">-</span><span class="token operator">></span><span class="token function">stop</span><span class="token punctuation">(</span>e_<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">setRefreshInterval</span><span class="token punctuation">(</span>std<span class="token operator">::</span>chrono<span class="token operator">::</span><span class="token function">milliseconds</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">addCommand</span><span class="token punctuation">(</span>std<span class="token operator">::</span>unique_ptr<span class="token operator">&lt;</span>Command<span class="token operator">></span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
 
-  //只有当前的requestGroup 退出的时候，才会为true
-  if (btAnnounce_->noMoreAnnounce()) {
-    A2_LOG_DEBUG("no more announce");
-    return true;
-  }
+  <span class="token comment" spellcheck="true">//只有当前的requestGroup 退出的时候，才会为true</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>btAnnounce_<span class="token operator">-</span><span class="token operator">></span><span class="token function">noMoreAnnounce</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">A2_LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"no more announce"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
 
-  //每500毫秒更新超时设置,utp 超时检查，内部会将那些没有使用的utpSocket对象释放掉 TODO tcp不用
-  if(checkPoint_.difference(global::wallclock()) >= refreshInterval_)
-  {
-      //重置刷新的时间
-      checkPoint_ = global::wallclock();
-      //参照transmission 每隔500毫秒重置一次bytesLeft的值，这个值代表utp滑动窗口的大小
-      requestGroup_->resetBytesLeft();
-  }
-  ...    
-}
+  <span class="token comment" spellcheck="true">//每500毫秒更新超时设置,utp 超时检查，内部会将那些没有使用的utpSocket对象释放掉 TODO tcp不用</span>
+  <span class="token keyword">if</span><span class="token punctuation">(</span>checkPoint_<span class="token punctuation">.</span><span class="token function">difference</span><span class="token punctuation">(</span>global<span class="token operator">::</span><span class="token function">wallclock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">>=</span> refreshInterval_<span class="token punctuation">)</span>
+  <span class="token punctuation">{</span>
+      <span class="token comment" spellcheck="true">//重置刷新的时间</span>
+      checkPoint_ <span class="token operator">=</span> global<span class="token operator">::</span><span class="token function">wallclock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token comment" spellcheck="true">//参照transmission 每隔500毫秒重置一次bytesLeft的值，这个值代表utp滑动窗口的大小</span>
+      requestGroup_<span class="token operator">-</span><span class="token operator">></span><span class="token function">resetBytesLeft</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>    
+<span class="token punctuation">}</span>
 
 添加utp 获取滑动窗口回调函数
-utp_set_callback(utpContext,UTP_GET_READ_BUFFER_SIZE,&callback_get_rb_size);//utp 限速回调函数
+<span class="token function">utp_set_callback</span><span class="token punctuation">(</span>utpContext<span class="token punctuation">,</span>UTP_GET_READ_BUFFER_SIZE<span class="token punctuation">,</span><span class="token operator">&amp;</span>callback_get_rb_size<span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//utp 限速回调函数</span>
 
-//utp 控制滑动窗口回调，用来实现限速处理
-uint64 callback_get_rb_size(utp_callback_arguments *a)
-{
-    utp_socket * utpSocket = a->socket;
+<span class="token comment" spellcheck="true">//utp 控制滑动窗口回调，用来实现限速处理</span>
+uint64 <span class="token function">callback_get_rb_size</span><span class="token punctuation">(</span>utp_callback_arguments <span class="token operator">*</span>a<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    utp_socket <span class="token operator">*</span> utpSocket <span class="token operator">=</span> a<span class="token operator">-</span><span class="token operator">></span>socket<span class="token punctuation">;</span>
 
-    void* utp_socket_userData = utp_get_userdata(utpSocket);
-    //我们在超时的时候，手动的置为了NULL
-    if(utp_socket_userData)
-    {
-        PeerAbstractCommand * peerAbstractCommand = static_cast<PeerAbstractCommand *>(utp_socket_userData);
-        if(peerAbstractCommand)
-        {
-            //对应的子类实现 分发消息
-            return peerAbstractCommand->utpGetRbSize();
-        }
-    }
-    return 0;
-}
+    <span class="token keyword">void</span><span class="token operator">*</span> utp_socket_userData <span class="token operator">=</span> <span class="token function">utp_get_userdata</span><span class="token punctuation">(</span>utpSocket<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//我们在超时的时候，手动的置为了NULL</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>utp_socket_userData<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        PeerAbstractCommand <span class="token operator">*</span> peerAbstractCommand <span class="token operator">=</span> <span class="token keyword">static_cast</span><span class="token operator">&lt;</span>PeerAbstractCommand <span class="token operator">*</span><span class="token operator">></span><span class="token punctuation">(</span>utp_socket_userData<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span>peerAbstractCommand<span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">//对应的子类实现 分发消息</span>
+            <span class="token keyword">return</span> peerAbstractCommand<span class="token operator">-</span><span class="token operator">></span><span class="token function">utpGetRbSize</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
 由于Aria2 限速的原理是针对piece Data才会做限速，所以我们也做类似的处理
-class PeerAbstractCommand : public Command {
-public:
-   ...
-   //新增utp 控制滑动窗口函数，默认为0，则走默认值，由于限速只针对下载piece数据有用，所以默认为0
-   virtual int utpGetRbSize(){ return 0;};
-   ...
-}
+<span class="token keyword">class</span> <span class="token class-name">PeerAbstractCommand</span> <span class="token operator">:</span> <span class="token keyword">public</span> Command <span class="token punctuation">{</span>
+<span class="token keyword">public</span><span class="token operator">:</span>
+   <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+   <span class="token comment" spellcheck="true">//新增utp 控制滑动窗口函数，默认为0，则走默认值，由于限速只针对下载piece数据有用，所以默认为0</span>
+   <span class="token keyword">virtual</span> <span class="token keyword">int</span> <span class="token function">utpGetRbSize</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span> <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+   <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 
 我们需要在PeerInteractionCommand 中重写这个方法，这个command就是获取到piece了
 
-class PeerInteractionCommand : public PeerAbstractCommand {
-public:
-   //重新父类的实现，事实的控制滑动窗口的大小，从而实现utp限速的处理
-   virtual int utpGetRbSize() CXX11_OVERRIDE; 
-   ...
-}
+<span class="token keyword">class</span> <span class="token class-name">PeerInteractionCommand</span> <span class="token operator">:</span> <span class="token keyword">public</span> PeerAbstractCommand <span class="token punctuation">{</span>
+<span class="token keyword">public</span><span class="token operator">:</span>
+   <span class="token comment" spellcheck="true">//重新父类的实现，事实的控制滑动窗口的大小，从而实现utp限速的处理</span>
+   <span class="token keyword">virtual</span> <span class="token keyword">int</span> <span class="token function">utpGetRbSize</span><span class="token punctuation">(</span><span class="token punctuation">)</span> CXX11_OVERRIDE<span class="token punctuation">;</span> 
+   <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 
-//当前command是下载种子数据的，所以这里要重写这个函数，返回的值决定滑动窗口的大小
-int PeerInteractionCommand::utpGetRbSize()
-{
-    //当前只针对Bt消息要处理
-    if(sequence_ == WIRED)
-    {
-        utp_context * utpContext = getDownloadEngine()->getBtRegistry()->getUtpContext();
-        if(utpContext == NULL)
-        {
-            LOGD("PeerInteractionCommand::utpGetRbSize utpContext == NULL error");
-            return 0;
-        }
-        //utp 默认的滑动窗口的大小
-        int opt_rcvbuf = utp_context_get_option(utpContext,UTP_RCVBUF);
-        //取的最小值
-        int minValue = opt_rcvbuf > requestGroup_->getBytesLeft() ? requestGroup_->getBytesLeft() : opt_rcvbuf;
-        int byteCount = minValue;
-        if(byteCount > 0)
-        {
-            //判断utp下载是否超过了下载的限制
-            if (getDownloadEngine()->getRequestGroupMan()->doesOverallDownloadSpeedExceed() || requestGroup_->doesDownloadSpeedExceed()) {
-                LOGD("PeerInteractionCommand::utpGetRbSize minValue %d doesDownloadUtpExceed",minValue);
-                //超过了将滑动窗口设置为0
-                byteCount = 0;
-            }
-        }
-        LOGD("CUID#%" PRId64 " PeerInteractionCommand utpGetRbSize byteCount %d",getCuid(),byteCount);
-        //这是utp的函数实现， return opt_rcvbuf > numbuf ? opt_rcvbuf - numbuf : 0; numbuf 为我们当前函数的返回值,所以限速的处理就直接将滑动窗口为0，所以numbuf = opt_rcvbuf
-        return opt_rcvbuf - byteCount;
-    }
-    //其他的情况下，返回0，则会执行默认的滑动窗口设置
-    return 0;
-}
+<span class="token comment" spellcheck="true">//当前command是下载种子数据的，所以这里要重写这个函数，返回的值决定滑动窗口的大小</span>
+<span class="token keyword">int</span> PeerInteractionCommand<span class="token operator">::</span><span class="token function">utpGetRbSize</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//当前只针对Bt消息要处理</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>sequence_ <span class="token operator">==</span> WIRED<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        utp_context <span class="token operator">*</span> utpContext <span class="token operator">=</span> <span class="token function">getDownloadEngine</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">getBtRegistry</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">getUtpContext</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span>utpContext <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"PeerInteractionCommand::utpGetRbSize utpContext == NULL error"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token comment" spellcheck="true">//utp 默认的滑动窗口的大小</span>
+        <span class="token keyword">int</span> opt_rcvbuf <span class="token operator">=</span> <span class="token function">utp_context_get_option</span><span class="token punctuation">(</span>utpContext<span class="token punctuation">,</span>UTP_RCVBUF<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//取的最小值</span>
+        <span class="token keyword">int</span> minValue <span class="token operator">=</span> opt_rcvbuf <span class="token operator">></span> requestGroup_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getBytesLeft</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">?</span> requestGroup_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getBytesLeft</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">:</span> opt_rcvbuf<span class="token punctuation">;</span>
+        <span class="token keyword">int</span> byteCount <span class="token operator">=</span> minValue<span class="token punctuation">;</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span>byteCount <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">//判断utp下载是否超过了下载的限制</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">getDownloadEngine</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">getRequestGroupMan</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">doesOverallDownloadSpeedExceed</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">||</span> requestGroup_<span class="token operator">-</span><span class="token operator">></span><span class="token function">doesDownloadSpeedExceed</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"PeerInteractionCommand::utpGetRbSize minValue %d doesDownloadUtpExceed"</span><span class="token punctuation">,</span>minValue<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token comment" spellcheck="true">//超过了将滑动窗口设置为0</span>
+                byteCount <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+        <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"CUID#%"</span> PRId64 <span class="token string">" PeerInteractionCommand utpGetRbSize byteCount %d"</span><span class="token punctuation">,</span><span class="token function">getCuid</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>byteCount<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//这是utp的函数实现， return opt_rcvbuf > numbuf ? opt_rcvbuf - numbuf : 0; numbuf 为我们当前函数的返回值,所以限速的处理就直接将滑动窗口为0，所以numbuf = opt_rcvbuf</span>
+        <span class="token keyword">return</span> opt_rcvbuf <span class="token operator">-</span> byteCount<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//其他的情况下，返回0，则会执行默认的滑动窗口设置</span>
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
 最后在更新这个bytesLeft值，可以放到DownloadContext 中，因为这个是针对当前任务
 
-//更新下载的速度，这是针对当前一个种子任务总的下载速度
-void DownloadContext::updateDownload(size_t bytes)
-{
-  //LOGD("DownloadContext updateDownload bytes %u \n",bytes);
-  //这是当前这个任务的下载速度
-  netStat_.updateDownload(bytes);
+<span class="token comment" spellcheck="true">//更新下载的速度，这是针对当前一个种子任务总的下载速度</span>
+<span class="token keyword">void</span> DownloadContext<span class="token operator">::</span><span class="token function">updateDownload</span><span class="token punctuation">(</span>size_t bytes<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">//LOGD("DownloadContext updateDownload bytes %u \n",bytes);</span>
+  <span class="token comment" spellcheck="true">//这是当前这个任务的下载速度</span>
+  netStat_<span class="token punctuation">.</span><span class="token function">updateDownload</span><span class="token punctuation">(</span>bytes<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-  //更新RequestGroup中的bytesLeft 也即是滑动窗口
-  ownerRequestGroup_->updateBytesLeft(bytes);
+  <span class="token comment" spellcheck="true">//更新RequestGroup中的bytesLeft 也即是滑动窗口</span>
+  ownerRequestGroup_<span class="token operator">-</span><span class="token operator">></span><span class="token function">updateBytesLeft</span><span class="token punctuation">(</span>bytes<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-  //这是全局的下载速度
-  RequestGroupMan* rgman = ownerRequestGroup_->getRequestGroupMan();
-  if (rgman) {
-     rgman->getNetStat().updateDownload(bytes);
-  }
-}
+  <span class="token comment" spellcheck="true">//这是全局的下载速度</span>
+  RequestGroupMan<span class="token operator">*</span> rgman <span class="token operator">=</span> ownerRequestGroup_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getRequestGroupMan</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>rgman<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+     rgman<span class="token operator">-</span><span class="token operator">></span><span class="token function">getNetStat</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">updateDownload</span><span class="token punctuation">(</span>bytes<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <p>注意这里如果不参照transmission的做法设置一个bytesLef,直接判断如果当前速度超过了，就直接设置滑动窗口为0，如果没有超过，就设置为默认值，这样会导致速度的波动，还会导致对方一直的发送数据等错误</p>
 <p>这里还有一个细节就是transmission中有这样的处理，也即是当尝试的获取数据的时候，获取不到，就主动调用这个方法<br><img src="/uploads/Utp下载限速/utp_PBDrained函数调用.png" alt="结果显示"></p>
 <p>utp_PBDrained函数实现,内部会调用send_ack<br><img src="/uploads/Utp下载限速/utp_PBDrained函数实现.png" alt="结果显示"></p>
 <p>utp_sendAck函数实现,这内部会获取到当前滑动窗口的大小，如果不这样处理的化，会导致滑动窗口的设置太慢，会出现问题<br><img src="/uploads/Utp下载限速/utp_sendAck函数实现.png" alt="结果显示"></p>
 <p>相应的我们可以在</p>
-<pre class=" language-CPP"><code class="language-CPP">bool PeerConnection::receiveMessage(unsigned char* data, size_t& dataLength)
-{
-    ...
-    //缓冲区中有内容才要拷贝
-    if(btResBufLength_ != 0)
-    {
-        //一次性拷贝会有问题，会偶现溢出缓冲空间，这里控制在64k之内，所以这里不能一次性拷贝
-        int finallyLen = btResBufLength_ > nread ? nread : btResBufLength_;
-        memcpy(resbuf_.get()+resbufLength_,btResbuf_.get(),finallyLen);
-        resbufLength_ += finallyLen;
+<pre class=" language-cpp"><code class="language-cpp"><span class="token keyword">bool</span> PeerConnection<span class="token operator">::</span><span class="token function">receiveMessage</span><span class="token punctuation">(</span><span class="token keyword">unsigned</span> <span class="token keyword">char</span><span class="token operator">*</span> data<span class="token punctuation">,</span> size_t<span class="token operator">&amp;</span> dataLength<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token comment" spellcheck="true">//缓冲区中有内容才要拷贝</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>btResBufLength_ <span class="token operator">!=</span> <span class="token number">0</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//一次性拷贝会有问题，会偶现溢出缓冲空间，这里控制在64k之内，所以这里不能一次性拷贝</span>
+        <span class="token keyword">int</span> finallyLen <span class="token operator">=</span> btResBufLength_ <span class="token operator">></span> nread <span class="token operator">?</span> nread <span class="token operator">:</span> btResBufLength_<span class="token punctuation">;</span>
+        <span class="token function">memcpy</span><span class="token punctuation">(</span>resbuf_<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">+</span>resbufLength_<span class="token punctuation">,</span>btResbuf_<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>finallyLen<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        resbufLength_ <span class="token operator">+</span><span class="token operator">=</span> finallyLen<span class="token punctuation">;</span>
 
-        //拷贝完之后要判断是否还剩下有数据，如果有要将剩余的数据，移到bt缓冲区的前面，下次继续再后面添加
-        if(finallyLen != btResBufLength_)
-        {
-            //将bt缓冲区的剩下的内容移动到前面
-            memmove(btResbuf_.get(), btResbuf_.get() + finallyLen, btResBufLength_ - finallyLen);
-        }
-        //标识当前bt缓冲区中还剩余的长度
-        //int leftLength = btResBufLength_ - finallyLen;
-        LOGD("utp receiveMessage before btResBufLength_ %d after leftLength %d resbufLength_ %d",btResBufLength_,(btResBufLength_ - finallyLen),resbufLength_);
-        btResBufLength_ -= finallyLen;
-    } else{
-        if(getSocketBuffer()->getSocketCore()->getUtpSocket())
-        {
-            //参照transmission 的做法，这个可以更改utp的滑动窗口
-            utp_read_drained(getSocketBuffer()->getSocketCore()->getUtpSocket());
-            //缓冲区没有内容，中断循环，下次继续执行
-            LOGD("btResBufLength_ == 0 break   utp_read_drained");
-        }
-        break;
-    }
-    ...
-}
+        <span class="token comment" spellcheck="true">//拷贝完之后要判断是否还剩下有数据，如果有要将剩余的数据，移到bt缓冲区的前面，下次继续再后面添加</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span>finallyLen <span class="token operator">!=</span> btResBufLength_<span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">//将bt缓冲区的剩下的内容移动到前面</span>
+            <span class="token function">memmove</span><span class="token punctuation">(</span>btResbuf_<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> btResbuf_<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> finallyLen<span class="token punctuation">,</span> btResBufLength_ <span class="token operator">-</span> finallyLen<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token comment" spellcheck="true">//标识当前bt缓冲区中还剩余的长度</span>
+        <span class="token comment" spellcheck="true">//int leftLength = btResBufLength_ - finallyLen;</span>
+        <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"utp receiveMessage before btResBufLength_ %d after leftLength %d resbufLength_ %d"</span><span class="token punctuation">,</span>btResBufLength_<span class="token punctuation">,</span><span class="token punctuation">(</span>btResBufLength_ <span class="token operator">-</span> finallyLen<span class="token punctuation">)</span><span class="token punctuation">,</span>resbufLength_<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        btResBufLength_ <span class="token operator">-</span><span class="token operator">=</span> finallyLen<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span><span class="token punctuation">{</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">getSocketBuffer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">getSocketCore</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">getUtpSocket</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">//参照transmission 的做法，这个可以更改utp的滑动窗口</span>
+            <span class="token function">utp_read_drained</span><span class="token punctuation">(</span><span class="token function">getSocketBuffer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">getSocketCore</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">getUtpSocket</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">//缓冲区没有内容，中断循环，下次继续执行</span>
+            <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"btResBufLength_ == 0 break   utp_read_drained"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">break</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <p><img src="/uploads/Utp下载限速/Aria2 Utp限速结果.png" alt="结果显示"></p>
 

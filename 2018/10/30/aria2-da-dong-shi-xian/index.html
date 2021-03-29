@@ -529,67 +529,67 @@
 <h3 id="Aria2打洞的实现"><a href="#Aria2打洞的实现" class="headerlink" title="Aria2打洞的实现"></a>Aria2打洞的实现</h3><blockquote>
 <p> 由于打洞<strong>首先</strong>要有一个服务器，这个服务器主要是用来告知对方的公网的ip和端口号，而我们的tracker服务器做的就是这个工作，tracker服务器会每隔一段时间返回当前已经连接上服务器的所用用户对应的外网ip和端口号<br><strong>第二</strong>打洞要使用udp，而我们移植的utp就是udp的实现，只是在udp的基础上添加了类似于tcp的逻辑，比如丢包重发，拥塞控制，滑动窗口等，使我们使用起来不用管理这些细节<br><strong>第三</strong>打洞要同时发起连接，由于很难做到同时，所以对应的应该要有一个重试的机制 虽然utp连接就是一个重试的过程，默认是20秒超时，但是为了可以控制，在移植utp的时候，我也增加了utp的重试机制,具体前面有介绍，最后就是同时连接了,这里我们就要针对原先的从tracker服务器返回peer列表的时候增加一点操作了，当收到tracker服务器返回的peer列表就直接执行连接操作,这里我们在保证原有的逻辑不改变的情况下，增加了一个临时的队列，存储了peer下次应该连接的时候，当时间到的时候，这个peer就应该执行连接操作，所以这里要算出对应的主机下一次触发连接的时间下面是大概的思路<br>满足下次peer触发tracker时间 &gt;= 当前系统时间)的元素：为他们新建队列，按照(下次peer触发tracker时间)进行排序，当元素满足（下次peer触发tracker时间 &lt;= 当前系统时间）时，进行addPeer相应的tracker服务端应该记录下每一个用户连接tracker的开始时间，下面是对应的代码实现</p>
 </blockquote>
-<pre class=" language-CPP"><code class="language-CPP">//从tracker服务器获取到peer之后，统一调用这个方法添加peer，内部完成对应的addPeer逻辑
-void DefaultPeerStorage::addPeerList(std::vector<std::shared_ptr<PeerNodeInfo>>& nodeInfos,std::chrono::seconds interval)
-{
-    //当下次tracker再次返回peer的时候，应该要清除这个缓冲的集合，因为按理来说，应该在下次tracker触发的时候，应该要把所有的peer执行连接操作
-    tempPeers.clear();
+<pre class=" language-cpp"><code class="language-cpp"><span class="token comment" spellcheck="true">//从tracker服务器获取到peer之后，统一调用这个方法添加peer，内部完成对应的addPeer逻辑</span>
+<span class="token keyword">void</span> DefaultPeerStorage<span class="token operator">::</span><span class="token function">addPeerList</span><span class="token punctuation">(</span>std<span class="token operator">::</span>vector<span class="token operator">&lt;</span>std<span class="token operator">::</span>shared_ptr<span class="token operator">&lt;</span>PeerNodeInfo<span class="token operator">>></span><span class="token operator">&amp;</span> nodeInfos<span class="token punctuation">,</span>std<span class="token operator">::</span>chrono<span class="token operator">::</span>seconds interval<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//当下次tracker再次返回peer的时候，应该要清除这个缓冲的集合，因为按理来说，应该在下次tracker触发的时候，应该要把所有的peer执行连接操作</span>
+    tempPeers<span class="token punctuation">.</span><span class="token function">clear</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    A2_LOG_DEBUG(fmt("tracker getPeerTime %u",util::timeGetTime()));
+    <span class="token function">A2_LOG_DEBUG</span><span class="token punctuation">(</span><span class="token function">fmt</span><span class="token punctuation">(</span><span class="token string">"tracker getPeerTime %u"</span><span class="token punctuation">,</span>util<span class="token operator">::</span><span class="token function">timeGetTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    for(auto& nodeInfo : nodeInfos)
-    {
-        //原本的逻辑，这个方法会执行peer的连接操作
-        addPeer(std::make_shared<Peer>(nodeInfo->getIpAddr(),nodeInfo->getPort()));
-        //当前时间的秒数
-        auto now_second = std::chrono::seconds(util::timeGetTime());
-        //peer添加的时间
-        auto minInterval_ = std::chrono::seconds(nodeInfo->getTimeStamp());
+    <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">auto</span><span class="token operator">&amp;</span> nodeInfo <span class="token operator">:</span> nodeInfos<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//原本的逻辑，这个方法会执行peer的连接操作</span>
+        <span class="token function">addPeer</span><span class="token punctuation">(</span>std<span class="token operator">::</span>make_shared<span class="token operator">&lt;</span>Peer<span class="token operator">></span><span class="token punctuation">(</span>nodeInfo<span class="token operator">-</span><span class="token operator">></span><span class="token function">getIpAddr</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>nodeInfo<span class="token operator">-</span><span class="token operator">></span><span class="token function">getPort</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//当前时间的秒数</span>
+        <span class="token keyword">auto</span> now_second <span class="token operator">=</span> std<span class="token operator">::</span>chrono<span class="token operator">::</span><span class="token function">seconds</span><span class="token punctuation">(</span>util<span class="token operator">::</span><span class="token function">timeGetTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//peer添加的时间</span>
+        <span class="token keyword">auto</span> minInterval_ <span class="token operator">=</span> std<span class="token operator">::</span>chrono<span class="token operator">::</span><span class="token function">seconds</span><span class="token punctuation">(</span>nodeInfo<span class="token operator">-</span><span class="token operator">></span><span class="token function">getTimeStamp</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        //2.其余满足( 下次peer触发tracker时间 >= 当前系统时间)的元素：为他们新建队列，按照(下次peer触发tracker时间)进行排序，当元素满足（下次peer触发tracker时间 <= 当前系统时间）时，进行addPeer
-        if(nodeInfo->getTimeStamp() != 0 && minInterval_ + interval <= now_second)
-        {
-            //算出当前的peer经历了多少次的tracker 刷新
-            int peerIntervalCount = (int) ((now_second - minInterval_ ) / interval);
-            //计算出当前peer下次刷新的tracker时间点
-            std::chrono::seconds trackTime = minInterval_ + interval * (peerIntervalCount+1);
-            A2_LOG_DEBUG(fmt("%s:%d old peer peerIntervalCount %d 下次连接时间 %ld",nodeInfo->getIpAddr().c_str(),nodeInfo->getPort(),peerIntervalCount,static_cast<long int> (trackTime.count())));
-            //存储到临时集合
-            tempPeers[nodeInfo] = std::move(trackTime);
-        }
-    }
-}
+        <span class="token comment" spellcheck="true">//2.其余满足( 下次peer触发tracker时间 >= 当前系统时间)的元素：为他们新建队列，按照(下次peer触发tracker时间)进行排序，当元素满足（下次peer触发tracker时间 &lt;= 当前系统时间）时，进行addPeer</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span>nodeInfo<span class="token operator">-</span><span class="token operator">></span><span class="token function">getTimeStamp</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> minInterval_ <span class="token operator">+</span> interval <span class="token operator">&lt;=</span> now_second<span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">//算出当前的peer经历了多少次的tracker 刷新</span>
+            <span class="token keyword">int</span> peerIntervalCount <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">int</span><span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>now_second <span class="token operator">-</span> minInterval_ <span class="token punctuation">)</span> <span class="token operator">/</span> interval<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">//计算出当前peer下次刷新的tracker时间点</span>
+            std<span class="token operator">::</span>chrono<span class="token operator">::</span>seconds trackTime <span class="token operator">=</span> minInterval_ <span class="token operator">+</span> interval <span class="token operator">*</span> <span class="token punctuation">(</span>peerIntervalCount<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">A2_LOG_DEBUG</span><span class="token punctuation">(</span><span class="token function">fmt</span><span class="token punctuation">(</span><span class="token string">"%s:%d old peer peerIntervalCount %d 下次连接时间 %ld"</span><span class="token punctuation">,</span>nodeInfo<span class="token operator">-</span><span class="token operator">></span><span class="token function">getIpAddr</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">c_str</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>nodeInfo<span class="token operator">-</span><span class="token operator">></span><span class="token function">getPort</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>peerIntervalCount<span class="token punctuation">,</span><span class="token keyword">static_cast</span><span class="token operator">&lt;</span><span class="token keyword">long</span> <span class="token keyword">int</span><span class="token operator">></span> <span class="token punctuation">(</span>trackTime<span class="token punctuation">.</span><span class="token function">count</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">//存储到临时集合</span>
+            tempPeers<span class="token punctuation">[</span>nodeInfo<span class="token punctuation">]</span> <span class="token operator">=</span> std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>trackTime<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
-//临时的队列，用来保存那些peer ，这里的key为 这些peer下次应该要触发的连接的时间，采用multimap ，是因为对于那些即将要添加的peer，他们连接的触发时间
-//范围在 当前的时间到tracker的刷新时间间隔之内,所以可能会有多个peer 拥有同样的key
-std::map<std::shared_ptr<PeerNodeInfo>,std::chrono::seconds> tempPeers;
+<span class="token comment" spellcheck="true">//临时的队列，用来保存那些peer ，这里的key为 这些peer下次应该要触发的连接的时间，采用multimap ，是因为对于那些即将要添加的peer，他们连接的触发时间</span>
+<span class="token comment" spellcheck="true">//范围在 当前的时间到tracker的刷新时间间隔之内,所以可能会有多个peer 拥有同样的key</span>
+std<span class="token operator">::</span>map<span class="token operator">&lt;</span>std<span class="token operator">::</span>shared_ptr<span class="token operator">&lt;</span>PeerNodeInfo<span class="token operator">></span><span class="token punctuation">,</span>std<span class="token operator">::</span>chrono<span class="token operator">::</span>seconds<span class="token operator">></span> tempPeers<span class="token punctuation">;</span>
 
 接着是用来一直检测这个临时队列的peer是否到了他们要执行连接的时间
-//根据当前的时间检查是否有peer 要添加的，如果有应该执行addPeer操作
-void DefaultPeerStorage::checkPeerTimeToAdd() {
-    //如果为空，不用检查
-    if (tempPeers.empty()) {
-        return;
-    }
-    //当前时间的秒数
-    auto now_second = std::chrono::seconds(util::timeGetTime());
-    for (auto i = std::begin(tempPeers); i != std::end(tempPeers);) {
-        //如果当前peer 下次触发的时间小于或者等于当前的时间，要立刻执行addPeer操作
-        if ((*i).second <= now_second) {
-            A2_LOG_DEBUG(fmt("TimeToAdd %s:%d time to add Peer now time %ld",(*i).first->getIpAddr().c_str(),(*i).first->getPort(),static_cast<long int> (now_second.count())));
-            LOGD("TimeToAdd %s:%d time to add Peer now time %ld",(*i).first->getIpAddr().c_str(),(*i).first->getPort(),static_cast<long int> (now_second.count()));
-            //构建一个Peer 对象，调用对应的构造函数完成初始化 这里只是添加进来，并没有进行连接peer的操作
-            addPeer(std::make_shared<Peer>((*i).first->getIpAddr(),(*i).first->getPort()));
-            tempPeers.erase(i++);
-        } else {
-            ++i;
-        }
-    }
-}
+<span class="token comment" spellcheck="true">//根据当前的时间检查是否有peer 要添加的，如果有应该执行addPeer操作</span>
+<span class="token keyword">void</span> DefaultPeerStorage<span class="token operator">::</span><span class="token function">checkPeerTimeToAdd</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//如果为空，不用检查</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>tempPeers<span class="token punctuation">.</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//当前时间的秒数</span>
+    <span class="token keyword">auto</span> now_second <span class="token operator">=</span> std<span class="token operator">::</span>chrono<span class="token operator">::</span><span class="token function">seconds</span><span class="token punctuation">(</span>util<span class="token operator">::</span><span class="token function">timeGetTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">auto</span> i <span class="token operator">=</span> std<span class="token operator">::</span><span class="token function">begin</span><span class="token punctuation">(</span>tempPeers<span class="token punctuation">)</span><span class="token punctuation">;</span> i <span class="token operator">!=</span> std<span class="token operator">::</span><span class="token function">end</span><span class="token punctuation">(</span>tempPeers<span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//如果当前peer 下次触发的时间小于或者等于当前的时间，要立刻执行addPeer操作</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token operator">*</span>i<span class="token punctuation">)</span><span class="token punctuation">.</span>second <span class="token operator">&lt;=</span> now_second<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token function">A2_LOG_DEBUG</span><span class="token punctuation">(</span><span class="token function">fmt</span><span class="token punctuation">(</span><span class="token string">"TimeToAdd %s:%d time to add Peer now time %ld"</span><span class="token punctuation">,</span><span class="token punctuation">(</span><span class="token operator">*</span>i<span class="token punctuation">)</span><span class="token punctuation">.</span>first<span class="token operator">-</span><span class="token operator">></span><span class="token function">getIpAddr</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">c_str</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token punctuation">(</span><span class="token operator">*</span>i<span class="token punctuation">)</span><span class="token punctuation">.</span>first<span class="token operator">-</span><span class="token operator">></span><span class="token function">getPort</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token keyword">static_cast</span><span class="token operator">&lt;</span><span class="token keyword">long</span> <span class="token keyword">int</span><span class="token operator">></span> <span class="token punctuation">(</span>now_second<span class="token punctuation">.</span><span class="token function">count</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"TimeToAdd %s:%d time to add Peer now time %ld"</span><span class="token punctuation">,</span><span class="token punctuation">(</span><span class="token operator">*</span>i<span class="token punctuation">)</span><span class="token punctuation">.</span>first<span class="token operator">-</span><span class="token operator">></span><span class="token function">getIpAddr</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">c_str</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token punctuation">(</span><span class="token operator">*</span>i<span class="token punctuation">)</span><span class="token punctuation">.</span>first<span class="token operator">-</span><span class="token operator">></span><span class="token function">getPort</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token keyword">static_cast</span><span class="token operator">&lt;</span><span class="token keyword">long</span> <span class="token keyword">int</span><span class="token operator">></span> <span class="token punctuation">(</span>now_second<span class="token punctuation">.</span><span class="token function">count</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">//构建一个Peer 对象，调用对应的构造函数完成初始化 这里只是添加进来，并没有进行连接peer的操作</span>
+            <span class="token function">addPeer</span><span class="token punctuation">(</span>std<span class="token operator">::</span>make_shared<span class="token operator">&lt;</span>Peer<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token operator">*</span>i<span class="token punctuation">)</span><span class="token punctuation">.</span>first<span class="token operator">-</span><span class="token operator">></span><span class="token function">getIpAddr</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token punctuation">(</span><span class="token operator">*</span>i<span class="token punctuation">)</span><span class="token punctuation">.</span>first<span class="token operator">-</span><span class="token operator">></span><span class="token function">getPort</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            tempPeers<span class="token punctuation">.</span><span class="token function">erase</span><span class="token punctuation">(</span>i<span class="token operator">++</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token operator">++</span>i<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
 这样这一端就可以算出下一次peer连接的时间，而对于另一端来说，他不知道此时要连接了，所以这个时候，应该要首先发起连接，当收到tracker服务器返回的peer列表的时候，对应的代码就是
-//原本的逻辑，这个方法会执行peer的连接操作
-addPeer(std::make_shared<Peer>(nodeInfo->getIpAddr(),nodeInfo->getPort()));
+<span class="token comment" spellcheck="true">//原本的逻辑，这个方法会执行peer的连接操作</span>
+<span class="token function">addPeer</span><span class="token punctuation">(</span>std<span class="token operator">::</span>make_shared<span class="token operator">&lt;</span>Peer<span class="token operator">></span><span class="token punctuation">(</span>nodeInfo<span class="token operator">-</span><span class="token operator">></span><span class="token function">getIpAddr</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>nodeInfo<span class="token operator">-</span><span class="token operator">></span><span class="token function">getPort</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 </code></pre>
 <hr>
 <h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><blockquote>

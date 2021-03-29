@@ -509,209 +509,209 @@
 <p><a href="http://bittorrent.org/beps/bep_0000.html" target="_blank" rel="noopener">http://bittorrent.org/beps/bep_0000.html</a></p>
 </blockquote>
 <h3 id="Aria2源码分析"><a href="#Aria2源码分析" class="headerlink" title="Aria2源码分析"></a>Aria2源码分析</h3><p>由于涉及到的源码比较多，这里不做详细的介绍,这里主要介绍下对应的类是干什么用的，哪些对象是共用的，哪些是自己独有的</p>
-<pre class=" language-CPP"><code class="language-CPP">1.DownloadEngine  首先这个类是所有种子公有的一个类，也即是只会有一个对象的存在 
+<pre class=" language-cpp"><code class="language-cpp"><span class="token number">1</span><span class="token punctuation">.</span>DownloadEngine  首先这个类是所有种子公有的一个类，也即是只会有一个对象的存在 
 他内部含有这俩个成员，这里面存放各种command，DownLoadEngine负责执行他们
-std::deque<std::unique_ptr<Command>> routineCommands_;
-std::deque<std::unique_ptr<Command>> commands_;
+std<span class="token operator">::</span>deque<span class="token operator">&lt;</span>std<span class="token operator">::</span>unique_ptr<span class="token operator">&lt;</span>Command<span class="token operator">>></span> routineCommands_<span class="token punctuation">;</span>
+std<span class="token operator">::</span>deque<span class="token operator">&lt;</span>std<span class="token operator">::</span>unique_ptr<span class="token operator">&lt;</span>Command<span class="token operator">>></span> commands_<span class="token punctuation">;</span>
 DownloadEngine 负责执行各种command的函数
-int DownloadEngine::run(bool oneshot)
-{
-  //如果  commands_ 或者 routineCommands_ 队列不为空，commands_一开始就有添加了一个保持事件响应的引用对象KeepRunningCommand  所以不为空
-  while (!commands_.empty() || !routineCommands_.empty()) {
-    ...
-    //判断是否达到了刷新界面的时间，constexpr auto A2_DELTA_MILLIS = std::chrono::milliseconds(10);
-    if (lastRefresh_.difference(global::wallclock()) + A2_DELTA_MILLIS >= refreshInterval_) {
-      //刷新的间隔为1秒
-      refreshInterval_ = DEFAULT_REFRESH_INTERVAL;
-      //保存上一次刷新的时间
-      lastRefresh_ = global::wallclock();
-      //执行命令 ,状态为 Command::STATUS_ALL
-      executeCommand(commands_, Command::STATUS_ALL);
-    }
-    else {
-      //如果还没有到刷新的时间，执行命令，状态为  Command::STATUS_ACTIVE
-      executeCommand(commands_, Command::STATUS_ACTIVE);
-    }
-    //执行命令
-    executeCommand(routineCommands_, Command::STATUS_ALL);
-    afterEachIteration();
-    if (!noWait_ && oneshot) {
-        return 1;
-    }
-  }
-  //如果到了这里，就说明引擎已经开始停止
-  onEndOfRun();
-  return 0;
-}
-他内部还有一个成员为 std::unique_ptr<RequestGroupMan> requestGroupMan_; 这个类为请求的管理类，也即是相当于请求的集合,至于为什么要持有这个引用，当引擎要退出的时候，可以将
+<span class="token keyword">int</span> DownloadEngine<span class="token operator">::</span><span class="token function">run</span><span class="token punctuation">(</span><span class="token keyword">bool</span> oneshot<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">//如果  commands_ 或者 routineCommands_ 队列不为空，commands_一开始就有添加了一个保持事件响应的引用对象KeepRunningCommand  所以不为空</span>
+  <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token operator">!</span>commands_<span class="token punctuation">.</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">||</span> <span class="token operator">!</span>routineCommands_<span class="token punctuation">.</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token comment" spellcheck="true">//判断是否达到了刷新界面的时间，constexpr auto A2_DELTA_MILLIS = std::chrono::milliseconds(10);</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>lastRefresh_<span class="token punctuation">.</span><span class="token function">difference</span><span class="token punctuation">(</span>global<span class="token operator">::</span><span class="token function">wallclock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">+</span> A2_DELTA_MILLIS <span class="token operator">>=</span> refreshInterval_<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token comment" spellcheck="true">//刷新的间隔为1秒</span>
+      refreshInterval_ <span class="token operator">=</span> DEFAULT_REFRESH_INTERVAL<span class="token punctuation">;</span>
+      <span class="token comment" spellcheck="true">//保存上一次刷新的时间</span>
+      lastRefresh_ <span class="token operator">=</span> global<span class="token operator">::</span><span class="token function">wallclock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token comment" spellcheck="true">//执行命令 ,状态为 Command::STATUS_ALL</span>
+      <span class="token function">executeCommand</span><span class="token punctuation">(</span>commands_<span class="token punctuation">,</span> Command<span class="token operator">::</span>STATUS_ALL<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">else</span> <span class="token punctuation">{</span>
+      <span class="token comment" spellcheck="true">//如果还没有到刷新的时间，执行命令，状态为  Command::STATUS_ACTIVE</span>
+      <span class="token function">executeCommand</span><span class="token punctuation">(</span>commands_<span class="token punctuation">,</span> Command<span class="token operator">::</span>STATUS_ACTIVE<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//执行命令</span>
+    <span class="token function">executeCommand</span><span class="token punctuation">(</span>routineCommands_<span class="token punctuation">,</span> Command<span class="token operator">::</span>STATUS_ALL<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">afterEachIteration</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>noWait_ <span class="token operator">&amp;&amp;</span> oneshot<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+  <span class="token comment" spellcheck="true">//如果到了这里，就说明引擎已经开始停止</span>
+  <span class="token function">onEndOfRun</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+他内部还有一个成员为 std<span class="token operator">::</span>unique_ptr<span class="token operator">&lt;</span>RequestGroupMan<span class="token operator">></span> requestGroupMan_<span class="token punctuation">;</span> 这个类为请求的管理类，也即是相当于请求的集合<span class="token punctuation">,</span>至于为什么要持有这个引用，当引擎要退出的时候，可以将
 要退出的动作传递过去
-//标识引擎要退出
-void DownloadEngine::requestHalt()
-{
-  haltRequested_ = std::max(haltRequested_, 1);
-  //标识所有的requestGroup退出
-  requestGroupMan_->halt();
-}
-//标识引擎要强制退出
-void DownloadEngine::requestForceHalt()
-{
-  haltRequested_ = std::max(haltRequested_, 2);
-  requestGroupMan_->forceHalt();
-}
+<span class="token comment" spellcheck="true">//标识引擎要退出</span>
+<span class="token keyword">void</span> DownloadEngine<span class="token operator">::</span><span class="token function">requestHalt</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  haltRequested_ <span class="token operator">=</span> std<span class="token operator">::</span><span class="token function">max</span><span class="token punctuation">(</span>haltRequested_<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//标识所有的requestGroup退出</span>
+  requestGroupMan_<span class="token operator">-</span><span class="token operator">></span><span class="token function">halt</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token comment" spellcheck="true">//标识引擎要强制退出</span>
+<span class="token keyword">void</span> DownloadEngine<span class="token operator">::</span><span class="token function">requestForceHalt</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  haltRequested_ <span class="token operator">=</span> std<span class="token operator">::</span><span class="token function">max</span><span class="token punctuation">(</span>haltRequested_<span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  requestGroupMan_<span class="token operator">-</span><span class="token operator">></span><span class="token function">forceHalt</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-他内部含有一个成员为 std::unique_ptr<BtRegistry> btRegistry_; 这个对象存储了当前所有正在运行的种子文件集合,下面看看BtRegister的成员以及作用
+他内部含有一个成员为 std<span class="token operator">::</span>unique_ptr<span class="token operator">&lt;</span>BtRegistry<span class="token operator">></span> btRegistry_<span class="token punctuation">;</span> 这个对象存储了当前所有正在运行的种子文件集合<span class="token punctuation">,</span>下面看看BtRegister的成员以及作用
 
-//map值的引用,key为当前任务的gid，value为BtObject对象引用   ,因为BtRegistry 是公有的，这个集合就是当前所有的种子对象, 所以根据gid从多个种子任务中获取到对应的种子对象的封装
-std::map<a2_gid_t, std::unique_ptr<BtObject>> pool_;
+<span class="token comment" spellcheck="true">//map值的引用,key为当前任务的gid，value为BtObject对象引用   ,因为BtRegistry 是公有的，这个集合就是当前所有的种子对象, 所以根据gid从多个种子任务中获取到对应的种子对象的封装</span>
+std<span class="token operator">::</span>map<span class="token operator">&lt;</span>a2_gid_t<span class="token punctuation">,</span> std<span class="token operator">::</span>unique_ptr<span class="token operator">&lt;</span>BtObject<span class="token operator">>></span> pool_<span class="token punctuation">;</span>
 以及对应的提供了添加还有获取对应的对象
-void BtRegistry::put(a2_gid_t gid, std::unique_ptr<BtObject> obj)
-{
-  pool_[gid] = std::move(obj);
-}
-//根据gid从pool   Map集合中获取到对应的BtObject对象 也即是对应的种子对象的封装
-BtObject* BtRegistry::get(a2_gid_t gid) const
-{
-  auto i = pool_.find(gid);
-  if (i == std::end(pool_)) {
-    return nullptr;
-  }
-  else {
-    return (*i).second.get();
-  }
-}
+<span class="token keyword">void</span> BtRegistry<span class="token operator">::</span><span class="token function">put</span><span class="token punctuation">(</span>a2_gid_t gid<span class="token punctuation">,</span> std<span class="token operator">::</span>unique_ptr<span class="token operator">&lt;</span>BtObject<span class="token operator">></span> obj<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  pool_<span class="token punctuation">[</span>gid<span class="token punctuation">]</span> <span class="token operator">=</span> std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token comment" spellcheck="true">//根据gid从pool   Map集合中获取到对应的BtObject对象 也即是对应的种子对象的封装</span>
+BtObject<span class="token operator">*</span> BtRegistry<span class="token operator">::</span><span class="token function">get</span><span class="token punctuation">(</span>a2_gid_t gid<span class="token punctuation">)</span> <span class="token keyword">const</span>
+<span class="token punctuation">{</span>
+  <span class="token keyword">auto</span> i <span class="token operator">=</span> pool_<span class="token punctuation">.</span><span class="token function">find</span><span class="token punctuation">(</span>gid<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>i <span class="token operator">==</span> std<span class="token operator">::</span><span class="token function">end</span><span class="token punctuation">(</span>pool_<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token keyword">nullptr</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token operator">*</span>i<span class="token punctuation">)</span><span class="token punctuation">.</span>second<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
-//至于BtObject 这个结构体代表当前种子下载的所有信息
-struct BtObject {
-  //当前种子下载的上下文引用
-  std::shared_ptr<DownloadContext> downloadContext;
-  std::shared_ptr<PieceStorage> pieceStorage;
-  std::shared_ptr<PeerStorage> peerStorage;
-  std::shared_ptr<BtAnnounce> btAnnounce;
-  //当前种子下载的BtRuntime引用
-  std::shared_ptr<BtRuntime> btRuntime;
-  std::shared_ptr<BtProgressInfoFile> btProgressInfoFile;
+<span class="token comment" spellcheck="true">//至于BtObject 这个结构体代表当前种子下载的所有信息</span>
+<span class="token keyword">struct</span> BtObject <span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">//当前种子下载的上下文引用</span>
+  std<span class="token operator">::</span>shared_ptr<span class="token operator">&lt;</span>DownloadContext<span class="token operator">></span> downloadContext<span class="token punctuation">;</span>
+  std<span class="token operator">::</span>shared_ptr<span class="token operator">&lt;</span>PieceStorage<span class="token operator">></span> pieceStorage<span class="token punctuation">;</span>
+  std<span class="token operator">::</span>shared_ptr<span class="token operator">&lt;</span>PeerStorage<span class="token operator">></span> peerStorage<span class="token punctuation">;</span>
+  std<span class="token operator">::</span>shared_ptr<span class="token operator">&lt;</span>BtAnnounce<span class="token operator">></span> btAnnounce<span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//当前种子下载的BtRuntime引用</span>
+  std<span class="token operator">::</span>shared_ptr<span class="token operator">&lt;</span>BtRuntime<span class="token operator">></span> btRuntime<span class="token punctuation">;</span>
+  std<span class="token operator">::</span>shared_ptr<span class="token operator">&lt;</span>BtProgressInfoFile<span class="token operator">></span> btProgressInfoFile<span class="token punctuation">;</span>
 
-  BtObject(const std::shared_ptr<DownloadContext>& downloadContext,
-           const std::shared_ptr<PieceStorage>& pieceStorage,
-           const std::shared_ptr<PeerStorage>& peerStorage,
-           const std::shared_ptr<BtAnnounce>& btAnnounce,
-           const std::shared_ptr<BtRuntime>& btRuntime,
-           const std::shared_ptr<BtProgressInfoFile>& btProgressInfoFile);
-  BtObject();
-};
+  <span class="token function">BtObject</span><span class="token punctuation">(</span><span class="token keyword">const</span> std<span class="token operator">::</span>shared_ptr<span class="token operator">&lt;</span>DownloadContext<span class="token operator">></span><span class="token operator">&amp;</span> downloadContext<span class="token punctuation">,</span>
+           <span class="token keyword">const</span> std<span class="token operator">::</span>shared_ptr<span class="token operator">&lt;</span>PieceStorage<span class="token operator">></span><span class="token operator">&amp;</span> pieceStorage<span class="token punctuation">,</span>
+           <span class="token keyword">const</span> std<span class="token operator">::</span>shared_ptr<span class="token operator">&lt;</span>PeerStorage<span class="token operator">></span><span class="token operator">&amp;</span> peerStorage<span class="token punctuation">,</span>
+           <span class="token keyword">const</span> std<span class="token operator">::</span>shared_ptr<span class="token operator">&lt;</span>BtAnnounce<span class="token operator">></span><span class="token operator">&amp;</span> btAnnounce<span class="token punctuation">,</span>
+           <span class="token keyword">const</span> std<span class="token operator">::</span>shared_ptr<span class="token operator">&lt;</span>BtRuntime<span class="token operator">></span><span class="token operator">&amp;</span> btRuntime<span class="token punctuation">,</span>
+           <span class="token keyword">const</span> std<span class="token operator">::</span>shared_ptr<span class="token operator">&lt;</span>BtProgressInfoFile<span class="token operator">></span><span class="token operator">&amp;</span> btProgressInfoFile<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">BtObject</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
 
 一般在使用的时候是通过先获取到DownloadEngine对象，然后获取到他里面的成员BtRegister成员，然后根据gid 获取到对应的BtObject对象，这个存放了当前种子文件的所有信息
 
-3.RequestGroupMan 这个类为请求的管理类，也即是相当于请求的集合
+<span class="token number">3</span><span class="token punctuation">.</span>RequestGroupMan 这个类为请求的管理类，也即是相当于请求的集合
 首先内部有俩个集合，一个代表当前正在请求的集合，另一个代表正要执行的请求集合
-RequestGroupList requestGroups_;//当前正在请求的集合
-RequestGroupList reservedGroups_;//正要执行的请求的集合
+RequestGroupList requestGroups_<span class="token punctuation">;</span><span class="token comment" spellcheck="true">//当前正在请求的集合</span>
+RequestGroupList reservedGroups_<span class="token punctuation">;</span><span class="token comment" spellcheck="true">//正要执行的请求的集合</span>
 
-//标识当前最多支持多少个同时并发的下载
-int maxConcurrentDownloads_;
+<span class="token comment" spellcheck="true">//标识当前最多支持多少个同时并发的下载</span>
+<span class="token keyword">int</span> maxConcurrentDownloads_<span class="token punctuation">;</span>
 以及提供了对应的让所有请求都退出的方法，本身这个方法的调用由DownloadEngine触发，前面分析过
-void RequestGroupMan::halt()
-{
-  for (auto& elem : requestGroups_) {
-      elem->setHaltRequested(true);
-  }
-}
+<span class="token keyword">void</span> RequestGroupMan<span class="token operator">::</span><span class="token function">halt</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">auto</span><span class="token operator">&amp;</span> elem <span class="token operator">:</span> requestGroups_<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      elem<span class="token operator">-</span><span class="token operator">></span><span class="token function">setHaltRequested</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
-void RequestGroupMan::forceHalt()
-{
-  for (auto& elem : requestGroups_) {
-      elem->setForceHaltRequested(true);
-  }
-}
+<span class="token keyword">void</span> RequestGroupMan<span class="token operator">::</span><span class="token function">forceHalt</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">auto</span><span class="token operator">&amp;</span> elem <span class="token operator">:</span> requestGroups_<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      elem<span class="token operator">-</span><span class="token operator">></span><span class="token function">setForceHaltRequested</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
-4.RequestGroup  代表当前种子请求对应的所有的内容，含有各种的对象
-//标识是否停止
-bool haltRequested_;
-//标识是否强制停止
-bool forceHaltRequested_;
-//标识是否为暂停的请求
-bool pauseRequested_;
+<span class="token number">4</span><span class="token punctuation">.</span>RequestGroup  代表当前种子请求对应的所有的内容，含有各种的对象
+<span class="token comment" spellcheck="true">//标识是否停止</span>
+<span class="token keyword">bool</span> haltRequested_<span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">//标识是否强制停止</span>
+<span class="token keyword">bool</span> forceHaltRequested_<span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">//标识是否为暂停的请求</span>
+<span class="token keyword">bool</span> pauseRequested_<span class="token punctuation">;</span>
 上面这些成员可以用来标识当前请求的状态，比如是退出，还是暂停等
 
-//DownloadContext 引入对象  当前种子的下载上下文对象,存放了当前种子的文件的信息
-std::shared_ptr<DownloadContext> downloadContext_;
-//BtRuntime 指针引用    当前种子对应的下载运行时对象
-BtRuntime* btRuntime_;
-//PeerStorage 指针引用    当前种子对应的存储Peer的对象
-PeerStorage* peerStorage_;
+<span class="token comment" spellcheck="true">//DownloadContext 引入对象  当前种子的下载上下文对象,存放了当前种子的文件的信息</span>
+std<span class="token operator">::</span>shared_ptr<span class="token operator">&lt;</span>DownloadContext<span class="token operator">></span> downloadContext_<span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">//BtRuntime 指针引用    当前种子对应的下载运行时对象</span>
+BtRuntime<span class="token operator">*</span> btRuntime_<span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">//PeerStorage 指针引用    当前种子对应的存储Peer的对象</span>
+PeerStorage<span class="token operator">*</span> peerStorage_<span class="token punctuation">;</span>
 
 BtRuntime 对象 代表当前种子下载的运行时对象
-//是否停止状态，每一个RequestGroup 对应的一个BtRuntime对象
-bool halt_;
-//标识当前的连接数  
-int connections_;
-//标识是否已经准备好
-bool ready_;
-//最大支持存储的Peer数量
-int maxPeers_;
-//最小支持存储的Peer数量
-int minPeers_;
+<span class="token comment" spellcheck="true">//是否停止状态，每一个RequestGroup 对应的一个BtRuntime对象</span>
+<span class="token keyword">bool</span> halt_<span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">//标识当前的连接数  </span>
+<span class="token keyword">int</span> connections_<span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">//标识是否已经准备好</span>
+<span class="token keyword">bool</span> ready_<span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">//最大支持存储的Peer数量</span>
+<span class="token keyword">int</span> maxPeers_<span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">//最小支持存储的Peer数量</span>
+<span class="token keyword">int</span> minPeers_<span class="token punctuation">;</span>
 
 一般要想知道当前种子对应的下载状态，可以通过当前对象的下面这俩个方法获取到
-//获取当前的RequetGroup是否为停止状态
-bool isHalt() const { return halt_; }
-//设置当前的RequetGroup为停止状态
-void setHalt(bool halt) { halt_ = halt; }
-而这俩个方法的调用，其实是有对应的RequstGroup调用的,而RequestGroup又可以由RequestGroupMan调用，RequestGroupMan又可以由DownloadEngine调用
-//设置当前requestGroup停止状态
-void RequestGroup::setHaltRequested(bool f, HaltReason haltReason)
-{
-  haltRequested_ = f;
-  if (haltRequested_) {
-    pauseRequested_ = false;
-    haltReason_ = haltReason;
-  }
-#ifdef ENABLE_BITTORRENT
-  if (btRuntime_) {
-     //设置停止
-     btRuntime_->setHalt(f);
-  }
-#endif // ENABLE_BITTORRENT
-}
+<span class="token comment" spellcheck="true">//获取当前的RequetGroup是否为停止状态</span>
+<span class="token keyword">bool</span> <span class="token function">isHalt</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">const</span> <span class="token punctuation">{</span> <span class="token keyword">return</span> halt_<span class="token punctuation">;</span> <span class="token punctuation">}</span>
+<span class="token comment" spellcheck="true">//设置当前的RequetGroup为停止状态</span>
+<span class="token keyword">void</span> <span class="token function">setHalt</span><span class="token punctuation">(</span><span class="token keyword">bool</span> halt<span class="token punctuation">)</span> <span class="token punctuation">{</span> halt_ <span class="token operator">=</span> halt<span class="token punctuation">;</span> <span class="token punctuation">}</span>
+而这俩个方法的调用，其实是有对应的RequstGroup调用的<span class="token punctuation">,</span>而RequestGroup又可以由RequestGroupMan调用，RequestGroupMan又可以由DownloadEngine调用
+<span class="token comment" spellcheck="true">//设置当前requestGroup停止状态</span>
+<span class="token keyword">void</span> RequestGroup<span class="token operator">::</span><span class="token function">setHaltRequested</span><span class="token punctuation">(</span><span class="token keyword">bool</span> f<span class="token punctuation">,</span> HaltReason haltReason<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  haltRequested_ <span class="token operator">=</span> f<span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>haltRequested_<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    pauseRequested_ <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+    haltReason_ <span class="token operator">=</span> haltReason<span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token macro property">#<span class="token directive keyword">ifdef</span> ENABLE_BITTORRENT</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>btRuntime_<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+     <span class="token comment" spellcheck="true">//设置停止</span>
+     btRuntime_<span class="token operator">-</span><span class="token operator">></span><span class="token function">setHalt</span><span class="token punctuation">(</span>f<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token macro property">#<span class="token directive keyword">endif</span> </span><span class="token comment" spellcheck="true">// ENABLE_BITTORRENT</span>
+<span class="token punctuation">}</span>
 
 
-//这里注意一下dht的初始化，这个只会初始化一次
-//配置DHT,解析dht指定的文件等,返回值为command Map ,这里是针对每一个种子都对应的初始化DhtSetup操作,但是里面会有限制，当前面的种子已经初始化过，后面的就不会再进行初始化
-std::tie(c, rc) = DHTSetup().setup(e, AF_INET);    
-//在dht协议中，bt客户端使用“distributed sloppy hash table”（DHT的全称）来存储没有tracker地址的种子文件所对应的peer节点的信息，
-//在这种情况下，每一个peer节点变成了一个tracker服务器，dht协议是在udp通信协议的基础上使用Kademila（俗称Kad算法）算法实现。
-DHTSetup::setup(DownloadEngine* e, int family)
-{
-    ...
-    //这里要注意，  DHTRegistry::isInitialized() 这个取的是静态对象值，所以对于多个种子来说，如果之前dht已经初始化过了，就不会再继续往下执行了，直接return 处理,那这样也可以保证我们的
-    //utpContext  的创建也是只会有一份 ,也即是后面的这些对象关于Dht的创建都是只有一份的，也即是所有的种子文件公用的
-    if ((family != AF_INET && family != AF_INET6) || (family == AF_INET && DHTRegistry::isInitialized()) || (family == AF_INET6 && DHTRegistry::isInitialized6())) {
-       return {};
-    }
-    ...
-    //标识初始化完成,下次另一个种子文件，就不会再次的执行初始化了
-    DHTRegistry::setInitialized(true);
-    ...
-}    
+<span class="token comment" spellcheck="true">//这里注意一下dht的初始化，这个只会初始化一次</span>
+<span class="token comment" spellcheck="true">//配置DHT,解析dht指定的文件等,返回值为command Map ,这里是针对每一个种子都对应的初始化DhtSetup操作,但是里面会有限制，当前面的种子已经初始化过，后面的就不会再进行初始化</span>
+std<span class="token operator">::</span><span class="token function">tie</span><span class="token punctuation">(</span>c<span class="token punctuation">,</span> rc<span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token function">DHTSetup</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">setup</span><span class="token punctuation">(</span>e<span class="token punctuation">,</span> AF_INET<span class="token punctuation">)</span><span class="token punctuation">;</span>    
+<span class="token comment" spellcheck="true">//在dht协议中，bt客户端使用“distributed sloppy hash table”（DHT的全称）来存储没有tracker地址的种子文件所对应的peer节点的信息，</span>
+<span class="token comment" spellcheck="true">//在这种情况下，每一个peer节点变成了一个tracker服务器，dht协议是在udp通信协议的基础上使用Kademila（俗称Kad算法）算法实现。</span>
+DHTSetup<span class="token operator">::</span><span class="token function">setup</span><span class="token punctuation">(</span>DownloadEngine<span class="token operator">*</span> e<span class="token punctuation">,</span> <span class="token keyword">int</span> family<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token comment" spellcheck="true">//这里要注意，  DHTRegistry::isInitialized() 这个取的是静态对象值，所以对于多个种子来说，如果之前dht已经初始化过了，就不会再继续往下执行了，直接return 处理,那这样也可以保证我们的</span>
+    <span class="token comment" spellcheck="true">//utpContext  的创建也是只会有一份 ,也即是后面的这些对象关于Dht的创建都是只有一份的，也即是所有的种子文件公用的</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>family <span class="token operator">!=</span> AF_INET <span class="token operator">&amp;&amp;</span> family <span class="token operator">!=</span> AF_INET6<span class="token punctuation">)</span> <span class="token operator">||</span> <span class="token punctuation">(</span>family <span class="token operator">==</span> AF_INET <span class="token operator">&amp;&amp;</span> DHTRegistry<span class="token operator">::</span><span class="token function">isInitialized</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">||</span> <span class="token punctuation">(</span>family <span class="token operator">==</span> AF_INET6 <span class="token operator">&amp;&amp;</span> DHTRegistry<span class="token operator">::</span><span class="token function">isInitialized6</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+       <span class="token keyword">return</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token comment" spellcheck="true">//标识初始化完成,下次另一个种子文件，就不会再次的执行初始化了</span>
+    DHTRegistry<span class="token operator">::</span><span class="token function">setInitialized</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>    
 
-所以对应dht后面初始化的对象也都是独有的是为所有的种子文件共享的,以及生成的各种command也是独有的，是不会销毁的，只有当引擎退出的时候才会退出，比如
+所以对应dht后面初始化的对象也都是独有的是为所有的种子文件共享的<span class="token punctuation">,</span>以及生成的各种command也是独有的，是不会销毁的，只有当引擎退出的时候才会退出，比如
 
-//构建一个  DHTInteractionCommand 对象，调用对应的构造函数完成初始化 , 这个command用于执行udp tracker ，dht ,以及 utp
-auto command = make_unique<DHTInteractionCommand>(e->newCUID(), e);
-bool DHTInteractionCommand::execute()
-{
-  // needs this. 这里要注意这里的退出条件，如果当前全部的种子都下载完成了，或者引擎退出 的时候这个对象才会销毁
-  if (e_->getRequestGroupMan()->downloadFinished() || (e_->isHaltRequested() && udpTrackerClient_->getNumWatchers() == 0)) {
-    LOGD("DHTInteractionCommand exiting");
-    return true;
-  }
-  else if (e_->isForceHaltRequested()) {//如果当前引擎是强制退出的化
-    udpTrackerClient_->failAll();
-    LOGD("DHTInteractionCommand exiting");
-    return true;
-  }
-  ...
-}
+<span class="token comment" spellcheck="true">//构建一个  DHTInteractionCommand 对象，调用对应的构造函数完成初始化 , 这个command用于执行udp tracker ，dht ,以及 utp</span>
+<span class="token keyword">auto</span> command <span class="token operator">=</span> make_unique<span class="token operator">&lt;</span>DHTInteractionCommand<span class="token operator">></span><span class="token punctuation">(</span>e<span class="token operator">-</span><span class="token operator">></span><span class="token function">newCUID</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">bool</span> DHTInteractionCommand<span class="token operator">::</span><span class="token function">execute</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">// needs this. 这里要注意这里的退出条件，如果当前全部的种子都下载完成了，或者引擎退出 的时候这个对象才会销毁</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getRequestGroupMan</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">downloadFinished</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">||</span> <span class="token punctuation">(</span>e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">isHaltRequested</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> udpTrackerClient_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getNumWatchers</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"DHTInteractionCommand exiting"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">isForceHaltRequested</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token comment" spellcheck="true">//如果当前引擎是强制退出的化</span>
+    udpTrackerClient_<span class="token operator">-</span><span class="token operator">></span><span class="token function">failAll</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"DHTInteractionCommand exiting"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h3 id="源码执行流程"><a href="#源码执行流程" class="headerlink" title="源码执行流程"></a>源码执行流程</h3><p>下面是做这个项目的时候整理的源码过程</p>
 <blockquote>

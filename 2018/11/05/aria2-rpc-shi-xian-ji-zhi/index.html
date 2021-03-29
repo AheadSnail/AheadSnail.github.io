@@ -523,90 +523,90 @@
 <p>Aria收到rpc的请求开始响应对应的内容<br><img src="/uploads/Aria2Rpc实现/Aria2收到rpc请求.png" alt="结果显示"></p>
 <p>至于我怎么知道rpc要发送的内容 可以查看官网 <a href="http://aria2.github.io/manual/en/html/aria2c.html" target="_blank" rel="noopener">http://aria2.github.io/manual/en/html/aria2c.html</a><br><img src="/uploads/Aria2Rpc实现/官网rpc支持的内容.png" alt="结果显示"></p>
 <p>当然这里包括了很多的rpc的请求，反正对于一个下载器来说，这些api是完全够用的，下面来分析下具体的源码实现</p>
-<h3 id="Rpc源码分析"><a href="#Rpc源码分析" class="headerlink" title="Rpc源码分析"></a>Rpc源码分析</h3><h4 id="首先要开启Rpc的支持"><a href="#首先要开启Rpc的支持" class="headerlink" title="首先要开启Rpc的支持"></a>首先要开启Rpc的支持</h4><pre class=" language-CPP"><code class="language-CPP">//设置允许rpc访问
-gloableOptions.push_back(std::pair<std::string,std::string> ("enable-rpc","true"));
-//设置rpc的监听端口
-gloableOptions.push_back(std::pair<std::string,std::string> ("rpc-listen-port","7800"));
-//设置监听所有，这样如果不是在同一个局域网的时候，可以通过对方的ip来连接
-gloableOptions.push_back(std::pair<std::string,std::string> ("rpc-listen-all","true"));
+<h3 id="Rpc源码分析"><a href="#Rpc源码分析" class="headerlink" title="Rpc源码分析"></a>Rpc源码分析</h3><h4 id="首先要开启Rpc的支持"><a href="#首先要开启Rpc的支持" class="headerlink" title="首先要开启Rpc的支持"></a>首先要开启Rpc的支持</h4><pre class=" language-cpp"><code class="language-cpp"><span class="token comment" spellcheck="true">//设置允许rpc访问</span>
+gloableOptions<span class="token punctuation">.</span><span class="token function">push_back</span><span class="token punctuation">(</span>std<span class="token operator">::</span>pair<span class="token operator">&lt;</span>std<span class="token operator">::</span>string<span class="token punctuation">,</span>std<span class="token operator">::</span>string<span class="token operator">></span> <span class="token punctuation">(</span><span class="token string">"enable-rpc"</span><span class="token punctuation">,</span><span class="token string">"true"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">//设置rpc的监听端口</span>
+gloableOptions<span class="token punctuation">.</span><span class="token function">push_back</span><span class="token punctuation">(</span>std<span class="token operator">::</span>pair<span class="token operator">&lt;</span>std<span class="token operator">::</span>string<span class="token punctuation">,</span>std<span class="token operator">::</span>string<span class="token operator">></span> <span class="token punctuation">(</span><span class="token string">"rpc-listen-port"</span><span class="token punctuation">,</span><span class="token string">"7800"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">//设置监听所有，这样如果不是在同一个局域网的时候，可以通过对方的ip来连接</span>
+gloableOptions<span class="token punctuation">.</span><span class="token function">push_back</span><span class="token punctuation">(</span>std<span class="token operator">::</span>pair<span class="token operator">&lt;</span>std<span class="token operator">::</span>string<span class="token punctuation">,</span>std<span class="token operator">::</span>string<span class="token operator">></span> <span class="token punctuation">(</span><span class="token string">"rpc-listen-all"</span><span class="token punctuation">,</span><span class="token string">"true"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 </code></pre>
-<h4 id="创建Tcp-Socket监听端口"><a href="#创建Tcp-Socket监听端口" class="headerlink" title="创建Tcp Socket监听端口"></a>创建Tcp Socket监听端口</h4><pre class=" language-CPP"><code class="language-CPP">//构建对应的ipv4,ipv6
-static int families[] = {AF_INET, AF_INET6};
-size_t familiesLength = op->getAsBool(PREF_DISABLE_IPV6) ? 1 : 2;
+<h4 id="创建Tcp-Socket监听端口"><a href="#创建Tcp-Socket监听端口" class="headerlink" title="创建Tcp Socket监听端口"></a>创建Tcp Socket监听端口</h4><pre class=" language-cpp"><code class="language-cpp"><span class="token comment" spellcheck="true">//构建对应的ipv4,ipv6</span>
+<span class="token keyword">static</span> <span class="token keyword">int</span> families<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span>AF_INET<span class="token punctuation">,</span> AF_INET6<span class="token punctuation">}</span><span class="token punctuation">;</span>
+size_t familiesLength <span class="token operator">=</span> op<span class="token operator">-</span><span class="token operator">></span><span class="token function">getAsBool</span><span class="token punctuation">(</span>PREF_DISABLE_IPV6<span class="token punctuation">)</span> <span class="token operator">?</span> <span class="token number">1</span> <span class="token operator">:</span> <span class="token number">2</span><span class="token punctuation">;</span>
 
-for (size_t i = 0; i < familiesLength; ++i) {
-    //构建HttpListenCommand 对象 secure 默认为false 代表是否加密
-    auto httpListenCommand = make_unique<HttpListenCommand>(e->newCUID(), e.get(), families[i], secure);
-    //执行绑定,PREF_RPC_LISTEN_PORT 默认监听的端口为6800
-    if (httpListenCommand->bindPort(op->getAsInt(PREF_RPC_LISTEN_PORT))) {
-       e->addCommand(std::move(httpListenCommand));
-       ok = true;
-    }
-}
+<span class="token keyword">for</span> <span class="token punctuation">(</span>size_t i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> familiesLength<span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//构建HttpListenCommand 对象 secure 默认为false 代表是否加密</span>
+    <span class="token keyword">auto</span> httpListenCommand <span class="token operator">=</span> make_unique<span class="token operator">&lt;</span>HttpListenCommand<span class="token operator">></span><span class="token punctuation">(</span>e<span class="token operator">-</span><span class="token operator">></span><span class="token function">newCUID</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> e<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> families<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> secure<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//执行绑定,PREF_RPC_LISTEN_PORT 默认监听的端口为6800</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>httpListenCommand<span class="token operator">-</span><span class="token operator">></span><span class="token function">bindPort</span><span class="token punctuation">(</span>op<span class="token operator">-</span><span class="token operator">></span><span class="token function">getAsInt</span><span class="token punctuation">(</span>PREF_RPC_LISTEN_PORT<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+       e<span class="token operator">-</span><span class="token operator">></span><span class="token function">addCommand</span><span class="token punctuation">(</span>std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>httpListenCommand<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+       ok <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
 bindPort 源码实现
 
-//默认的端口为6800
-bool HttpListenCommand::bindPort(uint16_t port)
-{
-  if (serverSocket_) {
-    e_->deleteSocketForReadCheck(serverSocket_, this);
-  }
-  //构建一个SocketCore对象,默认的为tcp连接
-  serverSocket_ = std::make_shared<SocketCore>();
-  const int ipv = (family_ == AF_INET) ? 4 : 6;
-  try {
-    int flags = 0;
-    if (e_->getOption()->getAsBool(PREF_RPC_LISTEN_ALL)) {
-      flags = AI_PASSIVE;
-    }
-    //绑定端口
-    serverSocket_->bind(nullptr, port, family_, flags);
-    //开始监听
-    serverSocket_->beginListen();
-    LOGD(MSG_LISTENING_PORT, getCuid(), port);
-    e_->addSocketForReadCheck(serverSocket_, this);
-    LOGD(("IPv%d RPC: listening on TCP port %u"), ipv, port);
-    return true;
-  }
-  catch (RecoverableException& e) {
-    A2_LOG_ERROR_EX(fmt("IPv%d RPC: failed to bind TCP port %u", ipv, port), e);
-    serverSocket_->closeConnection();
-  }
-  return false;
-}
+<span class="token comment" spellcheck="true">//默认的端口为6800</span>
+<span class="token keyword">bool</span> HttpListenCommand<span class="token operator">::</span><span class="token function">bindPort</span><span class="token punctuation">(</span>uint16_t port<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>serverSocket_<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">deleteSocketForReadCheck</span><span class="token punctuation">(</span>serverSocket_<span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token comment" spellcheck="true">//构建一个SocketCore对象,默认的为tcp连接</span>
+  serverSocket_ <span class="token operator">=</span> std<span class="token operator">::</span>make_shared<span class="token operator">&lt;</span>SocketCore<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">const</span> <span class="token keyword">int</span> ipv <span class="token operator">=</span> <span class="token punctuation">(</span>family_ <span class="token operator">==</span> AF_INET<span class="token punctuation">)</span> <span class="token operator">?</span> <span class="token number">4</span> <span class="token operator">:</span> <span class="token number">6</span><span class="token punctuation">;</span>
+  <span class="token keyword">try</span> <span class="token punctuation">{</span>
+    <span class="token keyword">int</span> flags <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getOption</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">getAsBool</span><span class="token punctuation">(</span>PREF_RPC_LISTEN_ALL<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      flags <span class="token operator">=</span> AI_PASSIVE<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//绑定端口</span>
+    serverSocket_<span class="token operator">-</span><span class="token operator">></span><span class="token function">bind</span><span class="token punctuation">(</span><span class="token keyword">nullptr</span><span class="token punctuation">,</span> port<span class="token punctuation">,</span> family_<span class="token punctuation">,</span> flags<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//开始监听</span>
+    serverSocket_<span class="token operator">-</span><span class="token operator">></span><span class="token function">beginListen</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOGD</span><span class="token punctuation">(</span>MSG_LISTENING_PORT<span class="token punctuation">,</span> <span class="token function">getCuid</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> port<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">addSocketForReadCheck</span><span class="token punctuation">(</span>serverSocket_<span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token string">"IPv%d RPC: listening on TCP port %u"</span><span class="token punctuation">)</span><span class="token punctuation">,</span> ipv<span class="token punctuation">,</span> port<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">catch</span> <span class="token punctuation">(</span>RecoverableException<span class="token operator">&amp;</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">A2_LOG_ERROR_EX</span><span class="token punctuation">(</span><span class="token function">fmt</span><span class="token punctuation">(</span><span class="token string">"IPv%d RPC: failed to bind TCP port %u"</span><span class="token punctuation">,</span> ipv<span class="token punctuation">,</span> port<span class="token punctuation">)</span><span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    serverSocket_<span class="token operator">-</span><span class="token operator">></span><span class="token function">closeConnection</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
 判断是否有收到内容
 
-bool HttpListenCommand::execute()
-{
-  //当前引擎退出的时候，这个command才会退出,这个command会一直存在，用于监听tcp的连接请求
-  if (e_->getRequestGroupMan()->downloadFinished() || e_->isHaltRequested()) {
-      return true;
-  }
-  try {
-     //如果这个 rpc监听的端口有读取到内容的化
-    if (serverSocket_->isReadable(0)) {
-      //利用tcp的Accept函数，返回当前连接的socketCore对象
-      std::shared_ptr<SocketCore> socket(serverSocket_->acceptConnection());
-      //设置不要延迟
-      socket->setTcpNodelay(true);
+<span class="token keyword">bool</span> HttpListenCommand<span class="token operator">::</span><span class="token function">execute</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">//当前引擎退出的时候，这个command才会退出,这个command会一直存在，用于监听tcp的连接请求</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getRequestGroupMan</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">downloadFinished</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">||</span> e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">isHaltRequested</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">try</span> <span class="token punctuation">{</span>
+     <span class="token comment" spellcheck="true">//如果这个 rpc监听的端口有读取到内容的化</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>serverSocket_<span class="token operator">-</span><span class="token operator">></span><span class="token function">isReadable</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token comment" spellcheck="true">//利用tcp的Accept函数，返回当前连接的socketCore对象</span>
+      std<span class="token operator">::</span>shared_ptr<span class="token operator">&lt;</span>SocketCore<span class="token operator">></span> <span class="token function">socket</span><span class="token punctuation">(</span>serverSocket_<span class="token operator">-</span><span class="token operator">></span><span class="token function">acceptConnection</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token comment" spellcheck="true">//设置不要延迟</span>
+      socket<span class="token operator">-</span><span class="token operator">></span><span class="token function">setTcpNodelay</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-      //获取对方的ip和端口号
-      auto endpoint = socket->getPeerInfo();
-      //标识建立了一个连接
-      LOGD("RPC: Accepted the connection from %s:%u.", endpoint.addr.c_str(), endpoint.port);
-      e_->setNoWait(true);
-      //构建一个 HttpServerCommand 对象，用于后面的通信
-      e_->addCommand(make_unique<HttpServerCommand>(e_->newCUID(), e_, socket, secure_));
-    }
-  }
-  catch (RecoverableException& e) {
-    A2_LOG_DEBUG_EX(fmt(MSG_ACCEPT_FAILURE, getCuid()), e);
-  }
-  e_->addCommand(std::unique_ptr<Command>(this));
-  return false;
-}
+      <span class="token comment" spellcheck="true">//获取对方的ip和端口号</span>
+      <span class="token keyword">auto</span> endpoint <span class="token operator">=</span> socket<span class="token operator">-</span><span class="token operator">></span><span class="token function">getPeerInfo</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token comment" spellcheck="true">//标识建立了一个连接</span>
+      <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"RPC: Accepted the connection from %s:%u."</span><span class="token punctuation">,</span> endpoint<span class="token punctuation">.</span>addr<span class="token punctuation">.</span><span class="token function">c_str</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> endpoint<span class="token punctuation">.</span>port<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">setNoWait</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token comment" spellcheck="true">//构建一个 HttpServerCommand 对象，用于后面的通信</span>
+      e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">addCommand</span><span class="token punctuation">(</span>make_unique<span class="token operator">&lt;</span>HttpServerCommand<span class="token operator">></span><span class="token punctuation">(</span>e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">newCUID</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> e_<span class="token punctuation">,</span> socket<span class="token punctuation">,</span> secure_<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">catch</span> <span class="token punctuation">(</span>RecoverableException<span class="token operator">&amp;</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">A2_LOG_DEBUG_EX</span><span class="token punctuation">(</span><span class="token function">fmt</span><span class="token punctuation">(</span>MSG_ACCEPT_FAILURE<span class="token punctuation">,</span> <span class="token function">getCuid</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">addCommand</span><span class="token punctuation">(</span>std<span class="token operator">::</span>unique_ptr<span class="token operator">&lt;</span>Command<span class="token operator">></span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h4 id="客户端发起一个请求"><a href="#客户端发起一个请求" class="headerlink" title="客户端发起一个请求"></a>客户端发起一个请求</h4><p>假设此时使用postMan发送了一个rpc的请求，请求的内容为</p>
 <pre class=" language-JSON"><code class="language-JSON">{
@@ -616,505 +616,505 @@ bool HttpListenCommand::execute()
  "params":[["https://github.com/aria2/aria2/archive/release-1.33.0.zip"]]
 }
 </code></pre>
-<h4 id="服务端响应请求"><a href="#服务端响应请求" class="headerlink" title="服务端响应请求"></a>服务端响应请求</h4><pre class=" language-CPP"><code class="language-CPP">也即是会执行到这里
-if (serverSocket_->isReadable(0)) {
-    //利用tcp的Accept函数，返回当前连接的socketCore对象
-    std::shared_ptr<SocketCore> socket(serverSocket_->acceptConnection());
-    //设置不要延迟
-    socket->setTcpNodelay(true);
+<h4 id="服务端响应请求"><a href="#服务端响应请求" class="headerlink" title="服务端响应请求"></a>服务端响应请求</h4><pre class=" language-cpp"><code class="language-cpp">也即是会执行到这里
+<span class="token keyword">if</span> <span class="token punctuation">(</span>serverSocket_<span class="token operator">-</span><span class="token operator">></span><span class="token function">isReadable</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//利用tcp的Accept函数，返回当前连接的socketCore对象</span>
+    std<span class="token operator">::</span>shared_ptr<span class="token operator">&lt;</span>SocketCore<span class="token operator">></span> <span class="token function">socket</span><span class="token punctuation">(</span>serverSocket_<span class="token operator">-</span><span class="token operator">></span><span class="token function">acceptConnection</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//设置不要延迟</span>
+    socket<span class="token operator">-</span><span class="token operator">></span><span class="token function">setTcpNodelay</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    //获取对方的ip和端口号
-    auto endpoint = socket->getPeerInfo();
-    //标识建立了一个连接
-    LOGD("RPC: Accepted the connection from %s:%u.", endpoint.addr.c_str(), endpoint.port);
-    e_->setNoWait(true);
-    //构建一个 HttpServerCommand 对象，用于后面的通信
-    e_->addCommand(make_unique<HttpServerCommand>(e_->newCUID(), e_, socket, secure_));
-}
+    <span class="token comment" spellcheck="true">//获取对方的ip和端口号</span>
+    <span class="token keyword">auto</span> endpoint <span class="token operator">=</span> socket<span class="token operator">-</span><span class="token operator">></span><span class="token function">getPeerInfo</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//标识建立了一个连接</span>
+    <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"RPC: Accepted the connection from %s:%u."</span><span class="token punctuation">,</span> endpoint<span class="token punctuation">.</span>addr<span class="token punctuation">.</span><span class="token function">c_str</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> endpoint<span class="token punctuation">.</span>port<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">setNoWait</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//构建一个 HttpServerCommand 对象，用于后面的通信</span>
+    e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">addCommand</span><span class="token punctuation">(</span>make_unique<span class="token operator">&lt;</span>HttpServerCommand<span class="token operator">></span><span class="token punctuation">(</span>e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">newCUID</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> e_<span class="token punctuation">,</span> socket<span class="token punctuation">,</span> secure_<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
 acceptConnection函数实现，会通过tcp的accept函数，监听到连接的请求，并且对应的创建一个用于俩者通信的socket返回
-//服务端判断是否有客户端连接上实现
-std::shared_ptr<SocketCore> SocketCore::acceptConnection() const
-{
-  sockaddr_union sockaddr;
-  socklen_t len = sizeof(sockaddr);
+<span class="token comment" spellcheck="true">//服务端判断是否有客户端连接上实现</span>
+std<span class="token operator">::</span>shared_ptr<span class="token operator">&lt;</span>SocketCore<span class="token operator">></span> SocketCore<span class="token operator">::</span><span class="token function">acceptConnection</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">const</span>
+<span class="token punctuation">{</span>
+  sockaddr_union sockaddr<span class="token punctuation">;</span>
+  socklen_t len <span class="token operator">=</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>sockaddr<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-  sock_t fd;
+  sock_t fd<span class="token punctuation">;</span>
 
-  //服务端调用accept函数接受连接，如果服务器调用accept()时还没有客户端的连接请求，就阻塞等待直到有客户端连接上来，addr是一个传出参数，accept()返回时传出客户端
-  //地址和端口号，accept函数   成功返回一个新的socket文件描述符，用于和客户端通信，失败返回-1,设置errno
-  while ((fd = accept(sockfd_, &sockaddr.sa, &len)) == (sock_t)-1 && SOCKET_ERRNO == A2_EINTR);
+  <span class="token comment" spellcheck="true">//服务端调用accept函数接受连接，如果服务器调用accept()时还没有客户端的连接请求，就阻塞等待直到有客户端连接上来，addr是一个传出参数，accept()返回时传出客户端</span>
+  <span class="token comment" spellcheck="true">//地址和端口号，accept函数   成功返回一个新的socket文件描述符，用于和客户端通信，失败返回-1,设置errno</span>
+  <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>fd <span class="token operator">=</span> <span class="token function">accept</span><span class="token punctuation">(</span>sockfd_<span class="token punctuation">,</span> <span class="token operator">&amp;</span>sockaddr<span class="token punctuation">.</span>sa<span class="token punctuation">,</span> <span class="token operator">&amp;</span>len<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token punctuation">(</span>sock_t<span class="token punctuation">)</span><span class="token operator">-</span><span class="token number">1</span> <span class="token operator">&amp;&amp;</span> SOCKET_ERRNO <span class="token operator">==</span> A2_EINTR<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-  //这里的fd 就是 成功返回的一个新的socket文件描述符，用于和客户端通信的，为什么要重新的返回一个新的socekt，因为每条tcp传输连接只能有俩个端点，只能进行
-  //点对点的数据传输，不支持多播和广播传输方式
-  int errNum = SOCKET_ERRNO;
-  //判断这个新创建的socekt是否合法
-  if (fd == (sock_t)-1) {
-    throw DL_ABORT_EX(fmt(EX_SOCKET_ACCEPT, errorMsg(errNum).c_str()));
-  }
+  <span class="token comment" spellcheck="true">//这里的fd 就是 成功返回的一个新的socket文件描述符，用于和客户端通信的，为什么要重新的返回一个新的socekt，因为每条tcp传输连接只能有俩个端点，只能进行</span>
+  <span class="token comment" spellcheck="true">//点对点的数据传输，不支持多播和广播传输方式</span>
+  <span class="token keyword">int</span> errNum <span class="token operator">=</span> SOCKET_ERRNO<span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//判断这个新创建的socekt是否合法</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>fd <span class="token operator">==</span> <span class="token punctuation">(</span>sock_t<span class="token punctuation">)</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">throw</span> <span class="token function">DL_ABORT_EX</span><span class="token punctuation">(</span><span class="token function">fmt</span><span class="token punctuation">(</span>EX_SOCKET_ACCEPT<span class="token punctuation">,</span> <span class="token function">errorMsg</span><span class="token punctuation">(</span>errNum<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">c_str</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
 
-  //设置socket，接受buff的大小
-  applySocketBufferSize(fd);
+  <span class="token comment" spellcheck="true">//设置socket，接受buff的大小</span>
+  <span class="token function">applySocketBufferSize</span><span class="token punctuation">(</span>fd<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-  //构建一个SocketCore 对象，调用对应的构造函数，完成初始化,这里的fd是客户端连接上之后，重新创建的socket 返回的描述符，sockType_为TCP的类型
-  auto sock = std::make_shared<SocketCore>(fd, sockType_);
-  //设置不阻塞
-  sock->setNonBlockingMode();
-  return sock;
-}
+  <span class="token comment" spellcheck="true">//构建一个SocketCore 对象，调用对应的构造函数，完成初始化,这里的fd是客户端连接上之后，重新创建的socket 返回的描述符，sockType_为TCP的类型</span>
+  <span class="token keyword">auto</span> sock <span class="token operator">=</span> std<span class="token operator">::</span>make_shared<span class="token operator">&lt;</span>SocketCore<span class="token operator">></span><span class="token punctuation">(</span>fd<span class="token punctuation">,</span> sockType_<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//设置不阻塞</span>
+  sock<span class="token operator">-</span><span class="token operator">></span><span class="token function">setNonBlockingMode</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">return</span> sock<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-接着构建一个HttpServerCommand，e_->addCommand(make_unique<HttpServerCommand>(e_->newCUID(), e_, socket, secure_)); 这个command使用的参数socket为accept 返回的socket
+接着构建一个HttpServerCommand，e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">addCommand</span><span class="token punctuation">(</span>make_unique<span class="token operator">&lt;</span>HttpServerCommand<span class="token operator">></span><span class="token punctuation">(</span>e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">newCUID</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> e_<span class="token punctuation">,</span> socket<span class="token punctuation">,</span> secure_<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 这个command使用的参数socket为accept 返回的socket
 
-//command命令的执行,这个command主要用来处理头部的内容
-bool HttpServerCommand::execute()
-{
-  //当前引擎退出的还是才会回收这个command对象
-  if (e_->getRequestGroupMan()->downloadFinished() || e_->isHaltRequested()) {
-     return true;
-  }
-  try {
-    //socket->isReadable判断是否有接受到内容
-    if (socket_->isReadable(0) || (writeCheck_ && socket_->isWritable(0)) || socket_->getRecvBufferedLength() || !httpServer_->getSocketRecvBuffer()->bufferEmpty()) {
-      //赋值超时的开始时间,防止连接通了之后，对方没有发送任何的内容造成浪费，
-      timeoutTimer_ = global::wallclock();
-      ...    
-      //httpServer接收请求  返回false代表没有成功解析到
-      if (!httpServer_->receiveRequest()) {
-        updateWriteCheck();
-        e_->addCommand(std::unique_ptr<Command>(this));
-        return false;
-      }
-      ...
+<span class="token comment" spellcheck="true">//command命令的执行,这个command主要用来处理头部的内容</span>
+<span class="token keyword">bool</span> HttpServerCommand<span class="token operator">::</span><span class="token function">execute</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">//当前引擎退出的还是才会回收这个command对象</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getRequestGroupMan</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">downloadFinished</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">||</span> e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">isHaltRequested</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+     <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">try</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//socket->isReadable判断是否有接受到内容</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>socket_<span class="token operator">-</span><span class="token operator">></span><span class="token function">isReadable</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">||</span> <span class="token punctuation">(</span>writeCheck_ <span class="token operator">&amp;&amp;</span> socket_<span class="token operator">-</span><span class="token operator">></span><span class="token function">isWritable</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">||</span> socket_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getRecvBufferedLength</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">||</span> <span class="token operator">!</span>httpServer_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getSocketRecvBuffer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">bufferEmpty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token comment" spellcheck="true">//赋值超时的开始时间,防止连接通了之后，对方没有发送任何的内容造成浪费，</span>
+      timeoutTimer_ <span class="token operator">=</span> global<span class="token operator">::</span><span class="token function">wallclock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>    
+      <span class="token comment" spellcheck="true">//httpServer接收请求  返回false代表没有成功解析到</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>httpServer_<span class="token operator">-</span><span class="token operator">></span><span class="token function">receiveRequest</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">updateWriteCheck</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">addCommand</span><span class="token punctuation">(</span>std<span class="token operator">::</span>unique_ptr<span class="token operator">&lt;</span>Command<span class="token operator">></span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+      <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
 
-      //判断是否超过了默认的请求长度内容限制,默认的大小为2M，如果超过了这个大小，将不会处理，直接return true，释放当前的连接
-      if (e_->getOption()->getAsInt(PREF_RPC_MAX_REQUEST_SIZE) < httpServer_->getContentLength()) {
-        LOGD("Request too long. ContentLength=%" PRId64 "."
-                          " See --rpc-max-request-size option to loose"
-                          " this limitation.",
-                          httpServer_->getContentLength());
-        return true;
-      }
+      <span class="token comment" spellcheck="true">//判断是否超过了默认的请求长度内容限制,默认的大小为2M，如果超过了这个大小，将不会处理，直接return true，释放当前的连接</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getOption</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">getAsInt</span><span class="token punctuation">(</span>PREF_RPC_MAX_REQUEST_SIZE<span class="token punctuation">)</span> <span class="token operator">&lt;</span> httpServer_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getContentLength</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"Request too long. ContentLength=%"</span> PRId64 <span class="token string">"."</span>
+                          <span class="token string">" See --rpc-max-request-size option to loose"</span>
+                          <span class="token string">" this limitation."</span><span class="token punctuation">,</span>
+                          httpServer_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getContentLength</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
 
-      //构建HttpServerBodyCommand对象，用来响应传递过来的body内容，之后返回true，回收这个对象
-      e_->addCommand(make_unique<HttpServerBodyCommand>(getCuid(), httpServer_, e_, socket_));
-      e_->setNoWait(true);
-      return true;
-    }catch (RecoverableException& e) {
-    //出现了异常，回收这个对象
-    LOGD("CUID#%" PRId64" - Error occurred while reading HTTP request", getCuid());
-    return true;
-  }
-}
+      <span class="token comment" spellcheck="true">//构建HttpServerBodyCommand对象，用来响应传递过来的body内容，之后返回true，回收这个对象</span>
+      e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">addCommand</span><span class="token punctuation">(</span>make_unique<span class="token operator">&lt;</span>HttpServerBodyCommand<span class="token operator">></span><span class="token punctuation">(</span><span class="token function">getCuid</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> httpServer_<span class="token punctuation">,</span> e_<span class="token punctuation">,</span> socket_<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">setNoWait</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token keyword">catch</span> <span class="token punctuation">(</span>RecoverableException<span class="token operator">&amp;</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//出现了异常，回收这个对象</span>
+    <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"CUID#%"</span> PRId64<span class="token string">" - Error occurred while reading HTTP request"</span><span class="token punctuation">,</span> <span class="token function">getCuid</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
 首先看receiveRequest 函数的实现，这个是用来接收传递的内容
-//是否有接受到内容
-bool HttpServer::receiveRequest()
-{
-  //如果缓冲空间为空
-  if (socketRecvBuffer_->bufferEmpty()) {
-     //从socket中尝试的获取内容，如果获取为空，并且socket不能读也不能写 抛出异常
-    if (socketRecvBuffer_->recv() == 0 && !socket_->wantRead() && !socket_->wantWrite()) {
-      throw DL_ABORT_EX(EX_EOF_FROM_PEER);
-    }
-  }
+<span class="token comment" spellcheck="true">//是否有接受到内容</span>
+<span class="token keyword">bool</span> HttpServer<span class="token operator">::</span><span class="token function">receiveRequest</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">//如果缓冲空间为空</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>socketRecvBuffer_<span class="token operator">-</span><span class="token operator">></span><span class="token function">bufferEmpty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+     <span class="token comment" spellcheck="true">//从socket中尝试的获取内容，如果获取为空，并且socket不能读也不能写 抛出异常</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>socketRecvBuffer_<span class="token operator">-</span><span class="token operator">></span><span class="token function">recv</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>socket_<span class="token operator">-</span><span class="token operator">></span><span class="token function">wantRead</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>socket_<span class="token operator">-</span><span class="token operator">></span><span class="token function">wantWrite</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">throw</span> <span class="token function">DL_ABORT_EX</span><span class="token punctuation">(</span>EX_EOF_FROM_PEER<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
 
-  //如果到了这里，就说明从socket读取到了内容， 解析读取的内容
-  if (headerProcessor_->parse(socketRecvBuffer_->getBuffer(), socketRecvBuffer_->getBufferLength())) {
-    //获取到请求头结果,将原本的对象转移到了 lastRequestHeader_中
-    lastRequestHeader_ = headerProcessor_->getResult();
-    //打印解析到的请求头
-    LOGD("HTTP Server received request\n%s", headerProcessor_->getHeaderString().c_str());
-    //移除当前读取的内容
-    socketRecvBuffer_->drain(headerProcessor_->getLastBytesProcessed());
-    bodyConsumed_ = 0;
-    if (setupResponseRecv() < 0) {
-      LOGD("Request path is invalid. Ignore the request body.");
-    }
-    //从请求头中获取到content_length 代表当前请求包含的长度
-    const std::string& contentLengthHdr = lastRequestHeader_->find(HttpHeader::CONTENT_LENGTH);
-    //如果请求长度不为空，并且成功的解析到lastContentLength_ 中
-    if (!contentLengthHdr.empty()) {
-      if (!util::parseLLIntNoThrow(lastContentLength_, contentLengthHdr) || lastContentLength_ < 0) {
-         throw DL_ABORT_EX(fmt("Invalid Content-Length=%s", contentLengthHdr.c_str()));
-      }
-    }
-    else {
-      //如果请求的长度为空，则标识当前请求内容的长度为0
-      lastContentLength_ = 0;
-    }
-    //执行清理操作
-    headerProcessor_->clear();
+  <span class="token comment" spellcheck="true">//如果到了这里，就说明从socket读取到了内容， 解析读取的内容</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>headerProcessor_<span class="token operator">-</span><span class="token operator">></span><span class="token function">parse</span><span class="token punctuation">(</span>socketRecvBuffer_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getBuffer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> socketRecvBuffer_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getBufferLength</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//获取到请求头结果,将原本的对象转移到了 lastRequestHeader_中</span>
+    lastRequestHeader_ <span class="token operator">=</span> headerProcessor_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getResult</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//打印解析到的请求头</span>
+    <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"HTTP Server received request\n%s"</span><span class="token punctuation">,</span> headerProcessor_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getHeaderString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">c_str</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//移除当前读取的内容</span>
+    socketRecvBuffer_<span class="token operator">-</span><span class="token operator">></span><span class="token function">drain</span><span class="token punctuation">(</span>headerProcessor_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getLastBytesProcessed</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    bodyConsumed_ <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">setupResponseRecv</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"Request path is invalid. Ignore the request body."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//从请求头中获取到content_length 代表当前请求包含的长度</span>
+    <span class="token keyword">const</span> std<span class="token operator">::</span>string<span class="token operator">&amp;</span> contentLengthHdr <span class="token operator">=</span> lastRequestHeader_<span class="token operator">-</span><span class="token operator">></span><span class="token function">find</span><span class="token punctuation">(</span>HttpHeader<span class="token operator">::</span>CONTENT_LENGTH<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//如果请求长度不为空，并且成功的解析到lastContentLength_ 中</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>contentLengthHdr<span class="token punctuation">.</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>util<span class="token operator">::</span><span class="token function">parseLLIntNoThrow</span><span class="token punctuation">(</span>lastContentLength_<span class="token punctuation">,</span> contentLengthHdr<span class="token punctuation">)</span> <span class="token operator">||</span> lastContentLength_ <span class="token operator">&lt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+         <span class="token keyword">throw</span> <span class="token function">DL_ABORT_EX</span><span class="token punctuation">(</span><span class="token function">fmt</span><span class="token punctuation">(</span><span class="token string">"Invalid Content-Length=%s"</span><span class="token punctuation">,</span> contentLengthHdr<span class="token punctuation">.</span><span class="token function">c_str</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">else</span> <span class="token punctuation">{</span>
+      <span class="token comment" spellcheck="true">//如果请求的长度为空，则标识当前请求内容的长度为0</span>
+      lastContentLength_ <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//执行清理操作</span>
+    headerProcessor_<span class="token operator">-</span><span class="token operator">></span><span class="token function">clear</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    //从请求结果中找到对应的accept_encoding
-    std::vector<Scip> acceptEncodings;
-    const std::string& acceptEnc = lastRequestHeader_->find(HttpHeader::ACCEPT_ENCODING);
-    util::splitIter(acceptEnc.begin(), acceptEnc.end(), std::back_inserter(acceptEncodings), ',', true);
-    //判断是否支持gzip
-    acceptsGZip_ = false;
-    for (std::vector<Scip>::const_iterator i = acceptEncodings.begin(), eoi = acceptEncodings.end(); i != eoi; ++i) {
-      if (util::strieq((*i).first, (*i).second, "gzip")) {
-        acceptsGZip_ = true;
-        break;
-      }
-    }
-    //最后成功解析，返回true
-    return true;
-  }
-  else {
-    //从接受的缓冲区中移除内容，返回false
-    socketRecvBuffer_->drain(headerProcessor_->getLastBytesProcessed());
-    return false;
-  }
-}
+    <span class="token comment" spellcheck="true">//从请求结果中找到对应的accept_encoding</span>
+    std<span class="token operator">::</span>vector<span class="token operator">&lt;</span>Scip<span class="token operator">></span> acceptEncodings<span class="token punctuation">;</span>
+    <span class="token keyword">const</span> std<span class="token operator">::</span>string<span class="token operator">&amp;</span> acceptEnc <span class="token operator">=</span> lastRequestHeader_<span class="token operator">-</span><span class="token operator">></span><span class="token function">find</span><span class="token punctuation">(</span>HttpHeader<span class="token operator">::</span>ACCEPT_ENCODING<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    util<span class="token operator">::</span><span class="token function">splitIter</span><span class="token punctuation">(</span>acceptEnc<span class="token punctuation">.</span><span class="token function">begin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> acceptEnc<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> std<span class="token operator">::</span><span class="token function">back_inserter</span><span class="token punctuation">(</span>acceptEncodings<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">','</span><span class="token punctuation">,</span> <span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//判断是否支持gzip</span>
+    acceptsGZip_ <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>std<span class="token operator">::</span>vector<span class="token operator">&lt;</span>Scip<span class="token operator">></span><span class="token operator">::</span>const_iterator i <span class="token operator">=</span> acceptEncodings<span class="token punctuation">.</span><span class="token function">begin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> eoi <span class="token operator">=</span> acceptEncodings<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> i <span class="token operator">!=</span> eoi<span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>util<span class="token operator">::</span><span class="token function">strieq</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token operator">*</span>i<span class="token punctuation">)</span><span class="token punctuation">.</span>first<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token operator">*</span>i<span class="token punctuation">)</span><span class="token punctuation">.</span>second<span class="token punctuation">,</span> <span class="token string">"gzip"</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        acceptsGZip_ <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+        <span class="token keyword">break</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//最后成功解析，返回true</span>
+    <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//从接受的缓冲区中移除内容，返回false</span>
+    socketRecvBuffer_<span class="token operator">-</span><span class="token operator">></span><span class="token function">drain</span><span class="token punctuation">(</span>headerProcessor_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getLastBytesProcessed</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 可以看出这个函数主要用来接受数据，并处理对应的请求头，当处理完之后继续往下执行
-//构建HttpServerBodyCommand对象，用来响应传递过来的body内容，之后返回true，回收这个对象
-e_->addCommand(make_unique<HttpServerBodyCommand>(getCuid(), httpServer_, e_, socket_));
-e_->setNoWait(true);
-return true;
+<span class="token comment" spellcheck="true">//构建HttpServerBodyCommand对象，用来响应传递过来的body内容，之后返回true，回收这个对象</span>
+e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">addCommand</span><span class="token punctuation">(</span>make_unique<span class="token operator">&lt;</span>HttpServerBodyCommand<span class="token operator">></span><span class="token punctuation">(</span><span class="token function">getCuid</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> httpServer_<span class="token punctuation">,</span> e_<span class="token punctuation">,</span> socket_<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">setNoWait</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
 
 这里会构建另一个command，用于响应请求的内容
-bool HttpServerBodyCommand::execute()
-{
-  //如果引擎退出，这个command才会回收
-  if (e_->getRequestGroupMan()->downloadFinished() || e_->isHaltRequested()) {
-     return true;
-  }
-  ...
-  switch (httpServer_->getRequestType()) { //获取到请求的类型,这里只看json格式的，当然也有xml格式的等
-    case RPC_TYPE_JSON:
-    case RPC_TYPE_JSONP: {//json方式
-        ...
-        //转成json的时候出现了错误
-        if (error < 0) {
-            LOGD("CUID#%" PRId64" - Failed to parse JSON-RPC request", getCuid());
-            rpc::RpcResponse res(rpc::createJsonRpcErrorResponse(-32700, "Parse error.", Null::g()));
-            sendJsonRpcResponse(res, callback);
-            return true;
-        }
-        Dict* jsondict = downcast<Dict>(json);
-        if (jsondict) {//但个任务
-            //处理json的请求,处理对应的请求，并且得到对应的处理结果封装到 RpcResponse 中
-            auto res = rpc::processJsonRpcRequest(jsondict, e_);
-            //发生响应的内容
-            sendJsonRpcResponse(res, callback);
-        }
-    ...    
-    }
-}
+<span class="token keyword">bool</span> HttpServerBodyCommand<span class="token operator">::</span><span class="token function">execute</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">//如果引擎退出，这个command才会回收</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getRequestGroupMan</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">downloadFinished</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">||</span> e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">isHaltRequested</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+     <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+  <span class="token keyword">switch</span> <span class="token punctuation">(</span>httpServer_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getRequestType</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token comment" spellcheck="true">//获取到请求的类型,这里只看json格式的，当然也有xml格式的等</span>
+    <span class="token keyword">case</span> RPC_TYPE_JSON<span class="token operator">:</span>
+    <span class="token keyword">case</span> RPC_TYPE_JSONP<span class="token operator">:</span> <span class="token punctuation">{</span><span class="token comment" spellcheck="true">//json方式</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+        <span class="token comment" spellcheck="true">//转成json的时候出现了错误</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>error <span class="token operator">&lt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"CUID#%"</span> PRId64<span class="token string">" - Failed to parse JSON-RPC request"</span><span class="token punctuation">,</span> <span class="token function">getCuid</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            rpc<span class="token operator">::</span>RpcResponse <span class="token function">res</span><span class="token punctuation">(</span>rpc<span class="token operator">::</span><span class="token function">createJsonRpcErrorResponse</span><span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">32700</span><span class="token punctuation">,</span> <span class="token string">"Parse error."</span><span class="token punctuation">,</span> Null<span class="token operator">::</span><span class="token function">g</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">sendJsonRpcResponse</span><span class="token punctuation">(</span>res<span class="token punctuation">,</span> callback<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        Dict<span class="token operator">*</span> jsondict <span class="token operator">=</span> downcast<span class="token operator">&lt;</span>Dict<span class="token operator">></span><span class="token punctuation">(</span>json<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>jsondict<span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token comment" spellcheck="true">//但个任务</span>
+            <span class="token comment" spellcheck="true">//处理json的请求,处理对应的请求，并且得到对应的处理结果封装到 RpcResponse 中</span>
+            <span class="token keyword">auto</span> res <span class="token operator">=</span> rpc<span class="token operator">::</span><span class="token function">processJsonRpcRequest</span><span class="token punctuation">(</span>jsondict<span class="token punctuation">,</span> e_<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">//发生响应的内容</span>
+            <span class="token function">sendJsonRpcResponse</span><span class="token punctuation">(</span>res<span class="token punctuation">,</span> callback<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>    
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
-首先要转成json格式，如果不是标准的json格式的化，会得到一个解析错误的回应,如果正常解析 执行processJsonRpcRequest 函数解析json的内容
-//读取传递过来的json内容
-RpcResponse processJsonRpcRequest(Dict* jsondict, DownloadEngine* e)
-{
-  //读取json中id的内容
-  auto id = jsondict->popValue("id");
-  if (!id) {
-    // 如果id为空，创建一个错误的响应返回
-    return createJsonRpcErrorResponse(-32600, "Invalid Request.", Null::g());
-  }
-  //读取json中method的内容
-  const String* methodName = downcast<String>(jsondict->get("method"));
-  //如果method为空，创建一个错误的响应返回
-  if (!methodName) {
-    return createJsonRpcErrorResponse(-32600, "Invalid Request.", std::move(id));
-  }
-  //获取到json中params的内容,可以传递多个，所以这里是一个list
-  std::unique_ptr<List> params;
-  auto tempParams = jsondict->popValue("params");
-  if (downcast<List>(tempParams)) {
-    params.reset(static_cast<List*>(tempParams.release()));
-  }
-  else if (!tempParams) {
-    params = List::g();
-  }
-  else {
-    // TODO No support for Named params
-    return createJsonRpcErrorResponse(-32602, "Invalid params.", std::move(id));
-  }
+首先要转成json格式，如果不是标准的json格式的化，会得到一个解析错误的回应<span class="token punctuation">,</span>如果正常解析 执行processJsonRpcRequest 函数解析json的内容
+<span class="token comment" spellcheck="true">//读取传递过来的json内容</span>
+RpcResponse <span class="token function">processJsonRpcRequest</span><span class="token punctuation">(</span>Dict<span class="token operator">*</span> jsondict<span class="token punctuation">,</span> DownloadEngine<span class="token operator">*</span> e<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">//读取json中id的内容</span>
+  <span class="token keyword">auto</span> id <span class="token operator">=</span> jsondict<span class="token operator">-</span><span class="token operator">></span><span class="token function">popValue</span><span class="token punctuation">(</span><span class="token string">"id"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>id<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// 如果id为空，创建一个错误的响应返回</span>
+    <span class="token keyword">return</span> <span class="token function">createJsonRpcErrorResponse</span><span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">32600</span><span class="token punctuation">,</span> <span class="token string">"Invalid Request."</span><span class="token punctuation">,</span> Null<span class="token operator">::</span><span class="token function">g</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token comment" spellcheck="true">//读取json中method的内容</span>
+  <span class="token keyword">const</span> String<span class="token operator">*</span> methodName <span class="token operator">=</span> downcast<span class="token operator">&lt;</span>String<span class="token operator">></span><span class="token punctuation">(</span>jsondict<span class="token operator">-</span><span class="token operator">></span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">"method"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//如果method为空，创建一个错误的响应返回</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>methodName<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token function">createJsonRpcErrorResponse</span><span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">32600</span><span class="token punctuation">,</span> <span class="token string">"Invalid Request."</span><span class="token punctuation">,</span> std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>id<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token comment" spellcheck="true">//获取到json中params的内容,可以传递多个，所以这里是一个list</span>
+  std<span class="token operator">::</span>unique_ptr<span class="token operator">&lt;</span>List<span class="token operator">></span> params<span class="token punctuation">;</span>
+  <span class="token keyword">auto</span> tempParams <span class="token operator">=</span> jsondict<span class="token operator">-</span><span class="token operator">></span><span class="token function">popValue</span><span class="token punctuation">(</span><span class="token string">"params"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>downcast<span class="token operator">&lt;</span>List<span class="token operator">></span><span class="token punctuation">(</span>tempParams<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    params<span class="token punctuation">.</span><span class="token function">reset</span><span class="token punctuation">(</span><span class="token keyword">static_cast</span><span class="token operator">&lt;</span>List<span class="token operator">*</span><span class="token operator">></span><span class="token punctuation">(</span>tempParams<span class="token punctuation">.</span><span class="token function">release</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>tempParams<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    params <span class="token operator">=</span> List<span class="token operator">::</span><span class="token function">g</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// TODO No support for Named params</span>
+    <span class="token keyword">return</span> <span class="token function">createJsonRpcErrorResponse</span><span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">32602</span><span class="token punctuation">,</span> <span class="token string">"Invalid params."</span><span class="token punctuation">,</span> std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>id<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
 
-  LOGD("Executing RPC method %s", methodName->s().c_str());
-  //构建一个  RpcRequest 请求，
-  RpcRequest req = {methodName->s(), std::move(params), std::move(id), true};
-  //根据rpc请求的方式，创建对应的 RpcMethod 执行对应的请求
-  return getMethod(methodName->s())->execute(std::move(req), e);
-}
+  <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"Executing RPC method %s"</span><span class="token punctuation">,</span> methodName<span class="token operator">-</span><span class="token operator">></span><span class="token function">s</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">c_str</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//构建一个  RpcRequest 请求，</span>
+  RpcRequest req <span class="token operator">=</span> <span class="token punctuation">{</span>methodName<span class="token operator">-</span><span class="token operator">></span><span class="token function">s</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>params<span class="token punctuation">)</span><span class="token punctuation">,</span> std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>id<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token boolean">true</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//根据rpc请求的方式，创建对应的 RpcMethod 执行对应的请求</span>
+  <span class="token keyword">return</span> <span class="token function">getMethod</span><span class="token punctuation">(</span>methodName<span class="token operator">-</span><span class="token operator">></span><span class="token function">s</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">execute</span><span class="token punctuation">(</span>std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>req<span class="token punctuation">)</span><span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
 根据上面的函数实现，就知道了为什么我们在发送的时候要参照这样的格式写
-{
- "jsonrpc":"2.0",
- "id":"ttrtrtrtrtrt",
- "method":"aria2.addUri",
- "params":[["https://github.com/aria2/aria2/archive/release-1.33.0.zip"]]
-}
+<span class="token punctuation">{</span>
+ <span class="token string">"jsonrpc"</span><span class="token operator">:</span><span class="token string">"2.0"</span><span class="token punctuation">,</span>
+ <span class="token string">"id"</span><span class="token operator">:</span><span class="token string">"ttrtrtrtrtrt"</span><span class="token punctuation">,</span>
+ <span class="token string">"method"</span><span class="token operator">:</span><span class="token string">"aria2.addUri"</span><span class="token punctuation">,</span>
+ <span class="token string">"params"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token string">"https://github.com/aria2/aria2/archive/release-1.33.0.zip"</span><span class="token punctuation">]</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
 
-当json格式解析完之后，创建一个RpcRequest请求  RpcRequest req = {methodName->s(), std::move(params), std::move(id), true}; 这里的methodName 就为 aria2.addUri
-params 就为 https://github.com/aria2/aria2/archive/release-1.33.0.zip  id 就为 ttrtrtrtrtrt ，接着执行 getMethod(methodName->s())->execute(std::move(req), e)
+当json格式解析完之后，创建一个RpcRequest请求  RpcRequest req <span class="token operator">=</span> <span class="token punctuation">{</span>methodName<span class="token operator">-</span><span class="token operator">></span><span class="token function">s</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>params<span class="token punctuation">)</span><span class="token punctuation">,</span> std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>id<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token boolean">true</span><span class="token punctuation">}</span><span class="token punctuation">;</span> 这里的methodName 就为 aria2<span class="token punctuation">.</span>addUri
+params 就为 https<span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>github<span class="token punctuation">.</span>com<span class="token operator">/</span>aria2<span class="token operator">/</span>aria2<span class="token operator">/</span>archive<span class="token operator">/</span>release<span class="token number">-1.33</span><span class="token punctuation">.</span><span class="token number">0</span><span class="token punctuation">.</span>zip  id 就为 ttrtrtrtrtrt ，接着执行 <span class="token function">getMethod</span><span class="token punctuation">(</span>methodName<span class="token operator">-</span><span class="token operator">></span><span class="token function">s</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">execute</span><span class="token punctuation">(</span>std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>req<span class="token punctuation">)</span><span class="token punctuation">,</span> e<span class="token punctuation">)</span>
 
 首先执行getMethod函数
 
-//根据rpc的method 得到对应的 RpcMethod 方法，首先会从缓存中查找，如果不存在，就构建对应的，然后存储到缓存中
-RpcMethod* getMethod(const std::string& methodName)
-{
-  //从map中查找methodName对应的  RpcMethod
-  auto itr = cache.find(methodName);
-  //如果没有找到
-  if (itr == std::end(cache)) {
-    //创建对应的RpcMethod 对象
-    auto m = createMethod(methodName);
-    if (m) {
-      //创建成功，插入到缓存中，然后返回这个RpcMethod
-      auto rv = cache.insert(std::make_pair(methodName, std::move(m)));
-      return (*rv.first).second.get();
-    }
+<span class="token comment" spellcheck="true">//根据rpc的method 得到对应的 RpcMethod 方法，首先会从缓存中查找，如果不存在，就构建对应的，然后存储到缓存中</span>
+RpcMethod<span class="token operator">*</span> <span class="token function">getMethod</span><span class="token punctuation">(</span><span class="token keyword">const</span> std<span class="token operator">::</span>string<span class="token operator">&amp;</span> methodName<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">//从map中查找methodName对应的  RpcMethod</span>
+  <span class="token keyword">auto</span> itr <span class="token operator">=</span> cache<span class="token punctuation">.</span><span class="token function">find</span><span class="token punctuation">(</span>methodName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//如果没有找到</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>itr <span class="token operator">==</span> std<span class="token operator">::</span><span class="token function">end</span><span class="token punctuation">(</span>cache<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//创建对应的RpcMethod 对象</span>
+    <span class="token keyword">auto</span> m <span class="token operator">=</span> <span class="token function">createMethod</span><span class="token punctuation">(</span>methodName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>m<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token comment" spellcheck="true">//创建成功，插入到缓存中，然后返回这个RpcMethod</span>
+      <span class="token keyword">auto</span> rv <span class="token operator">=</span> cache<span class="token punctuation">.</span><span class="token function">insert</span><span class="token punctuation">(</span>std<span class="token operator">::</span><span class="token function">make_pair</span><span class="token punctuation">(</span>methodName<span class="token punctuation">,</span> std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>m<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token operator">*</span>rv<span class="token punctuation">.</span>first<span class="token punctuation">)</span><span class="token punctuation">.</span>second<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    if (!noSuchRpcMethod) {
-       noSuchRpcMethod = make_unique<NoSuchMethodRpcMethod>();
-    }
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>noSuchRpcMethod<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+       noSuchRpcMethod <span class="token operator">=</span> make_unique<span class="token operator">&lt;</span>NoSuchMethodRpcMethod<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    return noSuchRpcMethod.get();
-  }
-  //从缓冲中找到了，直接返回
-  return (*itr).second.get();
-}
+    <span class="token keyword">return</span> noSuchRpcMethod<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token comment" spellcheck="true">//从缓冲中找到了，直接返回</span>
+  <span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token operator">*</span>itr<span class="token punctuation">)</span><span class="token punctuation">.</span>second<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 假设当前是第一次请求，所以缓存表中不存在任何的对象，所以会执行createMethod 函数，至于这里为什么要使用缓存表，估计是因为考虑到rpc请求比较频繁
 
-//根据methodName创建对应的RpcMethod对象 ,这里支持的接口有很多，这里只列出三个
-std::unique_ptr<RpcMethod> createMethod(const std::string& methodName)
-{
-  //如果当前请求的方法为 aria2.addUri 代表添加一个url
-  if (methodName == AddUriRpcMethod::getMethodName()) {
-    //构建一个AddUriRpcMethod 对象
-    return make_unique<AddUriRpcMethod>();
-  }
+<span class="token comment" spellcheck="true">//根据methodName创建对应的RpcMethod对象 ,这里支持的接口有很多，这里只列出三个</span>
+std<span class="token operator">::</span>unique_ptr<span class="token operator">&lt;</span>RpcMethod<span class="token operator">></span> <span class="token function">createMethod</span><span class="token punctuation">(</span><span class="token keyword">const</span> std<span class="token operator">::</span>string<span class="token operator">&amp;</span> methodName<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">//如果当前请求的方法为 aria2.addUri 代表添加一个url</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>methodName <span class="token operator">==</span> AddUriRpcMethod<span class="token operator">::</span><span class="token function">getMethodName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//构建一个AddUriRpcMethod 对象</span>
+    <span class="token keyword">return</span> make_unique<span class="token operator">&lt;</span>AddUriRpcMethod<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
 
-#ifdef ENABLE_BITTORRENT
-  //如果当前请求的方法为 aria2.addTorrent 代表添加一个种子
-  if (methodName == AddTorrentRpcMethod::getMethodName()) {
-    return make_unique<AddTorrentRpcMethod>();
-  }
+<span class="token macro property">#<span class="token directive keyword">ifdef</span> ENABLE_BITTORRENT</span>
+  <span class="token comment" spellcheck="true">//如果当前请求的方法为 aria2.addTorrent 代表添加一个种子</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>methodName <span class="token operator">==</span> AddTorrentRpcMethod<span class="token operator">::</span><span class="token function">getMethodName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> make_unique<span class="token operator">&lt;</span>AddTorrentRpcMethod<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
 
-  //如果当前请求的方法为 aria2.getPeers 获取到Peer节点
-  if (methodName == GetPeersRpcMethod::getMethodName()) {
-    return make_unique<GetPeersRpcMethod>();
-  }
-  ...
-}
-由于当前我们传递的是 aria2.addUri 所以会执行 make_unique<AddUriRpcMethod>() 返回，接着存储到缓存表中，接着执行 getMethod(methodName->s())->execute(std::move(req), e)
+  <span class="token comment" spellcheck="true">//如果当前请求的方法为 aria2.getPeers 获取到Peer节点</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>methodName <span class="token operator">==</span> GetPeersRpcMethod<span class="token operator">::</span><span class="token function">getMethodName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> make_unique<span class="token operator">&lt;</span>GetPeersRpcMethod<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
+由于当前我们传递的是 aria2<span class="token punctuation">.</span>addUri 所以会执行 make_unique<span class="token operator">&lt;</span>AddUriRpcMethod<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span> 返回，接着存储到缓存表中，接着执行 <span class="token function">getMethod</span><span class="token punctuation">(</span>methodName<span class="token operator">-</span><span class="token operator">></span><span class="token function">s</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">execute</span><span class="token punctuation">(</span>std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>req<span class="token punctuation">)</span><span class="token punctuation">,</span> e<span class="token punctuation">)</span>
 
-//执行RPC的入口
-RpcResponse RpcMethod::execute(RpcRequest req, DownloadEngine* e)
-{
-  auto authorized = RpcResponse::NOTAUTHORIZED;
-  try {
-    authorize(req, e);
-    authorized = RpcResponse::AUTHORIZED;
-    //调用子类对应的实现,并且得到处理之后的结果
-    auto r = process(req, e);
-    //构建一个RpcResponse 对象，用于响应
-    return RpcResponse(0, authorized, std::move(r), std::move(req.id));
-  }
-  catch (RecoverableException& ex) {
-    A2_LOG_DEBUG_EX(EX_EXCEPTION_CAUGHT, ex);
-    return RpcResponse(1, authorized, createErrorResponse(ex, req), std::move(req.id));
-  }
-}
+<span class="token comment" spellcheck="true">//执行RPC的入口</span>
+RpcResponse RpcMethod<span class="token operator">::</span><span class="token function">execute</span><span class="token punctuation">(</span>RpcRequest req<span class="token punctuation">,</span> DownloadEngine<span class="token operator">*</span> e<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token keyword">auto</span> authorized <span class="token operator">=</span> RpcResponse<span class="token operator">::</span>NOTAUTHORIZED<span class="token punctuation">;</span>
+  <span class="token keyword">try</span> <span class="token punctuation">{</span>
+    <span class="token function">authorize</span><span class="token punctuation">(</span>req<span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    authorized <span class="token operator">=</span> RpcResponse<span class="token operator">::</span>AUTHORIZED<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//调用子类对应的实现,并且得到处理之后的结果</span>
+    <span class="token keyword">auto</span> r <span class="token operator">=</span> <span class="token function">process</span><span class="token punctuation">(</span>req<span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//构建一个RpcResponse 对象，用于响应</span>
+    <span class="token keyword">return</span> <span class="token function">RpcResponse</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> authorized<span class="token punctuation">,</span> std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>r<span class="token punctuation">)</span><span class="token punctuation">,</span> std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>req<span class="token punctuation">.</span>id<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">catch</span> <span class="token punctuation">(</span>RecoverableException<span class="token operator">&amp;</span> ex<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">A2_LOG_DEBUG_EX</span><span class="token punctuation">(</span>EX_EXCEPTION_CAUGHT<span class="token punctuation">,</span> ex<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token function">RpcResponse</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> authorized<span class="token punctuation">,</span> <span class="token function">createErrorResponse</span><span class="token punctuation">(</span>ex<span class="token punctuation">,</span> req<span class="token punctuation">)</span><span class="token punctuation">,</span> std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>req<span class="token punctuation">.</span>id<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
 由于我们当前的子类是 AddUriRpcMethod 所以 process 由这个子类来实现
 
-//addUri rpc请求的实现类
-std::unique_ptr<ValueBase> AddUriRpcMethod::process(const RpcRequest& req, DownloadEngine* e)
-{
-  const List* urisParam = checkRequiredParam<List>(req, 0);
-  const Dict* optsParam = checkParam<Dict>(req, 1);
-  const Integer* posParam = checkParam<Integer>(req, 2);
+<span class="token comment" spellcheck="true">//addUri rpc请求的实现类</span>
+std<span class="token operator">::</span>unique_ptr<span class="token operator">&lt;</span>ValueBase<span class="token operator">></span> AddUriRpcMethod<span class="token operator">::</span><span class="token function">process</span><span class="token punctuation">(</span><span class="token keyword">const</span> RpcRequest<span class="token operator">&amp;</span> req<span class="token punctuation">,</span> DownloadEngine<span class="token operator">*</span> e<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token keyword">const</span> List<span class="token operator">*</span> urisParam <span class="token operator">=</span> checkRequiredParam<span class="token operator">&lt;</span>List<span class="token operator">></span><span class="token punctuation">(</span>req<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">const</span> Dict<span class="token operator">*</span> optsParam <span class="token operator">=</span> checkParam<span class="token operator">&lt;</span>Dict<span class="token operator">></span><span class="token punctuation">(</span>req<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">const</span> Integer<span class="token operator">*</span> posParam <span class="token operator">=</span> checkParam<span class="token operator">&lt;</span>Integer<span class="token operator">></span><span class="token punctuation">(</span>req<span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-  //获取到要添加的uri。这里可以添加多个
-  std::vector<std::string> uris;
-  extractUris(std::back_inserter(uris), urisParam);
-  if (uris.empty()) {
-    LOGD("URI is not provided.");
-    throw DL_ABORT_EX("URI is not provided.");
-  }
+  <span class="token comment" spellcheck="true">//获取到要添加的uri。这里可以添加多个</span>
+  std<span class="token operator">::</span>vector<span class="token operator">&lt;</span>std<span class="token operator">::</span>string<span class="token operator">></span> uris<span class="token punctuation">;</span>
+  <span class="token function">extractUris</span><span class="token punctuation">(</span>std<span class="token operator">::</span><span class="token function">back_inserter</span><span class="token punctuation">(</span>uris<span class="token punctuation">)</span><span class="token punctuation">,</span> urisParam<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>uris<span class="token punctuation">.</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"URI is not provided."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">throw</span> <span class="token function">DL_ABORT_EX</span><span class="token punctuation">(</span><span class="token string">"URI is not provided."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
 
-  //构建对应的Option对象
-  auto requestOption = std::make_shared<Option>(*e->getOption());
-  //将传递过来的参数整合到 requestOption 中
-  gatherRequestOption(requestOption.get(), optsParam);
+  <span class="token comment" spellcheck="true">//构建对应的Option对象</span>
+  <span class="token keyword">auto</span> requestOption <span class="token operator">=</span> std<span class="token operator">::</span>make_shared<span class="token operator">&lt;</span>Option<span class="token operator">></span><span class="token punctuation">(</span><span class="token operator">*</span>e<span class="token operator">-</span><span class="token operator">></span><span class="token function">getOption</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//将传递过来的参数整合到 requestOption 中</span>
+  <span class="token function">gatherRequestOption</span><span class="token punctuation">(</span>requestOption<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> optsParam<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-  //判断是否有指定下载的位置，比如添加下载到第一位等
-  bool posGiven = checkPosParam(posParam);
-  size_t pos = posGiven ? posParam->i() : 0;
+  <span class="token comment" spellcheck="true">//判断是否有指定下载的位置，比如添加下载到第一位等</span>
+  <span class="token keyword">bool</span> posGiven <span class="token operator">=</span> <span class="token function">checkPosParam</span><span class="token punctuation">(</span>posParam<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  size_t pos <span class="token operator">=</span> posGiven <span class="token operator">?</span> posParam<span class="token operator">-</span><span class="token operator">></span><span class="token function">i</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">:</span> <span class="token number">0</span><span class="token punctuation">;</span>
 
-  std::vector<std::shared_ptr<RequestGroup>> result;
-  //根据uri创建对应的RequestGroup
-  createRequestGroupForUri(result, requestOption, uris,
-                           /* ignoreForceSeq = */ true,
-                           /* ignoreLocalPath = */ true);
+  std<span class="token operator">::</span>vector<span class="token operator">&lt;</span>std<span class="token operator">::</span>shared_ptr<span class="token operator">&lt;</span>RequestGroup<span class="token operator">>></span> result<span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//根据uri创建对应的RequestGroup</span>
+  <span class="token function">createRequestGroupForUri</span><span class="token punctuation">(</span>result<span class="token punctuation">,</span> requestOption<span class="token punctuation">,</span> uris<span class="token punctuation">,</span>
+                           <span class="token comment" spellcheck="true">/* ignoreForceSeq = */</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+                           <span class="token comment" spellcheck="true">/* ignoreLocalPath = */</span> <span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-  //如果创建的RequestGroup不为空，添加请求
-  if (!result.empty()) {
-    //添加请求
-    return addRequestGroup(result.front(), e, posGiven, pos);
-  }
-  else {
-    LOGD("No URI to download.");
-    throw DL_ABORT_EX("No URI to download.");
-  }
-}
+  <span class="token comment" spellcheck="true">//如果创建的RequestGroup不为空，添加请求</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>result<span class="token punctuation">.</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//添加请求</span>
+    <span class="token keyword">return</span> <span class="token function">addRequestGroup</span><span class="token punctuation">(</span>result<span class="token punctuation">.</span><span class="token function">front</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> e<span class="token punctuation">,</span> posGiven<span class="token punctuation">,</span> pos<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"No URI to download."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">throw</span> <span class="token function">DL_ABORT_EX</span><span class="token punctuation">(</span><span class="token string">"No URI to download."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
 上面的函数通过解析传递过来的参数，然后创建对应的RequestGroup对象，然后执行 addRequestGroup 添加请求，返回gid，这两个函数之前已经分析过，也即是只要调用了这俩个方法，就会触发对应的下载了
-process函数执行完，得到对应的gid，接着构建一个 RpcResponse(0, authorized, std::move(r), std::move(req.id))，这里有process处理之后的返回值，这个返回值也即是要返回给客户端的
+process函数执行完，得到对应的gid，接着构建一个 <span class="token function">RpcResponse</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> authorized<span class="token punctuation">,</span> std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>r<span class="token punctuation">)</span><span class="token punctuation">,</span> std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>req<span class="token punctuation">.</span>id<span class="token punctuation">)</span><span class="token punctuation">)</span>，这里有process处理之后的返回值，这个返回值也即是要返回给客户端的
 
-//执行RPC的入口
-RpcResponse RpcMethod::execute(RpcRequest req, DownloadEngine* e)
-{
-  auto authorized = RpcResponse::NOTAUTHORIZED;
-  try {
-    authorize(req, e);
-    authorized = RpcResponse::AUTHORIZED;
-    //调用子类对应的实现,并且得到处理之后的结果
-    auto r = process(req, e);
-    //构建一个RpcResponse 对象，用于响应
-    return RpcResponse(0, authorized, std::move(r), std::move(req.id));
-  }
-  catch (RecoverableException& ex) {
-    A2_LOG_DEBUG_EX(EX_EXCEPTION_CAUGHT, ex);
-    return RpcResponse(1, authorized, createErrorResponse(ex, req), std::move(req.id));
-  }
-}
+<span class="token comment" spellcheck="true">//执行RPC的入口</span>
+RpcResponse RpcMethod<span class="token operator">::</span><span class="token function">execute</span><span class="token punctuation">(</span>RpcRequest req<span class="token punctuation">,</span> DownloadEngine<span class="token operator">*</span> e<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token keyword">auto</span> authorized <span class="token operator">=</span> RpcResponse<span class="token operator">::</span>NOTAUTHORIZED<span class="token punctuation">;</span>
+  <span class="token keyword">try</span> <span class="token punctuation">{</span>
+    <span class="token function">authorize</span><span class="token punctuation">(</span>req<span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    authorized <span class="token operator">=</span> RpcResponse<span class="token operator">::</span>AUTHORIZED<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//调用子类对应的实现,并且得到处理之后的结果</span>
+    <span class="token keyword">auto</span> r <span class="token operator">=</span> <span class="token function">process</span><span class="token punctuation">(</span>req<span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//构建一个RpcResponse 对象，用于响应</span>
+    <span class="token keyword">return</span> <span class="token function">RpcResponse</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> authorized<span class="token punctuation">,</span> std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>r<span class="token punctuation">)</span><span class="token punctuation">,</span> std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>req<span class="token punctuation">.</span>id<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">catch</span> <span class="token punctuation">(</span>RecoverableException<span class="token operator">&amp;</span> ex<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">A2_LOG_DEBUG_EX</span><span class="token punctuation">(</span>EX_EXCEPTION_CAUGHT<span class="token punctuation">,</span> ex<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token function">RpcResponse</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> authorized<span class="token punctuation">,</span> <span class="token function">createErrorResponse</span><span class="token punctuation">(</span>ex<span class="token punctuation">,</span> req<span class="token punctuation">)</span><span class="token punctuation">,</span> std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>req<span class="token punctuation">.</span>id<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
 继续回到这里 HttpServerBodyCommand 往下执行 接着就是响应了 sendJsonRpcResponse 
-//处理json的请求,处理对应的请求，并且得到对应的处理结果封装到 RpcResponse 中
-auto res = rpc::processJsonRpcRequest(jsondict, e_);
-//发生响应的内容
-sendJsonRpcResponse(res, callback);
+<span class="token comment" spellcheck="true">//处理json的请求,处理对应的请求，并且得到对应的处理结果封装到 RpcResponse 中</span>
+<span class="token keyword">auto</span> res <span class="token operator">=</span> rpc<span class="token operator">::</span><span class="token function">processJsonRpcRequest</span><span class="token punctuation">(</span>jsondict<span class="token punctuation">,</span> e_<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">//发生响应的内容</span>
+<span class="token function">sendJsonRpcResponse</span><span class="token punctuation">(</span>res<span class="token punctuation">,</span> callback<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-//将处理之后的结果，返回响应
-void HttpServerBodyCommand::sendJsonRpcResponse(const rpc::RpcResponse& res, const std::string& callback)
-{
-  bool notauthorized = rpc::not_authorized(res);
-  //当前是否支持gzip
-  bool gzip = httpServer_->supportsGZip();
-  //转成成json
-  std::string responseData = rpc::toJson(res, callback, gzip);
-  if (res.code == 0) {
-    //填充返回的内容
-    httpServer_->feedResponse(std::move(responseData), getJsonRpcContentType(!callback.empty()));
-  }
-  ..
-  //填充完了之后，准备发送,notauthorized 代表是否需要延迟
-  addHttpServerResponseCommand(notauthorized);
-}
+<span class="token comment" spellcheck="true">//将处理之后的结果，返回响应</span>
+<span class="token keyword">void</span> HttpServerBodyCommand<span class="token operator">::</span><span class="token function">sendJsonRpcResponse</span><span class="token punctuation">(</span><span class="token keyword">const</span> rpc<span class="token operator">::</span>RpcResponse<span class="token operator">&amp;</span> res<span class="token punctuation">,</span> <span class="token keyword">const</span> std<span class="token operator">::</span>string<span class="token operator">&amp;</span> callback<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token keyword">bool</span> notauthorized <span class="token operator">=</span> rpc<span class="token operator">::</span><span class="token function">not_authorized</span><span class="token punctuation">(</span>res<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//当前是否支持gzip</span>
+  <span class="token keyword">bool</span> gzip <span class="token operator">=</span> httpServer_<span class="token operator">-</span><span class="token operator">></span><span class="token function">supportsGZip</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//转成成json</span>
+  std<span class="token operator">::</span>string responseData <span class="token operator">=</span> rpc<span class="token operator">::</span><span class="token function">toJson</span><span class="token punctuation">(</span>res<span class="token punctuation">,</span> callback<span class="token punctuation">,</span> gzip<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>res<span class="token punctuation">.</span>code <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//填充返回的内容</span>
+    httpServer_<span class="token operator">-</span><span class="token operator">></span><span class="token function">feedResponse</span><span class="token punctuation">(</span>std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>responseData<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">getJsonRpcContentType</span><span class="token punctuation">(</span><span class="token operator">!</span>callback<span class="token punctuation">.</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token punctuation">.</span><span class="token punctuation">.</span>
+  <span class="token comment" spellcheck="true">//填充完了之后，准备发送,notauthorized 代表是否需要延迟</span>
+  <span class="token function">addHttpServerResponseCommand</span><span class="token punctuation">(</span>notauthorized<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-namespace {
-std::string getJsonRpcContentType(bool script)
-{
-  return script ? "text/javascript" : "application/json-rpc";
-}
-} // namespace
+<span class="token keyword">namespace</span> <span class="token punctuation">{</span>
+std<span class="token operator">::</span>string <span class="token function">getJsonRpcContentType</span><span class="token punctuation">(</span><span class="token keyword">bool</span> script<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token keyword">return</span> script <span class="token operator">?</span> <span class="token string">"text/javascript"</span> <span class="token operator">:</span> <span class="token string">"application/json-rpc"</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token punctuation">}</span> <span class="token comment" spellcheck="true">// namespace</span>
 
 
-//填充返回的内容，这里填充俩个部分一个是Http的Header部分，一个是text，传递的内容，填充到socketBuffer_ 中
-void HttpServer::feedResponse(int status, const std::string& headers,
-                              std::string text, const std::string& contentType)
-{
-  std::string httpDate = Time().toHTTPDate();
-  std::string header =
-      fmt("HTTP/1.1 %s\r\n"
-          "Date: %s\r\n"
-          "Content-Length: %lu\r\n"
-          "Expires: %s\r\n"
-          "Cache-Control: no-cache\r\n",
-          getStatusString(status), httpDate.c_str(),
-          static_cast<unsigned long>(text.size()), httpDate.c_str());
-  if (!contentType.empty()) {
-    header += "Content-Type: ";
-    header += contentType;
-    header += "\r\n";
-  }
-  if (!allowOrigin_.empty()) {
-    header += "Access-Control-Allow-Origin: ";
-    header += allowOrigin_;
-    header += "\r\n";
-  }
-  if (supportsGZip()) {
-    header += "Content-Encoding: gzip\r\n";
-  }
-  if (!supportsPersistentConnection()) {
-    header += "Connection: close\r\n";
-  }
-  header += headers;
-  header += "\r\n";
-  LOGD("HTTP Server sends response:\n%s", header.c_str());
-  //填充头部部分
-  socketBuffer_.pushStr(std::move(header));
-  //填充传的内容
-  socketBuffer_.pushStr(std::move(text));
-}
+<span class="token comment" spellcheck="true">//填充返回的内容，这里填充俩个部分一个是Http的Header部分，一个是text，传递的内容，填充到socketBuffer_ 中</span>
+<span class="token keyword">void</span> HttpServer<span class="token operator">::</span><span class="token function">feedResponse</span><span class="token punctuation">(</span><span class="token keyword">int</span> status<span class="token punctuation">,</span> <span class="token keyword">const</span> std<span class="token operator">::</span>string<span class="token operator">&amp;</span> headers<span class="token punctuation">,</span>
+                              std<span class="token operator">::</span>string text<span class="token punctuation">,</span> <span class="token keyword">const</span> std<span class="token operator">::</span>string<span class="token operator">&amp;</span> contentType<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  std<span class="token operator">::</span>string httpDate <span class="token operator">=</span> <span class="token function">Time</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toHTTPDate</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  std<span class="token operator">::</span>string header <span class="token operator">=</span>
+      <span class="token function">fmt</span><span class="token punctuation">(</span><span class="token string">"HTTP/1.1 %s\r\n"</span>
+          <span class="token string">"Date: %s\r\n"</span>
+          <span class="token string">"Content-Length: %lu\r\n"</span>
+          <span class="token string">"Expires: %s\r\n"</span>
+          <span class="token string">"Cache-Control: no-cache\r\n"</span><span class="token punctuation">,</span>
+          <span class="token function">getStatusString</span><span class="token punctuation">(</span>status<span class="token punctuation">)</span><span class="token punctuation">,</span> httpDate<span class="token punctuation">.</span><span class="token function">c_str</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+          <span class="token keyword">static_cast</span><span class="token operator">&lt;</span><span class="token keyword">unsigned</span> <span class="token keyword">long</span><span class="token operator">></span><span class="token punctuation">(</span>text<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> httpDate<span class="token punctuation">.</span><span class="token function">c_str</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>contentType<span class="token punctuation">.</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    header <span class="token operator">+</span><span class="token operator">=</span> <span class="token string">"Content-Type: "</span><span class="token punctuation">;</span>
+    header <span class="token operator">+</span><span class="token operator">=</span> contentType<span class="token punctuation">;</span>
+    header <span class="token operator">+</span><span class="token operator">=</span> <span class="token string">"\r\n"</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>allowOrigin_<span class="token punctuation">.</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    header <span class="token operator">+</span><span class="token operator">=</span> <span class="token string">"Access-Control-Allow-Origin: "</span><span class="token punctuation">;</span>
+    header <span class="token operator">+</span><span class="token operator">=</span> allowOrigin_<span class="token punctuation">;</span>
+    header <span class="token operator">+</span><span class="token operator">=</span> <span class="token string">"\r\n"</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">supportsGZip</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    header <span class="token operator">+</span><span class="token operator">=</span> <span class="token string">"Content-Encoding: gzip\r\n"</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">supportsPersistentConnection</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    header <span class="token operator">+</span><span class="token operator">=</span> <span class="token string">"Connection: close\r\n"</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  header <span class="token operator">+</span><span class="token operator">=</span> headers<span class="token punctuation">;</span>
+  header <span class="token operator">+</span><span class="token operator">=</span> <span class="token string">"\r\n"</span><span class="token punctuation">;</span>
+  <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"HTTP Server sends response:\n%s"</span><span class="token punctuation">,</span> header<span class="token punctuation">.</span><span class="token function">c_str</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//填充头部部分</span>
+  socketBuffer_<span class="token punctuation">.</span><span class="token function">pushStr</span><span class="token punctuation">(</span>std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>header<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//填充传的内容</span>
+  socketBuffer_<span class="token punctuation">.</span><span class="token function">pushStr</span><span class="token punctuation">(</span>std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>text<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
 这个函数主要是拼接要返回的内容，请求头，请求内容 并且添加到了socketBuffer_ 中此时并没有执行发送，接着执行addHttpServerResponseCommand 执行发送
-//发送响应的请求
-void HttpServerBodyCommand::addHttpServerResponseCommand(bool delayed)
-{
-  //构建一个 HttpServerResponseCommand对象
-  auto resp = make_unique<HttpServerResponseCommand>(getCuid(), httpServer_, e_, socket_);
-  ...
-  e_->addCommand(std::move(resp));
-  e_->setNoWait(true);
-}
+<span class="token comment" spellcheck="true">//发送响应的请求</span>
+<span class="token keyword">void</span> HttpServerBodyCommand<span class="token operator">::</span><span class="token function">addHttpServerResponseCommand</span><span class="token punctuation">(</span><span class="token keyword">bool</span> delayed<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">//构建一个 HttpServerResponseCommand对象</span>
+  <span class="token keyword">auto</span> resp <span class="token operator">=</span> make_unique<span class="token operator">&lt;</span>HttpServerResponseCommand<span class="token operator">></span><span class="token punctuation">(</span><span class="token function">getCuid</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> httpServer_<span class="token punctuation">,</span> e_<span class="token punctuation">,</span> socket_<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+  e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">addCommand</span><span class="token punctuation">(</span>std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>resp<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">setNoWait</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-HttpServerResponseCommand 的基类是AbstractHttpServerResponseCommand ，这里的发送逻辑是在父类实现的,现在看下execute函数的实现
+HttpServerResponseCommand 的基类是AbstractHttpServerResponseCommand ，这里的发送逻辑是在父类实现的<span class="token punctuation">,</span>现在看下execute函数的实现
 
-//command命令的执行
-bool AbstractHttpServerResponseCommand::execute()
-{
-  if (e_->getRequestGroupMan()->downloadFinished() || e_->isHaltRequested()) {
-    return true;
-  }
-  try {
-    //发送响应的内容
-    ssize_t len = httpServer_->sendResponse();
-    if (len > 0) {
-       //设置超时的时间
-       timeoutTimer_ = global::wallclock();
-    }
-  }
-  catch (RecoverableException& e) {
-    A2_LOG_INFO_EX(fmt("CUID#%" PRId64" - Error occurred while transmitting response body.", getCuid()), e);
-    return true;
-  }
+<span class="token comment" spellcheck="true">//command命令的执行</span>
+<span class="token keyword">bool</span> AbstractHttpServerResponseCommand<span class="token operator">::</span><span class="token function">execute</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">getRequestGroupMan</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">downloadFinished</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">||</span> e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">isHaltRequested</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">try</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//发送响应的内容</span>
+    ssize_t len <span class="token operator">=</span> httpServer_<span class="token operator">-</span><span class="token operator">></span><span class="token function">sendResponse</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>len <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+       <span class="token comment" spellcheck="true">//设置超时的时间</span>
+       timeoutTimer_ <span class="token operator">=</span> global<span class="token operator">::</span><span class="token function">wallclock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">catch</span> <span class="token punctuation">(</span>RecoverableException<span class="token operator">&amp;</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">A2_LOG_INFO_EX</span><span class="token punctuation">(</span><span class="token function">fmt</span><span class="token punctuation">(</span><span class="token string">"CUID#%"</span> PRId64<span class="token string">" - Error occurred while transmitting response body."</span><span class="token punctuation">,</span> <span class="token function">getCuid</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
 
-  //当所有的内容都发送完毕了之后
-  if (httpServer_->sendBufferIsEmpty()) {
-    LOGD("CUID#%" PRId64 " - HttpServer: all response transmitted.", getCuid());
-    //回调执行afterSend，之后执行回收操作
-    afterSend(httpServer_, e_);
-    return true;
-  }
-  else {
-    //代表缓冲区中还有内容，也即是内容还没有发送完，检查是否超时，这里为30秒，也即是开始发送的时间到终止的时间间隔为30，到了就回收这个command
-    if (timeoutTimer_.difference(global::wallclock()) >= 30_s) {
-      LOGD("CUID#%" PRId64" - HttpServer: Timeout while trasmitting response.", getCuid());
-      return true;
-    }
-    else {
-      updateReadWriteCheck();
-      e_->addCommand(std::unique_ptr<Command>(this));
-      return false;
-    }
-  }
-}
+  <span class="token comment" spellcheck="true">//当所有的内容都发送完毕了之后</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>httpServer_<span class="token operator">-</span><span class="token operator">></span><span class="token function">sendBufferIsEmpty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"CUID#%"</span> PRId64 <span class="token string">" - HttpServer: all response transmitted."</span><span class="token punctuation">,</span> <span class="token function">getCuid</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//回调执行afterSend，之后执行回收操作</span>
+    <span class="token function">afterSend</span><span class="token punctuation">(</span>httpServer_<span class="token punctuation">,</span> e_<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//代表缓冲区中还有内容，也即是内容还没有发送完，检查是否超时，这里为30秒，也即是开始发送的时间到终止的时间间隔为30，到了就回收这个command</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>timeoutTimer_<span class="token punctuation">.</span><span class="token function">difference</span><span class="token punctuation">(</span>global<span class="token operator">::</span><span class="token function">wallclock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">>=</span> 30_s<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"CUID#%"</span> PRId64<span class="token string">" - HttpServer: Timeout while trasmitting response."</span><span class="token punctuation">,</span> <span class="token function">getCuid</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">else</span> <span class="token punctuation">{</span>
+      <span class="token function">updateReadWriteCheck</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      e_<span class="token operator">-</span><span class="token operator">></span><span class="token function">addCommand</span><span class="token punctuation">(</span>std<span class="token operator">::</span>unique_ptr<span class="token operator">&lt;</span>Command<span class="token operator">></span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <p>上面的逻辑也是比较简单的，这样数据就发送出去了，这样另一端就收到了内容，这里是postman收到的内容为<br><img src="/uploads/Aria2Rpc实现/rpc收到的内容.png" alt="结果显示"></p>
 <h4 id="长连接的支持"><a href="#长连接的支持" class="headerlink" title="长连接的支持"></a>长连接的支持</h4><p>当数据发送完之后，会执行 afterSend(httpServer<em>, e</em>); 这个函数会由具体的子类来实现，比如当前是HttpServerResponseCommand，所以会执行对应的函数</p>
-<pre class=" language-CPP"><code class="language-CPP">void HttpServerResponseCommand::afterSend(const std::shared_ptr<HttpServer>& httpServer, DownloadEngine* e)
-{
-  //判断是否支持长连接,如果支持长连接，这里会构建一个 HttpServerCommand 用于后面的通信
-  if (httpServer->supportsPersistentConnection()) {
-    LOGD("CUID#%" PRId64 " - Persist connection.", getCuid());
-    e->addCommand(make_unique<HttpServerCommand>(getCuid(), httpServer, e, httpServer->getSocket()));
-  }
-}
+<pre class=" language-cpp"><code class="language-cpp"><span class="token keyword">void</span> HttpServerResponseCommand<span class="token operator">::</span><span class="token function">afterSend</span><span class="token punctuation">(</span><span class="token keyword">const</span> std<span class="token operator">::</span>shared_ptr<span class="token operator">&lt;</span>HttpServer<span class="token operator">></span><span class="token operator">&amp;</span> httpServer<span class="token punctuation">,</span> DownloadEngine<span class="token operator">*</span> e<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">//判断是否支持长连接,如果支持长连接，这里会构建一个 HttpServerCommand 用于后面的通信</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>httpServer<span class="token operator">-</span><span class="token operator">></span><span class="token function">supportsPersistentConnection</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"CUID#%"</span> PRId64 <span class="token string">" - Persist connection."</span><span class="token punctuation">,</span> <span class="token function">getCuid</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    e<span class="token operator">-</span><span class="token operator">></span><span class="token function">addCommand</span><span class="token punctuation">(</span>make_unique<span class="token operator">&lt;</span>HttpServerCommand<span class="token operator">></span><span class="token punctuation">(</span><span class="token function">getCuid</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> httpServer<span class="token punctuation">,</span> e<span class="token punctuation">,</span> httpServer<span class="token operator">-</span><span class="token operator">></span><span class="token function">getSocket</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <blockquote>
 <p>这里做的处理就是判断当前是否支持长连接，如果支持就构建一个HttpServerCommand 进行后续的操作,这个command前面有介绍，也即是当收到请求的时候，第一个的command这个command主要用来接收内容以及解析http header内容，处理完之后，会构建另一个command用于解析请求的内容，这样就少了一个步骤也即是最开始的监听端口请求的部分 accept函数，这样就不会每次都构建一个socket ，一直使用同一个socket,当然如果不支持长连接的化，就会关闭掉当前的socket，下次再次连接只能重新的通过accept函数重新的创建一个socket来响应后续的操作</p>

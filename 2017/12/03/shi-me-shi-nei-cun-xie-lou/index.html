@@ -497,8 +497,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <p>内存泄漏</p>
-<pre><code>在Android里，程序内存被分为2部分：native和dalvik，dalvik就是我们普通的Java使用内存，我们创建的对象是在这里面分配的，
+                <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><pre><code>在Android里，程序内存被分为2部分：native和dalvik，dalvik就是我们普通的Java使用内存，我们创建的对象是在这里面分配的，
 对于内存的限制是 native+dalvik 不能超过最大限制。android程序内存一般限制在16M，也有的是24M（早期的Android系统G1，就是只有16M）。具体看定制系统的设置，如果
 在有限的内存里面发生了内存泄漏，程序运行的越久，也就会越卡
 

@@ -509,108 +509,108 @@
 <p>为了从源码包构建aria2，您需要以下开发包（包名可能会因您使用的发行版而异）：<br>  ● libgnutls-dev（需要HTTPS，BitTorrent，Checksum支持）<br>  ● nettle-dev（需要BitTorrent，支持Checksum）<br>  ● libgmp-dev（BitTorrent必需）<br>  ● libssh2-1-dev（SFTP支持必需）<br>  ● libc-ares-dev（异步DNS支持需要）<br>  ● libxml2-dev（Metalink支持必需）<br>  ● zlib1g-dev（gzip需要，HTTP解压解码支持）<br>  ● libsqlite3-dev（需要Firefox3 / Chromium cookie支持）<br>  ● pkg-config（需要检测已安装的库）<br>你可以使用libgcrypt-dev而不是nettle-dev和libgmp-dev：<br>您可以使用libssl-dev而不是libgnutls-dev，nettle-dev，libgmp-dev，libgpg-error-dev和libgcrypt-dev：<br>您可以使用libexpat1-dev而不是libxml2-dev：<br>如果您从git存储库下载源代码，则必须安装以下软件包以获取autoconf宏：<br>  ● libxml2-dev<br>  ● libcppunit-dev<br>  ● autoconf<br>  ● automake<br>  ● autotools-dev<br>  ● autopoint<br>  ● libtool</p>
 </blockquote>
 <p>上面需要的包安装完之后，进入到下载下来的源码目录里面这里使用的是最新版Github上面的Maste分支的内容 然后运行以下命令生成构建程序所需的配置脚本和其他文件：</p>
-<pre class=" language-bash"><code class="language-bash">$ autoreconf -i
+<pre class=" language-shell"><code class="language-shell">$ autoreconf -i
 </code></pre>
 <p>您还需要Sphinx来构建手册页。如果您正在为Mac OS X构建aria2，请查看make-release-os.mk GNU Make makefile。 构建aria2的最快方法是首先运行configure脚本：</p>
-<pre class=" language-bash"><code class="language-bash">$ ./configure
+<pre class=" language-shell"><code class="language-shell">$ ./configure
 </code></pre>
 <p>要建立静态链接的aria2，请使用ARIA2_STATIC=yes 命令行选项：</p>
-<pre class=" language-bash"><code class="language-bash">$ ./configure ARIA2_STATIC <span class="token operator">=</span> <span class="token function">yes</span>
+<pre class=" language-shell"><code class="language-shell">$ ./configure ARIA2_STATIC = yes
 </code></pre>
 <p>配置完成后，运行make以编译该程序：</p>
-<pre class=" language-bash"><code class="language-bash">$ <span class="token function">make</span>
+<pre class=" language-shell"><code class="language-shell">$ make
 </code></pre>
 <p>编译完成就会在源码目录下面的src里面有一个可以执行的文件，名为aria2c<br><img src="/uploads/Aria2编译/linuxAria.png" alt="结果显示"></p>
 <p>测试可以下载<br><img src="/uploads/Aria2编译/linux运行.png" alt="结果显示"></p>
 <h3 id="Window产物"><a href="#Window产物" class="headerlink" title="Window产物"></a>Window产物</h3><blockquote>
 <p>编译<br>  ● Aria2 需要用到 mingw-w64 的交叉编译工具链来编译出来 Windows 下的二进制，所以要首先安装一个 Linux 系统，推荐用 Ubuntu<br>  ● 新建一个 setup.sh 脚本，来执行环境的安装和相关依赖库的编译<br>  ● #! /bin/bash</p>
 </blockquote>
-<pre class=" language-bash"><code class="language-bash">改成 x86_64-w64-mingw32 来编译64位版本 这个要对应的为你在Linux上面安装的Mingw64对应的 是64还是32位系统
-安装mingW64可以通过 <span class="token function">sudo</span> <span class="token function">apt-get</span> <span class="token function">install</span> mingw-w64-x86-64-dev 来完成安装
-<span class="token function">export</span> HOST<span class="token operator">=</span>x86_64-w64-mingw32
+<pre class=" language-shell"><code class="language-shell">改成 x86_64-w64-mingw32 来编译64位版本 这个要对应的为你在Linux上面安装的Mingw64对应的 是64还是32位系统
+安装mingW64可以通过 sudo apt-get install mingw-w64-x86-64-dev 来完成安装
+export HOST=x86_64-w64-mingw32
 
-It would be better to use nearest ubuntu archive mirror <span class="token keyword">for</span> faster
+It would be better to use nearest ubuntu archive mirror for faster
 downloads.
-RUN <span class="token function">sed</span> -ie <span class="token string">'s/archive\.ubuntu/jp.archive.ubuntu/g'</span> /etc/apt/sources.list
+RUN sed -ie 's/archive\.ubuntu/jp.archive.ubuntu/g' /etc/apt/sources.list
 </code></pre>
 <p>安装编译环境 后面的其实就是将官网上面介绍的那样，要安装的软件包，这里只不过是讲这些要安装的软件包通过脚本文件的形势来编译，这样的好处是不用一个一个的执行，可以通过脚本文件，一下子执行完成</p>
-<pre class=" language-bash"><code class="language-bash"><span class="token function">apt-get</span> update <span class="token operator">&amp;&amp;</span> \
-<span class="token function">apt-get</span> <span class="token function">install</span> -y <span class="token function">make</span> binutils autoconf automake autotools-dev libtool pkg-config <span class="token function">git</span> curl dpkg-dev gcc-mingw-w64 autopoint libcppunit-dev libxml2-dev libgcrypt11-dev lzip
+<pre class=" language-shell"><code class="language-shell">apt-get update && \
+apt-get install -y make binutils autoconf automake autotools-dev libtool pkg-config git curl dpkg-dev gcc-mingw-w64 autopoint libcppunit-dev libxml2-dev libgcrypt11-dev lzip
 
-<span class="token comment" spellcheck="true"># 下载依赖库</span>
-<span class="token keyword">if</span> <span class="token punctuation">[</span> <span class="token operator">!</span> -f <span class="token string">"gmp-6.1.2.tar.lz"</span> <span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token keyword">then</span> 
+# 下载依赖库
+if [ ! -f "gmp-6.1.2.tar.lz" ]; then 
     curl -L -O https://gmplib.org/download/gmp/gmp-6.1.2.tar.lz 
-<span class="token keyword">fi</span>
+fi
 
-<span class="token keyword">if</span> <span class="token punctuation">[</span> <span class="token operator">!</span> -f <span class="token string">"expat-2.2.0.tar.bz2"</span> <span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token keyword">then</span> 
+if [ ! -f "expat-2.2.0.tar.bz2" ]; then 
     curl -L -O http://downloads.sourceforge.net/project/expat/expat/2.2.0/expat-2.2.0.tar.bz2
-<span class="token keyword">fi</span>
+fi
 
-<span class="token keyword">if</span> <span class="token punctuation">[</span> <span class="token operator">!</span> -f <span class="token string">"sqlite-autoconf-3160200.tar.gz"</span> <span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token keyword">then</span> 
+if [ ! -f "sqlite-autoconf-3160200.tar.gz" ]; then 
     curl -L -O https://www.sqlite.org/2017/sqlite-autoconf-3160200.tar.gz
-<span class="token keyword">fi</span>
+fi
 
-<span class="token keyword">if</span> <span class="token punctuation">[</span> <span class="token operator">!</span> -f <span class="token string">"zlib-1.2.11.tar.gz"</span> <span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token keyword">then</span> 
+if [ ! -f "zlib-1.2.11.tar.gz" ]; then 
     curl -L -O http://zlib.net/zlib-1.2.11.tar.gz
-<span class="token keyword">fi</span>
+fi
 
-<span class="token keyword">if</span> <span class="token punctuation">[</span> <span class="token operator">!</span> -f <span class="token string">"c-ares-1.12.0.tar.gz"</span> <span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token keyword">then</span> 
+if [ ! -f "c-ares-1.12.0.tar.gz" ]; then 
     curl -L -O https://c-ares.haxx.se/download/c-ares-1.12.0.tar.gz
-<span class="token keyword">fi</span>
+fi
 
-<span class="token keyword">if</span> <span class="token punctuation">[</span> <span class="token operator">!</span> -f <span class="token string">"libssh2-1.8.0.tar.gz"</span> <span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token keyword">then</span> 
+if [ ! -f "libssh2-1.8.0.tar.gz" ]; then 
     curl -L -O http://libssh2.org/download/libssh2-1.8.0.tar.gz
-<span class="token keyword">fi</span>
+fi
 
-<span class="token comment" spellcheck="true"># 动态编译 gmp</span>
-<span class="token function">tar</span> xf gmp-6.1.2.tar.lz <span class="token operator">&amp;&amp;</span> \
-<span class="token function">cd</span> gmp-6.1.2 <span class="token operator">&amp;&amp;</span> \
-./configure --enable-shared --disable-static --prefix<span class="token operator">=</span>/usr/local/<span class="token variable">$HOST</span> --host<span class="token operator">=</span><span class="token variable">$HOST</span> --disable-cxx --enable-fat CFLAGS<span class="token operator">=</span><span class="token string">"-mtune=generic -O2 -g0"</span> <span class="token operator">&amp;&amp;</span> \
-<span class="token function">make</span> <span class="token function">install</span>
+# 动态编译 gmp
+tar xf gmp-6.1.2.tar.lz && \
+cd gmp-6.1.2 && \
+./configure --enable-shared --disable-static --prefix=/usr/local/$HOST --host=$HOST --disable-cxx --enable-fat CFLAGS="-mtune=generic -O2 -g0" && \
+make install
 
-<span class="token comment" spellcheck="true"># 动态编译 expat</span>
-<span class="token function">cd</span> <span class="token punctuation">..</span>
-<span class="token function">tar</span> xf expat-2.2.0.tar.bz2 <span class="token operator">&amp;&amp;</span> \
-<span class="token function">cd</span> expat-2.2.0 <span class="token operator">&amp;&amp;</span> \
-./configure --enable-shared --disable-static --prefix<span class="token operator">=</span>/usr/local/<span class="token variable">$HOST</span> --host<span class="token operator">=</span><span class="token variable">$HOST</span> --build<span class="token operator">=</span><span class="token variable"><span class="token variable">`</span>dpkg-architecture -qDEB_BUILD_GNU_TYPE<span class="token variable">`</span></span> <span class="token operator">&amp;&amp;</span> \
-<span class="token function">make</span> <span class="token function">install</span>
+# 动态编译 expat
+cd ..
+tar xf expat-2.2.0.tar.bz2 && \
+cd expat-2.2.0 && \
+./configure --enable-shared --disable-static --prefix=/usr/local/$HOST --host=$HOST --build=`dpkg-architecture -qDEB_BUILD_GNU_TYPE` && \
+make install
 
-<span class="token comment" spellcheck="true"># 动态编译 sqlite3</span>
-<span class="token function">cd</span> <span class="token punctuation">..</span>
-<span class="token function">tar</span> xf sqlite-autoconf-3160200.tar.gz <span class="token operator">&amp;&amp;</span> <span class="token function">cd</span> sqlite-autoconf-3160200 <span class="token operator">&amp;&amp;</span> \
-./configure --enable-shared --disable-static --prefix<span class="token operator">=</span>/usr/local/<span class="token variable">$HOST</span> --host<span class="token operator">=</span><span class="token variable">$HOST</span> --build<span class="token operator">=</span><span class="token variable"><span class="token variable">`</span>dpkg-architecture -qDEB_BUILD_GNU_TYPE<span class="token variable">`</span></span> <span class="token operator">&amp;&amp;</span> \
-<span class="token function">make</span> <span class="token function">install</span>
+# 动态编译 sqlite3
+cd ..
+tar xf sqlite-autoconf-3160200.tar.gz && cd sqlite-autoconf-3160200 && \
+./configure --enable-shared --disable-static --prefix=/usr/local/$HOST --host=$HOST --build=`dpkg-architecture -qDEB_BUILD_GNU_TYPE` && \
+make install
 
-<span class="token comment" spellcheck="true"># 动态编译 zlib</span>
-<span class="token function">cd</span> <span class="token punctuation">..</span>
-<span class="token function">tar</span> xf zlib-1.2.11.tar.gz <span class="token operator">&amp;&amp;</span> \
-<span class="token function">cd</span> zlib-1.2.11
-<span class="token function">export</span> BINARY_PATH<span class="token operator">=</span>/usr/local/<span class="token variable">$HOST</span>/bin
-<span class="token function">export</span> INCLUDE_PATH<span class="token operator">=</span>/usr/local/<span class="token variable">$HOST</span>/include
-<span class="token function">export</span> LIBRARY_PATH<span class="token operator">=</span>/usr/local/<span class="token variable">$HOST</span>/lib
-<span class="token function">make</span> <span class="token function">install</span> -f win32/Makefile.gcc PREFIX<span class="token operator">=</span><span class="token variable">$HOST</span>- SHARED_MODE<span class="token operator">=</span>1
+# 动态编译 zlib
+cd ..
+tar xf zlib-1.2.11.tar.gz && \
+cd zlib-1.2.11
+export BINARY_PATH=/usr/local/$HOST/bin
+export INCLUDE_PATH=/usr/local/$HOST/include
+export LIBRARY_PATH=/usr/local/$HOST/lib
+make install -f win32/Makefile.gcc PREFIX=$HOST- SHARED_MODE=1
 
-<span class="token comment" spellcheck="true"># 动态编译 c-ares</span>
-<span class="token function">cd</span> <span class="token punctuation">..</span>
-<span class="token function">tar</span> xf c-ares-1.12.0.tar.gz <span class="token operator">&amp;&amp;</span> \
-<span class="token function">cd</span> c-ares-1.12.0 <span class="token operator">&amp;&amp;</span> \
-./configure --enable-shared --disable-static --without-random --prefix<span class="token operator">=</span>/usr/local/<span class="token variable">$HOST</span> --host<span class="token operator">=</span><span class="token variable">$HOST</span> --build<span class="token operator">=</span><span class="token variable"><span class="token variable">`</span>dpkg-architecture -qDEB_BUILD_GNU_TYPE<span class="token variable">`</span></span> LIBS<span class="token operator">=</span><span class="token string">"-lws2_32"</span> <span class="token operator">&amp;&amp;</span> \
-<span class="token function">make</span> <span class="token function">install</span>
+# 动态编译 c-ares
+cd ..
+tar xf c-ares-1.12.0.tar.gz && \
+cd c-ares-1.12.0 && \
+./configure --enable-shared --disable-static --without-random --prefix=/usr/local/$HOST --host=$HOST --build=`dpkg-architecture -qDEB_BUILD_GNU_TYPE` LIBS="-lws2_32" && \
+make install
 
-<span class="token comment" spellcheck="true"># 动态编译 libssh2</span>
-<span class="token function">cd</span> <span class="token punctuation">..</span>
-<span class="token function">tar</span> xf libssh2-1.8.0.tar.gz <span class="token operator">&amp;&amp;</span> \
-<span class="token function">cd</span> libssh2-1.8.0 <span class="token operator">&amp;&amp;</span> \
-./configure --enable-shared --disable-static --prefix<span class="token operator">=</span>/usr/local/<span class="token variable">$HOST</span> --host<span class="token operator">=</span><span class="token variable">$HOST</span> --build<span class="token operator">=</span><span class="token variable"><span class="token variable">`</span>dpkg-architecture -qDEB_BUILD_GNU_TYPE<span class="token variable">`</span></span> --without-openssl --with-wincng LIBS<span class="token operator">=</span><span class="token string">"-lws2_32"</span> <span class="token operator">&amp;&amp;</span> \
-<span class="token function">make</span> <span class="token function">install</span>
+# 动态编译 libssh2
+cd ..
+tar xf libssh2-1.8.0.tar.gz && \
+cd libssh2-1.8.0 && \
+./configure --enable-shared --disable-static --prefix=/usr/local/$HOST --host=$HOST --build=`dpkg-architecture -qDEB_BUILD_GNU_TYPE` --without-openssl --with-wincng LIBS="-lws2_32" && \
+make install
 
-下载 Aria2 代码并解压，修改 aria2\mingw-config 文件，增加 --enable-libaria2 编译选项来生成 libaria2 库，并修改ARIA2_STATIC<span class="token operator">=</span>no 来关闭静态编译，如果想在 windows xp 上运行，则还要将 --with-libssh2 改成 --without-libssh2，否则会出现 bcrypt.dll 缺失报错，最后的修改如下:
+下载 Aria2 代码并解压，修改 aria2\mingw-config 文件，增加 --enable-libaria2 编译选项来生成 libaria2 库，并修改ARIA2_STATIC=no 来关闭静态编译，如果想在 windows xp 上运行，则还要将 --with-libssh2 改成 --without-libssh2，否则会出现 bcrypt.dll 缺失报错，最后的修改如下:
 
-<span class="token function">test</span> -z <span class="token string">"<span class="token variable">$HOST</span>"</span> <span class="token operator">&amp;&amp;</span> HOST<span class="token operator">=</span>i686-w64-mingw32
-<span class="token function">test</span> -z <span class="token string">"<span class="token variable">$PREFIX</span>"</span> <span class="token operator">&amp;&amp;</span> PREFIX<span class="token operator">=</span>/usr/local/<span class="token variable">$HOST</span>
+test -z "$HOST" && HOST=i686-w64-mingw32
+test -z "$PREFIX" && PREFIX=/usr/local/$HOST
 ./configure \
-    --host<span class="token operator">=</span><span class="token variable">$HOST</span> \
-    --prefix<span class="token operator">=</span><span class="token variable">$PREFIX</span> \
+    --host=$HOST \
+    --prefix=$PREFIX \
     --without-included-gettext \
     --disable-nls \
     --with-libcares \
@@ -624,18 +624,18 @@ RUN <span class="token function">sed</span> -ie <span class="token string">'s/ar
     --without-libssh2 \
     --without-libgcrypt \
     --without-libnettle \
-    --with-cppunit-prefix<span class="token operator">=</span><span class="token variable">$PREFIX</span> \
+    --with-cppunit-prefix=$PREFIX \
     --enable-libaria2 \
-    ARIA2_STATIC<span class="token operator">=</span>no \
-    CPPFLAGS<span class="token operator">=</span><span class="token string">"-I<span class="token variable">$PREFIX</span>/include"</span> \
-    LDFLAGS<span class="token operator">=</span><span class="token string">"-L<span class="token variable">$PREFIX</span>/lib"</span> \
-    PKG_CONFIG_PATH<span class="token operator">=</span><span class="token string">"<span class="token variable">$PREFIX</span>/lib/pkgconfig"</span>
+    ARIA2_STATIC=no \
+    CPPFLAGS="-I$PREFIX/include" \
+    LDFLAGS="-L$PREFIX/lib" \
+    PKG_CONFIG_PATH="$PREFIX/lib/pkgconfig"
 </code></pre>
 <p>新建一个 build.sh 来编译 Aria2 库</p>
-<pre class=" language-bash"><code class="language-bash"><span class="token shebang important">#! /bin/bash</span>
-<span class="token comment" spellcheck="true"># 改成 x86_64-w64-mingw32 来编译64位版本</span>
-<span class="token function">export</span> HOST<span class="token operator">=</span>x86_64-w64-mingw32
-<span class="token function">cd</span> aria2 <span class="token operator">&amp;&amp;</span> autoreconf -i <span class="token operator">&amp;&amp;</span> ./mingw-config <span class="token operator">&amp;&amp;</span> <span class="token function">make</span> <span class="token function">install</span> <span class="token operator">&amp;&amp;</span> <span class="token variable">$HOST</span>-strip /usr/local/<span class="token variable">$HOST</span>/bin/libaria2-0.dll
+<pre class=" language-shell"><code class="language-shell">#! /bin/bash
+# 改成 x86_64-w64-mingw32 来编译64位版本
+export HOST=x86_64-w64-mingw32
+cd aria2 && autoreconf -i && ./mingw-config && make install && $HOST-strip /usr/local/$HOST/bin/libaria2-0.dll
 </code></pre>
 <p>编译完成后</p>
 <blockquote>
@@ -644,217 +644,217 @@ RUN <span class="token function">sed</span> -ie <span class="token string">'s/ar
 <p>把 /usr/local/x86_64-w64-mingw32 文件夹复制到 Windows 中，这个文件夹中的文件就是 Windows 所需要的二进制,这个就是最后到Window中bin目录下的内容<br><img src="/uploads/Aria2编译/window编译.png" alt="结果显示"></p>
 <h3 id="Android-Arm-编译"><a href="#Android-Arm-编译" class="headerlink" title="Android Arm 编译"></a>Android Arm 编译</h3><p>编译的系统为Ubuntu16.04</p>
 <p>下面是build-libraries.sh的脚本，用来保证编译android的时候，需要的库等</p>
-<pre class=" language-bash"><code class="language-bash"><span class="token shebang important">#!/bin/bash</span>
+<pre class=" language-shell"><code class="language-shell">#!/bin/bash
 
-<span class="token keyword">if</span> <span class="token punctuation">[</span><span class="token punctuation">[</span> <span class="token variable">$ANDROID_HOME</span> <span class="token operator">==</span> <span class="token string">""</span> <span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">;</span><span class="token keyword">then</span>
-<span class="token keyword">echo</span> <span class="token string">"ANDROID_HOME not defined"</span>
-<span class="token keyword">exit</span> 0
-<span class="token keyword">fi</span>
+if [[ $ANDROID_HOME == "" ]];then
+echo "ANDROID_HOME not defined"
+exit 0
+fi
 
-<span class="token comment" spellcheck="true"># 安装编译环境</span>
-<span class="token function">apt-get</span> update <span class="token operator">&amp;&amp;</span> \
-<span class="token function">apt-get</span> <span class="token function">install</span> -y <span class="token function">make</span> binutils autoconf automake autotools-dev libtool pkg-config <span class="token function">git</span> curl dpkg-dev autopoint libcppunit-dev libxml2-dev libgcrypt11-dev
+# 安装编译环境
+apt-get update && \
+apt-get install -y make binutils autoconf automake autotools-dev libtool pkg-config git curl dpkg-dev autopoint libcppunit-dev libxml2-dev libgcrypt11-dev
 
-<span class="token comment" spellcheck="true">##LIBRARIES_DOWNLOAD_URL##</span>
-EXPAT<span class="token operator">=</span>https://github.com/libexpat/libexpat/releases/download/R_2_2_5/expat-2.2.5.tar.bz2
-OPENSSL<span class="token operator">=</span>https://www.openssl.org/source/openssl-1.0.2o.tar.gz
-C_ARES<span class="token operator">=</span>https://c-ares.haxx.se/download/c-ares-1.12.0.tar.gz
-SSH2<span class="token operator">=</span>http://libssh2.org/download/libssh2-1.8.0.tar.gz
-ZLIB<span class="token operator">=</span>http://zlib.net/zlib-1.2.11.tar.gz
+##LIBRARIES_DOWNLOAD_URL##
+EXPAT=https://github.com/libexpat/libexpat/releases/download/R_2_2_5/expat-2.2.5.tar.bz2
+OPENSSL=https://www.openssl.org/source/openssl-1.0.2o.tar.gz
+C_ARES=https://c-ares.haxx.se/download/c-ares-1.12.0.tar.gz
+SSH2=http://libssh2.org/download/libssh2-1.8.0.tar.gz
+ZLIB=http://zlib.net/zlib-1.2.11.tar.gz
 
-DOWNLOADER<span class="token operator">=</span><span class="token string">"wget -c"</span>
-TOOLCHAIN<span class="token operator">=</span><span class="token variable">$ANDROID_HOME</span>/toolchain
-PATH<span class="token operator">=</span><span class="token variable">$TOOLCHAIN</span>/bin:<span class="token variable">$PATH</span>
-HOST<span class="token operator">=</span>arm-linux-androideabi
-PREFIX<span class="token operator">=</span><span class="token variable">$ANDROID_HOME</span>/usr/local
-LOCAL_DIR<span class="token operator">=</span><span class="token variable">$ANDROID_HOME</span>/usr/local
-TOOL_BIN_DIR<span class="token operator">=</span><span class="token variable">$ANDROID_HOME</span>/toolchain/bin
-PATH<span class="token operator">=</span><span class="token variable">${TOOL_BIN_DIR}</span><span class="token keyword">:</span><span class="token variable">$PATH</span>
-CFLAGS<span class="token operator">=</span><span class="token string">"-march=armv7-a -mtune=cortex-a9"</span>
-DEST<span class="token operator">=</span><span class="token variable">$ANDROID_HOME</span>/usr/local
-CC<span class="token operator">=</span><span class="token variable">$HOST</span>-gcc
-CXX<span class="token operator">=</span><span class="token variable">$HOST</span>-g++
-LDFLAGS<span class="token operator">=</span><span class="token string">"-L<span class="token variable">$DEST</span>/lib"</span>
-CPPFLAGS<span class="token operator">=</span><span class="token string">"-I<span class="token variable">$DEST</span>/include"</span>
-CXXFLAGS<span class="token operator">=</span><span class="token variable">$CFLAGS</span>
+DOWNLOADER="wget -c"
+TOOLCHAIN=$ANDROID_HOME/toolchain
+PATH=$TOOLCHAIN/bin:$PATH
+HOST=arm-linux-androideabi
+PREFIX=$ANDROID_HOME/usr/local
+LOCAL_DIR=$ANDROID_HOME/usr/local
+TOOL_BIN_DIR=$ANDROID_HOME/toolchain/bin
+PATH=${TOOL_BIN_DIR}:$PATH
+CFLAGS="-march=armv7-a -mtune=cortex-a9"
+DEST=$ANDROID_HOME/usr/local
+CC=$HOST-gcc
+CXX=$HOST-g++
+LDFLAGS="-L$DEST/lib"
+CPPFLAGS="-I$DEST/include"
+CXXFLAGS=$CFLAGS
 
- <span class="token function">cd</span> /tmp
- <span class="token comment" spellcheck="true"># zlib library build</span>
-  <span class="token variable">$DOWNLOADER</span> <span class="token variable">$ZLIB</span>
-  <span class="token function">tar</span> zxvf zlib-1.2.11.tar.gz
-  <span class="token function">cd</span> zlib-1.2.11/
-  PKG_CONFIG_PATH<span class="token operator">=</span><span class="token variable">$PREFIX</span>/lib/pkgconfig/ LD_LIBRARY_PATH<span class="token operator">=</span><span class="token variable">$PREFIX</span>/lib/ CC<span class="token operator">=</span><span class="token variable">$HOST</span>-gcc STRIP<span class="token operator">=</span><span class="token variable">$HOST</span>-strip RANLIB<span class="token operator">=</span><span class="token variable">$HOST</span>-ranlib CXX<span class="token operator">=</span><span class="token variable">$HOST</span>-g++ AR<span class="token operator">=</span><span class="token variable">$HOST</span>-ar LD<span class="token operator">=</span><span class="token variable">$HOST</span>-ld ./configure --prefix<span class="token operator">=</span><span class="token variable">$PREFIX</span> --static
-  <span class="token function">make</span>
-  <span class="token function">make</span> <span class="token function">install</span>
+ cd /tmp
+ # zlib library build
+  $DOWNLOADER $ZLIB
+  tar zxvf zlib-1.2.11.tar.gz
+  cd zlib-1.2.11/
+  PKG_CONFIG_PATH=$PREFIX/lib/pkgconfig/ LD_LIBRARY_PATH=$PREFIX/lib/ CC=$HOST-gcc STRIP=$HOST-strip RANLIB=$HOST-ranlib CXX=$HOST-g++ AR=$HOST-ar LD=$HOST-ld ./configure --prefix=$PREFIX --static
+  make
+  make install
 
- <span class="token comment" spellcheck="true"># expat library build</span>
-  <span class="token function">cd</span> /tmp
-  <span class="token variable">$DOWNLOADER</span> <span class="token variable">$EXPAT</span>
-  <span class="token function">tar</span> xf expat-2.2.5.tar.bz2
-  <span class="token function">cd</span> expat-2.2.5/
-  PKG_CONFIG_PATH<span class="token operator">=</span><span class="token variable">$PREFIX</span>/lib/pkgconfig/ LD_LIBRARY_PATH<span class="token operator">=</span><span class="token variable">$PREFIX</span>/lib/ CC<span class="token operator">=</span><span class="token variable">$HOST</span>-gcc CXX<span class="token operator">=</span><span class="token variable">$HOST</span>-g++ ./configure --host<span class="token operator">=</span><span class="token variable">$HOST</span> --build<span class="token operator">=</span><span class="token variable"><span class="token variable">`</span>dpkg-architecture -qDEB_BUILD_GNU_TYPE<span class="token variable">`</span></span> --prefix<span class="token operator">=</span><span class="token variable">$PREFIX</span> --enable-static<span class="token operator">=</span>yes --enable-shared<span class="token operator">=</span>no
-  <span class="token function">make</span>
-  <span class="token function">make</span> <span class="token function">install</span>
+ # expat library build
+  cd /tmp
+  $DOWNLOADER $EXPAT
+  tar xf expat-2.2.5.tar.bz2
+  cd expat-2.2.5/
+  PKG_CONFIG_PATH=$PREFIX/lib/pkgconfig/ LD_LIBRARY_PATH=$PREFIX/lib/ CC=$HOST-gcc CXX=$HOST-g++ ./configure --host=$HOST --build=`dpkg-architecture -qDEB_BUILD_GNU_TYPE` --prefix=$PREFIX --enable-static=yes --enable-shared=no
+  make
+  make install
 
- <span class="token comment" spellcheck="true"># c-ares library build</span>
-  <span class="token function">cd</span> /tmp
-  <span class="token variable">$DOWNLOADER</span> <span class="token variable">$C_ARES</span>
-  <span class="token function">tar</span> xf c-ares-1.12.0.tar.gz
-  <span class="token function">cd</span> c-ares-1.12.0/
-  PKG_CONFIG_PATH<span class="token operator">=</span><span class="token variable">$PREFIX</span>/lib/pkgconfig/ LD_LIBRARY_PATH<span class="token operator">=</span><span class="token variable">$PREFIX</span>/lib/ CC<span class="token operator">=</span><span class="token variable">$HOST</span>-gcc CXX<span class="token operator">=</span><span class="token variable">$HOST</span>-g++ ./configure --host<span class="token operator">=</span><span class="token variable">$HOST</span> --build<span class="token operator">=</span><span class="token variable"><span class="token variable">`</span>dpkg-architecture -qDEB_BUILD_GNU_TYPE<span class="token variable">`</span></span> --prefix<span class="token operator">=</span><span class="token variable">$PREFIX</span> --enable-static --disable-shared
-  <span class="token function">make</span>
-  <span class="token function">make</span> <span class="token function">install</span>
+ # c-ares library build
+  cd /tmp
+  $DOWNLOADER $C_ARES
+  tar xf c-ares-1.12.0.tar.gz
+  cd c-ares-1.12.0/
+  PKG_CONFIG_PATH=$PREFIX/lib/pkgconfig/ LD_LIBRARY_PATH=$PREFIX/lib/ CC=$HOST-gcc CXX=$HOST-g++ ./configure --host=$HOST --build=`dpkg-architecture -qDEB_BUILD_GNU_TYPE` --prefix=$PREFIX --enable-static --disable-shared
+  make
+  make install
 
- <span class="token comment" spellcheck="true"># openssl library build</span>
-  <span class="token function">cd</span> /tmp
-  <span class="token variable">$DOWNLOADER</span> <span class="token variable">$OPENSSL</span>
-  <span class="token function">tar</span> xf openssl-1.0.2o.tar.gz
-  <span class="token function">cd</span> openssl-1.0.2o/
-  PKG_CONFIG_PATH<span class="token operator">=</span><span class="token variable">$PREFIX</span>/lib/pkgconfig/ LD_LIBRARY_PATH<span class="token operator">=</span><span class="token variable">$PREFIX</span>/lib/ CC<span class="token operator">=</span><span class="token variable">$HOST</span>-gcc CXX<span class="token operator">=</span><span class="token variable">$HOST</span>-g++ ./Configure linux-armv4 <span class="token variable">$CFLAGS</span> --prefix<span class="token operator">=</span><span class="token variable">$PREFIX</span> shared zlib zlib-dynamic -D_GNU_SOURCE -D_BSD_SOURCE --with-zlib-lib<span class="token operator">=</span><span class="token variable">$LOCAL_DIR</span>/lib --with-zlib-include<span class="token operator">=</span><span class="token variable">$LOCAL_DIR</span>/include
-  <span class="token function">make</span> 
-  <span class="token function">make</span> <span class="token function">install</span>
+ # openssl library build
+  cd /tmp
+  $DOWNLOADER $OPENSSL
+  tar xf openssl-1.0.2o.tar.gz
+  cd openssl-1.0.2o/
+  PKG_CONFIG_PATH=$PREFIX/lib/pkgconfig/ LD_LIBRARY_PATH=$PREFIX/lib/ CC=$HOST-gcc CXX=$HOST-g++ ./Configure linux-armv4 $CFLAGS --prefix=$PREFIX shared zlib zlib-dynamic -D_GNU_SOURCE -D_BSD_SOURCE --with-zlib-lib=$LOCAL_DIR/lib --with-zlib-include=$LOCAL_DIR/include
+  make 
+  make install
 
- <span class="token comment" spellcheck="true"># libssh2 library build</span>
-  <span class="token function">cd</span> /tmp
-  <span class="token variable">$DOWNLOADER</span> <span class="token variable">$SSH2</span>
-  <span class="token function">tar</span> xf libssh2-1.8.0.tar.gz
-  <span class="token function">cd</span> libssh2-1.8.0/
-  <span class="token function">rm</span> -rf <span class="token variable">$PREFIX</span>/lib/pkgconfig/libssh2.pc
-  PKG_CONFIG_PATH<span class="token operator">=</span><span class="token variable">$PREFIX</span>/lib/pkgconfig/ LD_LIBRARY_PATH<span class="token operator">=</span><span class="token variable">$PREFIX</span>/lib/ CC<span class="token operator">=</span><span class="token variable">$HOST</span>-gcc CXX<span class="token operator">=</span><span class="token variable">$HOST</span>-g++ AR<span class="token operator">=</span><span class="token variable">$HOST</span>-ar RANLIB<span class="token operator">=</span><span class="token variable">$HOST</span>-ranlib ./configure --host<span class="token operator">=</span><span class="token variable">$HOST</span> --without-libgcrypt --with-openssl --without-wincng --prefix<span class="token operator">=</span><span class="token variable">$PREFIX</span> --enable-static --disable-shared
-  <span class="token function">make</span>
-  <span class="token function">make</span> <span class="token function">install</span>
+ # libssh2 library build
+  cd /tmp
+  $DOWNLOADER $SSH2
+  tar xf libssh2-1.8.0.tar.gz
+  cd libssh2-1.8.0/
+  rm -rf $PREFIX/lib/pkgconfig/libssh2.pc
+  PKG_CONFIG_PATH=$PREFIX/lib/pkgconfig/ LD_LIBRARY_PATH=$PREFIX/lib/ CC=$HOST-gcc CXX=$HOST-g++ AR=$HOST-ar RANLIB=$HOST-ranlib ./configure --host=$HOST --without-libgcrypt --with-openssl --without-wincng --prefix=$PREFIX --enable-static --disable-shared
+  make
+  make install
 
-  <span class="token function">cd</span> /tmp
-  <span class="token function">rm</span> -rf c-ares*
-  <span class="token function">rm</span> -rf sqlite-autoconf*
-  <span class="token function">rm</span> -rf zlib-*
-  <span class="token function">rm</span> -rf expat-*
-  <span class="token function">rm</span> -rf openssl-*
-  <span class="token function">rm</span> -rf libssh2-*
- <span class="token keyword">echo</span> <span class="token string">"all complete!"</span>
+  cd /tmp
+  rm -rf c-ares*
+  rm -rf sqlite-autoconf*
+  rm -rf zlib-*
+  rm -rf expat-*
+  rm -rf openssl-*
+  rm -rf libssh2-*
+ echo "all complete!"
 </code></pre>
 <p>下面是build-ndk-toolchain.sh的脚本，用来保证ndk的环境，主要官网介绍最好用ndk-41b以上的版本</p>
-<pre class=" language-bash"><code class="language-bash"><span class="token shebang important">#!/bin/bash</span>
+<pre class=" language-shell"><code class="language-shell">#!/bin/bash
 
-<span class="token function">mkdir</span> -p /opt/NDK
-<span class="token function">cd</span> /opt/NDK
-apt <span class="token function">install</span> <span class="token function">wget</span>
-<span class="token function">wget</span> https://dl.google.com/android/repository/android-ndk-r14b-linux-x86_64.zip
-apt <span class="token function">install</span> unzip
+mkdir -p /opt/NDK
+cd /opt/NDK
+apt install wget
+wget https://dl.google.com/android/repository/android-ndk-r14b-linux-x86_64.zip
+apt install unzip
 unzip android-ndk-r14b-linux-x86_64.zip
-<span class="token function">rm</span> android-ndk-r14b-linux-x86_64.zip
+rm android-ndk-r14b-linux-x86_64.zip
 
-<span class="token keyword">echo</span> <span class="token string">"export NDK=/opt/NDK/android-ndk-r14b
+echo "export NDK=/opt/NDK/android-ndk-r14b
 export ANDROID_HOME=/opt/NDK/android-ndk-r14b
-export PATH=<span class="token variable">$ANDROID_HOME</span>:<span class="token variable">$PATH</span>"</span> <span class="token operator">>></span> /etc/profile
-<span class="token function">source</span> /etc/profile
+export PATH=$ANDROID_HOME:$PATH" >> /etc/profile
+source /etc/profile
 
 
-<span class="token keyword">if</span> <span class="token punctuation">[</span><span class="token punctuation">[</span> <span class="token variable">$ANDROID_HOME</span> <span class="token operator">==</span> <span class="token string">""</span> <span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">;</span><span class="token keyword">then</span>
- <span class="token keyword">echo</span> <span class="token string">"ANDROID_HOME not defined"</span>
- <span class="token keyword">exit</span> 0
- <span class="token keyword">fi</span>
+if [[ $ANDROID_HOME == "" ]];then
+ echo "ANDROID_HOME not defined"
+ exit 0
+ fi
 
-<span class="token variable">$ANDROID_HOME</span>/build/tools/make_standalone_toolchain.py \
-   --arch arm --api 16 --stl<span class="token operator">=</span>gnustl \
-   --install-dir <span class="token variable">$ANDROID_HOME</span>/toolchain
+$ANDROID_HOME/build/tools/make_standalone_toolchain.py \
+   --arch arm --api 16 --stl=gnustl \
+   --install-dir $ANDROID_HOME/toolchain
 
 
-<span class="token function">cd</span> <span class="token variable">$ANDROID_HOME</span>
+cd $ANDROID_HOME
 
-<span class="token function">mkdir</span> -p usr/local/lib/pkgconfig
+mkdir -p usr/local/lib/pkgconfig
 </code></pre>
 <p>在root的权限下面，执行 ./build-ndk-toolchain.sh 没有错误之后 执行 ./build-libraries.sh 如果有发生了错误，要修正这些错误，比如资源包查找不到的化，自行修改。找到一个可以下载的地址，替换上去既可然后进入aria2的源码文件里面 执行./android-config 用来确定当前的配置，这个android-config文件跟源码提供的一样，没有做任何的修改。。然后执行./android-make 如果没有错误的化，就会编译完成</p>
 <p>这里要注意下载Aria2源码的时候，要下载正确，不要选择最后面的source Code ，里面的文件不齐全，还要自己构建 configure 文件<br><img src="/uploads/Aria2编译/Aria2下载源码的时候要注意.png" alt="结果显示"></p>
 <h3 id="Android-X86编译"><a href="#Android-X86编译" class="headerlink" title="Android X86编译"></a>Android X86编译</h3><p>要注意的是Aria2 也是支持X86平台的编译的,首先是构建X86下面的交叉编译链</p>
-<pre class=" language-bash"><code class="language-bash"><span class="token shebang important">#!/bin/sh</span>
-<span class="token function">export</span> NDK<span class="token operator">=</span>/opt/android-ndk-r14b
-<span class="token function">export</span> ANDROID_HOME<span class="token operator">=</span>/opt/android-ndk-r14b
+<pre class=" language-shell"><code class="language-shell">#!/bin/sh
+export NDK=/opt/android-ndk-r14b
+export ANDROID_HOME=/opt/android-ndk-r14b
 
-<span class="token variable">$ANDROID_HOME</span>/build/tools/make_standalone_toolchain.py \
+$ANDROID_HOME/build/tools/make_standalone_toolchain.py \
    --arch x86 --api 16  \
-   --install-dir <span class="token variable">$ANDROID_HOME</span>/toolchainX86
-<span class="token function">cd</span> <span class="token variable">$ANDROID_HOME</span>
-<span class="token function">mkdir</span> -p usr/local/lib/pkgconfig
+   --install-dir $ANDROID_HOME/toolchainX86
+cd $ANDROID_HOME
+mkdir -p usr/local/lib/pkgconfig
 </code></pre>
 <p>之后其他的外部库编译脚本文件稍微的改动就可以,比如 编译Care库，脚本文件就要变成这样，其他的类似</p>
-<pre class=" language-bash"><code class="language-bash"><span class="token shebang important">#!/bin/bash</span>
+<pre class=" language-shell"><code class="language-shell">#!/bin/bash
 
-C_ARES<span class="token operator">=</span>https://c-ares.haxx.se/download/c-ares-1.13.0.tar.gz
-DOWNLOADER<span class="token operator">=</span><span class="token string">"wget -c"</span>
+C_ARES=https://c-ares.haxx.se/download/c-ares-1.13.0.tar.gz
+DOWNLOADER="wget -c"
 
-ANDROID_HOME<span class="token operator">=</span>/opt/android-ndk-r14b
-TOOLCHAIN<span class="token operator">=</span><span class="token variable">$ANDROID_HOME</span>/toolchainX86
-PATH<span class="token operator">=</span><span class="token variable">$TOOLCHAIN</span>/bin:<span class="token variable">$PATH</span>
-HOST<span class="token operator">=</span>i686-linux-android
-PREFIX<span class="token operator">=</span><span class="token variable">$ANDROID_HOME</span>/usr/local
-LOCAL_DIR<span class="token operator">=</span><span class="token variable">$ANDROID_HOME</span>/usr/local
-TOOL_BIN_DIR<span class="token operator">=</span><span class="token variable">$ANDROID_HOME</span>/toolchainX86/bin
-PATH<span class="token operator">=</span><span class="token variable">${TOOL_BIN_DIR}</span><span class="token keyword">:</span><span class="token variable">$PATH</span>
-DEST<span class="token operator">=</span><span class="token variable">$ANDROID_HOME</span>/usr/local
-CC<span class="token operator">=</span><span class="token string">"<span class="token variable">$HOST</span>-gcc -march=x86"</span>
-CXX<span class="token operator">=</span><span class="token variable">$HOST</span>-g++
-LDFLAGS<span class="token operator">=</span><span class="token string">"-L<span class="token variable">$DEST</span>/lib -march=x86"</span>
-CPPFLAGS<span class="token operator">=</span><span class="token string">"-I<span class="token variable">$DEST</span>/include -march=x86 -std=gnu99"</span>
-CXXFLAGS<span class="token operator">=</span><span class="token variable">$CFLAGS</span>
+ANDROID_HOME=/opt/android-ndk-r14b
+TOOLCHAIN=$ANDROID_HOME/toolchainX86
+PATH=$TOOLCHAIN/bin:$PATH
+HOST=i686-linux-android
+PREFIX=$ANDROID_HOME/usr/local
+LOCAL_DIR=$ANDROID_HOME/usr/local
+TOOL_BIN_DIR=$ANDROID_HOME/toolchainX86/bin
+PATH=${TOOL_BIN_DIR}:$PATH
+DEST=$ANDROID_HOME/usr/local
+CC="$HOST-gcc -march=x86"
+CXX=$HOST-g++
+LDFLAGS="-L$DEST/lib -march=x86"
+CPPFLAGS="-I$DEST/include -march=x86 -std=gnu99"
+CXXFLAGS=$CFLAGS
 
-<span class="token comment" spellcheck="true"># c-ares library build</span>
-<span class="token function">cd</span> /tmp
-  <span class="token variable">$DOWNLOADER</span> <span class="token variable">$C_ARES</span>
-  <span class="token function">tar</span> xf c-ares-1.13.0.tar.gz
-  <span class="token function">cd</span> c-ares-1.13.0/
-  PKG_CONFIG_PATH<span class="token operator">=</span><span class="token variable">$PREFIX</span>/lib/pkgconfig/ LD_LIBRARY_PATH<span class="token operator">=</span><span class="token variable">$PREFIX</span>/lib/ ./configure --host<span class="token operator">=</span><span class="token variable">$HOST</span> --build<span class="token operator">=</span><span class="token variable"><span class="token variable">`</span>dpkg-architecture -qDEB_BUILD_GNU_TYPE<span class="token variable">`</span></span> --prefix<span class="token operator">=</span><span class="token variable">$PREFIX</span> --enable-static --disable-shared
-  <span class="token function">make</span>
-  <span class="token function">make</span> <span class="token function">install</span>
+# c-ares library build
+cd /tmp
+  $DOWNLOADER $C_ARES
+  tar xf c-ares-1.13.0.tar.gz
+  cd c-ares-1.13.0/
+  PKG_CONFIG_PATH=$PREFIX/lib/pkgconfig/ LD_LIBRARY_PATH=$PREFIX/lib/ ./configure --host=$HOST --build=`dpkg-architecture -qDEB_BUILD_GNU_TYPE` --prefix=$PREFIX --enable-static --disable-shared
+  make
+  make install
 
-<span class="token function">cd</span> /tmp
-  <span class="token function">rm</span> -rf c-ares*
-<span class="token keyword">echo</span> <span class="token string">"build libCars complete!"</span>
+cd /tmp
+  rm -rf c-ares*
+echo "build libCars complete!"
 </code></pre>
 <p>编译OpenSSL库，脚本文件就要变成这样，注意 CROSS_COMPILE=$TOOLCHAIN/bin/i686-linux-android- 这里已经不是Arm的了，相应的要为x86</p>
-<pre class=" language-bash"><code class="language-bash">OPENSSL<span class="token operator">=</span>https://www.openssl.org/source/openssl-1.0.2m.tar.gz
-DOWNLOADER<span class="token operator">=</span><span class="token string">"wget -c"</span>
+<pre class=" language-shell"><code class="language-shell">OPENSSL=https://www.openssl.org/source/openssl-1.0.2m.tar.gz
+DOWNLOADER="wget -c"
 
-ANDROID_HOME<span class="token operator">=</span>/opt/android-ndk-r14b
-TOOLCHAIN<span class="token operator">=</span><span class="token variable">$ANDROID_HOME</span>/toolchainX86
-PATH<span class="token operator">=</span><span class="token variable">$TOOLCHAIN</span>/bin:<span class="token variable">$PATH</span>
-HOST<span class="token operator">=</span>i686-linux-android
-PREFIX<span class="token operator">=</span><span class="token variable">$ANDROID_HOME</span>/usr/local
-LOCAL_DIR<span class="token operator">=</span><span class="token variable">$ANDROID_HOME</span>/usr/local
-TOOL_BIN_DIR<span class="token operator">=</span><span class="token variable">$ANDROID_HOME</span>/toolchainX86/bin
-PATH<span class="token operator">=</span><span class="token variable">${TOOL_BIN_DIR}</span><span class="token keyword">:</span><span class="token variable">$PATH</span>
-DEST<span class="token operator">=</span><span class="token variable">$ANDROID_HOME</span>/usr/local
-CC<span class="token operator">=</span><span class="token string">"<span class="token variable">$HOST</span>-gcc -march=x86"</span>
-CXX<span class="token operator">=</span><span class="token variable">$HOST</span>-g++
-LDFLAGS<span class="token operator">=</span><span class="token string">"-L<span class="token variable">$DEST</span>/lib -march=x86"</span>
-CPPFLAGS<span class="token operator">=</span><span class="token string">"-I<span class="token variable">$DEST</span>/include -march=x86 -std=gnu99"</span>
-CXXFLAGS<span class="token operator">=</span><span class="token variable">$CFLAGS</span>
+ANDROID_HOME=/opt/android-ndk-r14b
+TOOLCHAIN=$ANDROID_HOME/toolchainX86
+PATH=$TOOLCHAIN/bin:$PATH
+HOST=i686-linux-android
+PREFIX=$ANDROID_HOME/usr/local
+LOCAL_DIR=$ANDROID_HOME/usr/local
+TOOL_BIN_DIR=$ANDROID_HOME/toolchainX86/bin
+PATH=${TOOL_BIN_DIR}:$PATH
+DEST=$ANDROID_HOME/usr/local
+CC="$HOST-gcc -march=x86"
+CXX=$HOST-g++
+LDFLAGS="-L$DEST/lib -march=x86"
+CPPFLAGS="-I$DEST/include -march=x86 -std=gnu99"
+CXXFLAGS=$CFLAGS
 
 
-<span class="token comment" spellcheck="true"># openssl library build</span>
-<span class="token function">cd</span> /tmp
-  <span class="token variable">$DOWNLOADER</span> <span class="token variable">$OPENSSL</span>
-  <span class="token function">tar</span> xf openssl-1.0.2m.tar.gz
-  <span class="token function">cd</span> openssl-1.0.2m/
-  PKG_CONFIG_PATH<span class="token operator">=</span><span class="token variable">$PREFIX</span>/lib/pkgconfig/ LD_LIBRARY_PATH<span class="token operator">=</span><span class="token variable">$PREFIX</span>/lib/ <span class="token function">export</span> CROSS_COMPILE<span class="token operator">=</span><span class="token variable">$TOOLCHAIN</span>/bin/i686-linux-android-
-./Configure --prefix<span class="token operator">=</span><span class="token variable">$PREFIX</span> android
+# openssl library build
+cd /tmp
+  $DOWNLOADER $OPENSSL
+  tar xf openssl-1.0.2m.tar.gz
+  cd openssl-1.0.2m/
+  PKG_CONFIG_PATH=$PREFIX/lib/pkgconfig/ LD_LIBRARY_PATH=$PREFIX/lib/ export CROSS_COMPILE=$TOOLCHAIN/bin/i686-linux-android-
+./Configure --prefix=$PREFIX android
 
-  <span class="token function">make</span>
-  <span class="token function">make</span> <span class="token function">install</span>
-<span class="token function">cd</span> /tmp
-  <span class="token function">rm</span> -rf openssl*
-<span class="token keyword">echo</span> <span class="token string">"build openssl complete!"</span>
+  make
+  make install
+cd /tmp
+  rm -rf openssl*
+echo "build openssl complete!"
 </code></pre>
 <p>由于没有设置ANDROID_HOME 环境变量，对应的Aria2源码中的android-config文件就要变成</p>
-<pre class=" language-bash"><code class="language-bash">ANDROID_HOME<span class="token operator">=</span>/opt/android-ndk-r14b
-TOOLCHAIN<span class="token operator">=</span><span class="token variable">$ANDROID_HOME</span>/toolchainX86
+<pre class=" language-shell"><code class="language-shell">ANDROID_HOME=/opt/android-ndk-r14b
+TOOLCHAIN=$ANDROID_HOME/toolchainX86
 
-PREFIX<span class="token operator">=</span><span class="token variable">$ANDROID_HOME</span>/usr/local
-PATH<span class="token operator">=</span><span class="token variable">$TOOLCHAIN</span>/bin:<span class="token variable">$PATH</span>
+PREFIX=$ANDROID_HOME/usr/local
+PATH=$TOOLCHAIN/bin:$PATH
 
 ./configure \
-    --host<span class="token operator">=</span>i686-linux-android \
-    --build<span class="token operator">=</span><span class="token variable"><span class="token variable">`</span>dpkg-architecture -qDEB_BUILD_GNU_TYPE<span class="token variable">`</span></span> \
+    --host=i686-linux-android \
+    --build=`dpkg-architecture -qDEB_BUILD_GNU_TYPE` \
     --disable-nls \
     --without-gnutls \
     --with-openssl \
@@ -864,20 +864,20 @@ PATH<span class="token operator">=</span><span class="token variable">$TOOLCHAIN
     --with-libcares \
     --with-libz \
     --with-libssh2 \
-    CC<span class="token operator">=</span><span class="token string">"<span class="token variable">$TOOLCHAIN</span>"</span>/bin/i686-linux-android-clang \
-    CXX<span class="token operator">=</span><span class="token string">"<span class="token variable">$TOOLCHAIN</span>"</span>/bin/i686-linux-android-clang++ \
-    CXXFLAGS<span class="token operator">=</span><span class="token string">"-Os -g"</span> \
-    CFLAGS<span class="token operator">=</span><span class="token string">"-Os -g"</span> \
-    CPPFLAGS<span class="token operator">=</span><span class="token string">"-fPIE"</span> \
-    LDFLAGS<span class="token operator">=</span><span class="token string">"-fPIE -pie -L<span class="token variable">$PREFIX</span>/lib"</span> \
-    PKG_CONFIG_LIBDIR<span class="token operator">=</span><span class="token string">"<span class="token variable">$PREFIX</span>/lib/pkgconfig"</span>
+    CC="$TOOLCHAIN"/bin/i686-linux-android-clang \
+    CXX="$TOOLCHAIN"/bin/i686-linux-android-clang++ \
+    CXXFLAGS="-Os -g" \
+    CFLAGS="-Os -g" \
+    CPPFLAGS="-fPIE" \
+    LDFLAGS="-fPIE -pie -L$PREFIX/lib" \
+    PKG_CONFIG_LIBDIR="$PREFIX/lib/pkgconfig"
 </code></pre>
 <p>Aria2源码中的android-make文件就要变成</p>
-<pre class=" language-bash"><code class="language-bash">ANDROID_HOME<span class="token operator">=</span>/opt/android-ndk-r14b
-TOOLCHAIN<span class="token operator">=</span><span class="token variable">$ANDROID_HOME</span>/toolchainX86
-PATH<span class="token operator">=</span><span class="token variable">$TOOLCHAIN</span>/bin:<span class="token variable">$PATH</span>
+<pre class=" language-shell"><code class="language-shell">ANDROID_HOME=/opt/android-ndk-r14b
+TOOLCHAIN=$ANDROID_HOME/toolchainX86
+PATH=$TOOLCHAIN/bin:$PATH
 
-<span class="token function">make</span> <span class="token string">"<span class="token variable">$@</span>"</span>
+make "$@"
 </code></pre>
 <h3 id="编译结果验证"><a href="#编译结果验证" class="headerlink" title="编译结果验证"></a>编译结果验证</h3><p>最后的编译产物为<br><img src="/uploads/Aria2编译/android编译.png" alt="结果显示"></p>
 <p>在上面可以发现我们编译出来的内容达到了70多M，而官网提供的一个zip包里面，解压缩也就4M，然来发现我们少执行了一个脚本android-release (个人认为这是官网的一个缺失，应该告知)</p>
