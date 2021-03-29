@@ -5,13 +5,6 @@ date: 2019-03-15 09:12:38
 tags: [Android,Matrix]
 description:  Matrix Resource Cannary 源码解析
 ---
-
-### 概述
-
-> Matrix Resource Cannary 源码解析
-
-<!--more-->
-
 ### 简介
 > 前面分析了Matrix 中 SQLite Lint 模块，了解了对应的检测原理实现，本文继续分析 Matrix Resource Cannary  模块,在分析之前先看检测的原理，官网有这样的介绍，基于 WeakReference 的特性和Square Haha 库开发的 Activity 泄漏和 Bitmap 重复创建检测工具，我们知道 WeakReference 在触发Gc的时候都会被回收掉，所以利用这个特性就能知道是否发生了泄漏,本模块提供的功能有
 1.分离了检测和分析部分，便于在不打断自动化测试的前提下持续输出分析后的检测结果

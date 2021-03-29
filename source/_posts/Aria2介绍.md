@@ -5,14 +5,6 @@ date: 2018-08-23 09:21:02
 tags: [Aria2,Linux,Android,Window]
 description: Aria2介绍 与 Linux下编译Window,Linux,Android 产物
 ---
-
-### 概述
-
-> Aria2介绍 与 Linux 下编译 Window ，Linux，Android 产物
-
-<!--more-->
-
-
 ### 简介
 > 今年三月底的时候，收到了老大的一个任务说去研究一下p2p的下载，对于我们这种屌丝来说，当然是老大说什么就是什么了，俗话说拿人钱财替人消灾
 首先我们要先去了解这个东西，什么是p2p下载，在搞这个之前，确实不了解，这个p2p技术早就已经存在了，所以关于他的内容也是非常的多

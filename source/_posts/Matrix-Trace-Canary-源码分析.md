@@ -5,13 +5,6 @@ date: 2019-03-12 13:58:27
 tags: [Android,Matrix]
 description:  Matrix Trace Canary 源码分析
 ---
-
-### 概述
-
-> Matrix Trace Canary 源码分析
-
-<!--more-->
-
 ### 简介
 > 最近微信开源了一个性能检测工具 Matrix 简称 APM，可以通过各种性能监控方案，对性能监控项的异常数据进行采集和分析，输出相应的问题分析、定位与优化建议，从而帮助开发者开发出更高质量的应用。做为一个Android开发低手的我，订阅了Android 开发高手，这门课确实很牛逼，含金量很高，在Android 开发高手这门课中一部门的内容是关于Matrix 检测的原理，做为一个Android 开发也不应该只局限于使用的地步，我们更加应该去阅读源码，所以接下来的文章会依次的解析Matrix的内容，这篇文章会先解析 Trace Canary
 

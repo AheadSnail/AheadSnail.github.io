@@ -5,13 +5,6 @@ date: 2019-03-13 09:51:57
 tags: [Android,Matrix]
 description:  Matrix IO Canary源码解析
 ---
-
-### 概述
-
-> Matrix IO Canary源码解析
-
-<!--more-->
-
 ### 简介
 > 前面分析了Matrix 中 Trace Canary 模块，了解了对应的检测原理实现，本文继续分析 IO Canary 模块,在分析这块内容的时候最好知道对于IO的性能主要检测的内容有哪些，这个可以参考极客时间的Android 开发高手 张绍文大佬 写的  11 | I/O优化（下）：如何监控线上I/O操作，里面说到检测的方式采用Native的hook，没有采用java的hook，是因为无法监控到native代码，性能极差，甚至由于采用java hook 要对应的做兼容处理，所以相比之下采用native hook,监测文件的操作函数，比如open,read,write,close通过hook这些函数我们可以拿到对应的信息，比如hook open函数，我们可以拿到操作的文件名，fd，文件的原始大小等，hook read,write可以得到对应的读写次数，读写总大小，使用buffer大小，读写总耗时等，而对于要检测的内容包括下面几种
 1.主线程的Io操作

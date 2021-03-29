@@ -5,13 +5,6 @@ date: 2018-11-06 14:09:12
 tags: [NDK,Aria2,utp]
 description: Aria2 限速原理以及Utp限速处理
 ---
-
-### 概述
-
-> Aria2 限速原理以及Utp限速处理
-
-<!--more-->
-
 ### 简介
 绝大多数的Bt下载都含有限速的功能，包括限制上传的速度，以及下载的速度，更有甚者拿限速来要求用户充值会员，比如百度网盘下载，迅雷等，
 
@@ -33,7 +26,7 @@ description: Aria2 限速原理以及Utp限速处理
 
 ### 限速处理源码分析
 #### 首先要开启限速的支持
-```C++
+```CPP
 //设置最大的下载速度, 由于utp采用的是udp的原因，如果做限速处理的化，无法达到tcp限速的效果，所以下载不支持限速
 gloableOptions.push_back(std::pair<std::string,std::string> ("max-download-limit","50k"));
 //设置最大的上传速度
@@ -41,7 +34,7 @@ gloableOptions.push_back(std::pair<std::string,std::string> ("max-upload-limit",
 ```
 
 #### 参数的解析使用
-```C++
+```CPP
 
 首先会在创建对应的RequestGroup 中解析，然后设置maxDownloadSpeedLimit_ ，maxUploadSpeedLimit_ 保存值
 
@@ -92,7 +85,7 @@ bool RequestGroup::doesUploadSpeedExceed()
 #### 下载速度限制
 
 具体的使用doesDownloadSpeedExceed只有俩个地方，而且都只作用在Bt下载请求内容的时候,先来看第一处PeerInteractionCommand ,他的父类为 PeerAbstractCommand,主要完成超时的处理
-```C++
+```CPP
 //command 命令的执行
 bool PeerInteractionCommand::executeInternal()
 {
@@ -174,7 +167,7 @@ size_t DefaultBtInteractive::receiveMessages()
 
 对应上传速度的使用，只有在DefaultBtMessageDispatcher 有做对应的处理
 
-```C++
+```CPP
 void DefaultBtMessageDispatcher::sendMessagesInternal()
 {
   auto tempQueue = std::vector<std::unique_ptr<BtMessage>>{};

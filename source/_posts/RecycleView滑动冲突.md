@@ -5,10 +5,8 @@ tags: [Android,RecycleView,Scroll]
 description: RecycleView滑动冲突
 ---
 
-RecycleView 嵌套使用的時候，RecycleView滑动冲突
-<!--more-->
-
-# RecycleView嵌套滑动的冲突
+### 简介
+RecycleView嵌套滑动的冲突
 1.当一个大的RecycleView中的item也是一个RecycleView的时候，滑动的时候，就会出现滑动不顺畅，比如我在子的RecycleView中斜着滑动的时候，
 为什么是里面的RecycleView 获取到了事件，可以左右滑动，上下滑动的时候，为什么是外面的RecycleView获取到了事件，可以上下滑动？
 

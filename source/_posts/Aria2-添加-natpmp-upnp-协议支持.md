@@ -5,13 +5,6 @@ date: 2018-11-16 11:31:11
 tags: [NDK,Aria2,natpmp,upnp]
 description: Aria2 添加 natpmp,upnp 协议支持
 ---
-
-### 概述
-
-> Aria2 添加 natpmp,upnp 协议支持
-
-<!--more-->
-
 ### 简介
 
 什么是UPnp
@@ -86,7 +79,7 @@ pmp 编译选项支持
 tr_sessionSetPortForwardingEnabled函数实现
 ![结果显示](/uploads/upnp协议支持/SetPortForwardEnabled函数实现.png)
 
-```C++
+```CPP
 这里的shared是在前面初始化session的时候就执行了初始化，下面是调用的过程
 
 //构建一个tr_shared 对象，赋值默认的成员变量,赋值给session中的shared,这个shared成员保存了upnp,pmp对应的对象
@@ -499,7 +492,7 @@ static void set_evtimer_from_status(tr_shared * s) {
 ```
 
 ### Aria2 移植upnp,pmp
-```Cmake
+```CPP
 首先我们需要将这俩个库引进来，对应的CmakeList中添加要编译的内容
 
 #添加头文件的查找目录
@@ -554,7 +547,7 @@ add_library( # Sets the name of the library.
 CmakeList目录结构
 ![结果显示](/uploads/upnp协议支持/CmakeList目录结构.png)
 transmission中代码为C风格，这里要改成C++11的方式  ，接下来就是对应的移植了
-```C++
+```CPP
 首先 我们也要搞一个开关配置，具体怎么添加，可以参照源码原本的添加过程
 //设置允许端口隐射
 gloableOptions.push_back(std::pair<std::string,std::string> ("bt-enable-port-forward","true"));
@@ -773,7 +766,7 @@ if(e->getOption()->getAsBool(PREF_ENABLE_PORT_FORWARD))
 ### Aria2 释放操作
 > 由于我们采用的是智能指针，所以不用关心对象的销毁动作，比如 BtPortForward ，我们把他保存到了 BtRegistery中，这样当BtRegistery销毁的时候，这个BtPortForward的引用才会变成0,进而完成它的销毁操作,又因为  BtPortForward 中以智能指针的方式持有 BtUpnp,BtNatpmp 的引用，所以对应 BtUpnp,BtNatpmp 只要以智能指针的方式初始化，之后设置到这个对象中，对应这俩个对象也不用管理销毁的操作
 
-```C++
+```CPP
 //对应的 upnp的协议的 对象指针
 std::shared_ptr<BtUpnp> _upnp;
 //对应的 pmp 协议的 对象指针

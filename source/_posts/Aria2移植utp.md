@@ -5,14 +5,6 @@ date: 2018-10-18 10:27:13
 tags: [Android,NDK,Aria2]
 description:  Aria2移植utp
 ---
-
-### 概述
-
->  Aria2移植utp
-
-<!--more-->
-
-
 ### 简介
 
 先来了解下打洞的基础知识:
@@ -60,7 +52,7 @@ utp连接上互相发送消息
 
 首先是解析传递过来的参数
 
-```C++
+```CPP
 int main(int argc, char *argv[])
 {
 	int i;
@@ -130,7 +122,7 @@ void setup(void)
 }
 ```
 由于utp不管你数据的接收跟发送，所以当你发送数据的之前，你先将数据丢给utp，当utp处理完之后，其实就是添加数据头，然后他会调用 callback_sendto 函数，来完成真正的发送数据
-```C++
+```CPP
 uint64 callback_sendto(utp_callback_arguments *a)
 {
 	struct sockaddr_in *sin = (struct sockaddr_in *) a->address;
@@ -271,7 +263,7 @@ uint64 callback_on_read(utp_callback_arguments *a)
 ### utp的使用总结
 
 下面说下大概的实现细节:
-```C++
+```CPP
 首先调用下面的这个方法，得到一个UtpContext对象，这个方法只能调用一次，UtpContext对象非常重要，基本上所有的api都要使用这个对象
 ctx = utp_init(2);
 
@@ -305,7 +297,7 @@ void*			utp_get_userdata				(utp_socket *s);
 当然一开始我并不知道怎么去移植utp库，我是参考transmission的做法，只是transmission使用的utp库不是官网提供的，估计是早先的版本，他有做了部分的修改，但是只要了解他为什么要这样做
 就其实也没有多大的关系，所以最终我采用的是系统的utp库，并且到了最后面也没有动到这个库的一行代码，关于transmission的源码分析，前面一篇文章有介绍,下面开始移植
 
-```C++
+```CPP
 1.首先找到初始化UtpContext的对象，而且要考虑这个对象只能初始化一次，也即是单例的存在,最终放到了Dht的初始化部分
 DHTSetup::setup(DownloadEngine* e, int family)
 {
@@ -483,7 +475,7 @@ bool PeerInitiateConnectionCommand::executeInternal()
 ```
 这里要注意对于原有的Aria2的源码来说，都是使用command来执行对应的类的，对应原有的tcp的化，他每个都会创建一个连接，但是对于utp的化，我们因为是在同一个地方执行数据的发送，同一个对方执行数据的接收，所以我们就要设计到对应的分发操作，所以设置了 utp_set_userdata(utpSocket,this); 这样当utp接收到了数据，触发callback_on_read 的时候，就可以分发数据了
 
-```C++
+```CPP
 //utp 将接受的数据包，处理之后执行的回调函数
 uint64 callback_on_read(utp_callback_arguments *a)
 {
@@ -524,35 +516,35 @@ void PeerReceiveHandshakeCommand::dispatchUtpMessage(const unsigned char *buff,s
 
 如果当没有收到utp的状态变成UTP_STATE_CONNECT时，就执行数据的发送，此时utp的处理是直接抛去这个数据，参照他的demo也可知道，此时正确的做法是应该等他处于连接状态才能允许发送数据，还有后面由于打洞的需要，我们要将utp能实现超时重连的机制，增大打洞的机制，这些操作，我们都可以直接在第一个Command 也即是PeerInitiateConnectionCommand 中处理
 
-```C++
+```CPP
 我们在utp状态改变回调的时候，通知这个对象，让他做相应的原本的逻辑
 //utp 状态的变化回调
 uint64 callback_on_state_change(utp_callback_arguments *a)
 {
-	...
-        case UTP_STATE_CONNECT://通知utp连接上了，可以往下走了
-            if(utp_socket_userData)
+  ...
+  case UTP_STATE_CONNECT://通知utp连接上了，可以往下走了
+        if(utp_socket_userData)
+        {
+            PeerAbstractCommand * peerAbstractCommand = static_cast<PeerAbstractCommand *>(utp_socket_userData);
+            if(peerAbstractCommand)
             {
-                PeerAbstractCommand * peerAbstractCommand = static_cast<PeerAbstractCommand *>(utp_socket_userData);
-                if(peerAbstractCommand)
-                {
-                    peerAbstractCommand->utpConnected();
-                }
+                peerAbstractCommand->utpConnected();
             }
-            break;
-        case UTP_STATE_EOF://收到了对方的断开连接的消息，比如下载完成的时候，或者其他的错误的时候，此时应该要关闭掉utp的连接,
-             A2_LOG_DEBUG(fmt("Received EOF from socket"));
-            if(utp_socket_userData)
+        }
+  break;
+  case UTP_STATE_EOF://收到了对方的断开连接的消息，比如下载完成的时候，或者其他的错误的时候，此时应该要关闭掉utp的连接,
+        A2_LOG_DEBUG(fmt("Received EOF from socket"));
+        if(utp_socket_userData)
+        {
+            PeerAbstractCommand * peerAbstractCommand = static_cast<PeerAbstractCommand *>(utp_socket_userData);
+            if(peerAbstractCommand)
             {
-                PeerAbstractCommand * peerAbstractCommand = static_cast<PeerAbstractCommand *>(utp_socket_userData);
-                if(peerAbstractCommand)
-                {
-                    //这里简单，直接传递一个utp错误
-                    peerAbstractCommand->setUtpErrorCode(1);
-                }
+                //这里简单，直接传递一个utp错误
+                peerAbstractCommand->setUtpErrorCode(1);
             }
-            break;
-	...
+        }
+   break;
+	 ...
 }
 
 对应utp的连接通知，只有第一个command才需要知道，对应后面的command都是在当前处于连接状态才往后面走，所以在PeerAbstractCommand中可以添加默认的虚函数实现 
@@ -597,7 +589,7 @@ void PeerInitiateConnectionCommand::utpConnected()
 当前这个command收到了utp连接的状态才会往下执行构建其他的command执行剩余的操作，还有一点就是由于我们utp跟dht都是采用了同一个socket的fd，做到了消息的统一发送，消息的统一接受
 但是每一个command内部都有自己的数据，如果不区分的化，那么数据就混在一起了，对应的也即是SocketCore 对象，我们这里采用的是保持他原本的逻辑只是我们构建SocketCore的时候，都是使用
 同一个socket的fd，这样每一个command都有自己的socketCore，就可以将数据区分开来
-```C++
+```CPP
 
 //为每一个peer的连接都创建对应的SocketCore对象，但是由于是utp，所以这里的fd要共用一个 socketCore = contextUserData->connection->getSocket();
 auto socketCore = std::make_shared<SocketCore>(contextUserData->connection->getSocket()->getSockfd(),contextUserData->connection->getSocket()->getSocketType());
@@ -665,7 +657,7 @@ ssize_t SocketCore::writeVector(a2iovec* iov, size_t iovcnt)
 ```
 当然对应SocketCore原本的逻辑，当这个对象被销毁的时候，会关闭掉这个socket的fd，我们由于是共用的，不能关闭
 
-```C++
+```CPP
 //关闭连接,这里要处理，由于当前的utp共有一个fd，但是含有多个SocketCore对象，所以对应的虚构函数，就不能关闭掉这个fd，要不然会导致所有的都会失败
 //最终关闭的地方应该交给最原始的对象DHTConnectionImpl 这个对象中的socketCore来关闭
 void SocketCore::closeConnection()
@@ -776,7 +768,7 @@ bool PeerAbstractCommand::execute()
 ```
 我们的utp超时是跟peer超时关联在一起的，也即是当peer还没有超时，而utp超时的化，此时utp应该要重试连接,所以我们把超时的逻辑放到了peer检查超时的后面，这样对应peer的超时我们就不要处理任何的逻辑，走原本的逻辑就好，超时的时候会触发onUtpTimeOutNextConnect 操作,这个函数默认是返回true的，返回true的化，就代表不用执行重新连接
 
-```C++
+```CPP
 //当前收到了utp的超时回调，默认返回true，代表是否需要中断连接，执行销毁操作
 bool PeerAbstractCommand::onUtpTimeOutNextConnect()
 {

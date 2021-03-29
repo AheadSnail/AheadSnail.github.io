@@ -5,13 +5,6 @@ date: 2019-03-14 09:04:20
 tags: [Android,Matrix]
 description:  Matrix SQLite Lint源码解析
 ---
-
-### 概述
-
-> Matrix SQLite Lint源码解析
-
-<!--more-->
-
 ### 简介
 > 前面分析了Matrix 中 IO Canary 模块，了解了对应的检测原理实现，本文继续分析 SQLite Lint 模块,在分析这块内容的时候最好知道对于SQLite Lint的性能主要检测的内容有哪些,这个可以参考这篇文章
 https://mp.weixin.qq.com/s/laUgOmAcMiZIOfM2sWrQgw

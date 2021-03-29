@@ -4,13 +4,8 @@ date: 2017-09-18 23:45:55
 tags: [Android,View,TouchEvent]
 description: 属性动画源码解析
 ---
-
-View的事件传递的源码解析，也对一些疑问做了下解答
-<!--more-->
-
-
-
-# View的事件传递的源码解析
+### 简介
+View的事件传递的源码解析
 我们就从Activity的中的下面的来触发，方法都为public的，说明是给别人调用的，我们就从这里出发
 ```java
 public boolean dispatchTouchEvent(MotionEvent ev) {

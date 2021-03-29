@@ -5,13 +5,6 @@ date: 2018-11-05 15:01:43
 tags: [NDK,Aria2,RPC]
 description: Aria2 RPC 实现机制
 ---
-
-### 概述
-
-> Aria2 RPC 实现机制
-
-<!--more-->
-
 ### 简介
 RPC(Remote Procedure Call Protocol)--远程过程调用协议
 > 它是一种通过网络从远程计算机程序上请求服务，而不需要了解底层网络技术的协议。RPC协议假定某些传输协议的存在，如TCP或UDP，为通信程序之间携带信息数据。在OSI网络通信模型中，
@@ -58,7 +51,7 @@ Aria收到rpc的请求开始响应对应的内容
 
 ### Rpc源码分析
 #### 首先要开启Rpc的支持
-```C++
+```CPP
 //设置允许rpc访问
 gloableOptions.push_back(std::pair<std::string,std::string> ("enable-rpc","true"));
 //设置rpc的监听端口
@@ -68,7 +61,7 @@ gloableOptions.push_back(std::pair<std::string,std::string> ("rpc-listen-all","t
 ```
 
 #### 创建Tcp Socket监听端口
-```C++
+```CPP
 //构建对应的ipv4,ipv6
 static int families[] = {AF_INET, AF_INET6};
 size_t familiesLength = op->getAsBool(PREF_DISABLE_IPV6) ? 1 : 2;
@@ -150,7 +143,7 @@ bool HttpListenCommand::execute()
 
 #### 客户端发起一个请求
 假设此时使用postMan发送了一个rpc的请求，请求的内容为
-```json
+```JSON
 {
  "jsonrpc":"2.0",
  "id":"ttrtrtrtrtrt",
@@ -160,7 +153,7 @@ bool HttpListenCommand::execute()
 ```
 
 #### 服务端响应请求
-```C++
+```CPP
 也即是会执行到这里
 if (serverSocket_->isReadable(0)) {
     //利用tcp的Accept函数，返回当前连接的socketCore对象
@@ -656,7 +649,7 @@ bool AbstractHttpServerResponseCommand::execute()
 
 #### 长连接的支持
 当数据发送完之后，会执行 afterSend(httpServer_, e_); 这个函数会由具体的子类来实现，比如当前是HttpServerResponseCommand，所以会执行对应的函数
-```C++
+```CPP
 void HttpServerResponseCommand::afterSend(const std::shared_ptr<HttpServer>& httpServer, DownloadEngine* e)
 {
   //判断是否支持长连接,如果支持长连接，这里会构建一个 HttpServerCommand 用于后面的通信

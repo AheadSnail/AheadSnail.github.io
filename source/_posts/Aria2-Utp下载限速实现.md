@@ -5,13 +5,6 @@ date: 2018-11-12 09:22:42
 tags: [NDK,Aria2,utp]
 description: Aria2,transmission 速度统计原理以及Utp下载限速实现
 ---
-
-### 概述
-
-> Aria2,transmission 速度统计原理以及Utp下载限速实现
-
-<!--more-->
-
 ### 简介
 前面一篇中介绍了Aria2 tcp下载，上传限速的原理，并且对utp的的限速也做了大概的分析，对应上传限速来说，本身是没有任何的区别，但对于utp的下载限速来说前面分析到按理来说是做不到真正意义上的限速，但是我观察发现transmission是可以实现utp的下载限速的，所以这篇文章会先去分析下transmission中utp限速的原理，以及Aria2中速度的计算，之后再将transmission中utp的限速原理，相应的修改到Aria2，实现真正意义上的utp限速
 
@@ -115,7 +108,7 @@ getSpeed_Bps 函数实现为
 
 
 ### Aria2 下载速度统计源码分析
-```C++
+```CPP
 
 首先是开启对应的速度监控器
 //设置最大的下载速度, 由于utp采用的是udp的原因，如果做限速处理的化，无法达到tcp限速的效果，所以下载不支持限速
@@ -379,7 +372,7 @@ int SpeedCalc::calculateSpeed()
 ```
 
 ### Aria2 Utp限速实现
-```C++
+```CPP
 我们可以参考transmission的做法，实现Utp的限速处理
 
 由于我们的限速针对是整个任务，不是单个peer，也不是全局的速度监控，为什么是整个任务，不是单个peer呢，如果限制了单个peer的化，如果此时有好些人连接上这个用户，也会把用户的带宽吃掉，如果设置到
@@ -590,7 +583,7 @@ utp_sendAck函数实现,这内部会获取到当前滑动窗口的大小，如�
 ![结果显示](/uploads/Utp下载限速/utp_sendAck函数实现.png)
 
 相应的我们可以在
-```C++
+```CPP
 bool PeerConnection::receiveMessage(unsigned char* data, size_t& dataLength)
 {
     ...
