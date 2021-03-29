@@ -493,11 +493,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><blockquote>
-<p>scrcpy 使用以及编译</p>
-</blockquote>
-<a id="more"></a>
-<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><blockquote>
+                <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><blockquote>
 <p>scrcpy 此应用程序提供USB（或通过TCP / IP）连接的Android设备的显示和控制。 它不需要任何root访问权限。 它适用于GNU / Linux，Windows和MacOS。而且最主要的是他是一个开源的应用，在github的地址为<a href="https://github.com/Genymobile/scrcpy" target="_blank" rel="noopener">https://github.com/Genymobile/scrcpy</a> start数量达到了9k多算是一个比较优秀的，值得去了解的一个应用</p>
 </blockquote>
 <h3 id="简单的使用"><a href="#简单的使用" class="headerlink" title="简单的使用"></a>简单的使用</h3><p>由于是跨平台的，所以针对不同的平台，可能操作不一样，比如针对window下，如果你想要简单的使用的化，可以直接的使用官网提供的压缩包，这里要注意这里是有区分32位或者64位的<br><img src="/uploads/scrcypy编译/scrcpy下载使用.png" alt="结果显示"></p>
@@ -551,13 +547,13 @@ Press any key to continue<span class="token punctuation">..</span>.
 <p>可以知道这是 采用一种meson的构建工具,所以接下来就分析下meson的编译过程</p>
 <h3 id="Meson编译原理"><a href="#Meson编译原理" class="headerlink" title="Meson编译原理"></a>Meson编译原理</h3><p>Meson的官网地址为  <a href="http://mesonbuild.com/Tutorial.html" target="_blank" rel="noopener">http://mesonbuild.com/Tutorial.html</a> 以及基本的语法</p>
 <p>比如新建一个main.c 代码如下</p>
-<pre class=" language-C++"><code class="language-C++">#include <stdio.h>
+<pre class=" language-cpp"><code class="language-cpp"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
 
-int main(int argc,char ** argv)
-{
-    printf("Hello There.\n");
-    return 0;
-}
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">int</span> argc<span class="token punctuation">,</span><span class="token keyword">char</span> <span class="token operator">*</span><span class="token operator">*</span> argv<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"Hello There.\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <p>编写完之后 新建一个meson.build 这个是用来说明怎么样构建，比如内容可以如下</p>
 <pre class=" language-bash"><code class="language-bash">project<span class="token punctuation">(</span><span class="token string">'tutorial'</span>,<span class="token string">'c'</span><span class="token punctuation">)</span>
@@ -757,29 +753,29 @@ endif
 <pre class=" language-bash"><code class="language-bash">run_target<span class="token punctuation">(</span><span class="token string">'run'</span>, command: <span class="token punctuation">[</span><span class="token string">'scripts/run-scrcpy.sh'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> ，这个脚本主要用来定义俩个变量
 </code></pre>
 <p><img src="/uploads/scrcypy编译/scrpites脚本文件.png" alt="结果显示"><br>这样meson.build配置完成，就会生成一个config.h 对应的内容为执行 app目录下面的meson.build 的配置</p>
-<pre class=" language-C++"><code class="language-C++">#pragma once
+<pre class=" language-cpp"><code class="language-cpp"><span class="token macro property">#<span class="token directive keyword">pragma</span> once</span>
 
-#undef BUILD_DEBUG
+<span class="token macro property">#<span class="token directive keyword">undef</span> BUILD_DEBUG</span>
 
-#define DEFAULT_BIT_RATE 8000000
+<span class="token macro property">#<span class="token directive keyword">define</span> DEFAULT_BIT_RATE 8000000</span>
 
-#define DEFAULT_LOCAL_PORT 27183
+<span class="token macro property">#<span class="token directive keyword">define</span> DEFAULT_LOCAL_PORT 27183</span>
 
-#define DEFAULT_MAX_SIZE 0
+<span class="token macro property">#<span class="token directive keyword">define</span> DEFAULT_MAX_SIZE 0</span>
 
-#define HIDPI_SUPPORT
+<span class="token macro property">#<span class="token directive keyword">define</span> HIDPI_SUPPORT</span>
 
-#undef OVERRIDE_SERVER_PATH
+<span class="token macro property">#<span class="token directive keyword">undef</span> OVERRIDE_SERVER_PATH</span>
 
-#define PREFIX "H:/msys64/msys64/mingw64"
+<span class="token macro property">#<span class="token directive keyword">define</span> PREFIX "H:/msys64/msys64/mingw64"</span>
 
-#define PREFIXED_SERVER_PATH "/share/scrcpy/scrcpy-server.jar"
+<span class="token macro property">#<span class="token directive keyword">define</span> PREFIXED_SERVER_PATH "/share/scrcpy/scrcpy-server.jar"</span>
 
-#define SCRCPY_VERSION "1.5"
+<span class="token macro property">#<span class="token directive keyword">define</span> SCRCPY_VERSION "1.5"</span>
 
-#define SKIP_FRAMES
+<span class="token macro property">#<span class="token directive keyword">define</span> SKIP_FRAMES</span>
 
-#undef WINDOWS_NOCONSOLE
+<span class="token macro property">#<span class="token directive keyword">undef</span> WINDOWS_NOCONSOLE</span>
 </code></pre>
 <h3 id="AndroidStudio-Cmake编译"><a href="#AndroidStudio-Cmake编译" class="headerlink" title="AndroidStudio Cmake编译"></a>AndroidStudio Cmake编译</h3><p>从前面的分析meson的编译原理以及编译脚本可以知道，客户端meson.build文件中有这样的依赖</p>
 <pre class=" language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># native build</span>
@@ -809,116 +805,116 @@ LOCAL_LDLIBS <span class="token operator">:=</span> -lGLESv1_CM -lGLESv2 -llog
 </code></pre>
 <p>可以知道这个mk文件有这样的内容 LOCAL_SHARED_LIBRARIES := SDL2 说明了他需要SDL2 这个so ,而这个目录为 SDL_PATH := ../SDL 而在工程的源码目录中还有一个Android.mk文件<br><img src="/uploads/scrcypy编译/SDL主MakeFile.png" alt="结果显示"></p>
 <p>下面是Android.mk文件的关键内容</p>
-<pre class=" language-MakeFile"><code class="language-MakeFile">LOCAL_PATH := $(call my-dir)
+<pre class=" language-makefile"><code class="language-makefile">LOCAL_PATH <span class="token operator">:=</span> <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">call</span> my-dir<span class="token punctuation">)</span>
 
-###########################
-#
-# SDL shared library
-#
-###########################
+<span class="token comment" spellcheck="true">###########################</span>
+<span class="token comment" spellcheck="true">#</span>
+<span class="token comment" spellcheck="true"># SDL shared library</span>
+<span class="token comment" spellcheck="true">#</span>
+<span class="token comment" spellcheck="true">###########################</span>
 
-include $(CLEAR_VARS)
+<span class="token keyword">include</span> <span class="token variable">$</span><span class="token punctuation">(</span>CLEAR_VARS<span class="token punctuation">)</span>
 
-LOCAL_MODULE := SDL2
+LOCAL_MODULE <span class="token operator">:=</span> SDL2
 
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/include
+LOCAL_C_INCLUDES <span class="token operator">:=</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/<span class="token keyword">include</span>
 
-LOCAL_EXPORT_C_INCLUDES := $(LOCAL_C_INCLUDES)
+LOCAL_EXPORT_C_INCLUDES <span class="token operator">:=</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_C_INCLUDES<span class="token punctuation">)</span>
 
-LOCAL_SRC_FILES := \
-    $(subst $(LOCAL_PATH)/,, \
-    $(wildcard $(LOCAL_PATH)/src/*.c) \
-    $(wildcard $(LOCAL_PATH)/src/audio/*.c) \
-    $(wildcard $(LOCAL_PATH)/src/audio/android/*.c) \
-    $(wildcard $(LOCAL_PATH)/src/audio/dummy/*.c) \
-    $(LOCAL_PATH)/src/atomic/SDL_atomic.c.arm \
-    $(LOCAL_PATH)/src/atomic/SDL_spinlock.c.arm \
-    $(wildcard $(LOCAL_PATH)/src/core/android/*.c) \
-    $(wildcard $(LOCAL_PATH)/src/cpuinfo/*.c) \
-    $(wildcard $(LOCAL_PATH)/src/dynapi/*.c) \
-    $(wildcard $(LOCAL_PATH)/src/events/*.c) \
-    $(wildcard $(LOCAL_PATH)/src/file/*.c) \
-    $(wildcard $(LOCAL_PATH)/src/haptic/*.c) \
-    $(wildcard $(LOCAL_PATH)/src/haptic/android/*.c) \
-    $(wildcard $(LOCAL_PATH)/src/joystick/*.c) \
-    $(wildcard $(LOCAL_PATH)/src/joystick/android/*.c) \
-    $(wildcard $(LOCAL_PATH)/src/joystick/hidapi/*.c) \
-    $(wildcard $(LOCAL_PATH)/src/loadso/dlopen/*.c) \
-    $(wildcard $(LOCAL_PATH)/src/power/*.c) \
-    $(wildcard $(LOCAL_PATH)/src/power/android/*.c) \
-    $(wildcard $(LOCAL_PATH)/src/filesystem/android/*.c) \
-    $(wildcard $(LOCAL_PATH)/src/sensor/*.c) \
-    $(wildcard $(LOCAL_PATH)/src/sensor/android/*.c) \
-    $(wildcard $(LOCAL_PATH)/src/render/*.c) \
-    $(wildcard $(LOCAL_PATH)/src/render/*/*.c) \
-    $(wildcard $(LOCAL_PATH)/src/stdlib/*.c) \
-    $(wildcard $(LOCAL_PATH)/src/thread/*.c) \
-    $(wildcard $(LOCAL_PATH)/src/thread/pthread/*.c) \
-    $(wildcard $(LOCAL_PATH)/src/timer/*.c) \
-    $(wildcard $(LOCAL_PATH)/src/timer/unix/*.c) \
-    $(wildcard $(LOCAL_PATH)/src/video/*.c) \
-    $(wildcard $(LOCAL_PATH)/src/video/android/*.c) \
-    $(wildcard $(LOCAL_PATH)/src/video/yuv2rgb/*.c) \
-    $(wildcard $(LOCAL_PATH)/src/test/*.c))
+LOCAL_SRC_FILES <span class="token operator">:=</span> \
+    <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">subst</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/,, \
+    <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">wildcard</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/src/*.c<span class="token punctuation">)</span> \
+    <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">wildcard</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/src/audio/*.c<span class="token punctuation">)</span> \
+    <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">wildcard</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/src/audio/android/*.c<span class="token punctuation">)</span> \
+    <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">wildcard</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/src/audio/dummy/*.c<span class="token punctuation">)</span> \
+    <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/src/atomic/SDL_atomic.c.arm \
+    <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/src/atomic/SDL_spinlock.c.arm \
+    <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">wildcard</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/src/core/android/*.c<span class="token punctuation">)</span> \
+    <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">wildcard</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/src/cpuinfo/*.c<span class="token punctuation">)</span> \
+    <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">wildcard</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/src/dynapi/*.c<span class="token punctuation">)</span> \
+    <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">wildcard</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/src/events/*.c<span class="token punctuation">)</span> \
+    <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">wildcard</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/src/file/*.c<span class="token punctuation">)</span> \
+    <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">wildcard</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/src/haptic/*.c<span class="token punctuation">)</span> \
+    <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">wildcard</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/src/haptic/android/*.c<span class="token punctuation">)</span> \
+    <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">wildcard</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/src/joystick/*.c<span class="token punctuation">)</span> \
+    <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">wildcard</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/src/joystick/android/*.c<span class="token punctuation">)</span> \
+    <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">wildcard</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/src/joystick/hidapi/*.c<span class="token punctuation">)</span> \
+    <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">wildcard</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/src/loadso/dlopen/*.c<span class="token punctuation">)</span> \
+    <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">wildcard</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/src/power/*.c<span class="token punctuation">)</span> \
+    <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">wildcard</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/src/power/android/*.c<span class="token punctuation">)</span> \
+    <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">wildcard</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/src/filesystem/android/*.c<span class="token punctuation">)</span> \
+    <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">wildcard</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/src/sensor/*.c<span class="token punctuation">)</span> \
+    <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">wildcard</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/src/sensor/android/*.c<span class="token punctuation">)</span> \
+    <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">wildcard</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/src/render/*.c<span class="token punctuation">)</span> \
+    <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">wildcard</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/src/render/*/*.c<span class="token punctuation">)</span> \
+    <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">wildcard</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/src/stdlib/*.c<span class="token punctuation">)</span> \
+    <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">wildcard</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/src/thread/*.c<span class="token punctuation">)</span> \
+    <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">wildcard</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/src/thread/pthread/*.c<span class="token punctuation">)</span> \
+    <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">wildcard</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/src/timer/*.c<span class="token punctuation">)</span> \
+    <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">wildcard</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/src/timer/unix/*.c<span class="token punctuation">)</span> \
+    <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">wildcard</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/src/video/*.c<span class="token punctuation">)</span> \
+    <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">wildcard</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/src/video/android/*.c<span class="token punctuation">)</span> \
+    <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">wildcard</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/src/video/yuv2rgb/*.c<span class="token punctuation">)</span> \
+    <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">wildcard</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/src/test/*.c<span class="token punctuation">)</span><span class="token punctuation">)</span>
 
-LOCAL_SHARED_LIBRARIES := hidapi
+LOCAL_SHARED_LIBRARIES <span class="token operator">:=</span> hidapi
 
-LOCAL_CFLAGS += -DGL_GLEXT_PROTOTYPES
-LOCAL_LDLIBS := -ldl -lGLESv1_CM -lGLESv2 -llog -landroid
+LOCAL_CFLAGS <span class="token operator">+=</span> -DGL_GLEXT_PROTOTYPES
+LOCAL_LDLIBS <span class="token operator">:=</span> -ldl -lGLESv1_CM -lGLESv2 -llog -landroid
 
-ifeq ($(NDK_DEBUG),1)
-    cmd-strip :=
-endif
+<span class="token keyword">ifeq</span> <span class="token punctuation">(</span><span class="token variable">$</span><span class="token punctuation">(</span>NDK_DEBUG<span class="token punctuation">)</span>,1<span class="token punctuation">)</span>
+    cmd-strip <span class="token operator">:=</span>
+<span class="token keyword">endif</span>
 
-include $(BUILD_SHARED_LIBRARY)
+<span class="token keyword">include</span> <span class="token variable">$</span><span class="token punctuation">(</span>BUILD_SHARED_LIBRARY<span class="token punctuation">)</span>
 
-###########################
-#
-# SDL static library
-#
-###########################
+<span class="token comment" spellcheck="true">###########################</span>
+<span class="token comment" spellcheck="true">#</span>
+<span class="token comment" spellcheck="true"># SDL static library</span>
+<span class="token comment" spellcheck="true">#</span>
+<span class="token comment" spellcheck="true">###########################</span>
 
-LOCAL_MODULE := SDL2_static
+LOCAL_MODULE <span class="token operator">:=</span> SDL2_static
 
-LOCAL_MODULE_FILENAME := libSDL2
+LOCAL_MODULE_FILENAME <span class="token operator">:=</span> libSDL2
 
-LOCAL_LDLIBS := 
-LOCAL_EXPORT_LDLIBS := -ldl -lGLESv1_CM -lGLESv2 -llog -landroid
+LOCAL_LDLIBS <span class="token operator">:=</span> 
+LOCAL_EXPORT_LDLIBS <span class="token operator">:=</span> -ldl -lGLESv1_CM -lGLESv2 -llog -landroid
 
-include $(BUILD_STATIC_LIBRARY)
+<span class="token keyword">include</span> <span class="token variable">$</span><span class="token punctuation">(</span>BUILD_STATIC_LIBRARY<span class="token punctuation">)</span>
 
-###########################
-#
-# SDL main static library
-#
-###########################
+<span class="token comment" spellcheck="true">###########################</span>
+<span class="token comment" spellcheck="true">#</span>
+<span class="token comment" spellcheck="true"># SDL main static library</span>
+<span class="token comment" spellcheck="true">#</span>
+<span class="token comment" spellcheck="true">###########################</span>
 
-include $(CLEAR_VARS)
+<span class="token keyword">include</span> <span class="token variable">$</span><span class="token punctuation">(</span>CLEAR_VARS<span class="token punctuation">)</span>
 
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/include
+LOCAL_C_INCLUDES <span class="token operator">:=</span> <span class="token variable">$</span><span class="token punctuation">(</span>LOCAL_PATH<span class="token punctuation">)</span>/<span class="token keyword">include</span>
 
-LOCAL_MODULE := SDL2_main
+LOCAL_MODULE <span class="token operator">:=</span> SDL2_main
 
-LOCAL_MODULE_FILENAME := libSDL2main
+LOCAL_MODULE_FILENAME <span class="token operator">:=</span> libSDL2main
 
-include $(BUILD_STATIC_LIBRARY)
+<span class="token keyword">include</span> <span class="token variable">$</span><span class="token punctuation">(</span>BUILD_STATIC_LIBRARY<span class="token punctuation">)</span>
 
-###########################
-#
-# hidapi library
-#
-###########################
+<span class="token comment" spellcheck="true">###########################</span>
+<span class="token comment" spellcheck="true">#</span>
+<span class="token comment" spellcheck="true"># hidapi library</span>
+<span class="token comment" spellcheck="true">#</span>
+<span class="token comment" spellcheck="true">###########################</span>
 
-include $(CLEAR_VARS)
+<span class="token keyword">include</span> <span class="token variable">$</span><span class="token punctuation">(</span>CLEAR_VARS<span class="token punctuation">)</span>
 
-LOCAL_CPPFLAGS += -std=c++11
+LOCAL_CPPFLAGS <span class="token operator">+=</span> -std<span class="token operator">=</span>c++11
 
-LOCAL_SRC_FILES := src/hidapi/android/hid.cpp
+LOCAL_SRC_FILES <span class="token operator">:=</span> src/hidapi/android/hid.cpp
 
-LOCAL_MODULE := libhidapi
-LOCAL_LDLIBS := -llog
+LOCAL_MODULE <span class="token operator">:=</span> libhidapi
+LOCAL_LDLIBS <span class="token operator">:=</span> -llog
 
-include $(BUILD_SHARED_LIBRARY)
+<span class="token keyword">include</span> <span class="token variable">$</span><span class="token punctuation">(</span>BUILD_SHARED_LIBRARY<span class="token punctuation">)</span>
 </code></pre>
 <p>从这个MakeFile可以知道，如果我们单纯的想编译出SDL2.so的化，可以去掉 SDL2_main,SDL2_static 这俩个库，剩下的就是要编译的Makefile文件了,之后会编译出俩个so，一个为hidapi，一个为SDL2</p>
 <p>外部库准备好了，接下来就是源码的编译了,下面是源码的目录结构<br><img src="/uploads/scrcypy编译/scrcpyAndroidStudio编译结构.png" alt="结果显示"> </p>
@@ -942,7 +938,7 @@ externalNativeBuild {
 }
 </code></pre>
 <p>CMakeLists.txt的内容为</p>
-<pre class=" language-Cmake"><code class="language-Cmake">cmake_minimum_required(VERSION 3.4.1)
+<pre class=" language-CMakeLists"><code class="language-CMakeLists">cmake_minimum_required(VERSION 3.4.1)
 
 #添加头文件的查找目录
 include_directories(${CMAKE_SOURCE_DIR}/src/main/cpp/include
@@ -1629,9 +1625,7 @@ LDFLAGS <span class="token operator">+=</span> -flto -Wl,--no-undefined -Wl,--as
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概述
-scrcpy 源码分析
-
+                            
                         
                     </div>
                     <div class="publish-info">
