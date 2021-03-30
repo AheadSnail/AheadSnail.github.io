@@ -5,13 +5,6 @@ date: 2018-07-08 21:57:07
 tags: [Opus,SoundTouch,NDK,Android]
 description:  Opus结合SoundTouch Android实现
 ---
-
-### 概述
-
-> Opus结合SoundTouch Android实现
-
-<!--more-->
-
 ### 简介
 > 前面一篇文章介绍到SoundTouch可以做到变声的效果，大致的效果是可以做到变速，变音调，还可以结合使用，官网也有提供Android版本的实现，也即是上一篇文章中介绍到的
 下载下来的源码目录里面有一个Android-lib的目录，甚至连NDK的Android.mk文件都写好了，是一个可以在Eclipse直接运行的
@@ -153,11 +146,11 @@ JNIEXPORT jint JNICALL Java_example_com_opussoundtouchdemo_SoundTouch_processFil
 
 下面是文件的结构图
 
-![结果显示](/uploads/SoundTouchopus/文件目录结构图.png)
+![](/uploads/SoundTouchopus/文件目录结构图.png)
 
 下面是对应的Android.mk文件编写
 
-```Makefile
+```makefile
 LOCAL_PATH := $(call my-dir)
 
 $(warning ${LOCAL_PATH})
@@ -244,7 +237,7 @@ LOCAL_STATIC_LIBRARIES := FLAc Ogg Opus soundtouch
 include $(BUILD_SHARED_LIBRARY)
 ```
 上面的MakeFile文件中要注意的一个点
-```C++
+```cpp
 这里要注意的一个是-DANDROID -D__SOFTFP__ 这个涉及到了SoundTouch 决定SAMPLETYPE 类型，在STTypes.h中有这样代码
 #if (defined(__SOFTFP__) && defined(ANDROID))
         // For Android compilation: Force use of Integer samples in case that
@@ -275,7 +268,7 @@ include $(BUILD_SHARED_LIBRARY)
 因为前面介绍SoundTouch native接口说到，要使用short 类型的 ，所以这里的SAMPLETYPE 类型也要为short，所以要加上这个宏的定义
 
 Application.mk 文件的编写：
-```Makefile
+```makefile
 APP_PLATFORM := android-14
 APP_ABI := armeabi-v7a
 NDK_TOOLCHAIN_VERSION := 4.9
@@ -313,11 +306,11 @@ externalNativeBuild {
 
 执行编译产生的结果：
 
-![结果显示](/uploads/SoundTouchopus/OpusSoundTouch编译之后内容.png)
+![](/uploads/SoundTouchopus/OpusSoundTouch编译之后内容.png)
 
 录音部分跟之前的Opus一样，这里主要讲下播放部分,下面是界面的展示
 
-![结果显示](/uploads/SoundTouchopus/界面视图.png)
+![](/uploads/SoundTouchopus/界面视图.png)
 
 我们可以在播放的时候，设置好，音调跟音速 然后点击播放按钮
 

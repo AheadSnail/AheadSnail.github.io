@@ -5,14 +5,6 @@ date: 2018-07-06 11:10:43
 tags: [Opus,AndroidStudio,NDK]
 description:  Opus Android Studio移植
 ---
-
-### 概述
-
-> Opus Android Studio移植
-
-<!--more-->
-
-
 ### 简介
 > 这篇文章会介绍怎么在Android Studio中编译Opus，至于为什么要在Android Studio中编译，是为了营造一个可以直接调试C代码的环境，这样可以方便我们开发人员查看代码，调试代码
 前面一篇文章已经介绍了在Ubuntu 使用NDKr14-b来编译最新版的Opus，而且验证了在手机上是可以正常运行的，而且我们知道opus-tools，需要依赖ogg,flac,opus库，这些库对于我们
@@ -26,11 +18,11 @@ description:  Opus Android Studio移植
 接着创建一个Android.mk文件，以及Application.mk文件,下面是文件的结构图
 
 目录结构图:
-![结果显示](/uploads/Opus交叉编译/OpusAndroidStudio移植.jpg)
+![](/uploads/Opus交叉编译/OpusAndroidStudio移植.jpg)
 
 1.修改app目录下的build.gradle文件
 
-```gradle
+```cpp
 defaultConfig{
     ...
     externalNativeBuild {
@@ -56,7 +48,7 @@ ABIs [armeabi] are not supported for platform. Supported ABIs are [armeabi-v7a, 
 
 下面是Android.mk的内容
 
-```MakeFile
+```makefile
 #此变量用于指定当前文件的路径。必须在 Android.mk 文件的开头定义它。 以下示例向您展示如何操作： LOCAL_PATH := $(call my-dir)
 #CLEAR_VARS 指向的脚本不会清除此变量。因此，即使您的 Android.mk 文件描述了多个模块，您也只需定义它一次。
 
@@ -151,7 +143,7 @@ include $(BUILD_SHARED_LIBRARY)
 
 下面是Appliation.mk文件的内容
 
-```MakeFile
+```makefile
 APP_PLATFORM := android-14
 APP_ABI := armeabi-v7a
 NDK_TOOLCHAIN_VERSION := 4.9
@@ -197,7 +189,7 @@ private native int nativeReleaseEncoder();
 
 myencode.c实现：
 
-```C++
+```cpp
 /*
  * Class:     vide_m4399_com_newopusdemo_OpusEncoder
  * Method:    nativeInitEncoder
@@ -791,7 +783,7 @@ private native int nativeReleaseDecoder();
 
 JNI接口对应的源码实现
 
-```C++
+```cpp
 int MyOpusDecoder(char * srcData,int nb_read,short * destData)
 {
 	int ret = 0;
@@ -1461,5 +1453,5 @@ public class Recording
 }
 ```
 生成结果
-![结果显示](/uploads/Opus交叉编译/opusSo生成成功.png)
+![](/uploads/Opus交叉编译/opusSo生成成功.png)
 

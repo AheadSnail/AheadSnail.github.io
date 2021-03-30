@@ -5,14 +5,6 @@ date: 2018-06-27 17:40:19
 tags: [Android,NDK,Transmission]
 description:  Transmission Ubuntu NDK 交叉编译
 ---
-
-### 概述
-
-> Transmission Ubuntu NDK 交叉编译
-
-<!--more-->
-
-
 ### 什么是Transmission?
 
 > Transmission是一种BitTorrent客户端，特点是一个跨平台的后端和其上的简洁的用户界面。Transmission以MIT许可证和GNU通用公共许可证双许可证授权，因此是一款自由软件
@@ -68,10 +60,10 @@ $ cd transmission-2.51
 CFLAGS="-Os -march=native" ./configure && make && checkinstall
 ```
 如果正常没有错误的化，是这样的
-![结果显示](/uploads/Transmision 交叉编译/ubuntu编译.png)
+![](/uploads/Transmision 交叉编译/ubuntu编译.png)
 
 生成的结果：
-![结果显示](/uploads/Transmision 交叉编译/ubuntu生成的文件.png)
+![](/uploads/Transmision 交叉编译/ubuntu生成的文件.png)
 
 ### Transmission NDK 交叉编译
 
@@ -130,12 +122,13 @@ exit 1
 
 ```
 
-这里需要注意的是,如果GCC 不是这样指定的化，会出现 error: C compiler cannot create executables的错误 ,sysroot 也即是指定环境的意思
+这里需要注意的是
+> 如果GCC 不是这样指定的化，会出现 error: C compiler cannot create executables的错误 ,sysroot 也即是指定环境的意思
 export CC="$NDK/toolchains/${ACT_ARCH}-${PLATFROM}-4.9/prebuilt/linux-x86_64/bin/${ACT_ARCH}-${PLATFROM}-gcc --sysroot=${SYSROOT}"
 
 下面是介绍为什么要这样写的原因  这个一般是跟ndk相关的错误,某些头文件或者obj文件找不到。可以编写个简单的hello world源文件测试
 
-```C++
+```cpp
 #include 
 int main() { 
 printf("Hello world."); 
@@ -171,18 +164,18 @@ collect2: error: ld returned 1 exit status
 cd /home/longjing/tools/Android/android-ndk-r15c 
 find . -iname crtend_android.o 
 ```
-![结果显示](/uploads/Transmision 交叉编译/c canot create.jpg)
-```
+![](/uploads/Transmision 交叉编译/c canot create.jpg)
+
 可以看到,obj文件都是存在的。那么怎么解决呢?既然找不到,那就给你个路径
 $ANDROID_NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-linux-androideabi-gcc test.c --sysroot=$ANDROID_NDK/platforms/android-9/arch-arm 
 最后重新编译,错误消失了。
-```
-![结果显示](/uploads/Transmision 交叉编译/test编译成功.png)
-```
+
+![](/uploads/Transmision 交叉编译/test编译成功.png)
+
 通过上面的脚本文件可以知道，我们的编译成功之后存放的目录为/thin/arm/ 目录下，如果这个目录就会存放编译产生的文件，其中lib目录如果有下面的俩个红色的就代表成功了，
 至于这里这么多是因为没有再次的编译了，这是全部编译成功产生的文件
-```
-![结果显示](/uploads/Transmision 交叉编译/openssl编译结果.png)
+
+![](/uploads/Transmision 交叉编译/openssl编译结果.png)
 
 #### 编译libevent
 
@@ -241,10 +234,10 @@ build_libevent() {
 这里要注意的，这里一定要使用ndkr11以下的版本，要不然会出现找不到arc4random_addrandom 之类的错误，这主要是因为ndkr11以上，有对这个函数最修改 下面分别在对应的r10e ，r14b中查询这个函数
 
 r10e 查询的结果为：
-![结果显示](/uploads/Transmision 交叉编译/arc4andomR10查询结果.png)
+![](/uploads/Transmision 交叉编译/arc4andomR10查询结果.png)
 
 r14b中查询的结果为：
-![结果显示](/uploads/Transmision 交叉编译/arc4r14b查询结果.png)
+![](/uploads/Transmision 交叉编译/arc4r14b查询结果.png)
 
 可以看到俩者是有区别的，更加详细的信息可以查询
 arc4random_addrandom的改动 https://github.com/android-ndk/ndk/issues/48
@@ -254,7 +247,7 @@ arc4random_addrandom的改动 https://github.com/android-ndk/ndk/issues/48
 通过上面的脚本文件可以知道，我们的编译成功之后存放的目录为/thin/arm/ 目录下，如果这个目录就会存放编译产生的文件，其中lib目录如果有下面的俩个红色的就代表成功了，
 至于这里这么多是因为没有再次的编译了，这是全部编译成功产生的文件
 
-![结果显示](/uploads/Transmision 交叉编译/libevent编译结果.png)
+![](/uploads/Transmision 交叉编译/libevent编译结果.png)
 
 #### 编译curl
 
@@ -315,10 +308,10 @@ exit 1
 通过上面的脚本文件可以知道，我们的编译成功之后存放的目录为/thin/arm/ 目录下，如果这个目录就会存放编译产生的文件，其中lib目录如果有下面的俩个红色的就代表成功了，
 至于这里这么多是因为没有再次的编译了，这是全部编译成功产生的文件
 
-![结果显示](/uploads/Transmision 交叉编译/curl编译结果.png)
+![](/uploads/Transmision 交叉编译/curl编译结果.png)
 
 最终这三个库编译出来的内容为
-![结果显示](/uploads/Transmision 交叉编译/外部依赖库编译结果.png)
+![](/uploads/Transmision 交叉编译/外部依赖库编译结果.png)
 
 #### 编译 transmission2.9.4
 
@@ -439,7 +432,7 @@ echo Done
 
 third-party\miniupnp\miniwget.c文件 修改的内容为：
 
-```C++
+```cpp
 #if defined(__sun) || defined(sun) || defined(__android__)
 #define MIN(x,y) (((x)<(y))?(x):(y))
 #endif
@@ -449,7 +442,7 @@ third-party\miniupnp\miniwget.c文件 修改的内容为：
 
 libtransmission目录下的variant.c 修改的内容为：
 
-```C++
+```cpp
 #ifndef __android__
 #include <locale.h> /* setlocale() */
 #endif
@@ -600,7 +593,7 @@ tr_variantFromBuf (tr_variant      * setme,
 
 transmission源码中的libtransmission目录下的platform-quote.c 修改的内容为：
 
-```C++
+```cpp
 #elif defined (__sun)
   #include <sys/fs/ufs_quota.h> /* quotactl */
  #elif defined (__android__)
@@ -669,7 +662,7 @@ tr_device_info_get_free_space (const struct tr_device_info * info)
 
 libtransmission目录下的util.c 修改的内容为：
  
-```C++
+```cpp
 double
 tr_truncd (double x, int precision)
 {
@@ -689,7 +682,7 @@ tr_truncd (double x, int precision)
 
 libtransmission目录下的util.h 修改的内容为：
 
-```C++
+```cpp
 /** @brief Private libtransmission function to update tr_time ()'s counter */
 static inline void tr_timeUpdate (time_t now) { __tr_current_time = now; }
 
@@ -711,7 +704,7 @@ uint64_t tr_htonll (uint64_t);
 
 这些内容修改完之后，就可以执行脚本的执行了，如果正常执行的没有错误的化，会生成下面的文件 因为脚本指定了 --prefix=$THIN/$ARCH 所以会在/thin/arm/目录下生成对应的内容
 
-![结果显示](/uploads/Transmision 交叉编译/transmission编译结果.png)
+![](/uploads/Transmision 交叉编译/transmission编译结果.png)
 
 ### 交叉编译总结
 > 至此Transmission交叉编译成功,我们为什么要先在ubuntu下面交叉编译，是为了后面移植到android studio 编译做准备，接下来会介绍怎么在Android Studio 中采用CmakeList直接编译源码

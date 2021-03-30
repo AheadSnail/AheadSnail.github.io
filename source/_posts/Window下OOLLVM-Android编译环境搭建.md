@@ -5,14 +5,6 @@ date: 2018-06-17 14:08:46
 tags: [Android,NDK,OOLLVM]
 description:  Window下OOLLVM Android编译环境搭建
 ---
-
-### 概述
-
-> Window下OOLLVM Android编译环境搭建
-
-<!--more-->
-
-
 ### 什么是OOLLVM?
 > LLVM是由瑞士应用科学大学和瑞士西部艺术大学Yverdon-les-Bains（HEIG-VD）于2010年6月发起的一个项目。这个项目的目的是提供一个LLVM编译套件的开源代码
 能够通过代码混淆和防篡改提供更高的软件安全性。由于我们目前主要工作在中间代表（IR）级别，因此我们的工具与所有编程语言（C，C ++，Objective-C，Ada和Fortran）
@@ -24,7 +16,7 @@ Wiki介绍 https://github.com/obfuscator-llvm/obfuscator/wiki
 
 Build: 编译的方式：如果是mac，或者ubuntu可以直接采用这种方式来编译
 
-```bash
+```cpp
 git clone https://github.com/Qrilee/llvm-obfuscator
 
 mkdir build
@@ -78,11 +70,11 @@ Java_com_test_Test(JNIEnv *env, jclass t,jint k) {
 
 得到so文件 然后打开 IDA pro(反汇编工具) 没有的百度下载,可以看到 我们的jni函数名: Java_com_test_Test 
 
-![结果显示](/uploads/OLLVM编译/NDK正常编译.png)
+![](/uploads/OLLVM编译/NDK正常编译.png)
 
 点进去  然后按F5 查看伪代码 
 
-![结果显示](/uploads/OLLVM编译/查看伪代码.png)
+![](/uploads/OLLVM编译/查看伪代码.png)
 
 ```java
 //IDA-pro 伪代码效果
@@ -108,7 +100,7 @@ externalNativeBuild {
 //IDA-pro  进行OLLVM混淆-伪代码效果
 //尴尬了 一个普通的算法突然混淆成这样 大大增加了破解者的破解难度!!!
 //....反正我是看不懂了...
-```C++
+```cpp
 unsigned int __fastcall Java_com_test_Test(int a1, int a2, int a3)
 {
   signed int v3; // r4@1
@@ -216,7 +208,7 @@ git clone -b llvm-4.0 https://github.com/obfuscator-llvm/obfuscator.git
 如果直接编译源码，会在编译的过程中出现问题，所以我就直接把我踩的坑直接贴出来
 
 问题1：修改CryptoUtils.h，修改的内容如下：
-```C++
+```cpp
 #if defined(__i386) || defined(__i386__) || defined(_M_IX86) ||                \
     defined(INTEL_CC) || defined(_WIN64) || defined(_WIN32)
 ```
@@ -224,7 +216,7 @@ git clone -b llvm-4.0 https://github.com/obfuscator-llvm/obfuscator.git
 > 可以在这里下载 : https://github.com/rrrfff/Obfuscator-LLVM/blob/master/lib/Transforms/Obfuscation/CryptoUtils.cpp
 
 问题三：修改 OrcRemoteTargetClient.h 修改的内容如下：
-```C++
+```cpp
 将Expected<std::vector<char>> readMem(char *Dst, JITTargetAddress Src,uint64_t Size)
 修改为：Expected<std::vector<uint8_t>> readMem(char *Dst, JITTargetAddress Src,uint64_t Size)
 ```
@@ -240,7 +232,7 @@ mingw32-make -j16
 数字可根据电脑配置进行选择，编译完成后，会在build/bin下看到编译完成的二进制文件，编译时间比较长。
 
 编译成功之后的结果为下面这样的
-![结果显示](/uploads/OLLVM编译/OOLLVMWindow编译成功.png)
+![](/uploads/OLLVM编译/OOLLVMWindow编译成功.png)
 
 #### 备份源 bin 文件：
 备份 ndk-bundle/toolchains 的 llvm 的bin目录, 比如：D:\sdk\android-ndk-r14b-windows-x86_64\android-ndk-r14b\toolchains\llvm\prebuilt\windows-x86_64\

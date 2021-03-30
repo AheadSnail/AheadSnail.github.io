@@ -5,14 +5,6 @@ date: 2018-08-17 06:58:14
 tags: [Android,TouchEvent]
 description:  Android事件传递项目实战
 ---
-
-### 概述
-
->  Android事件传递项目实战
-
-<!--more-->
-
-
 ### 简介
 
 >  Android事件传递,好像大家都懂，无非就是事件从最外层传递进来，然后判断你是否需要拦截事件对应的也就是(onInterceptTouchEvent 事件)，如果这个事件返回了true就代表当前层要
@@ -117,7 +109,8 @@ mFirstTouchTarget变量默认是为null的,那么就会往下执行 final boolea
 ![结果显示](/uploads/Andorid事件传递项目实战/View事件传递8.png)
 ![结果显示](/uploads/Andorid事件传递项目实战/View事件传递9.png)
 ![结果显示](/uploads/Andorid事件传递项目实战/View事件传递11.png)
-这里就会根据mFirstTouchTarget变量是否有完成赋值，如果没有赋值，那么就会执行自己的OnTouchEvent方法判断是否需要拦截事件，如果mFirstTouchTarget已经完成了赋值，就会执行
+
+> 这里就会根据mFirstTouchTarget变量是否有完成赋值，如果没有赋值，那么就会执行自己的OnTouchEvent方法判断是否需要拦截事件，如果mFirstTouchTarget已经完成了赋值，就会执行
 下面的while循环，这里为什么要有一个这样的while循环，是这样的，事件是一层一层传递下去的，如果找到事件的消耗者了，又会一层一层的往上返回，相应的
 dispatchTransformedTouchEvent函数都会返回true，而我们的mFirstTouchTarget是在当前返回true的时候，赋值的，也即是说mFirstTouchTarget 代表的view不是真实的事件消耗者
 这是循环调用的关系，比如有三层A B C 假设C层是一个View，而且消耗了事件，那么他的mFirstTouchTarget根本没有机会赋值，因为他没有孩子了,但是上层B的mFirstTouchTarget

@@ -530,7 +530,7 @@ externalNativeBuild {
 }
 ```
 CMakeLists.txt的内容为
-```CMakeLists
+```makefile
 cmake_minimum_required(VERSION 3.4.1)
 
 #添加头文件的查找目录

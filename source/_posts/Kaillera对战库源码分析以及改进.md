@@ -5,20 +5,12 @@ date: 2018-10-16 09:21:05
 tags: [Android,NDK,Kaillera]
 description: Kaillera对战库源码分析以及改进
 ---
-
-### 概述
-
-> Aria2 Kaillera对战库源码分析以及改进
-
-<!--more-->
-
-
 ### Kaillera测试代码的编写
 
 前面一篇文章大致的介绍了Fba流程，这篇会大致的讲解下Kaillera对战库的实现，以及改进的方式，最后怎么样移植到Android上面,首先是对战库的大致的实现，我们可以在前面调试这个对战库的
 代码来看代码这样会简单很多，那么我们就可以根据上一篇中发生怎么样使用Kaillera 对战库，下面是对应的测试代码
 
-```C
+```cpp
 static int WINAPI gameCallback(char* game, int player, int numplayers)
 {
 	printf("select game == %s\n",game);
@@ -101,7 +93,7 @@ int main()
 
 客户端CmakeList的写法
 
-```cmake
+```makefile
 cmake_minimum_required(VERSION 3.6.0)
 add_library(kailleraDemo
     SHARED
@@ -143,7 +135,7 @@ target_link_libraries(kailleraDemo ${log-lib})
 
 服务端的CmakeList写法
 
-```cmake
+```makefile
 cmake_minimum_required(VERSION 3.6.0)
 #file (GLOB COMMON_SRC *.cpp EXCLUDE k_server.cpp)
 set (
@@ -162,7 +154,7 @@ target_link_libraries(kaisev ${llog})
 
 由于对战库内部是新建了一个线程，所以对应JNI的调用，要注意线程的问题，要采用这种方法
 
-```C++
+```cpp
 static void N02CCNV gameClosed ()
 {
     TRACE();
@@ -223,7 +215,7 @@ static void N02CCNV gameClosed ()
 
 而Kaillera对战库采用的就是帧锁定下面是对应的服务端代码体现：
 
-```C++
+```cpp
 if(players.length > 0) {
 			//遍历当前所有的玩家，
 			for (int index_ = 0; index_ < players.length; index_++) {
@@ -305,7 +297,7 @@ if(players.length > 0) {
 客户端以及服务端是怎么样保证数据按照顺序到达，由于采用的是udp实现的，所以肯定会存在丢包的情况，相应的就应该有集合来保存双方发送的数据包，方便重发数据，还要有标识，标识当前数据包的序列号，以及当前已经接受的数据包的序列号，类比于tcp的化，就是seq以及ack
 
 客户端同步代码的实现
-```C++
+```cpp
 // recv input data
 int  N02CCNV recvSyncData(void * value, const int /*len*/)
 {
@@ -325,7 +317,7 @@ int  N02CCNV recvSyncData(void * value, const int /*len*/)
 
 前面说过客户端，以及服务端都会发送冗余的数据包，对应的找到正确的数据包的体现
 
-```C++
+```cpp
 void dataArrivalCallback()
 {
    
@@ -402,7 +394,7 @@ inline bool searchProcessInstruction(unsigned short forSerial, unsigned char * b
 
 收集当前用户是否有操作
 
-```C++
+```cpp
 //先将第一个玩家的当前按键不为0的值，存储到nControls 里面
 for (i = 0, j = 0; i < nPlayerInputs[0]; i++, j++) {
 	BurnDrvGetInputInfo(&bii, i + nPlayerOffset[0]);
@@ -472,7 +464,7 @@ void N02CCNV sendSyncData(const void * value, const int len,int isNeedSend)
 
 其次是 2. 服务端每秒钟20-50次向所有客户端发送更新消息（包含所有客户端的操作和递增的帧号）：update=（FrameID，player_keyboards）响应的代码体现是
 
-```C++
+```cpp
 //乐观帧的机制实现,乐观帧的实现原理即为，不管当前的玩家有没有数据到来，只要到了服务端发送数据的时间，就收集当前所有玩家距离上一次
 //收集到的数据包，发送给每一个用户，这样块的用户就不用等待慢的用户。。。
 bool k_user::k_game::game_data_time_to_send()
@@ -606,7 +598,7 @@ void k_user::k_game::collect_all_players_game_data()
 4. 客户端如果没有update数据了，就必须等待，直到有新的数据到来。
 5. 客户端如果一下子收到很多连续的update，则快进播放。
 
-```C++
+```cpp
 // recv input data 同步的接受数据
 int  N02CCNV recvSyncData(void * value, const int len)
 {
@@ -685,7 +677,7 @@ int  N02CCNV recvSyncData(void * value, const int len)
 
 相应的客户端加速也要在游戏引擎中设置对应的快进的回调，gameSpeedRunCallBack 函数指针
 
-```C++
+```cpp
 //设置游戏加速的回调
 speedGameInfo.speedGameRunInfo = gameSpeedRunCallBack;
 kailleraSetSpeddGameRunInfo(&speedGameInfo);

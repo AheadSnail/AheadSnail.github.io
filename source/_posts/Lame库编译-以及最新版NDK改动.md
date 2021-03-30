@@ -6,12 +6,6 @@ tags: [Lame,Android,NDK]
 description:  Lame库编译 以及最新版NDK改动
 ---
 
-### 概述
-
-> Lame库编译 以及最新版NDK改动
-
-<!--more-->
-
 ### 简介
 > LAME 是最好的MP3编码器，编码高品质MP3的最好也是唯一的选择。LAME本身是控制台程序，需要加外壳程序才比较容易使用，也可以在别的软件(比如EAC)中间调用。是一款出色的MP3压缩程序，它使用了独创的人体听音心理学模型和声学模型，改变了人们对MP3高音发哑、低音发破的音质的印象。 总结来说也就是可以用来压缩原始流，也即是pcm的数据，转为mp3
 官网地址  ： http://lame.sourceforge.net/
@@ -54,7 +48,7 @@ echo "build lame complete!"
 
 Mp3Encoder.cpp内容
 
-```C++
+```cpp
 #include "Mp3Encoder.h"
 int Mp3Encoder::Init(const char *pcmFilePath, const char *mp3FilePath, int sampleRate, int channels, int bitRate)
 {
@@ -233,7 +227,7 @@ JNIEXPORT void JNICALL Java_com_example_administrator_lamemp3encoder_Mp3Encoder_
 
 CMakeLists.txt文件内容:
 
-```Cmake
+```bash
 cmake_minimum_required(VERSION 3.4.1)
 add_library( open-lame
              STATIC

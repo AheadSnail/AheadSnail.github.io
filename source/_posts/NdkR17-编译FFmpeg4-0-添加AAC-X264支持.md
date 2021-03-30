@@ -5,13 +5,6 @@ date: 2018-08-03 14:09:16
 tags: [NDK,FFmpeg,AAC,X264]
 description:  NdkR17 编译FFmpeg4.0 添加AAC,X264支持
 ---
-
-### 概述
-
-> NdkR17 编译FFmpeg4.0 添加AAC,X264支持
-
-<!--more-->
-
 ### 简介
 > FFmpeg是一套可以用来记录、转换数字音频、视频，并能将其转化为流的开源计算机程序。采用LGPL或GPL许可证。它提供了录制、转换以及流化音视频的完整解决方案。它包含了非常先进的音频/视频编解码库libavcodec，为了保证高可移植性和编解码质量，libavcodec里很多code都是从头开发的。本文采用最新版的NDK 版本NDkR17 编译最新版的FFmpeg，以此来记录编译的过程
 
@@ -61,11 +54,11 @@ export LDFLAGS=" -pie"
 echo "build AAc complete!"   
 ```
 编译结果:
-![结果显示](/uploads/NDkR17编译FFmpeg4.0/AAC生成文件.png)
+![](/uploads/NDkR17编译FFmpeg4.0/AAC生成文件.png)
 
 这里要检查是否是采用clang来生成的，对应的可以在对应的源文件目录下面的config.log文件中有体现，比如
 
-![结果显示](/uploads/NDkR17编译FFmpeg4.0/x264采用Clang编译.jpg)
+![](/uploads/NDkR17编译FFmpeg4.0/x264采用Clang编译.jpg)
 
 #### 编译X264
 
@@ -98,19 +91,19 @@ echo "build x264 complete!"
 ```
 
 编译结果:
-![结果显示](/uploads/NDkR17编译FFmpeg4.0/x264生成文件.png)   
+![](/uploads/NDkR17编译FFmpeg4.0/x264生成文件.png)   
 
 这里要检查是否是采用clang来生成的，对应的可以在对应的源文件目录下面的config.log文件中有体现，比如
 
-![结果显示](/uploads/NDkR17编译FFmpeg4.0/AAC采用Clang编译.png)
+![](/uploads/NDkR17编译FFmpeg4.0/AAC采用Clang编译.png)
 
 #### 编译FFmpeg
 
 首先在FFmpeg源码目录新建一个目录为存储AAc,X264库，这里创建为external-libs,里面存放俩个文件夹分别为 AAC,X264 然后分别对应的在这俩个文件夹里面放进刚刚编译生成的文件,分别包括include文件夹，已经lib文件夹都要拷贝过来
 
 目录显示
-![结果显示](/uploads/NDkR17编译FFmpeg4.0/external-libs目录.jpg)
-![结果显示](/uploads/NDkR17编译FFmpeg4.0/AAc拷贝目录.jpg)
+![](/uploads/NDkR17编译FFmpeg4.0/external-libs目录.jpg)
+![](/uploads/NDkR17编译FFmpeg4.0/AAc拷贝目录.jpg)
 
 FFmpeg 编译脚本
 
@@ -191,22 +184,22 @@ EXTERNAL_PATH=/home/yuhui/workSpace/FFmpeg/ffmpeg-4.0/external-libs
 echo "build FFmpeg complete!"
 ```
 
-**注意**:其中 --enable-libx264为打开x264 库编译,--enable-encoder=libx264 设在h264 编码库为x264 编码,--enable-encoder=aac 为打开libfdk-aac 库,
+**注意**:
+> 其中 --enable-libx264为打开x264 库编译,--enable-encoder=libx264 设在h264 编码库为x264 编码,--enable-encoder=aac 为打开libfdk-aac 库,
 --enable-decoder=aac 和--enable-libfdk-aac设置aac 的编码和解码库为libfdk-aac 编码库,这样就会替换内部的默认aac编码库。
 
 下面是指定这俩个外部库要链接的位置，头文件的位置
---extra-cflags=" -I$EXTERNAL_PATH/FDK_AAC/include -I$EXTERNAL_PATH/X264/include " \
+> --extra-cflags=" -I$EXTERNAL_PATH/FDK_AAC/include -I$EXTERNAL_PATH/X264/include " \
 --extra-ldflags=" -pie -Wl,-rpath-link=$SYSROOT/usr/lib -L$SYSROOT/usr/lib -lc -lm -ldl -L$EXTERNAL_PATH/FDK_AAC/lib -L$EXTERNAL_PATH/X264/lib " \
-
 --sysroot=$SYSROOT \  这个要指定为我们生成的交叉编译链下面的sysroot目录，而不要采用默认的sysroot
 --toolchain=clang-usan \  这个可以指定我们CC 采用的是 arm-linux-androideabi-clang
 
 有一点要注意的是，生成的AAC,X264 这俩个库的脚本文件的配置，尽量要跟FFmpeg里面的配置一样，要不然连接的时候会出现问题
 
-![结果显示](/uploads/NDkR17编译FFmpeg4.0/FFmpeg编译错误.png)
+![](/uploads/NDkR17编译FFmpeg4.0/FFmpeg编译错误.png)
 解决办法为 需要将libavcodec/aaccoder.c里面的B0定义改一下，我是修改为b0，之后make ，编译成功
-![结果显示](/uploads/NDkR17编译FFmpeg4.0/FFmpeg编译成功.png)
-![结果显示](/uploads/NDkR17编译FFmpeg4.0/FFmpeg成功编译文件.png)
+![](/uploads/NDkR17编译FFmpeg4.0/FFmpeg编译成功.png)
+![](/uploads/NDkR17编译FFmpeg4.0/FFmpeg成功编译文件.png)
 如果在执行./configure 的时候出现了错误，可以在ffbuild 目录下的 config.log里面查看详细的错误信息
-![结果显示](/uploads/NDkR17编译FFmpeg4.0/ffmpegConfig.jpg)
+![](/uploads/NDkR17编译FFmpeg4.0/ffmpegConfig.jpg)
 

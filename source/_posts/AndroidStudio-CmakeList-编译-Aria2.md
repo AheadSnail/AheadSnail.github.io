@@ -5,14 +5,6 @@ date: 2018-06-17 10:28:07
 tags: [AndroidStudio,CmakeList,Aria2]
 description:  AndroidStudio CmakeList 编译 Aria2为一个动态库
 ---
-
-### 概述
-
-> AndroidStudio CmakeList 编译 Aria2为一个动态库
-
-<!--more-->
-
-
 ### 简介
 > 上一篇文章中，介绍了AutoConf，AutoMake，LibTool的基本语法，已经简单的使用，如何生成还有是怎么样来维护MakeFile的，之前都有分析过，大致我们要维护的文件就有configure.ac文件，还有Makefile.am文件，其中的configure.ac文件主要是用来检测环境的，使我们可以做到条件编译，比如检测当前的系统，检测当前环境是否含有某个库，检测函数等，根据检测的结果可以生成不同的变量传递到我们的MakeFile.am或者直接传递到Makefile文件中，还有一个文件就是Makefile.am文件，这个用来定义我们当前要编译的文件，还有编译的参数，连接的参数等，还可以接受到configure.ac文件检测的结果来做到条件的编译，有选择的编译需要的文件
 
@@ -22,7 +14,7 @@ description:  AndroidStudio CmakeList 编译 Aria2为一个动态库
 因为我们需要手动的写CmakeList所以我们就有必要去了解文件，去了解他是怎么编译的。然后提取我们需要的信息，比如需要编译什么文件 编译的时候传递什么样的参数，需要连接什么库等，
 
 ### 确定需要编译的文件
-```MakeFile
+```cpp
 首先我们在Ubuntu，Aria源码目录下面执行 ./android-config文件，用来检测当前的环境，并且生成对应的变量，以便条件编译，其中configure.ac中有这样的输出文件
 AC_CONFIG_FILES([Makefile
                 src/Makefile
@@ -55,10 +47,10 @@ make "$@"
 就是检测下环境变量，然后执行make "$@"，$@就是上面所说的多个MakeFIle文件，这里就会依次的执行编译，而且每一个MakeFile文件的环境变量，编译的参数都是一样的，但是要编译的规则，还有要
 编译的文件，是要根据每一个文件夹下面的MakeFile.am文件指定的，这里最主要的就是src/Makefile文件，我们的源码文件都是存储在这个文件
 ```
-[MakeFile.am基本知识](http://www.cnblogs.com/ranson7zop/p/8268196.html)
+[](http://www.cnblogs.com/ranson7zop/p/8268196.html)
 
 确定MakeFIle文件中哪些文件是需要编译的
-```MakeFile
+```cpp
 下面的这些宏都是通过configure.ac检测之后生成的宏
 如果当前是window下编译的化
 if MINGW_BUILD			   MINGW_BUILD 为false
@@ -92,7 +84,7 @@ endif # HAVE_SOME_XMLLIB
 如果你不知道，或者不确定那些宏的值，也是可以知道 MakeFIle.am文件，需要什么样的文件，我们知道最终肯定都是由MakeFile来编译的，所以我们可以直接看MakeFile文件，他肯定会将要编译的文件收集起来，不需要编译的文件就注释掉，而且这样比较保险
 
 MakeFIle文件其中指定要编译的文件是用这个变量来收集的
-```MakeFIle
+```cpp
 SRCS = a2algo.h a2functional.h a2io.h a2iterator.h a2netcompat.h \
 	 ......
 	 libssl_compat.h $(am__append_1) $(am__append_2) \
@@ -129,7 +121,7 @@ am__append_4 = \
 ```
 
 从MakeFIle文件中确定连接的参数，以及对应的编译参数
-```MakeFIle
+```cpp
 MakeFile文件中的 AM_CPPFLAGS这个变量就代表编译需要传递的编译参数，这个我们是需要的，这里解释下期中的变量
 -I$(top_srcdir)/lib ， -I 代表需要导入哪个文件，也即是定位文件，可以用来定义头文件的地方，这样系统就会去对应的目录中去查找对应的文件
 -DLOCALEDIR=\"${datarootdir}/locale\" -DHAVE_CONFIG_H  -D代表定义一个宏
@@ -176,13 +168,13 @@ EXTLDADD =  \
 ```
 
 也可以在Aria2根目录中，执行./android-config命令，改命令会去检测环境，同时最后面会将检测的结果，还有编译的一些参数，打印出来
-![结果显示](/uploads/Aria2编译/android-config配置.png)
+![](/uploads/Aria2编译/android-config配置.png)
 
 ### AndroidStudio CmakeList编写
 
 这里我们需要连接的库是从Ubuntu，跨平台吧编译Android的时候生成导出来的,下面是我CmakeList文件的编写
 
-```Cmake
+```cpp
 cmake_minimum_required(VERSION 3.4.1)
 
 #设置变量 自定义变量使用SET(OBJ_NAME xxxx)，使用时${OBJ_NAME}
@@ -301,16 +293,16 @@ target_link_libraries( Aria
                        openssl-ssl openssl-crypto
                        )
 ```
-[CMake语法](https://cmake.org/cmake/help/latest/index.html)
+[](https://cmake.org/cmake/help/latest/index.html)
 
 
 AndroidStudio 文件目录显示
-![结果显示](/uploads/Aria2编译/AndroidStudioCmakeList文件编写.png)
+![](/uploads/Aria2编译/AndroidStudioCmakeList文件编写.png)
 
 AndroidStuido编译的结果
-![结果显示](/uploads/Aria2编译/Aria2Android编译结果.png)
+![](/uploads/Aria2编译/Aria2Android编译结果.png)
 
-![结果显示](/uploads/Aria2编译/Aria2生成的so.png)
+![](/uploads/Aria2编译/Aria2生成的so.png)
 
 ### 其中遇到的问题记录
 

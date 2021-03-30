@@ -5,14 +5,6 @@ date: 2018-06-30 09:24:52
 tags: [Android,NDK,Transmission,CmakeList]
 description:  Transmission Android CmakeList编译过程
 ---
-
-### 概述
-
-> Transmission Android CmakeList编译过程
-
-<!--more-->
-
-
 ### 简介
 > 上一篇文章中介绍了怎么样在ubuntu下面的采用Ndk,交叉编译链，编译transmission，这篇文章将介绍怎么在Android Studio下面采用CmakeList的方式来编译transmission库，至于为什么要在
 android Studio中编译是为了我们开发的方便，在Android Studio中采用最新的CmakeList编译的化，是支持断点调试代码，方便我们阅读，修改代码
@@ -23,7 +15,7 @@ android Studio中编译是为了我们开发的方便，在Android Studio中采�
 
 还记得前面一篇文章中介绍到在编译libevent库的时候采用的NDKr10e ,那是因为Ndk11以上有对这些函数做调整，但是在Android Studio中如果想采用CmakeList来编译的化，最低的Ndk版本不能低于r12要不然会提示下面的这些错误
 
-```Cmake
+```makefile
 CMake Error at D:/sdk/sdk/cmake/3.6.4111459/android.toolchain.cmake:345 (message):
   Missing file:
   D:/sdk/android-ndk-r10e-windows-x86_64/android-ndk-r10e/source.properties.
@@ -41,7 +33,7 @@ CMake Error: CMAKE_CXX_COMPILER not set, after EnableLanguage
 
 evutil_rand.c 中有这样的实现
 
-```C++
+```cpp
 #ifdef EVENT__HAVE_ARC4RANDOM
 .....
 #else /* !EVENT__HAVE_ARC4RANDOM { */
@@ -79,7 +71,7 @@ evutil_secure_rng_add_bytes(const char *buf, size_t n)
 }
 ```
 通过上面可以知道，如果EVENT__HAVE_ARC4RANDOM = 0,也即是没有定义这个宏的时候，就会将arc4random.c 包含进来，这样 arc4random_addrandom 就会有定义了，下面查看一下这个宏是怎么产生的,由于transmission是采用autoconf来维护的，在他生成makefile文件之前，要先通过configure文件的检查，这个文件主要是检查当前的系统的环境，下面是configure.ac文件的内容
-```
+```cpp
 dnl Checks for library functions.
 AC_CHECK_FUNCS([ \
   accept4 \
@@ -108,11 +100,11 @@ AC_CHECK_FUNCS：检查C标准库中是否存在函数。 如果找到，则定�
 ....
 修改完之后，重新进行编译，发现又出现了
 ```
-![结果显示](/uploads/Transmision 交叉编译/libeventndk14编译.png)
+![](/uploads/Transmision 交叉编译/libeventndk14编译.png)
 
 从错误的信息可以看出来，这个函数的定义跟系统的这个对应的这个函数重定义了，系统的函数肯定是不能修改的，那么我们就有必要修改libevent库的函数，就改一个名字而已，下面是修改的内容
 
-```C++
+```cpp
 arc4random.c中总的要修改下面的内容
 #ifndef ARC4RANDOM_NOADDRANDOM
 ARC4RANDOM_EXPORT void
@@ -150,21 +142,20 @@ evutil_secure_rng_add_bytes(const char *buf, size_t n)
 
 编译transmission,遇到下面的这个问题
 
-![结果显示](/uploads/Transmision 交叉编译/ndkr14endpowent.png)
+![](/uploads/Transmision 交叉编译/ndkr14endpowent.png)
 
 经查阅这个函数也是NDK的一个坑，详细信息可以参考
 endpowent https://github.com/android-ndk/ndk/issues/77
 
-这个函数在系统的头文件pwd.h文件中，跟他一起配套使用的方式是getpwuid，endpwent函数一般用来关闭用getpwent打开的密码文件。
-从上面的文章中可知这个函数是没有实现的，那我们可以在Android的源码中查找这个函数，因为这个是系统的库，那么这个函数肯定存在android的源码中
+这个函数在系统的头文件pwd.h文件中，跟他一起配套使用的方式是getpwuid，endpwent函数一般用来关闭用getpwent打开的密码文件。从上面的文章中可知这个函数是没有实现的，那我们可以在Android的源码中查找这个函数，因为这个是系统的库，那么这个函数肯定存在android的源码中
 
 查找的结果
 
-![结果显示](/uploads/Transmision 交叉编译/endpewent查找结果.png)
+![](/uploads/Transmision 交叉编译/endpewent查找结果.png)
 
 其中有这样的查询结果 /bionic/libc/bionic/ndk_cruft.cpp:void endpwent() { }，我们可以进入对应的目录找到这个文件，下面是关键的内容
 
-```C++
+```cpp
 // This was never implemented in bionic, only needed for ABI compatibility with the NDK.
 // In the M time frame, over 1000 apps have a reference to this!
 void endpwent() { }
@@ -214,11 +205,11 @@ static void check_getpwuid_r(const char* username, uid_t uid, uid_type_t uid_typ
 }
 ```
 通过上面的内容，我们可以直接，简单的将这个函数屏蔽掉，这样就可以编译通过了，最终生成下面的内容
-![结果显示](/uploads/Transmision 交叉编译/transmission编译结果.png)
+![](/uploads/Transmision 交叉编译/transmission编译结果.png)
 
 ### Android CmakeList的编写
 
-```Cmake
+```cpp
 cmake_minimum_required(VERSION 3.4.1)
 
 #设置变量 自定义变量使用SET(OBJ_NAME xxxx)，使用时${OBJ_NAME}
@@ -516,10 +507,10 @@ target_link_libraries( transmission
                        )		  				  
 ```
 目录工程为:
-![结果显示](/uploads/Transmision 交叉编译/transmisionsCmamekList移植.jpg)
+![](/uploads/Transmision 交叉编译/transmisionsCmamekList移植.jpg)
 
 编译的结果为：
-![结果显示](/uploads/Transmision 交叉编译/CmakeList编译结果.png)
+![](/uploads/Transmision 交叉编译/CmakeList编译结果.png)
 
 ### 验证是否可以真的下载
 
@@ -592,7 +583,7 @@ JNIEXPORT jint JNICALL Java_com_example_com_transmissionandroidproject_Transmiss
 
 对应的C源码实现
 
-```C++
+```cpp
 extern "C" {
 extern int cli_tr_main(int argc, char *argv[]);
 }
@@ -623,7 +614,7 @@ int cli_tr_main (int argc, char * argv[])
 }
 ```
 下面是下载的结果,可以看出来，我们的移植是没有出现问题的
-![结果显示](/uploads/Transmision 交叉编译/transmission结果验证.png)
+![](/uploads/Transmision 交叉编译/transmission结果验证.png)
 
 
 

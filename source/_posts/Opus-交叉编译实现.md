@@ -5,13 +5,6 @@ date: 2018-07-04 20:32:03
 tags: [Opus,Ubuntu,NDK]
 description:  Opus Ubuntu实现交叉编译
 ---
-
-### 概述
-
-> Opus Ubuntu实现交叉编译
-
-<!--more-->
-
 ### 简介
 > 要将一个开源库移植到Android 上面，那么有一个重要的步骤就是要尝试的采用NDK交叉编译来编译，从而确定这个库是否能够移植到Android上面，如果能够交叉编译成功，后面的步骤
 就是移植到Android Studio 中来编译，实现一个可以调试的NDK环境，所以这篇文章就是介绍在Ubuntu下面，采用Ndk 交叉编译最新版的Opus，
@@ -30,7 +23,7 @@ flac-1.3.2		https://ftp.osuosl.org/pub/xiph/releases/flac/flac-1.3.2.tar.xz
 openssl-1.0.2m		https://www.openssl.org/source/openssl-1.0.2m.tar.gz
 
 需要的文件结构图
-![结果显示](/uploads/Opus交叉编译/Opus目录结构.jpg)
+![](/uploads/Opus交叉编译/Opus目录结构.jpg)
 
 ### 目标
 > 目标是我们要编译出opus-tools里面的可执行程序，然后放到手机里面跑，看是否能够正常工作,在此之前，我们可以先看下官网提供的opus-tools可执行的程序
@@ -38,16 +31,16 @@ openssl-1.0.2m		https://www.openssl.org/source/openssl-1.0.2m.tar.gz
 下面了解他们是干嘛用的，提供了什么功能
 
 压缩包文件内容
-![结果显示](/uploads/Opus交叉编译/官网提供opustools工具.png)
+![](/uploads/Opus交叉编译/官网提供opustools工具.png)
 
 opusdec.exe是用来将一个opus文件还原成一个wav文件
-![结果显示](/uploads/Opus交叉编译/opusdec使用.jpg)
+![](/uploads/Opus交叉编译/opusdec使用.jpg)
 
 opusenc.exe 是用来将一个wav文件，压缩成一个opus格式的文件 
-![结果显示](/uploads/Opus交叉编译/opusenc工具使用.png)
+![](/uploads/Opus交叉编译/opusenc工具使用.png)
 
 opusinfo.exe 可以用来显示一个opus文件的信息
-![结果显示](/uploads/Opus交叉编译/opusinfo工具使用.png)
+![](/uploads/Opus交叉编译/opusinfo工具使用.png)
 
 ### 交叉编译实现
 
@@ -70,7 +63,7 @@ mkdir -p usr/local/lib/pkgconfig
 ```
 
 上述脚本执行之后的结果
-![结果显示](/uploads/Opus交叉编译/交叉编译链执行结果.png)
+![](/uploads/Opus交叉编译/交叉编译链执行结果.png)
 
 #### 编译  libogg-1.3.3
 
@@ -106,7 +99,7 @@ CXXFLAGS=$CFLAGS
 echo "build ogg complete!"
 ```
 编译的结果为红色部分指定的
-![结果显示](/uploads/Opus交叉编译/ogg编译结果.jpg)
+![](/uploads/Opus交叉编译/ogg编译结果.jpg)
 
 #### 编译  flac-1.3.2,
 
@@ -140,7 +133,7 @@ echo "build flac complete!"
 ```
 这里要知道的是编译flac库需要使用到ogg库，所以ogg库放在第一个编译，而且我们的 LDFLAGS="-L$DEST/lib  CPPFLAGS="-I$DEST/include 指定了链接查找的地方，所以可以他可以自动的查找到
 编译的结果为红色部分指定的
-![结果显示](/uploads/Opus交叉编译/flac编译结果.jpg)
+![](/uploads/Opus交叉编译/flac编译结果.jpg)
 
 #### 编译  libopus 1.2.1
 
@@ -170,7 +163,7 @@ CXXFLAGS=$CFLAGS
 
 ```
 编译的结果为红色部分指定的
-![结果显示](/uploads/Opus交叉编译/opus编译结果.png)
+![](/uploads/Opus交叉编译/opus编译结果.png)
 
 #### 编译 openssl-1.0.2m
 
@@ -200,7 +193,7 @@ CXXFLAGS=$CFLAGS
   make install
 ```
 编译的结果为红色部分指定的
-![结果显示](/uploads/Opus交叉编译/openssl编译结果.jpg)
+![](/uploads/Opus交叉编译/openssl编译结果.jpg)
 
 #### 编译 opusfile 0.9 
 
@@ -228,7 +221,7 @@ CXXFLAGS=$CFLAGS
   make install
 ```
 编译的结果为红色部分指定的
-![结果显示](/uploads/Opus交叉编译/opusfile编译结果.png)
+![](/uploads/Opus交叉编译/opusfile编译结果.png)
 
 #### 编译 opus-tools 0.1.10 
 
@@ -257,26 +250,26 @@ PKG_CONFIG_PATH=$PREFIX/lib/pkgconfig/ LD_LIBRARY_PATH=$PREFIX/lib/ ./configure 
   make install
 ```
 要注意的是这个opus-tools 需要依赖opus库，ogg库，flac库 编译的结果为红色部分指定的
-![结果显示](/uploads/Opus交叉编译/opustools编译结果.png)
+![](/uploads/Opus交叉编译/opustools编译结果.png)
 
 ### 验证编译的结果
 > 我们可以将编译之后产生的文件拷贝到手机里面，手机里面有一个目录可以不用root进入的，就是/data/local/tmp目录，这个目录是所有的手机都是可以访问的，所以选择放在这个目录
 然后进入使用adb shell 进入命令行模式
 
 push到手机的目录以及内容，这里是将整个local的内容push到手机上
-![结果显示](/uploads/Opus交叉编译/localpush到手机.png)
+![](/uploads/Opus交叉编译/localpush到手机.png)
 
 opusinfo使用结果
-![结果显示](/uploads/Opus交叉编译/opusinfo手机调用.png)
+![](/uploads/Opus交叉编译/opusinfo手机调用.png)
 
 opusdec使用结果
-![结果显示](/uploads/Opus交叉编译/opusdec手机实验.jpg)
+![](/uploads/Opus交叉编译/opusdec手机实验.jpg)
 
 opusdec使用结果
-![结果显示](/uploads/Opus交叉编译/opusenc手机实验.jpg)
+![](/uploads/Opus交叉编译/opusenc手机实验.jpg)
 
 将压缩之后，还有解压缩生成的文件，可以直接使用音乐播放器播放，qq音乐也是支持直接播放opus文件的，还有google浏览器也是支持的，我们可以根据这个来判断是否生成有问题
-![结果显示](/uploads/Opus交叉编译/opus文件google浏览器运行.png)
+![](/uploads/Opus交叉编译/opus文件google浏览器运行.png)
 
 ### 总结
 > 至此，Opus交叉编译已经完成，接下来一篇文章会介绍怎么集成到Android Studio中，而且实现边录音边压缩，边解压缩边播放

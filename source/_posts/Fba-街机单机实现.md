@@ -6,12 +6,6 @@ tags: [Android,NDK,Fba]
 description:  Fba Android版本 街机单机实现
 ---
 
-### 概述
-
-> Fba Android版本 街机单机实现
-
-<!--more-->
-
 ### 简介
 
 这里总结下之前做的街机项目，要不然过段时间之后会忘的一干二净，目前街机主流的好几种，比如 fc,Fba,Mame,小鸡等， 而目前做的比较好的就是悟饭的游戏厅了，里面集成了多种的街机版本,但是Fba仍然是他们的主流，之前有尝试过使用Mame，但是因为项目工程太大，编译出来的项目也是非常大，所以通过分析悟饭的做法，采用了Fba，而且最主要的一个原因是Window下的实现是支持对战的，对于其他的fc,小鸡等官网不支持对战的，所以我们参考他对应window的实现
@@ -42,7 +36,7 @@ description:  Fba Android版本 街机单机实现
 
 Fba 单机的实现，其实在Github上面就有了，链接地址为 https://github.com/Cpasjuste/libarcade ，当然这个直接下载下来是不能运行的，缺少了部分的内容，接下来就是修改对应的错误，错误修改完之后，由于这个项目放在是5年前开发的，现在的Fba官网早就更新了多个版本，所以接下来我们要参照他编译的makefile 整合当前最新的代码 而且可以参考https://github.com/libretro/fbalpha 这个是当前最新的Fba  可以编译出对应的lib库的实现，当然也是支持Android对应的编译实现，所以可以结合这俩个项目来整理，所以下面来分析下这个项目的MakeFile
 
-```MakeFile
+```makefile
 首先是  Application.mk文件 
 APP_ABI			:= armeabi-v7a , x86
 APP_PLATFORM		:= android-9
@@ -247,7 +241,7 @@ $(warning "Test....." $(LOCAL_PATH))
 
 搞懂了这俩个的区别，继续分析
 
-```MakeFile
+```makefile
 CPU := 	    $(subst $(LOCAL_PATH)/,, \
 			$(wildcard $(CPU_PATH)/*.cpp) \
 			$(wildcard $(CPU_PATH)/arm/*.cpp) \
@@ -264,7 +258,7 @@ wildcard 函数是用来获取目标文件的 比如一般我们可以使用“$
 
 ![结果显示](/uploads/Fba/截取之后的结果.png)
 
-```MakeFile
+```makefile
 LOCAL_SRC_FILES := $(filter-out intf/input/sdl/inp_sdl.cpp, $(LOCAL_SRC_FILES))  filter-out 函数可以做到过滤的作用，就是当前的inp_sdl.cpp文件从$(LOCAL_SRC_FILES)中移除,比如
 $(filter-out $(mains),$(objects))  实现了去除变量“objects”中“mains”定义的字串（文件名）功能。它的返回值 为“foo.o bar.o”。
 
