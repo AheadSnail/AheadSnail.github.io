@@ -497,50 +497,46 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><blockquote>
-<p>Window下OOLLVM Android编译环境搭建</p>
-</blockquote>
-<a id="more"></a>
-<h3 id="什么是OOLLVM"><a href="#什么是OOLLVM" class="headerlink" title="什么是OOLLVM?"></a>什么是OOLLVM?</h3><blockquote>
+                <h3 id="什么是OOLLVM"><a href="#什么是OOLLVM" class="headerlink" title="什么是OOLLVM?"></a>什么是OOLLVM?</h3><blockquote>
 <p>LLVM是由瑞士应用科学大学和瑞士西部艺术大学Yverdon-les-Bains（HEIG-VD）于2010年6月发起的一个项目。这个项目的目的是提供一个LLVM编译套件的开源代码<br>能够通过代码混淆和防篡改提供更高的软件安全性。由于我们目前主要工作在中间代表（IR）级别，因此我们的工具与所有编程语言（C，C ++，Objective-C，Ada和Fortran）<br>以及目标平台（x86，x86-64，PowerPC，PowerPC-64 ，ARM，Thumb，SPARC，Alpha，CellSPU，MIPS，MSP430，SystemZ和XCore）目前由LLVM支持。</p>
 </blockquote>
 <h3 id="OOLLVM-官网提供的有用信息"><a href="#OOLLVM-官网提供的有用信息" class="headerlink" title="OOLLVM 官网提供的有用信息"></a>OOLLVM 官网提供的有用信息</h3><blockquote>
 <p>OOLLVM官网 <a href="https://github.com/obfuscator-llvm/obfuscator" target="_blank" rel="noopener">https://github.com/obfuscator-llvm/obfuscator</a><br>Wiki介绍 <a href="https://github.com/obfuscator-llvm/obfuscator/wiki" target="_blank" rel="noopener">https://github.com/obfuscator-llvm/obfuscator/wiki</a></p>
 </blockquote>
 <p>Build: 编译的方式：如果是mac，或者ubuntu可以直接采用这种方式来编译</p>
-<pre class=" language-bash"><code class="language-bash"><span class="token function">git</span> clone https://github.com/Qrilee/llvm-obfuscator
+<pre class=" language-cpp"><code class="language-cpp">git clone https<span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>github<span class="token punctuation">.</span>com<span class="token operator">/</span>Qrilee<span class="token operator">/</span>llvm<span class="token operator">-</span>obfuscator
 
-<span class="token function">mkdir</span> build
+mkdir build
 
-<span class="token function">cd</span> build
+cd build
 
-cmake -DCMAKE_BUILD_TYPE<span class="token operator">=</span>Release <span class="token punctuation">..</span>/Obfuscator-LLVM/
+cmake <span class="token operator">-</span>DCMAKE_BUILD_TYPE<span class="token operator">=</span>Release <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token operator">/</span>Obfuscator<span class="token operator">-</span>LLVM<span class="token operator">/</span>
 
-<span class="token function">make</span> -j7
+make <span class="token operator">-</span>j7
 
 
-Build pass <span class="token keyword">for</span> windows: window下编译要注意的地方：
+Build pass <span class="token keyword">for</span> windows<span class="token operator">:</span> window下编译要注意的地方：
 
   MinGW64 <span class="token keyword">for</span> Windows
 
-  Cmake 3.9 rc5 <span class="token keyword">for</span> Windows x64
+  Cmake <span class="token number">3.9</span> rc5 <span class="token keyword">for</span> Windows x64
 
-Build pass <span class="token keyword">for</span> linux:
+Build pass <span class="token keyword">for</span> linux<span class="token operator">:</span>
 
-  gcc<span class="token operator">&amp;</span>g++ 7.2.0
+  gcc<span class="token operator">&amp;</span>g<span class="token operator">++</span> <span class="token number">7.2</span><span class="token punctuation">.</span><span class="token number">0</span>
 
-  cmake 3.8.0
+  cmake <span class="token number">3.8</span><span class="token punctuation">.</span><span class="token number">0</span>
 
-Use:使用的方式，我们可以通过在build.gradle 中将这些内容引进来，后面会介绍怎么添加
+Use<span class="token operator">:</span>使用的方式，我们可以通过在build<span class="token punctuation">.</span>gradle 中将这些内容引进来，后面会介绍怎么添加
 
--mllvm -bcf -mllvm -fla -mllvm -sub -mllvm -sobf
+<span class="token operator">-</span>mllvm <span class="token operator">-</span>bcf <span class="token operator">-</span>mllvm <span class="token operator">-</span>fla <span class="token operator">-</span>mllvm <span class="token operator">-</span>sub <span class="token operator">-</span>mllvm <span class="token operator">-</span>sobf
 
-Function:功能介绍
+Function<span class="token operator">:</span>功能介绍
 
-Instructions Substitution -mllvm -sub
-Bogus Control Flow -mllvm -bcf
-Control Flow Flattening -mllvm -fla
-String Obfuscation -mllvm -sobf
+Instructions Substitution <span class="token operator">-</span>mllvm <span class="token operator">-</span>sub
+Bogus Control Flow <span class="token operator">-</span>mllvm <span class="token operator">-</span>bcf
+Control Flow Flattening <span class="token operator">-</span>mllvm <span class="token operator">-</span>fla
+String Obfuscation <span class="token operator">-</span>mllvm <span class="token operator">-</span>sobf
 </code></pre>
 <h3 id="NDK开发真的安全吗"><a href="#NDK开发真的安全吗" class="headerlink" title="NDK开发真的安全吗?"></a>NDK开发真的安全吗?</h3><blockquote>
 <p>在开发android的时候，通常会将一些关键代码放JNI (C/C++)里真的很安全吗?<br>很多Android开发者都认为 把关键代码放到C/C++里 然后打包静态库 然后破解者就无法破解<br>我想说 你太嫩了，下面来演示下OOLLVM的作用 </p>
@@ -553,9 +549,9 @@ String Obfuscation -mllvm -sobf
 <span class="token punctuation">}</span>
 </code></pre>
 <p>得到so文件 然后打开 IDA pro(反汇编工具) 没有的百度下载,可以看到 我们的jni函数名: Java_com_test_Test </p>
-<p><img src="/uploads/OLLVM编译/NDK正常编译.png" alt="结果显示"></p>
+<p><img src="/uploads/OLLVM编译/NDK正常编译.png" alt></p>
 <p>点进去  然后按F5 查看伪代码 </p>
-<p><img src="/uploads/OLLVM编译/查看伪代码.png" alt="结果显示"></p>
+<p><img src="/uploads/OLLVM编译/查看伪代码.png" alt></p>
 <pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">//IDA-pro 伪代码效果</span>
 <span class="token keyword">int</span> __fastcall <span class="token function">Java_com_test_Test</span><span class="token punctuation">(</span><span class="token keyword">int</span> a1<span class="token punctuation">,</span> <span class="token keyword">int</span> a2<span class="token punctuation">,</span> <span class="token keyword">int</span> a3<span class="token punctuation">)</span>
 <span class="token punctuation">{</span>
@@ -575,80 +571,80 @@ externalNativeBuild <span class="token punctuation">{</span>
 <span class="token punctuation">}</span>
 </code></pre>
 <p>编译so后 重新使用IDA pro反汇编这个so文件,查看c/c++代码 如下….<br>//IDA-pro  进行OLLVM混淆-伪代码效果<br>//尴尬了 一个普通的算法突然混淆成这样 大大增加了破解者的破解难度!!!<br>//….反正我是看不懂了…</p>
-<pre class=" language-C++"><code class="language-C++">unsigned int __fastcall Java_com_test_Test(int a1, int a2, int a3)
-{
-  signed int v3; // r4@1
-  signed int v4; // r5@1
-  unsigned int v5; // r1@1
-  signed int v6; // r3@5
-  bool v7; // zf@9
-  signed int v8; // r5@9
-  unsigned int v9; // r2@9
-  signed int v10; // r1@9
-  signed int v11; // r4@13
-  unsigned __int8 v13; // [sp+2h] [bp-16h]@3
-  unsigned __int8 v14; // [sp+3h] [bp-15h]@5
-  unsigned int v15; // [sp+4h] [bp-14h]@0
+<pre class=" language-cpp"><code class="language-cpp"><span class="token keyword">unsigned</span> <span class="token keyword">int</span> __fastcall <span class="token function">Java_com_test_Test</span><span class="token punctuation">(</span><span class="token keyword">int</span> a1<span class="token punctuation">,</span> <span class="token keyword">int</span> a2<span class="token punctuation">,</span> <span class="token keyword">int</span> a3<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token keyword">signed</span> <span class="token keyword">int</span> v3<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// r4@1</span>
+  <span class="token keyword">signed</span> <span class="token keyword">int</span> v4<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// r5@1</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">int</span> v5<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// r1@1</span>
+  <span class="token keyword">signed</span> <span class="token keyword">int</span> v6<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// r3@5</span>
+  <span class="token keyword">bool</span> v7<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// zf@9</span>
+  <span class="token keyword">signed</span> <span class="token keyword">int</span> v8<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// r5@9</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">int</span> v9<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// r2@9</span>
+  <span class="token keyword">signed</span> <span class="token keyword">int</span> v10<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// r1@9</span>
+  <span class="token keyword">signed</span> <span class="token keyword">int</span> v11<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// r4@13</span>
+  <span class="token keyword">unsigned</span> __int8 v13<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// [sp+2h] [bp-16h]@3</span>
+  <span class="token keyword">unsigned</span> __int8 v14<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// [sp+3h] [bp-15h]@5</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">int</span> v15<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// [sp+4h] [bp-14h]@0</span>
 
-  v3 = 0;
-  v4 = 0;
-  v5 = x * ~-x & (x * ~-x ^ 0xFFFFFFFE);
-  if ( !v5 )
-    v4 = 1;
-  v13 = v4;
-  if ( y < 10 )
-    v3 = 1;
-  v6 = 0;
-  v14 = v3;
-  if ( v5 )
-    v5 = 1;
-  if ( y > 9 )
-    v6 = 1;
-  v7 = ((v6 | v5) ^ 1 | v4 ^ v3) == 0;
-  v8 = -1313485305;
-  v9 = a3 & 0xFFFFFFF7 | 8 * (((unsigned int)~a3 >> 3) & 1);
-  v10 = -1265641972;
-  if ( !v7 )
-    v10 = 1153232101;
-  while ( 1 )
-  {
-    v11 = v8;
-    if ( v8 > 1153232100 )
-      break;
-    v8 = -1766943702;
-    if ( v11 != -1265641972 )
-    {
-      if ( v11 == -1766943702 )
-      {
-        v15 = v9;
-        v8 = v10;
-      }
-      else
-      {
-        if ( v11 != -1313485305 )
-          goto LABEL_22;
-        v8 = -1265641972;
-        if ( ((unsigned __int8)(v13 & v14) | v13 ^ v14) & 1 )
-          v8 = -1766943702;
-      }
-    }
-  }
-  if ( v8 != 1153232101 )
-  {
-    while ( 1 )
-LABEL_22:
-      ;
-  }
-  return v15;
-}
+  v3 <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+  v4 <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+  v5 <span class="token operator">=</span> x <span class="token operator">*</span> <span class="token operator">~</span><span class="token operator">-</span>x <span class="token operator">&amp;</span> <span class="token punctuation">(</span>x <span class="token operator">*</span> <span class="token operator">~</span><span class="token operator">-</span>x <span class="token operator">^</span> <span class="token number">0xFFFFFFFE</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span> <span class="token operator">!</span>v5 <span class="token punctuation">)</span>
+    v4 <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+  v13 <span class="token operator">=</span> v4<span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span> y <span class="token operator">&lt;</span> <span class="token number">10</span> <span class="token punctuation">)</span>
+    v3 <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+  v6 <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+  v14 <span class="token operator">=</span> v3<span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span> v5 <span class="token punctuation">)</span>
+    v5 <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span> y <span class="token operator">></span> <span class="token number">9</span> <span class="token punctuation">)</span>
+    v6 <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+  v7 <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>v6 <span class="token operator">|</span> v5<span class="token punctuation">)</span> <span class="token operator">^</span> <span class="token number">1</span> <span class="token operator">|</span> v4 <span class="token operator">^</span> v3<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">;</span>
+  v8 <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1313485305</span><span class="token punctuation">;</span>
+  v9 <span class="token operator">=</span> a3 <span class="token operator">&amp;</span> <span class="token number">0xFFFFFFF7</span> <span class="token operator">|</span> <span class="token number">8</span> <span class="token operator">*</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">unsigned</span> <span class="token keyword">int</span><span class="token punctuation">)</span><span class="token operator">~</span>a3 <span class="token operator">>></span> <span class="token number">3</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  v10 <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1265641972</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span> <span class="token operator">!</span>v7 <span class="token punctuation">)</span>
+    v10 <span class="token operator">=</span> <span class="token number">1153232101</span><span class="token punctuation">;</span>
+  <span class="token keyword">while</span> <span class="token punctuation">(</span> <span class="token number">1</span> <span class="token punctuation">)</span>
+  <span class="token punctuation">{</span>
+    v11 <span class="token operator">=</span> v8<span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span> v8 <span class="token operator">></span> <span class="token number">1153232100</span> <span class="token punctuation">)</span>
+      <span class="token keyword">break</span><span class="token punctuation">;</span>
+    v8 <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1766943702</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span> v11 <span class="token operator">!=</span> <span class="token operator">-</span><span class="token number">1265641972</span> <span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span> v11 <span class="token operator">==</span> <span class="token operator">-</span><span class="token number">1766943702</span> <span class="token punctuation">)</span>
+      <span class="token punctuation">{</span>
+        v15 <span class="token operator">=</span> v9<span class="token punctuation">;</span>
+        v8 <span class="token operator">=</span> v10<span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+      <span class="token keyword">else</span>
+      <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span> v11 <span class="token operator">!=</span> <span class="token operator">-</span><span class="token number">1313485305</span> <span class="token punctuation">)</span>
+          <span class="token keyword">goto</span> LABEL_22<span class="token punctuation">;</span>
+        v8 <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1265641972</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">unsigned</span> __int8<span class="token punctuation">)</span><span class="token punctuation">(</span>v13 <span class="token operator">&amp;</span> v14<span class="token punctuation">)</span> <span class="token operator">|</span> v13 <span class="token operator">^</span> v14<span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">1</span> <span class="token punctuation">)</span>
+          v8 <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1766943702</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span> v8 <span class="token operator">!=</span> <span class="token number">1153232101</span> <span class="token punctuation">)</span>
+  <span class="token punctuation">{</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span> <span class="token number">1</span> <span class="token punctuation">)</span>
+LABEL_22<span class="token operator">:</span>
+      <span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">return</span> v15<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
 以上就是混淆效果  你再看看原来没混淆的
 
-//IDA-pro 未进行OLLVM混淆-伪代码效果
-int __fastcall Java_com_test_Test(int a1, int a2, int a3)
-{
-   return a3 ^ 8;
-}
+<span class="token comment" spellcheck="true">//IDA-pro 未进行OLLVM混淆-伪代码效果</span>
+<span class="token keyword">int</span> __fastcall <span class="token function">Java_com_test_Test</span><span class="token punctuation">(</span><span class="token keyword">int</span> a1<span class="token punctuation">,</span> <span class="token keyword">int</span> a2<span class="token punctuation">,</span> <span class="token keyword">int</span> a3<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+   <span class="token keyword">return</span> a3 <span class="token operator">^</span> <span class="token number">8</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h3 id="OOLLVM-Window编译"><a href="#OOLLVM-Window编译" class="headerlink" title="OOLLVM Window编译"></a>OOLLVM Window编译</h3><blockquote>
 <p>这里先介绍下OOLLVM的使用流程，将源代码下载下来之后，通过替换NDK中的内容，比如我当前的目录为D:\sdk\android-ndk-r14b\toolchains\llvm\prebuilt\windows-x86_64\<br>那么我们就要将编译出来的OOLLVM的内容，替换这个目录下面的bin目录下的内容,所以基于大部分的开发人员还是屌丝，都是采用Window下开发，所以我们就有必要在Window下编译，<br>当然mac，ubuntu系统我们也会介绍怎么编译，那俩个相对来说比较简单</p>
@@ -673,16 +669,16 @@ int __fastcall Java_com_test_Test(int a1, int a2, int a3)
 </code></pre>
 <p>如果直接编译源码，会在编译的过程中出现问题，所以我就直接把我踩的坑直接贴出来</p>
 <p>问题1：修改CryptoUtils.h，修改的内容如下：</p>
-<pre class=" language-C++"><code class="language-C++">#if defined(__i386) || defined(__i386__) || defined(_M_IX86) ||                \
-    defined(INTEL_CC) || defined(_WIN64) || defined(_WIN32)
+<pre class=" language-cpp"><code class="language-cpp"><span class="token macro property">#<span class="token directive keyword">if</span> defined(__i386) || defined(__i386__) || defined(_M_IX86) ||                \
+    defined(INTEL_CC) || defined(_WIN64) || defined(_WIN32)</span>
 </code></pre>
 <p>问题二：替换CryptoUtils.cpp</p>
 <blockquote>
 <p>可以在这里下载 : <a href="https://github.com/rrrfff/Obfuscator-LLVM/blob/master/lib/Transforms/Obfuscation/CryptoUtils.cpp" target="_blank" rel="noopener">https://github.com/rrrfff/Obfuscator-LLVM/blob/master/lib/Transforms/Obfuscation/CryptoUtils.cpp</a></p>
 </blockquote>
 <p>问题三：修改 OrcRemoteTargetClient.h 修改的内容如下：</p>
-<pre class=" language-C++"><code class="language-C++">将Expected<std::vector<char>> readMem(char *Dst, JITTargetAddress Src,uint64_t Size)
-修改为：Expected<std::vector<uint8_t>> readMem(char *Dst, JITTargetAddress Src,uint64_t Size)
+<pre class=" language-cpp"><code class="language-cpp">将Expected<span class="token operator">&lt;</span>std<span class="token operator">::</span>vector<span class="token operator">&lt;</span><span class="token keyword">char</span><span class="token operator">>></span> <span class="token function">readMem</span><span class="token punctuation">(</span><span class="token keyword">char</span> <span class="token operator">*</span>Dst<span class="token punctuation">,</span> JITTargetAddress Src<span class="token punctuation">,</span>uint64_t Size<span class="token punctuation">)</span>
+修改为：Expected<span class="token operator">&lt;</span>std<span class="token operator">::</span>vector<span class="token operator">&lt;</span>uint8_t<span class="token operator">>></span> <span class="token function">readMem</span><span class="token punctuation">(</span><span class="token keyword">char</span> <span class="token operator">*</span>Dst<span class="token punctuation">,</span> JITTargetAddress Src<span class="token punctuation">,</span>uint64_t Size<span class="token punctuation">)</span>
 </code></pre>
 <h4 id="编译"><a href="#编译" class="headerlink" title="编译:"></a>编译:</h4><p>直接打开一个cmd命令，进入到下载的源码目录，这里最好在这个源码目录的外面再新建一层文件夹 创建文件夹 </p>
 <pre class=" language-bash"><code class="language-bash"><span class="token function">mkdir</span> build
@@ -691,7 +687,7 @@ cmake -G <span class="token string">"MinGW Makefiles"</span> -DCMAKE_BUILD_TYPE:
 mingw32-make -j16
 </code></pre>
 <p>数字可根据电脑配置进行选择，编译完成后，会在build/bin下看到编译完成的二进制文件，编译时间比较长。</p>
-<p>编译成功之后的结果为下面这样的<br><img src="/uploads/OLLVM编译/OOLLVMWindow编译成功.png" alt="结果显示"></p>
+<p>编译成功之后的结果为下面这样的<br><img src="/uploads/OLLVM编译/OOLLVMWindow编译成功.png" alt></p>
 <h4 id="备份源-bin-文件："><a href="#备份源-bin-文件：" class="headerlink" title="备份源 bin 文件："></a>备份源 bin 文件：</h4><p>备份 ndk-bundle/toolchains 的 llvm 的bin目录, 比如：D:\sdk\android-ndk-r14b-windows-x86_64\android-ndk-r14b\toolchains\llvm\prebuilt\windows-x86_64\<br>我们可以将原本这个目录下的bin目录改为bin_back</p>
 <h4 id="拷贝编译的-bin-文件："><a href="#拷贝编译的-bin-文件：" class="headerlink" title="拷贝编译的 bin 文件："></a>拷贝编译的 bin 文件：</h4><p>将我们编译的OOLLVM bin目录整个拷贝到D:\sdk\android-ndk-r14b-windows-x86_64\android-ndk-r14b\toolchains\llvm\prebuilt\windows-x86_64\<br>拷贝 ollvm 依赖的 buildin lib 和 include 头文件，不拷贝会导致编译时多头文件和类型找不到</p>
 <h3 id="OOLLVM-macOS-Ubuntu编译"><a href="#OOLLVM-macOS-Ubuntu编译" class="headerlink" title="OOLLVM macOS Ubuntu编译"></a>OOLLVM macOS Ubuntu编译</h3><h4 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h4><p>建议操作系统：macOS Ubuntu<br>Obfuscator-llvm 安装：</p>
@@ -1250,9 +1246,7 @@ bundle/toolchains/llvm/prebuilt/darwin-x86_64/
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概述
-Android 中利用Aria2 完成一个P2P的下载神器
-
+                            
                         
                     </div>
                     <div class="publish-info">
@@ -1305,9 +1299,7 @@ Android 中利用Aria2 完成一个P2P的下载神器
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概述
-AndroidStudio CmakeList 编译 Aria2为一个动态库
-
+                            
                         
                     </div>
                     <div class="publish-info">
@@ -1329,12 +1321,12 @@ AndroidStudio CmakeList 编译 Aria2为一个动态库
                         <span class="chip bg-color">AndroidStudio</span>
                     </a>
                     
-                    <a href="/tags/Aria2/">
-                        <span class="chip bg-color">Aria2</span>
-                    </a>
-                    
                     <a href="/tags/CmakeList/">
                         <span class="chip bg-color">CmakeList</span>
+                    </a>
+                    
+                    <a href="/tags/Aria2/">
+                        <span class="chip bg-color">Aria2</span>
                     </a>
                     
                 </div>

@@ -456,12 +456,12 @@
                                 <span class="chip bg-color">AndroidStudio</span>
                             </a>
                         
-                            <a href="/tags/Aria2/">
-                                <span class="chip bg-color">Aria2</span>
-                            </a>
-                        
                             <a href="/tags/CmakeList/">
                                 <span class="chip bg-color">CmakeList</span>
+                            </a>
+                        
+                            <a href="/tags/Aria2/">
+                                <span class="chip bg-color">Aria2</span>
                             </a>
                         
                     </div>
@@ -497,11 +497,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><blockquote>
-<p>AndroidStudio CmakeList 编译 Aria2为一个动态库</p>
-</blockquote>
-<a id="more"></a>
-<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><blockquote>
+                <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><blockquote>
 <p>上一篇文章中，介绍了AutoConf，AutoMake，LibTool的基本语法，已经简单的使用，如何生成还有是怎么样来维护MakeFile的，之前都有分析过，大致我们要维护的文件就有configure.ac文件，还有Makefile.am文件，其中的configure.ac文件主要是用来检测环境的，使我们可以做到条件编译，比如检测当前的系统，检测当前环境是否含有某个库，检测函数等，根据检测的结果可以生成不同的变量传递到我们的MakeFile.am或者直接传递到Makefile文件中，还有一个文件就是Makefile.am文件，这个用来定义我们当前要编译的文件，还有编译的参数，连接的参数等，还可以接受到configure.ac文件检测的结果来做到条件的编译，有选择的编译需要的文件</p>
 </blockquote>
 <p>我们为什么需要去了解这个文件</p>
@@ -509,274 +505,274 @@
 <p>是因为当前的Aria2虽然在ubuntu利用android的交叉编译链可以生成可执行文件，但是我们需要移植到AndroidStudio上面去的化，就需要我们自己来编写CmakeList文件 而且我们需要生成的文件是一个so文件，不是一个可执行的文件，至于为什么要采用CmakeList来写主要是因为Google推荐使用，还有AndroidStudio在CmakeList下面如果配置的好，是可以调试的， 方便我们查看代码，本身目前就缺少一个编译器查看这些源码还有断点调试，所以采用CmakeList来写</p>
 </blockquote>
 <p>因为我们需要手动的写CmakeList所以我们就有必要去了解文件，去了解他是怎么编译的。然后提取我们需要的信息，比如需要编译什么文件 编译的时候传递什么样的参数，需要连接什么库等，</p>
-<h3 id="确定需要编译的文件"><a href="#确定需要编译的文件" class="headerlink" title="确定需要编译的文件"></a>确定需要编译的文件</h3><pre class=" language-MakeFile"><code class="language-MakeFile">首先我们在Ubuntu，Aria源码目录下面执行 ./android-config文件，用来检测当前的环境，并且生成对应的变量，以便条件编译，其中configure.ac中有这样的输出文件
-AC_CONFIG_FILES([Makefile
-                src/Makefile
-                src/libaria2.pc
-                src/includes/Makefile
-                test/Makefile
-                po/Makefile.in
-                lib/Makefile
-                doc/Makefile
-                doc/manual-src/Makefile
-                doc/manual-src/en/Makefile
-                doc/manual-src/en/conf.py
-                doc/manual-src/ru/Makefile
-                doc/manual-src/ru/conf.py
-                doc/manual-src/pt/Makefile
-                doc/manual-src/pt/conf.py
-                deps/Makefile])
+<h3 id="确定需要编译的文件"><a href="#确定需要编译的文件" class="headerlink" title="确定需要编译的文件"></a>确定需要编译的文件</h3><pre class=" language-cpp"><code class="language-cpp">首先我们在Ubuntu，Aria源码目录下面执行 <span class="token punctuation">.</span><span class="token operator">/</span>android<span class="token operator">-</span>config文件，用来检测当前的环境，并且生成对应的变量，以便条件编译，其中configure<span class="token punctuation">.</span>ac中有这样的输出文件
+<span class="token function">AC_CONFIG_FILES</span><span class="token punctuation">(</span><span class="token punctuation">[</span>Makefile
+                src<span class="token operator">/</span>Makefile
+                src<span class="token operator">/</span>libaria2<span class="token punctuation">.</span>pc
+                src<span class="token operator">/</span>includes<span class="token operator">/</span>Makefile
+                test<span class="token operator">/</span>Makefile
+                po<span class="token operator">/</span>Makefile<span class="token punctuation">.</span>in
+                lib<span class="token operator">/</span>Makefile
+                doc<span class="token operator">/</span>Makefile
+                doc<span class="token operator">/</span>manual<span class="token operator">-</span>src<span class="token operator">/</span>Makefile
+                doc<span class="token operator">/</span>manual<span class="token operator">-</span>src<span class="token operator">/</span>en<span class="token operator">/</span>Makefile
+                doc<span class="token operator">/</span>manual<span class="token operator">-</span>src<span class="token operator">/</span>en<span class="token operator">/</span>conf<span class="token punctuation">.</span>py
+                doc<span class="token operator">/</span>manual<span class="token operator">-</span>src<span class="token operator">/</span>ru<span class="token operator">/</span>Makefile
+                doc<span class="token operator">/</span>manual<span class="token operator">-</span>src<span class="token operator">/</span>ru<span class="token operator">/</span>conf<span class="token punctuation">.</span>py
+                doc<span class="token operator">/</span>manual<span class="token operator">-</span>src<span class="token operator">/</span>pt<span class="token operator">/</span>Makefile
+                doc<span class="token operator">/</span>manual<span class="token operator">-</span>src<span class="token operator">/</span>pt<span class="token operator">/</span>conf<span class="token punctuation">.</span>py
+                deps<span class="token operator">/</span>Makefile<span class="token punctuation">]</span><span class="token punctuation">)</span>
 意思就是说用于检测的环境等生成的变量都要在这些文件里面生成一份，可以看到这里有多个MakeFile文件
 
-然后执行 ./android-make ，就可以完成android 版本的Aria2的可执行文件，下面是这个文件的内容
-if [ -z "$ANDROID_HOME" ]; then
-    echo 'No $ANDROID_HOME specified.'
-    exit 1
+然后执行 <span class="token punctuation">.</span><span class="token operator">/</span>android<span class="token operator">-</span>make ，就可以完成android 版本的Aria2的可执行文件，下面是这个文件的内容
+<span class="token keyword">if</span> <span class="token punctuation">[</span> <span class="token operator">-</span>z <span class="token string">"$ANDROID_HOME"</span> <span class="token punctuation">]</span><span class="token punctuation">;</span> then
+    echo <span class="token string">'No $ANDROID_HOME specified.'</span>
+    exit <span class="token number">1</span>
 fi
-TOOLCHAIN=$ANDROID_HOME/toolchain
-PATH=$TOOLCHAIN/bin:$PATH
+TOOLCHAIN<span class="token operator">=</span>$ANDROID_HOME<span class="token operator">/</span>toolchain
+PATH<span class="token operator">=</span>$TOOLCHAIN<span class="token operator">/</span>bin<span class="token operator">:</span>$PATH
 
-make "$@"
+make <span class="token string">"$@"</span>
 
-就是检测下环境变量，然后执行make "$@"，$@就是上面所说的多个MakeFIle文件，这里就会依次的执行编译，而且每一个MakeFile文件的环境变量，编译的参数都是一样的，但是要编译的规则，还有要
-编译的文件，是要根据每一个文件夹下面的MakeFile.am文件指定的，这里最主要的就是src/Makefile文件，我们的源码文件都是存储在这个文件
+就是检测下环境变量，然后执行make <span class="token string">"$@"</span>，$@就是上面所说的多个MakeFIle文件，这里就会依次的执行编译，而且每一个MakeFile文件的环境变量，编译的参数都是一样的，但是要编译的规则，还有要
+编译的文件，是要根据每一个文件夹下面的MakeFile<span class="token punctuation">.</span>am文件指定的，这里最主要的就是src<span class="token operator">/</span>Makefile文件，我们的源码文件都是存储在这个文件
 </code></pre>
-<p><a href="http://www.cnblogs.com/ranson7zop/p/8268196.html" target="_blank" rel="noopener">MakeFile.am基本知识</a></p>
+<p><a href="http://www.cnblogs.com/ranson7zop/p/8268196.html" target="_blank" rel="noopener"></a></p>
 <p>确定MakeFIle文件中哪些文件是需要编译的</p>
-<pre class=" language-MakeFile"><code class="language-MakeFile">下面的这些宏都是通过configure.ac检测之后生成的宏
+<pre class=" language-cpp"><code class="language-cpp">下面的这些宏都是通过configure<span class="token punctuation">.</span>ac检测之后生成的宏
 如果当前是window下编译的化
-if MINGW_BUILD               MINGW_BUILD 为false
-SRCS += WinConsoleFile.cc WinConsoleFile.h
+<span class="token keyword">if</span> MINGW_BUILD               MINGW_BUILD 为<span class="token boolean">false</span>
+SRCS <span class="token operator">+</span><span class="token operator">=</span> WinConsoleFile<span class="token punctuation">.</span>cc WinConsoleFile<span class="token punctuation">.</span>h
 endif # MINGW_BUILD
 
 如果允许WebSocket的化，默认是支持的
-if ENABLE_WEBSOCKET
-SRCS += \
-    WebSocketInteractionCommand.cc WebSocketInteractionCommand.h\
-    WebSocketResponseCommand.cc WebSocketResponseCommand.h\
-    WebSocketSession.cc WebSocketSession.h\
-    WebSocketSessionMan.cc WebSocketSessionMan.h
+<span class="token keyword">if</span> ENABLE_WEBSOCKET
+SRCS <span class="token operator">+</span><span class="token operator">=</span> \
+    WebSocketInteractionCommand<span class="token punctuation">.</span>cc WebSocketInteractionCommand<span class="token punctuation">.</span>h\
+    WebSocketResponseCommand<span class="token punctuation">.</span>cc WebSocketResponseCommand<span class="token punctuation">.</span>h\
+    WebSocketSession<span class="token punctuation">.</span>cc WebSocketSession<span class="token punctuation">.</span>h\
+    WebSocketSessionMan<span class="token punctuation">.</span>cc WebSocketSessionMan<span class="token punctuation">.</span>h
 endif # ENABLE_WEBSOCKET
 
 如果不允许WebSocket的化
-if !ENABLE_WEBSOCKET
-SRCS += NullWebSocketSessionMan.h
-endif # !ENABLE_WEBSOCKET
+<span class="token keyword">if</span> <span class="token operator">!</span>ENABLE_WEBSOCKET
+SRCS <span class="token operator">+</span><span class="token operator">=</span> NullWebSocketSessionMan<span class="token punctuation">.</span>h
+endif # <span class="token operator">!</span>ENABLE_WEBSOCKET
 
 如果支持XMLLIB
-if HAVE_SOME_XMLLIB
-SRCS += \
-    ParserStateMachine.h\
-    XmlAttr.cc XmlAttr.h\
-    XmlParser.cc XmlParser.h
+<span class="token keyword">if</span> HAVE_SOME_XMLLIB
+SRCS <span class="token operator">+</span><span class="token operator">=</span> \
+    ParserStateMachine<span class="token punctuation">.</span>h\
+    XmlAttr<span class="token punctuation">.</span>cc XmlAttr<span class="token punctuation">.</span>h\
+    XmlParser<span class="token punctuation">.</span>cc XmlParser<span class="token punctuation">.</span>h
 endif # HAVE_SOME_XMLLIB
-....
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
 </code></pre>
 <p>如果你不知道，或者不确定那些宏的值，也是可以知道 MakeFIle.am文件，需要什么样的文件，我们知道最终肯定都是由MakeFile来编译的，所以我们可以直接看MakeFile文件，他肯定会将要编译的文件收集起来，不需要编译的文件就注释掉，而且这样比较保险</p>
 <p>MakeFIle文件其中指定要编译的文件是用这个变量来收集的</p>
-<pre class=" language-MakeFIle"><code class="language-MakeFIle">SRCS = a2algo.h a2functional.h a2io.h a2iterator.h a2netcompat.h \
-     ......
-     libssl_compat.h $(am__append_1) $(am__append_2) \
-    $(am__append_3) $(am__append_4) $(am__append_5) \
-    $(am__append_6) $(am__append_7) $(am__append_8) \
-    $(am__append_9) $(am__append_10) $(am__append_11) \
-    $(am__append_12) $(am__append_13) $(am__append_14) \
-    $(am__append_15) $(am__append_16) $(am__append_17) \
-    $(am__append_18) $(am__append_19) $(am__append_20) \
-    $(am__append_21) $(am__append_22) $(am__append_23) \
-    $(am__append_24) $(am__append_25) $(am__append_26) \
-    $(am__append_27) $(am__append_28) $(am__append_29) \
-    $(am__append_30) $(am__append_31) $(am__append_32) \
-    $(am__append_33) $(am__append_34) $(am__append_35) \
-    $(am__append_36) $(am__append_37) $(am__append_38) \
-    $(am__append_39) $(am__append_40) $(am__append_41) \
-    $(am__append_42) $(am__append_43) $(am__append_44) \
-    $(am__append_45) $(am__append_46)
+<pre class=" language-cpp"><code class="language-cpp">SRCS <span class="token operator">=</span> a2algo<span class="token punctuation">.</span>h a2functional<span class="token punctuation">.</span>h a2io<span class="token punctuation">.</span>h a2iterator<span class="token punctuation">.</span>h a2netcompat<span class="token punctuation">.</span>h \
+     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+     libssl_compat<span class="token punctuation">.</span>h $<span class="token punctuation">(</span>am__append_1<span class="token punctuation">)</span> $<span class="token punctuation">(</span>am__append_2<span class="token punctuation">)</span> \
+    $<span class="token punctuation">(</span>am__append_3<span class="token punctuation">)</span> $<span class="token punctuation">(</span>am__append_4<span class="token punctuation">)</span> $<span class="token punctuation">(</span>am__append_5<span class="token punctuation">)</span> \
+    $<span class="token punctuation">(</span>am__append_6<span class="token punctuation">)</span> $<span class="token punctuation">(</span>am__append_7<span class="token punctuation">)</span> $<span class="token punctuation">(</span>am__append_8<span class="token punctuation">)</span> \
+    $<span class="token punctuation">(</span>am__append_9<span class="token punctuation">)</span> $<span class="token punctuation">(</span>am__append_10<span class="token punctuation">)</span> $<span class="token punctuation">(</span>am__append_11<span class="token punctuation">)</span> \
+    $<span class="token punctuation">(</span>am__append_12<span class="token punctuation">)</span> $<span class="token punctuation">(</span>am__append_13<span class="token punctuation">)</span> $<span class="token punctuation">(</span>am__append_14<span class="token punctuation">)</span> \
+    $<span class="token punctuation">(</span>am__append_15<span class="token punctuation">)</span> $<span class="token punctuation">(</span>am__append_16<span class="token punctuation">)</span> $<span class="token punctuation">(</span>am__append_17<span class="token punctuation">)</span> \
+    $<span class="token punctuation">(</span>am__append_18<span class="token punctuation">)</span> $<span class="token punctuation">(</span>am__append_19<span class="token punctuation">)</span> $<span class="token punctuation">(</span>am__append_20<span class="token punctuation">)</span> \
+    $<span class="token punctuation">(</span>am__append_21<span class="token punctuation">)</span> $<span class="token punctuation">(</span>am__append_22<span class="token punctuation">)</span> $<span class="token punctuation">(</span>am__append_23<span class="token punctuation">)</span> \
+    $<span class="token punctuation">(</span>am__append_24<span class="token punctuation">)</span> $<span class="token punctuation">(</span>am__append_25<span class="token punctuation">)</span> $<span class="token punctuation">(</span>am__append_26<span class="token punctuation">)</span> \
+    $<span class="token punctuation">(</span>am__append_27<span class="token punctuation">)</span> $<span class="token punctuation">(</span>am__append_28<span class="token punctuation">)</span> $<span class="token punctuation">(</span>am__append_29<span class="token punctuation">)</span> \
+    $<span class="token punctuation">(</span>am__append_30<span class="token punctuation">)</span> $<span class="token punctuation">(</span>am__append_31<span class="token punctuation">)</span> $<span class="token punctuation">(</span>am__append_32<span class="token punctuation">)</span> \
+    $<span class="token punctuation">(</span>am__append_33<span class="token punctuation">)</span> $<span class="token punctuation">(</span>am__append_34<span class="token punctuation">)</span> $<span class="token punctuation">(</span>am__append_35<span class="token punctuation">)</span> \
+    $<span class="token punctuation">(</span>am__append_36<span class="token punctuation">)</span> $<span class="token punctuation">(</span>am__append_37<span class="token punctuation">)</span> $<span class="token punctuation">(</span>am__append_38<span class="token punctuation">)</span> \
+    $<span class="token punctuation">(</span>am__append_39<span class="token punctuation">)</span> $<span class="token punctuation">(</span>am__append_40<span class="token punctuation">)</span> $<span class="token punctuation">(</span>am__append_41<span class="token punctuation">)</span> \
+    $<span class="token punctuation">(</span>am__append_42<span class="token punctuation">)</span> $<span class="token punctuation">(</span>am__append_43<span class="token punctuation">)</span> $<span class="token punctuation">(</span>am__append_44<span class="token punctuation">)</span> \
+    $<span class="token punctuation">(</span>am__append_45<span class="token punctuation">)</span> $<span class="token punctuation">(</span>am__append_46<span class="token punctuation">)</span>
 
-其中的$(am__append_1)代表是取这个变量的值，如果这个变量前面有定义就取他的值，如果不存在就定义一个变量
-例如：下面就是我们条件编译的内容，前面带有#的代表是注释的文件，这就是我们在MakeFile.am文件中对应的条件编译的内容，如果不需要就是用#注释的，所以我们能没有错误的指定哪些文件是需要编译的
-#am__append_1 = WinConsoleFile.cc WinConsoleFile.h    
-am__append_2 = \
-    WebSocketInteractionCommand.cc WebSocketInteractionCommand.h\
-    WebSocketResponseCommand.cc WebSocketResponseCommand.h\
-    WebSocketSession.cc WebSocketSession.h\
-    WebSocketSessionMan.cc WebSocketSessionMan.h
-#am__append_3 = NullWebSocketSessionMan.h
-am__append_4 = \
-    ParserStateMachine.h\
-    XmlAttr.cc XmlAttr.h\
-    XmlParser.cc XmlParser.h
-...
+其中的$<span class="token punctuation">(</span>am__append_1<span class="token punctuation">)</span>代表是取这个变量的值，如果这个变量前面有定义就取他的值，如果不存在就定义一个变量
+例如：下面就是我们条件编译的内容，前面带有#的代表是注释的文件，这就是我们在MakeFile<span class="token punctuation">.</span>am文件中对应的条件编译的内容，如果不需要就是用#注释的，所以我们能没有错误的指定哪些文件是需要编译的
+<span class="token macro property">#am__append_1 = WinConsoleFile.cc WinConsoleFile.h    </span>
+am__append_2 <span class="token operator">=</span> \
+    WebSocketInteractionCommand<span class="token punctuation">.</span>cc WebSocketInteractionCommand<span class="token punctuation">.</span>h\
+    WebSocketResponseCommand<span class="token punctuation">.</span>cc WebSocketResponseCommand<span class="token punctuation">.</span>h\
+    WebSocketSession<span class="token punctuation">.</span>cc WebSocketSession<span class="token punctuation">.</span>h\
+    WebSocketSessionMan<span class="token punctuation">.</span>cc WebSocketSessionMan<span class="token punctuation">.</span>h
+<span class="token macro property">#am__append_3 = NullWebSocketSessionMan.h</span>
+am__append_4 <span class="token operator">=</span> \
+    ParserStateMachine<span class="token punctuation">.</span>h\
+    XmlAttr<span class="token punctuation">.</span>cc XmlAttr<span class="token punctuation">.</span>h\
+    XmlParser<span class="token punctuation">.</span>cc XmlParser<span class="token punctuation">.</span>h
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
 </code></pre>
 <p>从MakeFIle文件中确定连接的参数，以及对应的编译参数</p>
-<pre class=" language-MakeFIle"><code class="language-MakeFIle">MakeFile文件中的 AM_CPPFLAGS这个变量就代表编译需要传递的编译参数，这个我们是需要的，这里解释下期中的变量
--I$(top_srcdir)/lib ， -I 代表需要导入哪个文件，也即是定位文件，可以用来定义头文件的地方，这样系统就会去对应的目录中去查找对应的文件
--DLOCALEDIR=\"${datarootdir}/locale\" -DHAVE_CONFIG_H  -D代表定义一个宏
+<pre class=" language-cpp"><code class="language-cpp">MakeFile文件中的 AM_CPPFLAGS这个变量就代表编译需要传递的编译参数，这个我们是需要的，这里解释下期中的变量
+<span class="token operator">-</span>I$<span class="token punctuation">(</span>top_srcdir<span class="token punctuation">)</span><span class="token operator">/</span>lib ， <span class="token operator">-</span>I 代表需要导入哪个文件，也即是定位文件，可以用来定义头文件的地方，这样系统就会去对应的目录中去查找对应的文件
+<span class="token operator">-</span>DLOCALEDIR<span class="token operator">=</span>\"$<span class="token punctuation">{</span>datarootdir<span class="token punctuation">}</span><span class="token operator">/</span>locale\" <span class="token operator">-</span>DHAVE_CONFIG_H  <span class="token operator">-</span>D代表定义一个宏
 
-AM_CPPFLAGS = \
-    -I$(top_srcdir)/lib -I$(top_srcdir)/intl\
-    -I$(srcdir)/includes -I$(builddir)/includes\
-    -DLOCALEDIR=\"${datarootdir}/locale\" -DHAVE_CONFIG_H \
+AM_CPPFLAGS <span class="token operator">=</span> \
+    <span class="token operator">-</span>I$<span class="token punctuation">(</span>top_srcdir<span class="token punctuation">)</span><span class="token operator">/</span>lib <span class="token operator">-</span>I$<span class="token punctuation">(</span>top_srcdir<span class="token punctuation">)</span><span class="token operator">/</span>intl\
+    <span class="token operator">-</span>I$<span class="token punctuation">(</span>srcdir<span class="token punctuation">)</span><span class="token operator">/</span>includes <span class="token operator">-</span>I$<span class="token punctuation">(</span>builddir<span class="token punctuation">)</span><span class="token operator">/</span>includes\
+    <span class="token operator">-</span>DLOCALEDIR<span class="token operator">=</span>\"$<span class="token punctuation">{</span>datarootdir<span class="token punctuation">}</span><span class="token operator">/</span>locale\" <span class="token operator">-</span>DHAVE_CONFIG_H \
      \
-    -I/opt/NDK/android-ndk-r14b/usr/local/include \
-     \
-     \
-    -I/opt/NDK/android-ndk-r14b/usr/local/include \
+    <span class="token operator">-</span>I<span class="token operator">/</span>opt<span class="token operator">/</span>NDK<span class="token operator">/</span>android<span class="token operator">-</span>ndk<span class="token operator">-</span>r14b<span class="token operator">/</span>usr<span class="token operator">/</span>local<span class="token operator">/</span>include \
      \
      \
-    -I/opt/NDK/android-ndk-r14b/usr/local/include \
+    <span class="token operator">-</span>I<span class="token operator">/</span>opt<span class="token operator">/</span>NDK<span class="token operator">/</span>android<span class="token operator">-</span>ndk<span class="token operator">-</span>r14b<span class="token operator">/</span>usr<span class="token operator">/</span>local<span class="token operator">/</span>include \
+     \
+     \
+    <span class="token operator">-</span>I<span class="token operator">/</span>opt<span class="token operator">/</span>NDK<span class="token operator">/</span>android<span class="token operator">-</span>ndk<span class="token operator">-</span>r14b<span class="token operator">/</span>usr<span class="token operator">/</span>local<span class="token operator">/</span>include \
      \
      \
      \
-    -I/opt/NDK/android-ndk-r14b/usr/local/include \
-    -DCARES_STATICLIB -I/opt/NDK/android-ndk-r14b/usr/local/include \
-    -I$(top_builddir)/deps/wslay/lib/includes -I$(top_srcdir)/deps/wslay/lib/includes \
+    <span class="token operator">-</span>I<span class="token operator">/</span>opt<span class="token operator">/</span>NDK<span class="token operator">/</span>android<span class="token operator">-</span>ndk<span class="token operator">-</span>r14b<span class="token operator">/</span>usr<span class="token operator">/</span>local<span class="token operator">/</span>include \
+    <span class="token operator">-</span>DCARES_STATICLIB <span class="token operator">-</span>I<span class="token operator">/</span>opt<span class="token operator">/</span>NDK<span class="token operator">/</span>android<span class="token operator">-</span>ndk<span class="token operator">-</span>r14b<span class="token operator">/</span>usr<span class="token operator">/</span>local<span class="token operator">/</span>include \
+    <span class="token operator">-</span>I$<span class="token punctuation">(</span>top_builddir<span class="token punctuation">)</span><span class="token operator">/</span>deps<span class="token operator">/</span>wslay<span class="token operator">/</span>lib<span class="token operator">/</span>includes <span class="token operator">-</span>I$<span class="token punctuation">(</span>top_srcdir<span class="token punctuation">)</span><span class="token operator">/</span>deps<span class="token operator">/</span>wslay<span class="token operator">/</span>lib<span class="token operator">/</span>includes \
      \
 
 MakeFile文件中的这个变量代表编译的时候需要连接的库     
-EXTLDADD =  \
+EXTLDADD <span class="token operator">=</span>  \
      \
-    -L/opt/NDK/android-ndk-r14b/usr/local/lib -lz \
-     \
-     \
-    -L/opt/NDK/android-ndk-r14b/usr/local/lib -lexpat \
+    <span class="token operator">-</span>L<span class="token operator">/</span>opt<span class="token operator">/</span>NDK<span class="token operator">/</span>android<span class="token operator">-</span>ndk<span class="token operator">-</span>r14b<span class="token operator">/</span>usr<span class="token operator">/</span>local<span class="token operator">/</span>lib <span class="token operator">-</span>lz \
      \
      \
-     \
-    -L/opt/NDK/android-ndk-r14b/usr/local/lib -lssl -lcrypto \
+    <span class="token operator">-</span>L<span class="token operator">/</span>opt<span class="token operator">/</span>NDK<span class="token operator">/</span>android<span class="token operator">-</span>ndk<span class="token operator">-</span>r14b<span class="token operator">/</span>usr<span class="token operator">/</span>local<span class="token operator">/</span>lib <span class="token operator">-</span>lexpat \
      \
      \
      \
-    -L/opt/NDK/android-ndk-r14b/usr/local/lib -lssh2 \
-    -L/opt/NDK/android-ndk-r14b/usr/local/lib -lcares \
-    $(top_builddir)/deps/wslay/lib/libwslay.la \
+    <span class="token operator">-</span>L<span class="token operator">/</span>opt<span class="token operator">/</span>NDK<span class="token operator">/</span>android<span class="token operator">-</span>ndk<span class="token operator">-</span>r14b<span class="token operator">/</span>usr<span class="token operator">/</span>local<span class="token operator">/</span>lib <span class="token operator">-</span>lssl <span class="token operator">-</span>lcrypto \
+     \
+     \
+     \
+    <span class="token operator">-</span>L<span class="token operator">/</span>opt<span class="token operator">/</span>NDK<span class="token operator">/</span>android<span class="token operator">-</span>ndk<span class="token operator">-</span>r14b<span class="token operator">/</span>usr<span class="token operator">/</span>local<span class="token operator">/</span>lib <span class="token operator">-</span>lssh2 \
+    <span class="token operator">-</span>L<span class="token operator">/</span>opt<span class="token operator">/</span>NDK<span class="token operator">/</span>android<span class="token operator">-</span>ndk<span class="token operator">-</span>r14b<span class="token operator">/</span>usr<span class="token operator">/</span>local<span class="token operator">/</span>lib <span class="token operator">-</span>lcares \
+    $<span class="token punctuation">(</span>top_builddir<span class="token punctuation">)</span><span class="token operator">/</span>deps<span class="token operator">/</span>wslay<span class="token operator">/</span>lib<span class="token operator">/</span>libwslay<span class="token punctuation">.</span>la \
      \
      \
 </code></pre>
-<p>也可以在Aria2根目录中，执行./android-config命令，改命令会去检测环境，同时最后面会将检测的结果，还有编译的一些参数，打印出来<br><img src="/uploads/Aria2编译/android-config配置.png" alt="结果显示"></p>
+<p>也可以在Aria2根目录中，执行./android-config命令，改命令会去检测环境，同时最后面会将检测的结果，还有编译的一些参数，打印出来<br><img src="/uploads/Aria2编译/android-config配置.png" alt></p>
 <h3 id="AndroidStudio-CmakeList编写"><a href="#AndroidStudio-CmakeList编写" class="headerlink" title="AndroidStudio CmakeList编写"></a>AndroidStudio CmakeList编写</h3><p>这里我们需要连接的库是从Ubuntu，跨平台吧编译Android的时候生成导出来的,下面是我CmakeList文件的编写</p>
-<pre class=" language-Cmake"><code class="language-Cmake">cmake_minimum_required(VERSION 3.4.1)
+<pre class=" language-cpp"><code class="language-cpp"><span class="token function">cmake_minimum_required</span><span class="token punctuation">(</span>VERSION <span class="token number">3.4</span><span class="token punctuation">.</span><span class="token number">1</span><span class="token punctuation">)</span>
 
-#设置变量 自定义变量使用SET(OBJ_NAME xxxx)，使用时${OBJ_NAME}
-set(My_ARIC_SRC ${CMAKE_SOURCE_DIR}/src/main/cpp/src)
-#message( WARNING  "${My_ARIC_SRC}")
+#设置变量 自定义变量使用<span class="token function">SET</span><span class="token punctuation">(</span>OBJ_NAME xxxx<span class="token punctuation">)</span>，使用时$<span class="token punctuation">{</span>OBJ_NAME<span class="token punctuation">}</span>
+<span class="token function">set</span><span class="token punctuation">(</span>My_ARIC_SRC $<span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span><span class="token operator">/</span>src<span class="token operator">/</span>main<span class="token operator">/</span>cpp<span class="token operator">/</span>src<span class="token punctuation">)</span>
+<span class="token macro property">#message( WARNING  "${My_ARIC_SRC}")</span>
 
-#定义宏 对应的即为  -DHAVE_CONFIG_H 
-add_definitions(-DHAVE_CONFIG_H)
+#定义宏 对应的即为  <span class="token operator">-</span>DHAVE_CONFIG_H 
+<span class="token function">add_definitions</span><span class="token punctuation">(</span><span class="token operator">-</span>DHAVE_CONFIG_H<span class="token punctuation">)</span>
 
 #添加头文件的查找目录
-include_directories(${CMAKE_SOURCE_DIR}/src/main/cpp/src/includes)
+<span class="token function">include_directories</span><span class="token punctuation">(</span>$<span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span><span class="token operator">/</span>src<span class="token operator">/</span>main<span class="token operator">/</span>cpp<span class="token operator">/</span>src<span class="token operator">/</span>includes<span class="token punctuation">)</span>
 
 
-#用来输出参数 ${CMAKE_SOURCE_DIR} 代表的就为CmakeList的路径，这里即为app目录
-#message( WARNING  "${CMAKE_SOURCE_DIR}")
+#用来输出参数 $<span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span> 代表的就为CmakeList的路径，这里即为app目录
+<span class="token macro property">#message( WARNING  "${CMAKE_SOURCE_DIR}")</span>
 
-#add_library():添加库，分为两种，一种是需要编译为库的代码，一种是已经编译好的库文件。 一般.so文件，还有STATIC，一般.a文件。IMPORTED表示引用的不是生成的。
-add_library( open-cares
+<span class="token macro property">#add_library():添加库，分为两种，一种是需要编译为库的代码，一种是已经编译好的库文件。 一般.so文件，还有STATIC，一般.a文件。IMPORTED表示引用的不是生成的。</span>
+<span class="token function">add_library</span><span class="token punctuation">(</span> open<span class="token operator">-</span>cares
              STATIC
-             IMPORTED)
+             IMPORTED<span class="token punctuation">)</span>
 
-# set_target_properties：对于已经编译好的so文件需要引入，所以需要设置 这里cares是名字，然后是PROPERTIES IMPORTED_LOCATION加上库的路径。
-set_target_properties( open-cares
+<span class="token macro property"># set_target_properties：对于已经编译好的so文件需要引入，所以需要设置 这里cares是名字，然后是PROPERTIES IMPORTED_LOCATION加上库的路径。</span>
+<span class="token function">set_target_properties</span><span class="token punctuation">(</span> open<span class="token operator">-</span>cares
                        PROPERTIES IMPORTED_LOCATION
-                       ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/libcares.a )
+                       $<span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span><span class="token operator">/</span>src<span class="token operator">/</span>main<span class="token operator">/</span>cpp<span class="token operator">/</span>lib<span class="token operator">/</span>libcares<span class="token punctuation">.</span>a <span class="token punctuation">)</span>
 
 # 添加两个预编译库
-add_library(openssl-crypto
+<span class="token function">add_library</span><span class="token punctuation">(</span>openssl<span class="token operator">-</span>crypto
     STATIC
-    IMPORTED)
+    IMPORTED<span class="token punctuation">)</span>
 
-set_target_properties(openssl-crypto
+<span class="token function">set_target_properties</span><span class="token punctuation">(</span>openssl<span class="token operator">-</span>crypto
                       PROPERTIES IMPORTED_LOCATION
-                      ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/libcrypto.a )
+                      $<span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span><span class="token operator">/</span>src<span class="token operator">/</span>main<span class="token operator">/</span>cpp<span class="token operator">/</span>lib<span class="token operator">/</span>libcrypto<span class="token punctuation">.</span>a <span class="token punctuation">)</span>
 
-add_library(openssl-ssl
+<span class="token function">add_library</span><span class="token punctuation">(</span>openssl<span class="token operator">-</span>ssl
   STATIC
-  IMPORTED)
+  IMPORTED<span class="token punctuation">)</span>
 
-set_target_properties(openssl-ssl
+<span class="token function">set_target_properties</span><span class="token punctuation">(</span>openssl<span class="token operator">-</span>ssl
                     PROPERTIES IMPORTED_LOCATION
-                    ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/libssl.a )
+                    $<span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span><span class="token operator">/</span>src<span class="token operator">/</span>main<span class="token operator">/</span>cpp<span class="token operator">/</span>lib<span class="token operator">/</span>libssl<span class="token punctuation">.</span>a <span class="token punctuation">)</span>
 
 
-add_library( open-expat
+<span class="token function">add_library</span><span class="token punctuation">(</span> open<span class="token operator">-</span>expat
              STATIC
-             IMPORTED)
+             IMPORTED<span class="token punctuation">)</span>
 
-set_target_properties( open-expat
+<span class="token function">set_target_properties</span><span class="token punctuation">(</span> open<span class="token operator">-</span>expat
                        PROPERTIES IMPORTED_LOCATION
-                       ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/libexpat.a )
+                       $<span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span><span class="token operator">/</span>src<span class="token operator">/</span>main<span class="token operator">/</span>cpp<span class="token operator">/</span>lib<span class="token operator">/</span>libexpat<span class="token punctuation">.</span>a <span class="token punctuation">)</span>
 
-add_library( open-ssh2
+<span class="token function">add_library</span><span class="token punctuation">(</span> open<span class="token operator">-</span>ssh2
              STATIC
-             IMPORTED)
+             IMPORTED<span class="token punctuation">)</span>
 
-set_target_properties( open-ssh2
+<span class="token function">set_target_properties</span><span class="token punctuation">(</span> open<span class="token operator">-</span>ssh2
                        PROPERTIES IMPORTED_LOCATION
-                       ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/libssh2.a )
+                       $<span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span><span class="token operator">/</span>src<span class="token operator">/</span>main<span class="token operator">/</span>cpp<span class="token operator">/</span>lib<span class="token operator">/</span>libssh2<span class="token punctuation">.</span>a <span class="token punctuation">)</span>
 
-add_library( open-z
+<span class="token function">add_library</span><span class="token punctuation">(</span> open<span class="token operator">-</span>z
              STATIC
-             IMPORTED)
+             IMPORTED<span class="token punctuation">)</span>
 
-set_target_properties( open-z
+<span class="token function">set_target_properties</span><span class="token punctuation">(</span> open<span class="token operator">-</span>z
                        PROPERTIES IMPORTED_LOCATION
-                       ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/libz.a )
+                       $<span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span><span class="token operator">/</span>src<span class="token operator">/</span>main<span class="token operator">/</span>cpp<span class="token operator">/</span>lib<span class="token operator">/</span>libz<span class="token punctuation">.</span>a <span class="token punctuation">)</span>
 
-set(wslay_Src
-     ${My_ARIC_SRC}/wslay/wslay_frame.c
-     ${My_ARIC_SRC}/wslay/wslay_event.c
-     ${My_ARIC_SRC}/wslay/wslay_queue.c
-     ${My_ARIC_SRC}/wslay/wslay_net.c )
+<span class="token function">set</span><span class="token punctuation">(</span>wslay_Src
+     $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>wslay<span class="token operator">/</span>wslay_frame<span class="token punctuation">.</span>c
+     $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>wslay<span class="token operator">/</span>wslay_event<span class="token punctuation">.</span>c
+     $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>wslay<span class="token operator">/</span>wslay_queue<span class="token punctuation">.</span>c
+     $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>wslay<span class="token operator">/</span>wslay_net<span class="token punctuation">.</span>c <span class="token punctuation">)</span>
 
-.......
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
 
-find_library( # Sets the name of the path variable.
-              log-lib
-              # Specifies the name of the NDK library that
-              # you want CMake to locate.
-              log )
+<span class="token function">find_library</span><span class="token punctuation">(</span> # Sets the name of the path variable<span class="token punctuation">.</span>
+              log<span class="token operator">-</span>lib
+              <span class="token macro property"># Specifies the name of the NDK library that</span>
+              <span class="token macro property"># you want CMake to locate.</span>
+              log <span class="token punctuation">)</span>
 
-add_library( # Sets the name of the library.
+<span class="token function">add_library</span><span class="token punctuation">(</span> # Sets the name of the library<span class="token punctuation">.</span>
              Aria
 
-             # Sets the library as a shared library.
+             <span class="token macro property"># Sets the library as a shared library.</span>
              SHARED
 
-            ${AriaSrc}
-            ${am__append_1_4}
-            ${am__append_6_22}
-            ${am__append_23_29}
-            ${am__append_30}
-            ${am__append_31}
-            ${wslay_Src}
+            $<span class="token punctuation">{</span>AriaSrc<span class="token punctuation">}</span>
+            $<span class="token punctuation">{</span>am__append_1_4<span class="token punctuation">}</span>
+            $<span class="token punctuation">{</span>am__append_6_22<span class="token punctuation">}</span>
+            $<span class="token punctuation">{</span>am__append_23_29<span class="token punctuation">}</span>
+            $<span class="token punctuation">{</span>am__append_30<span class="token punctuation">}</span>
+            $<span class="token punctuation">{</span>am__append_31<span class="token punctuation">}</span>
+            $<span class="token punctuation">{</span>wslay_Src<span class="token punctuation">}</span>
 
             #自己的源码文件
-            src/main/cpp/native-lib.cpp
-            ${My_ARIC_SRC}/main.cc
-            )
+            src<span class="token operator">/</span>main<span class="token operator">/</span>cpp<span class="token operator">/</span>native<span class="token operator">-</span>lib<span class="token punctuation">.</span>cpp
+            $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>main<span class="token punctuation">.</span>cc
+            <span class="token punctuation">)</span>
 
 
-#链接库文件，第一个代表要生成的target，后面的item为要连接的item,对于如果是通过 IMPORTED_NO_SONAME的方式来导入的
+#链接库文件，第一个代表要生成的target，后面的item为要连接的item<span class="token punctuation">,</span>对于如果是通过 IMPORTED_NO_SONAME的方式来导入的
 #这里注意不推荐使用全路径的方式来导入，一般要通过set_target_properties来指定
-target_link_libraries( Aria
+<span class="token function">target_link_libraries</span><span class="token punctuation">(</span> Aria
 
-                       # Links the target library to the log library
-                       # included in the NDK.
+                       <span class="token macro property"># Links the target library to the log library</span>
+                       <span class="token macro property"># included in the NDK.</span>
 
-                       ${log-lib}
-                       open-z
-                       open-expat
-                       open-ssh2
-                       open-cares
+                       $<span class="token punctuation">{</span>log<span class="token operator">-</span>lib<span class="token punctuation">}</span>
+                       open<span class="token operator">-</span>z
+                       open<span class="token operator">-</span>expat
+                       open<span class="token operator">-</span>ssh2
+                       open<span class="token operator">-</span>cares
                        #最后一个openssl 库文件要放在最后来连接。。。要不然会出现找不到函数的定义问题。。。注意，要不然会坑死你
-                       openssl-ssl openssl-crypto
-                       )
+                       openssl<span class="token operator">-</span>ssl openssl<span class="token operator">-</span>crypto
+                       <span class="token punctuation">)</span>
 </code></pre>
-<p><a href="https://cmake.org/cmake/help/latest/index.html" target="_blank" rel="noopener">CMake语法</a></p>
-<p>AndroidStudio 文件目录显示<br><img src="/uploads/Aria2编译/AndroidStudioCmakeList文件编写.png" alt="结果显示"></p>
-<p>AndroidStuido编译的结果<br><img src="/uploads/Aria2编译/Aria2Android编译结果.png" alt="结果显示"></p>
-<p><img src="/uploads/Aria2编译/Aria2生成的so.png" alt="结果显示"></p>
+<p><a href="https://cmake.org/cmake/help/latest/index.html" target="_blank" rel="noopener"></a></p>
+<p>AndroidStudio 文件目录显示<br><img src="/uploads/Aria2编译/AndroidStudioCmakeList文件编写.png" alt></p>
+<p>AndroidStuido编译的结果<br><img src="/uploads/Aria2编译/Aria2Android编译结果.png" alt></p>
+<p><img src="/uploads/Aria2编译/Aria2生成的so.png" alt></p>
 <h3 id="其中遇到的问题记录"><a href="#其中遇到的问题记录" class="headerlink" title="其中遇到的问题记录"></a>其中遇到的问题记录</h3><p>1.posix_memalign() undeclared identifier issue.<br>这个出现的原因就是：posix_memalign这个函数，在Api16以下是不存在的<br>解决的方案就是：这个需要我们提高Android Api的最低等级，也即是minSdkVersion 16</p>
 <ol>
 <li><p>relocation overflow in R_ARM_THM_CALL<br>这个出现的原因就是：该错误通常意味着被链接的二进制文件中的一个太大而且跳转/重定位地址根本不适合该指令。<br>解决的方案就是 我们可以在Android.mk文件中添加 LOCAL_ARM_MODE := arm 如果是在CmakeList里面可以在app的build.gradle中配置 arguments ‘-DANDROID_ARM_MODE=arm’</p>
@@ -853,12 +849,12 @@ target_link_libraries( Aria
                                     <span class="chip bg-color">AndroidStudio</span>
                                 </a>
                             
-                                <a href="/tags/Aria2/">
-                                    <span class="chip bg-color">Aria2</span>
-                                </a>
-                            
                                 <a href="/tags/CmakeList/">
                                     <span class="chip bg-color">CmakeList</span>
+                                </a>
+                            
+                                <a href="/tags/Aria2/">
+                                    <span class="chip bg-color">Aria2</span>
                                 </a>
                             
                         </div>
@@ -1312,9 +1308,7 @@ target_link_libraries( Aria
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概述
-Window下OOLLVM Android编译环境搭建
-
+                            
                         
                     </div>
                     <div class="publish-info">

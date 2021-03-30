@@ -497,523 +497,519 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><blockquote>
-<p>Fba 街机对战实现</p>
-</blockquote>
-<a id="more"></a>
-<h3 id="Fba源码分析"><a href="#Fba源码分析" class="headerlink" title="Fba源码分析"></a>Fba源码分析</h3><blockquote>
+                <h3 id="Fba源码分析"><a href="#Fba源码分析" class="headerlink" title="Fba源码分析"></a>Fba源码分析</h3><blockquote>
 <p>前面一篇文章中分析了FBa 中引入开源的Kaillera库，可以实现街机的对战，简要的介绍了他对应的功能，也从对应的网站上下载到了开源的代码，客户端以及服务端，测试是可以使用的，下面就简要的分析 下，这个对战库在Fba 源码中是怎么样使用的，这样才能写出对应的测试代码，来调试分析对战库</p>
 </blockquote>
 <p>前面已经分析过了，主函数的入口位置为 src/burn/win32/main.cpp文件,下面就大致的介绍看下对应的源码</p>
-<pre class=" language-C"><code class="language-C">int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nShowCmd)
-{
-    ...
-    if (!(AppInit())) {                            // Init the application
-        if (bAlwaysCreateSupportFolders) CreateSupportFolders();
-        if (!(ProcessCmdLine())) {
-            DetectWindowsVersion();
-            EnableHighResolutionTiming();
+<pre class=" language-cpp"><code class="language-cpp"><span class="token keyword">int</span> WINAPI <span class="token function">WinMain</span><span class="token punctuation">(</span>HINSTANCE hInstance<span class="token punctuation">,</span> HINSTANCE<span class="token punctuation">,</span> LPSTR lpCmdLine<span class="token punctuation">,</span> <span class="token keyword">int</span> nShowCmd<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token punctuation">(</span><span class="token function">AppInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>                            <span class="token comment" spellcheck="true">// Init the application</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>bAlwaysCreateSupportFolders<span class="token punctuation">)</span> <span class="token function">CreateSupportFolders</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token punctuation">(</span><span class="token function">ProcessCmdLine</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token function">DetectWindowsVersion</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">EnableHighResolutionTiming</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-            MediaInit();
+            <span class="token function">MediaInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-            RunMessageLoop();                    // Run the application message loop
-        }
-    }
-    ...
-}
+            <span class="token function">RunMessageLoop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                    <span class="token comment" spellcheck="true">// Run the application message loop</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 
 首先看AppInit 函数的实现
-static int AppInit()
-{
-    ...
-    // Init the Burn library  
-    BurnLibInit();
-    ...
-}
+<span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">AppInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token comment" spellcheck="true">// Init the Burn library  </span>
+    <span class="token function">BurnLibInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 
-extern "C" INT32 BurnLibInit()
-{
-    BurnLibExit();
-    nBurnDrvCount = sizeof(pDriver) / sizeof(pDriver[0]);    // count available drivers
+<span class="token keyword">extern</span> <span class="token string">"C"</span> INT32 <span class="token function">BurnLibInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token function">BurnLibExit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    nBurnDrvCount <span class="token operator">=</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>pDriver<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>pDriver<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>    <span class="token comment" spellcheck="true">// count available drivers</span>
 
-    cmc_4p_Precalc();
-    bBurnUseMMX = BurnCheckMMXSupport();
+    <span class="token function">cmc_4p_Precalc</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    bBurnUseMMX <span class="token operator">=</span> <span class="token function">BurnCheckMMXSupport</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    return 0;
-}
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-这里主要是算出当前街机支持的drivers的数量,是通过 sizeof(pDriver) / sizeof(pDriver[0]),这里的pDriver 为
-// Structure containing addresses of all drivers
-// Needs to be kept sorted (using the full game name as the key) to prevent problems with the gamelist in Kaillera
-static struct BurnDriver* pDriver[] = {
-    &BurnDrvgames88,            // '88 Games
-    &BurnDrvFlagrall,            // '96 Flag Rally
-    &BurnDrv99lstwar,            // '99: The Last War
-    &BurnDrv99lstwara,            // '99: The Last War (alternate)
-    &BurnDrv99lstwark,            // '99: The Last War (Kyugo)
-    &BurnDrvMSX_007tld,            // 007 - The Living Daylights (Euro)
-    &BurnDrvsg1k_jb007a,        // 007 James Bond (Jpn, v2.6, OMV)
-    &BurnDrvsg1k_jb007,            // 007 James Bond (Jpn, v2.7, OMV)
-    &BurnDrvsg1k_jb007t,        // 007 James Bond (Tw)
-    &BurnDrvMSX_10yard,            // 10-Yard Fight (Jpn)
-    &BurnDrvMSX_10yarda,        // 10-Yard Fight (Jpn, Alt)
-    &BurnDrvGtmro,                // 1000 Miglia: Great 1000 Miles Rally (94/05/10)
-    &BurnDrvGtmrb,                // 1000 Miglia: Great 1000 Miles Rally (94/05/26)
-    &BurnDrvGtmra,                // 1000 Miglia: Great 1000 Miles Rally (94/06/13)
-    &BurnDrvGtmr,                // 1000 Miglia: Great 1000 Miles Rally (94/07/18)
-    &BurnDrvmd_12in1,            // 12 in 1
-    &BurnDrvmd_13mahjan,        // 13 Ma Jiang - 98 Mei Shao Nu Pian (Chi)
-    &BurnDrvmd_16tongnk,        // 16 Ton (Jpn, Game no Kandume MegaCD Rip)
-    &BurnDrvmd_16ton,            // 16 Ton (Jpn, SegaNet)
-    &BurnDrvmd_16zhan,            // 16 Zhang Ma Jiang (Chi)
-    &BurnDrvMSX_180,            // 180 Degrees
-.....
-}
+这里主要是算出当前街机支持的drivers的数量<span class="token punctuation">,</span>是通过 <span class="token keyword">sizeof</span><span class="token punctuation">(</span>pDriver<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>pDriver<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">,</span>这里的pDriver 为
+<span class="token comment" spellcheck="true">// Structure containing addresses of all drivers</span>
+<span class="token comment" spellcheck="true">// Needs to be kept sorted (using the full game name as the key) to prevent problems with the gamelist in Kaillera</span>
+<span class="token keyword">static</span> <span class="token keyword">struct</span> BurnDriver<span class="token operator">*</span> pDriver<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token operator">&amp;</span>BurnDrvgames88<span class="token punctuation">,</span>            <span class="token comment" spellcheck="true">// '88 Games</span>
+    <span class="token operator">&amp;</span>BurnDrvFlagrall<span class="token punctuation">,</span>            <span class="token comment" spellcheck="true">// '96 Flag Rally</span>
+    <span class="token operator">&amp;</span>BurnDrv99lstwar<span class="token punctuation">,</span>            <span class="token comment" spellcheck="true">// '99: The Last War</span>
+    <span class="token operator">&amp;</span>BurnDrv99lstwara<span class="token punctuation">,</span>            <span class="token comment" spellcheck="true">// '99: The Last War (alternate)</span>
+    <span class="token operator">&amp;</span>BurnDrv99lstwark<span class="token punctuation">,</span>            <span class="token comment" spellcheck="true">// '99: The Last War (Kyugo)</span>
+    <span class="token operator">&amp;</span>BurnDrvMSX_007tld<span class="token punctuation">,</span>            <span class="token comment" spellcheck="true">// 007 - The Living Daylights (Euro)</span>
+    <span class="token operator">&amp;</span>BurnDrvsg1k_jb007a<span class="token punctuation">,</span>        <span class="token comment" spellcheck="true">// 007 James Bond (Jpn, v2.6, OMV)</span>
+    <span class="token operator">&amp;</span>BurnDrvsg1k_jb007<span class="token punctuation">,</span>            <span class="token comment" spellcheck="true">// 007 James Bond (Jpn, v2.7, OMV)</span>
+    <span class="token operator">&amp;</span>BurnDrvsg1k_jb007t<span class="token punctuation">,</span>        <span class="token comment" spellcheck="true">// 007 James Bond (Tw)</span>
+    <span class="token operator">&amp;</span>BurnDrvMSX_10yard<span class="token punctuation">,</span>            <span class="token comment" spellcheck="true">// 10-Yard Fight (Jpn)</span>
+    <span class="token operator">&amp;</span>BurnDrvMSX_10yarda<span class="token punctuation">,</span>        <span class="token comment" spellcheck="true">// 10-Yard Fight (Jpn, Alt)</span>
+    <span class="token operator">&amp;</span>BurnDrvGtmro<span class="token punctuation">,</span>                <span class="token comment" spellcheck="true">// 1000 Miglia: Great 1000 Miles Rally (94/05/10)</span>
+    <span class="token operator">&amp;</span>BurnDrvGtmrb<span class="token punctuation">,</span>                <span class="token comment" spellcheck="true">// 1000 Miglia: Great 1000 Miles Rally (94/05/26)</span>
+    <span class="token operator">&amp;</span>BurnDrvGtmra<span class="token punctuation">,</span>                <span class="token comment" spellcheck="true">// 1000 Miglia: Great 1000 Miles Rally (94/06/13)</span>
+    <span class="token operator">&amp;</span>BurnDrvGtmr<span class="token punctuation">,</span>                <span class="token comment" spellcheck="true">// 1000 Miglia: Great 1000 Miles Rally (94/07/18)</span>
+    <span class="token operator">&amp;</span>BurnDrvmd_12in1<span class="token punctuation">,</span>            <span class="token comment" spellcheck="true">// 12 in 1</span>
+    <span class="token operator">&amp;</span>BurnDrvmd_13mahjan<span class="token punctuation">,</span>        <span class="token comment" spellcheck="true">// 13 Ma Jiang - 98 Mei Shao Nu Pian (Chi)</span>
+    <span class="token operator">&amp;</span>BurnDrvmd_16tongnk<span class="token punctuation">,</span>        <span class="token comment" spellcheck="true">// 16 Ton (Jpn, Game no Kandume MegaCD Rip)</span>
+    <span class="token operator">&amp;</span>BurnDrvmd_16ton<span class="token punctuation">,</span>            <span class="token comment" spellcheck="true">// 16 Ton (Jpn, SegaNet)</span>
+    <span class="token operator">&amp;</span>BurnDrvmd_16zhan<span class="token punctuation">,</span>            <span class="token comment" spellcheck="true">// 16 Zhang Ma Jiang (Chi)</span>
+    <span class="token operator">&amp;</span>BurnDrvMSX_180<span class="token punctuation">,</span>            <span class="token comment" spellcheck="true">// 180 Degrees</span>
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 
 其中的BurnDriver 结构体代表引擎的通用结构体
-struct BurnDriver {
-    char* szShortName;            // The filename of the zip file (without extension)
-    char* szParent;                // The filename of the parent (without extension, NULL if not applicable)
-    char* szBoardROM;            // The filename of the board ROMs (without extension, NULL if not applicable)
-    char* szSampleName;            // The filename of the samples zip file (without extension, NULL if not applicable)
-    char* szDate;
+<span class="token keyword">struct</span> BurnDriver <span class="token punctuation">{</span>
+    <span class="token keyword">char</span><span class="token operator">*</span> szShortName<span class="token punctuation">;</span>            <span class="token comment" spellcheck="true">// The filename of the zip file (without extension)</span>
+    <span class="token keyword">char</span><span class="token operator">*</span> szParent<span class="token punctuation">;</span>                <span class="token comment" spellcheck="true">// The filename of the parent (without extension, NULL if not applicable)</span>
+    <span class="token keyword">char</span><span class="token operator">*</span> szBoardROM<span class="token punctuation">;</span>            <span class="token comment" spellcheck="true">// The filename of the board ROMs (without extension, NULL if not applicable)</span>
+    <span class="token keyword">char</span><span class="token operator">*</span> szSampleName<span class="token punctuation">;</span>            <span class="token comment" spellcheck="true">// The filename of the samples zip file (without extension, NULL if not applicable)</span>
+    <span class="token keyword">char</span><span class="token operator">*</span> szDate<span class="token punctuation">;</span>
 
-    // szFullNameA, szCommentA, szManufacturerA and szSystemA should always contain valid info
-    // szFullNameW, szCommentW, szManufacturerW and szSystemW should be used only if characters or scripts are needed that ASCII can't handle
-    char*    szFullNameA; char*    szCommentA; char*    szManufacturerA; char*    szSystemA;
-    wchar_t* szFullNameW; wchar_t* szCommentW; wchar_t* szManufacturerW; wchar_t* szSystemW;
+    <span class="token comment" spellcheck="true">// szFullNameA, szCommentA, szManufacturerA and szSystemA should always contain valid info</span>
+    <span class="token comment" spellcheck="true">// szFullNameW, szCommentW, szManufacturerW and szSystemW should be used only if characters or scripts are needed that ASCII can't handle</span>
+    <span class="token keyword">char</span><span class="token operator">*</span>    szFullNameA<span class="token punctuation">;</span> <span class="token keyword">char</span><span class="token operator">*</span>    szCommentA<span class="token punctuation">;</span> <span class="token keyword">char</span><span class="token operator">*</span>    szManufacturerA<span class="token punctuation">;</span> <span class="token keyword">char</span><span class="token operator">*</span>    szSystemA<span class="token punctuation">;</span>
+    <span class="token keyword">wchar_t</span><span class="token operator">*</span> szFullNameW<span class="token punctuation">;</span> <span class="token keyword">wchar_t</span><span class="token operator">*</span> szCommentW<span class="token punctuation">;</span> <span class="token keyword">wchar_t</span><span class="token operator">*</span> szManufacturerW<span class="token punctuation">;</span> <span class="token keyword">wchar_t</span><span class="token operator">*</span> szSystemW<span class="token punctuation">;</span>
 
-    INT32 Flags;            // See burn.h
-    INT32 Players;        // Max number of players a game supports (so we can remove single player games from netplay)
-    INT32 Hardware;        // Which type of hardware the game runs on
-    INT32 Genre;
-    INT32 Family;
-    INT32 (*GetZipName)(char** pszName, UINT32 i);                // Function to get possible zip names
-    INT32 (*GetRomInfo)(struct BurnRomInfo* pri, UINT32 i);        // Function to get the length and crc of each rom
-    INT32 (*GetRomName)(char** pszName, UINT32 i, INT32 nAka);    // Function to get the possible names for each rom
-    INT32 (*GetSampleInfo)(struct BurnSampleInfo* pri, UINT32 i);        // Function to get the sample flags
-    INT32 (*GetSampleName)(char** pszName, UINT32 i, INT32 nAka);    // Function to get the possible names for each sample
-    INT32 (*GetInputInfo)(struct BurnInputInfo* pii, UINT32 i);    // Function to get the input info for the game
-    INT32 (*GetDIPInfo)(struct BurnDIPInfo* pdi, UINT32 i);        // Function to get the input info for the game
-    INT32 (*Init)(); INT32 (*Exit)(); INT32 (*Frame)(); INT32 (*Redraw)(); INT32 (*AreaScan)(INT32 nAction, INT32* pnMin);
-    UINT8* pRecalcPal; UINT32 nPaletteEntries;                                        // Set to 1 if the palette needs to be fully re-calculated
-    INT32 nWidth, nHeight; INT32 nXAspect, nYAspect;                    // Screen width, height, x/y aspect
-};
-比如，当前引擎的名称，支持多少个玩家，游戏的宽高信息等，以及对应的一些函数指针，比如初始化，退出，界面的渲染，获取按键的信息获取rom的信息等 ,这样不同的引擎就要实现对应的函数指针的实现，
+    INT32 Flags<span class="token punctuation">;</span>            <span class="token comment" spellcheck="true">// See burn.h</span>
+    INT32 Players<span class="token punctuation">;</span>        <span class="token comment" spellcheck="true">// Max number of players a game supports (so we can remove single player games from netplay)</span>
+    INT32 Hardware<span class="token punctuation">;</span>        <span class="token comment" spellcheck="true">// Which type of hardware the game runs on</span>
+    INT32 Genre<span class="token punctuation">;</span>
+    INT32 Family<span class="token punctuation">;</span>
+    <span class="token function">INT32</span> <span class="token punctuation">(</span><span class="token operator">*</span>GetZipName<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">char</span><span class="token operator">*</span><span class="token operator">*</span> pszName<span class="token punctuation">,</span> UINT32 i<span class="token punctuation">)</span><span class="token punctuation">;</span>                <span class="token comment" spellcheck="true">// Function to get possible zip names</span>
+    <span class="token function">INT32</span> <span class="token punctuation">(</span><span class="token operator">*</span>GetRomInfo<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">struct</span> BurnRomInfo<span class="token operator">*</span> pri<span class="token punctuation">,</span> UINT32 i<span class="token punctuation">)</span><span class="token punctuation">;</span>        <span class="token comment" spellcheck="true">// Function to get the length and crc of each rom</span>
+    <span class="token function">INT32</span> <span class="token punctuation">(</span><span class="token operator">*</span>GetRomName<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">char</span><span class="token operator">*</span><span class="token operator">*</span> pszName<span class="token punctuation">,</span> UINT32 i<span class="token punctuation">,</span> INT32 nAka<span class="token punctuation">)</span><span class="token punctuation">;</span>    <span class="token comment" spellcheck="true">// Function to get the possible names for each rom</span>
+    <span class="token function">INT32</span> <span class="token punctuation">(</span><span class="token operator">*</span>GetSampleInfo<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">struct</span> BurnSampleInfo<span class="token operator">*</span> pri<span class="token punctuation">,</span> UINT32 i<span class="token punctuation">)</span><span class="token punctuation">;</span>        <span class="token comment" spellcheck="true">// Function to get the sample flags</span>
+    <span class="token function">INT32</span> <span class="token punctuation">(</span><span class="token operator">*</span>GetSampleName<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">char</span><span class="token operator">*</span><span class="token operator">*</span> pszName<span class="token punctuation">,</span> UINT32 i<span class="token punctuation">,</span> INT32 nAka<span class="token punctuation">)</span><span class="token punctuation">;</span>    <span class="token comment" spellcheck="true">// Function to get the possible names for each sample</span>
+    <span class="token function">INT32</span> <span class="token punctuation">(</span><span class="token operator">*</span>GetInputInfo<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">struct</span> BurnInputInfo<span class="token operator">*</span> pii<span class="token punctuation">,</span> UINT32 i<span class="token punctuation">)</span><span class="token punctuation">;</span>    <span class="token comment" spellcheck="true">// Function to get the input info for the game</span>
+    <span class="token function">INT32</span> <span class="token punctuation">(</span><span class="token operator">*</span>GetDIPInfo<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">struct</span> BurnDIPInfo<span class="token operator">*</span> pdi<span class="token punctuation">,</span> UINT32 i<span class="token punctuation">)</span><span class="token punctuation">;</span>        <span class="token comment" spellcheck="true">// Function to get the input info for the game</span>
+    <span class="token function">INT32</span> <span class="token punctuation">(</span><span class="token operator">*</span>Init<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token function">INT32</span> <span class="token punctuation">(</span><span class="token operator">*</span>Exit<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token function">INT32</span> <span class="token punctuation">(</span><span class="token operator">*</span>Frame<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token function">INT32</span> <span class="token punctuation">(</span><span class="token operator">*</span>Redraw<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token function">INT32</span> <span class="token punctuation">(</span><span class="token operator">*</span>AreaScan<span class="token punctuation">)</span><span class="token punctuation">(</span>INT32 nAction<span class="token punctuation">,</span> INT32<span class="token operator">*</span> pnMin<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    UINT8<span class="token operator">*</span> pRecalcPal<span class="token punctuation">;</span> UINT32 nPaletteEntries<span class="token punctuation">;</span>                                        <span class="token comment" spellcheck="true">// Set to 1 if the palette needs to be fully re-calculated</span>
+    INT32 nWidth<span class="token punctuation">,</span> nHeight<span class="token punctuation">;</span> INT32 nXAspect<span class="token punctuation">,</span> nYAspect<span class="token punctuation">;</span>                    <span class="token comment" spellcheck="true">// Screen width, height, x/y aspect</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+比如，当前引擎的名称，支持多少个玩家，游戏的宽高信息等，以及对应的一些函数指针，比如初始化，退出，界面的渲染，获取按键的信息获取rom的信息等 <span class="token punctuation">,</span>这样不同的引擎就要实现对应的函数指针的实现，
 
 这里我们看一个BurnDrvgames88 
-struct BurnDriver BurnDrvgames88 = {
-    "88games", NULL, NULL, NULL, "1988",
-    "'88 Games\0", NULL, "Konami", "GX861",
-    NULL, NULL, NULL, NULL,
-    BDF_GAME_WORKING, 4, HARDWARE_PREFIX_KONAMI, GBF_SPORTSMISC, 0,
-    NULL, games88RomInfo, games88RomName, NULL, NULL, games88InputInfo, games88DIPInfo,
-    DrvInit, DrvExit, DrvFrame, DrvDraw, DrvScan, &DrvRecalc, 0x800,
-    304, 224, 4, 3
-};
-大致就是这个引擎的名称为88games,最多支持的玩家数量为4个，游戏的分辨率，已经对应的函数指针,所以BurnLibInit 列出了当前支持的引擎数量
+<span class="token keyword">struct</span> BurnDriver BurnDrvgames88 <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token string">"88games"</span><span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">,</span> <span class="token string">"1988"</span><span class="token punctuation">,</span>
+    <span class="token string">"'88 Games\0"</span><span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">,</span> <span class="token string">"Konami"</span><span class="token punctuation">,</span> <span class="token string">"GX861"</span><span class="token punctuation">,</span>
+    <span class="token constant">NULL</span><span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">,</span>
+    BDF_GAME_WORKING<span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">,</span> HARDWARE_PREFIX_KONAMI<span class="token punctuation">,</span> GBF_SPORTSMISC<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span>
+    <span class="token constant">NULL</span><span class="token punctuation">,</span> games88RomInfo<span class="token punctuation">,</span> games88RomName<span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">,</span> games88InputInfo<span class="token punctuation">,</span> games88DIPInfo<span class="token punctuation">,</span>
+    DrvInit<span class="token punctuation">,</span> DrvExit<span class="token punctuation">,</span> DrvFrame<span class="token punctuation">,</span> DrvDraw<span class="token punctuation">,</span> DrvScan<span class="token punctuation">,</span> <span class="token operator">&amp;</span>DrvRecalc<span class="token punctuation">,</span> <span class="token number">0x800</span><span class="token punctuation">,</span>
+    <span class="token number">304</span><span class="token punctuation">,</span> <span class="token number">224</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">,</span> <span class="token number">3</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+大致就是这个引擎的名称为88games<span class="token punctuation">,</span>最多支持的玩家数量为<span class="token number">4</span>个，游戏的分辨率，已经对应的函数指针<span class="token punctuation">,</span>所以BurnLibInit 列出了当前支持的引擎数量
 
-接着main函数继续执行 ,执行到 MediaInit(); 函数
+接着main函数继续执行 <span class="token punctuation">,</span>执行到 <span class="token function">MediaInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 函数
 
-int MediaInit()
-{
-    if (ScrnInit()) {                    // Init the Scrn Window
-        FBAPopupAddText(PUF_TEXT_DEFAULT, MAKEINTRESOURCE(IDS_ERR_UI_WINDOW));
-        FBAPopupDisplay(PUF_TYPE_ERROR);
-        return 1;
-    }
+<span class="token keyword">int</span> <span class="token function">MediaInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">ScrnInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>                    <span class="token comment" spellcheck="true">// Init the Scrn Window</span>
+        <span class="token function">FBAPopupAddText</span><span class="token punctuation">(</span>PUF_TEXT_DEFAULT<span class="token punctuation">,</span> <span class="token function">MAKEINTRESOURCE</span><span class="token punctuation">(</span>IDS_ERR_UI_WINDOW<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">FBAPopupDisplay</span><span class="token punctuation">(</span>PUF_TYPE_ERROR<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    if (!bInputOkay) {
-        InputInit();                    // Init Input
-    }
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>bInputOkay<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">InputInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                    <span class="token comment" spellcheck="true">// Init Input</span>
+    <span class="token punctuation">}</span>
 
-    nAppVirtualFps = nBurnFPS;
+    nAppVirtualFps <span class="token operator">=</span> nBurnFPS<span class="token punctuation">;</span>
 
-    if (!bAudOkay) {
-        AudSoundInit();                    // Init Sound (not critical if it fails)
-    }
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>bAudOkay<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">AudSoundInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                    <span class="token comment" spellcheck="true">// Init Sound (not critical if it fails)</span>
+    <span class="token punctuation">}</span>
 
-    nBurnSoundRate = 0;                    // Assume no sound
-    pBurnSoundOut = NULL;
-    if (bAudOkay) {
-        nBurnSoundRate = nAudSampleRate[nAudSelect];
-        nBurnSoundLen = nAudSegLen;
-    }
+    nBurnSoundRate <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>                    <span class="token comment" spellcheck="true">// Assume no sound</span>
+    pBurnSoundOut <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>bAudOkay<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        nBurnSoundRate <span class="token operator">=</span> nAudSampleRate<span class="token punctuation">[</span>nAudSelect<span class="token punctuation">]</span><span class="token punctuation">;</span>
+        nBurnSoundLen <span class="token operator">=</span> nAudSegLen<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    if (!bVidOkay) {
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>bVidOkay<span class="token punctuation">)</span> <span class="token punctuation">{</span>
 
-        // Reinit the video plugin
-        VidInit();
-        if (!bVidOkay && nVidFullscreen) {
+        <span class="token comment" spellcheck="true">// Reinit the video plugin</span>
+        <span class="token function">VidInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>bVidOkay <span class="token operator">&amp;&amp;</span> nVidFullscreen<span class="token punctuation">)</span> <span class="token punctuation">{</span>
 
-            nVidFullscreen = 0;
+            nVidFullscreen <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
 
-            MediaExit();
-            return (MediaInit());
-        }
-        if (!nVidFullscreen) {
-            ScrnSize();
-        }
+            <span class="token function">MediaExit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token function">MediaInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>nVidFullscreen<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token function">ScrnSize</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
 
-        if (!bVidOkay) {
-            // Make sure the error will be visible
-            SplashDestroy(1);
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>bVidOkay<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">// Make sure the error will be visible</span>
+            <span class="token function">SplashDestroy</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-            FBAPopupAddText(PUF_TEXT_DEFAULT, MAKEINTRESOURCE(IDS_ERR_UI_VID_MODULE), VidGetModuleName());
-            FBAPopupDisplay(PUF_TYPE_ERROR);
-        }
+            <span class="token function">FBAPopupAddText</span><span class="token punctuation">(</span>PUF_TEXT_DEFAULT<span class="token punctuation">,</span> <span class="token function">MAKEINTRESOURCE</span><span class="token punctuation">(</span>IDS_ERR_UI_VID_MODULE<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">VidGetModuleName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">FBAPopupDisplay</span><span class="token punctuation">(</span>PUF_TYPE_ERROR<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
 
-        if (bVidOkay && ((bRunPause && bAltPause) || !bDrvOkay)) {
-            VidRedraw();
-        }
-    }
-    return 0;
-}
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>bVidOkay <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>bRunPause <span class="token operator">&amp;&amp;</span> bAltPause<span class="token punctuation">)</span> <span class="token operator">||</span> <span class="token operator">!</span>bDrvOkay<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token function">VidRedraw</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
 首先初始化窗口，设置窗口对应的事件等
-// Init the screen window (create it)
-int ScrnInit()
-{
-    ...
-    if (ScrnRegister() != 0) {
-        return 1;
-    }
-    ....
-    hScrnWnd = CreateWindowEx(nWindowExStyles, szClass, _T(APP_TITLE), nWindowStyles,
-        0, 0, 0, 0,                                                   // size of window
-        NULL, NULL, hAppInst, NULL);
-    ....    
-}
+<span class="token comment" spellcheck="true">// Init the screen window (create it)</span>
+<span class="token keyword">int</span> <span class="token function">ScrnInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">ScrnRegister</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    hScrnWnd <span class="token operator">=</span> <span class="token function">CreateWindowEx</span><span class="token punctuation">(</span>nWindowExStyles<span class="token punctuation">,</span> szClass<span class="token punctuation">,</span> <span class="token function">_T</span><span class="token punctuation">(</span>APP_TITLE<span class="token punctuation">)</span><span class="token punctuation">,</span> nWindowStyles<span class="token punctuation">,</span>
+        <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span>                                                   <span class="token comment" spellcheck="true">// size of window</span>
+        <span class="token constant">NULL</span><span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">,</span> hAppInst<span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>    
+<span class="token punctuation">}</span>
 上面的代码主要是创建对应的显示窗口，并且设置对应的事件触发函数 ScrnRegister 函数，执行窗口的注册，包括事件等
-static int ScrnRegister()
-{
-    WNDCLASSEX WndClassEx;
-    ATOM Atom = 0;
+<span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">ScrnRegister</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    WNDCLASSEX WndClassEx<span class="token punctuation">;</span>
+    ATOM Atom <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
 
-    // Register the window class
-    memset(&WndClassEx, 0, sizeof(WndClassEx));         // Init structure to all zeros
-    WndClassEx.cbSize            = sizeof(WndClassEx);
-    WndClassEx.style            = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS | CS_CLASSDC;// These cause flicker in the toolbar
-    WndClassEx.lpfnWndProc        = ScrnProc;
-    WndClassEx.hInstance        = hAppInst;
-    WndClassEx.hIcon            = LoadIcon(hAppInst, MAKEINTRESOURCE(IDI_APP));
-    WndClassEx.hCursor            = LoadCursor(NULL, IDC_ARROW);
-    WndClassEx.hbrBackground    = static_cast<HBRUSH>( GetStockObject ( BLACK_BRUSH ));
-    WndClassEx.lpszClassName    = szClass;
+    <span class="token comment" spellcheck="true">// Register the window class</span>
+    <span class="token function">memset</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>WndClassEx<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>WndClassEx<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>         <span class="token comment" spellcheck="true">// Init structure to all zeros</span>
+    WndClassEx<span class="token punctuation">.</span>cbSize            <span class="token operator">=</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>WndClassEx<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    WndClassEx<span class="token punctuation">.</span>style            <span class="token operator">=</span> CS_HREDRAW <span class="token operator">|</span> CS_VREDRAW <span class="token operator">|</span> CS_DBLCLKS <span class="token operator">|</span> CS_CLASSDC<span class="token punctuation">;</span><span class="token comment" spellcheck="true">// These cause flicker in the toolbar</span>
+    WndClassEx<span class="token punctuation">.</span>lpfnWndProc        <span class="token operator">=</span> ScrnProc<span class="token punctuation">;</span>
+    WndClassEx<span class="token punctuation">.</span>hInstance        <span class="token operator">=</span> hAppInst<span class="token punctuation">;</span>
+    WndClassEx<span class="token punctuation">.</span>hIcon            <span class="token operator">=</span> <span class="token function">LoadIcon</span><span class="token punctuation">(</span>hAppInst<span class="token punctuation">,</span> <span class="token function">MAKEINTRESOURCE</span><span class="token punctuation">(</span>IDI_APP<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    WndClassEx<span class="token punctuation">.</span>hCursor            <span class="token operator">=</span> <span class="token function">LoadCursor</span><span class="token punctuation">(</span><span class="token constant">NULL</span><span class="token punctuation">,</span> IDC_ARROW<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    WndClassEx<span class="token punctuation">.</span>hbrBackground    <span class="token operator">=</span> <span class="token keyword">static_cast</span><span class="token operator">&lt;</span>HBRUSH<span class="token operator">></span><span class="token punctuation">(</span> <span class="token function">GetStockObject</span> <span class="token punctuation">(</span> BLACK_BRUSH <span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    WndClassEx<span class="token punctuation">.</span>lpszClassName    <span class="token operator">=</span> szClass<span class="token punctuation">;</span>
 
-    // Register the window class with the above information:
-    Atom = RegisterClassEx(&WndClassEx);
-    if (Atom) {
-        return 0;
-    } else {
-        return 1;
-    }
-}
+    <span class="token comment" spellcheck="true">// Register the window class with the above information:</span>
+    Atom <span class="token operator">=</span> <span class="token function">RegisterClassEx</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>WndClassEx<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>Atom<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
-窗口的注册事件主要是通过 RegisterClassEx 实现的，具体可以查对应的api,  lpfnWndProc：代表窗口处理函数的指针。,也即是对应的ScrnProc 函数
-static LRESULT CALLBACK ScrnProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
-{
-    ...
-    switch (Msg) {
-        HANDLE_MSG(hWnd, WM_CREATE,            OnCreate);
-        //HANDLE_MSG(hWnd, WM_ACTIVATEAPP,    OnActivateApp);
-        HANDLE_MSGB(hWnd,WM_PAINT,            OnPaint);
-        HANDLE_MSG(hWnd, WM_CLOSE,            OnClose);
-        HANDLE_MSG(hWnd, WM_DESTROY,        OnDestroy);
-        HANDLE_MSG(hWnd, WM_COMMAND,        OnCommand);
-    ...
-}
-HANDLE_MSG是 Win32应用中的回调函数WndProc用于接收Windows向应用程序直接发送的消息，以及响应消息,这些事件对应的也即是窗口创建的时候，执行函数OnCreate,窗口绘制的时候，执行OnPaint，
-窗口销毁的时候，执行OnDestroy 等，这里我们的窗口按钮的点击是在OnCommand 函数实现的，具体的窗口的绘制就不看了，都是利用window下特有的api实现的,这里主要看按钮的事件响应函数
+窗口的注册事件主要是通过 RegisterClassEx 实现的，具体可以查对应的api<span class="token punctuation">,</span>  lpfnWndProc：代表窗口处理函数的指针。<span class="token punctuation">,</span>也即是对应的ScrnProc 函数
+<span class="token keyword">static</span> LRESULT CALLBACK <span class="token function">ScrnProc</span><span class="token punctuation">(</span>HWND hWnd<span class="token punctuation">,</span> UINT Msg<span class="token punctuation">,</span> WPARAM wParam<span class="token punctuation">,</span> LPARAM lParam<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token keyword">switch</span> <span class="token punctuation">(</span>Msg<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">HANDLE_MSG</span><span class="token punctuation">(</span>hWnd<span class="token punctuation">,</span> WM_CREATE<span class="token punctuation">,</span>            OnCreate<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//HANDLE_MSG(hWnd, WM_ACTIVATEAPP,    OnActivateApp);</span>
+        <span class="token function">HANDLE_MSGB</span><span class="token punctuation">(</span>hWnd<span class="token punctuation">,</span>WM_PAINT<span class="token punctuation">,</span>            OnPaint<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">HANDLE_MSG</span><span class="token punctuation">(</span>hWnd<span class="token punctuation">,</span> WM_CLOSE<span class="token punctuation">,</span>            OnClose<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">HANDLE_MSG</span><span class="token punctuation">(</span>hWnd<span class="token punctuation">,</span> WM_DESTROY<span class="token punctuation">,</span>        OnDestroy<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">HANDLE_MSG</span><span class="token punctuation">(</span>hWnd<span class="token punctuation">,</span> WM_COMMAND<span class="token punctuation">,</span>        OnCommand<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
+HANDLE_MSG是 Win32应用中的回调函数WndProc用于接收Windows向应用程序直接发送的消息，以及响应消息<span class="token punctuation">,</span>这些事件对应的也即是窗口创建的时候，执行函数OnCreate<span class="token punctuation">,</span>窗口绘制的时候，执行OnPaint，
+窗口销毁的时候，执行OnDestroy 等，这里我们的窗口按钮的点击是在OnCommand 函数实现的，具体的窗口的绘制就不看了，都是利用window下特有的api实现的<span class="token punctuation">,</span>这里主要看按钮的事件响应函数
 
-static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
-{
-        case MENU_LOAD://普通的单机选择游戏事件
-        {
-            .....
-            nGame = SelDialog(0, hScrnWnd);        // Bring up select dialog to pick a driver
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">OnCommand</span><span class="token punctuation">(</span>HWND <span class="token comment" spellcheck="true">/*hDlg*/</span><span class="token punctuation">,</span> <span class="token keyword">int</span> id<span class="token punctuation">,</span> HWND <span class="token comment" spellcheck="true">/*hwndCtl*/</span><span class="token punctuation">,</span> UINT codeNotify<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+        <span class="token keyword">case</span> MENU_LOAD<span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>普通的单机选择游戏事件
+        <span class="token punctuation">{</span>
+            <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+            nGame <span class="token operator">=</span> <span class="token function">SelDialog</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> hScrnWnd<span class="token punctuation">)</span><span class="token punctuation">;</span>        <span class="token comment" spellcheck="true">// Bring up select dialog to pick a driver</span>
 
-            extern bool bDialogCancel;
+            <span class="token keyword">extern</span> <span class="token keyword">bool</span> bDialogCancel<span class="token punctuation">;</span>
 
-            if (nGame >= 0 && bDialogCancel == false) {
-                DrvExit();
-                DrvInit(nGame, true);            // Init the game driver
-                .....
-                break;
-            } 
-            ....
-        }
-        case MENU_STARTNET:  //网络对战的按钮事件
-        {
-            if (Init_Network()) {
-                MessageBox(hScrnWnd, FBALoadStringEx(hAppInst, IDS_ERR_NO_NETPLAYDLL, true), FBALoadStringEx(hAppInst, IDS_ERR_ERROR, true), MB_OK);
-                break;
-            }
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>nGame <span class="token operator">>=</span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> bDialogCancel <span class="token operator">==</span> <span class="token boolean">false</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token function">DrvExit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token function">DrvInit</span><span class="token punctuation">(</span>nGame<span class="token punctuation">,</span> <span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>            <span class="token comment" spellcheck="true">// Init the game driver</span>
+                <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+                <span class="token keyword">break</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> 
+            <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">case</span> MENU_STARTNET<span class="token operator">:</span>  <span class="token comment" spellcheck="true">//网络对战的按钮事件</span>
+        <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">Init_Network</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token function">MessageBox</span><span class="token punctuation">(</span>hScrnWnd<span class="token punctuation">,</span> <span class="token function">FBALoadStringEx</span><span class="token punctuation">(</span>hAppInst<span class="token punctuation">,</span> IDS_ERR_NO_NETPLAYDLL<span class="token punctuation">,</span> <span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">FBALoadStringEx</span><span class="token punctuation">(</span>hAppInst<span class="token punctuation">,</span> IDS_ERR_ERROR<span class="token punctuation">,</span> <span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">,</span> MB_OK<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">break</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
 
-            if (!kNetGame) {
-                InputSetCooperativeLevel(false, bAlwaysProcessKeyboardInput);
-                AudBlankSound();
-                SplashDestroy(1);
-                StopReplay();
-                DrvExit();
-                DoNetGame();
-                MenuEnableItems();
-                InputSetCooperativeLevel(false, bAlwaysProcessKeyboardInput);
-            }
-            break;
-        }
-    .....    
-    }
-}
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>kNetGame<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token function">InputSetCooperativeLevel</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">,</span> bAlwaysProcessKeyboardInput<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token function">AudBlankSound</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token function">SplashDestroy</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token function">StopReplay</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token function">DrvExit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token function">DoNetGame</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token function">MenuEnableItems</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token function">InputSetCooperativeLevel</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">,</span> bAlwaysProcessKeyboardInput<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">break</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>    
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
-接着继续分析 MediaInit函数 InputInit() 也即是输入的初始化 
-INT32 InputInit()
-{
-    INT32 nRet;
+接着继续分析 MediaInit函数 <span class="token function">InputInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span> 也即是输入的初始化 
+INT32 <span class="token function">InputInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    INT32 nRet<span class="token punctuation">;</span>
 
-    bInputOkay = false;
+    bInputOkay <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
 
-    if (nInputSelect >= INPUT_LEN) {
-        return 1;
-    }
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>nInputSelect <span class="token operator">>=</span> INPUT_LEN<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    if ((nRet = pInputInOut[nInputSelect]->Init()) == 0) {
-        bInputOkay = true;
-    }
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>nRet <span class="token operator">=</span> pInputInOut<span class="token punctuation">[</span>nInputSelect<span class="token punctuation">]</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        bInputOkay <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    return nRet;
-}
+    <span class="token keyword">return</span> nRet<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
 这里的pInputInOut 为
-static struct InputInOut *pInputInOut[]=
-{
-#if defined (BUILD_WIN32)
-    &InputInOutDInput,
-#elif defined (BUILD_SDL)
-    &InputInOutSDL,
-#elif defined (_XBOX)
-    &InputInOutXInput2,
-#elif defined (BUILD_QT)
-    &InputInOutQt,
-#endif
-};
+<span class="token keyword">static</span> <span class="token keyword">struct</span> InputInOut <span class="token operator">*</span>pInputInOut<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">=</span>
+<span class="token punctuation">{</span>
+<span class="token macro property">#<span class="token directive keyword">if</span> defined (BUILD_WIN32)</span>
+    <span class="token operator">&amp;</span>InputInOutDInput<span class="token punctuation">,</span>
+<span class="token macro property">#<span class="token directive keyword">elif</span> defined (BUILD_SDL)</span>
+    <span class="token operator">&amp;</span>InputInOutSDL<span class="token punctuation">,</span>
+<span class="token macro property">#<span class="token directive keyword">elif</span> defined (_XBOX)</span>
+    <span class="token operator">&amp;</span>InputInOutXInput2<span class="token punctuation">,</span>
+<span class="token macro property">#<span class="token directive keyword">elif</span> defined (BUILD_QT)</span>
+    <span class="token operator">&amp;</span>InputInOutQt<span class="token punctuation">,</span>
+<span class="token macro property">#<span class="token directive keyword">endif</span></span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
 
 可以看出这里提供了对应的平台下的实现，这里是win32 所以这个函数返回 InputInOutDInput，而这个结构体变量的定义为
-struct InputInOut InputInOutDInput = { init, exit, setCooperativeLevel, newFrame, getState, readGamepadAxis, readMouseAxis, find, getControlName, NULL, _T("DirectInput8 input") }; 
+<span class="token keyword">struct</span> InputInOut InputInOutDInput <span class="token operator">=</span> <span class="token punctuation">{</span> init<span class="token punctuation">,</span> exit<span class="token punctuation">,</span> setCooperativeLevel<span class="token punctuation">,</span> newFrame<span class="token punctuation">,</span> getState<span class="token punctuation">,</span> readGamepadAxis<span class="token punctuation">,</span> readMouseAxis<span class="token punctuation">,</span> find<span class="token punctuation">,</span> getControlName<span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">,</span> <span class="token function">_T</span><span class="token punctuation">(</span><span class="token string">"DirectInput8 input"</span><span class="token punctuation">)</span> <span class="token punctuation">}</span><span class="token punctuation">;</span> 
 所以执行到了对应的init，这是一个函数指针
-int init()
-{
-    ...
-    if (FAILED(_DirectInput8Create(hAppInst, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&pDI, NULL))) {
-        return 1;
-    }
+<span class="token keyword">int</span> <span class="token function">init</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">FAILED</span><span class="token punctuation">(</span><span class="token function">_DirectInput8Create</span><span class="token punctuation">(</span>hAppInst<span class="token punctuation">,</span> DIRECTINPUT_VERSION<span class="token punctuation">,</span> IID_IDirectInput8<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token keyword">void</span><span class="token operator">*</span><span class="token operator">*</span><span class="token punctuation">)</span><span class="token operator">&amp;</span>pDI<span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    // keyboard
-    if (FAILED(pDI->CreateDevice(GUID_SysKeyboard, &keyboardProperties[0].lpdid, NULL))) {
-        return 1;
-    }
-    ...
-}
+    <span class="token comment" spellcheck="true">// keyboard</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">FAILED</span><span class="token punctuation">(</span>pDI<span class="token operator">-</span><span class="token operator">></span><span class="token function">CreateDevice</span><span class="token punctuation">(</span>GUID_SysKeyboard<span class="token punctuation">,</span> <span class="token operator">&amp;</span>keyboardProperties<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>lpdid<span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 
 所以对于MediaInit函数 中的AudSoundInit 函数，这个函数主要完成声音的初始化，跟上面的执行逻辑是一样的
-INT32 AudSoundInit()
-{
-    INT32 nRet;
+INT32 <span class="token function">AudSoundInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    INT32 nRet<span class="token punctuation">;</span>
 
-    if (nAudSelect >= AUD_LEN) {
-        return 1;
-    }
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>nAudSelect <span class="token operator">>=</span> AUD_LEN<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    nAudActive = nAudSelect;
+    nAudActive <span class="token operator">=</span> nAudSelect<span class="token punctuation">;</span>
 
-    if ((nRet = pAudOut[nAudActive]->SoundInit()) == 0) {
-        bAudOkay = true;
-    }
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>nRet <span class="token operator">=</span> pAudOut<span class="token punctuation">[</span>nAudActive<span class="token punctuation">]</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">SoundInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        bAudOkay <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    return nRet;
-}
+    <span class="token keyword">return</span> nRet<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-MediaInit函数 中的VidInit(); 函数，这个主要完成视频的初始化
-INT32 VidInit()
-{
-    ....
-    pVidOut[nVidActive]->Init() 
-    ...
-}
-static struct VidOut *pVidOut[] = {
-#if defined (BUILD_WIN32)
-    &VidOutDDraw,
-    &VidOutD3D,
-    &VidOutDDrawFX,
-    &VidOutDX9,
-    &VidOutDX9Alt,
-#elif defined (BUILD_SDL)
-    &VidOutSDLOpenGL,
-    &VidOutSDLFX,
-#elif defined (_XBOX)
-    &VidOutD3D,
-#elif defined (BUILD_QT)
-    &VidOutOGL,
-#endif
-};
+MediaInit函数 中的<span class="token function">VidInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 函数，这个主要完成视频的初始化
+INT32 <span class="token function">VidInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    pVidOut<span class="token punctuation">[</span>nVidActive<span class="token punctuation">]</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span> 
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">static</span> <span class="token keyword">struct</span> VidOut <span class="token operator">*</span>pVidOut<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span>
+<span class="token macro property">#<span class="token directive keyword">if</span> defined (BUILD_WIN32)</span>
+    <span class="token operator">&amp;</span>VidOutDDraw<span class="token punctuation">,</span>
+    <span class="token operator">&amp;</span>VidOutD3D<span class="token punctuation">,</span>
+    <span class="token operator">&amp;</span>VidOutDDrawFX<span class="token punctuation">,</span>
+    <span class="token operator">&amp;</span>VidOutDX9<span class="token punctuation">,</span>
+    <span class="token operator">&amp;</span>VidOutDX9Alt<span class="token punctuation">,</span>
+<span class="token macro property">#<span class="token directive keyword">elif</span> defined (BUILD_SDL)</span>
+    <span class="token operator">&amp;</span>VidOutSDLOpenGL<span class="token punctuation">,</span>
+    <span class="token operator">&amp;</span>VidOutSDLFX<span class="token punctuation">,</span>
+<span class="token macro property">#<span class="token directive keyword">elif</span> defined (_XBOX)</span>
+    <span class="token operator">&amp;</span>VidOutD3D<span class="token punctuation">,</span>
+<span class="token macro property">#<span class="token directive keyword">elif</span> defined (BUILD_QT)</span>
+    <span class="token operator">&amp;</span>VidOutOGL<span class="token punctuation">,</span>
+<span class="token macro property">#<span class="token directive keyword">endif</span></span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
 所以之类的初始化过程，跟上面也是类似的
 
-接着回到主函数的 RunMessageLoop();                    // Run the application message loop 
-// The main message loop
-int RunMessageLoop()
-{
-    int bRestartVideo;
-    MSG Msg;
+接着回到主函数的 <span class="token function">RunMessageLoop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                    <span class="token comment" spellcheck="true">// Run the application message loop </span>
+<span class="token comment" spellcheck="true">// The main message loop</span>
+<span class="token keyword">int</span> <span class="token function">RunMessageLoop</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">int</span> bRestartVideo<span class="token punctuation">;</span>
+    MSG Msg<span class="token punctuation">;</span>
 
-    do {
-        ...
-        //显示窗口
-        ShowWindow(hScrnWnd, nAppShowCmd);                                    
-        ....
-        //一直循环，用来响应各种事件
-        while (1) {
-        if (PeekMessage(&Msg, NULL, 0, 0, PM_REMOVE)) {
-            // A message is waiting to be processed
-            if (Msg.message == WM_QUIT)    {                                            // Quit program
-                break;
-            }
-            if (Msg.message == (WM_APP + 0)) {                                        // Restart video
-                bRestartVideo = 1;
-                break;
-            }
-            .....
-        }
-        else {
-            //没有事件，默认执行这里
-            bRunPause ? wav_pause(false) : wav_pause(true);
-            // No messages are waiting
-            SplashDestroy(0);
-            RunIdle();
-        }
-    }
-}
-PeekMessage是一个Windows API函数。该函数为一个消息检查线程消息队列，并将该消息(如果存在)放于指定的结构。 由于这里是刚初始化，所以没有事件，调用ShowWindow(hScrnWnd, nAppShowCmd); 
-那么默认的窗口也就显示出来了,如果没有事件的化，默认执行 RunIdle ,RunIdle 会执行 RunFrame来更新界面
+    <span class="token keyword">do</span> <span class="token punctuation">{</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+        <span class="token comment" spellcheck="true">//显示窗口</span>
+        <span class="token function">ShowWindow</span><span class="token punctuation">(</span>hScrnWnd<span class="token punctuation">,</span> nAppShowCmd<span class="token punctuation">)</span><span class="token punctuation">;</span>                                    
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+        <span class="token comment" spellcheck="true">//一直循环，用来响应各种事件</span>
+        <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">PeekMessage</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>Msg<span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> PM_REMOVE<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">// A message is waiting to be processed</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>Msg<span class="token punctuation">.</span>message <span class="token operator">==</span> WM_QUIT<span class="token punctuation">)</span>    <span class="token punctuation">{</span>                                            <span class="token comment" spellcheck="true">// Quit program</span>
+                <span class="token keyword">break</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>Msg<span class="token punctuation">.</span>message <span class="token operator">==</span> <span class="token punctuation">(</span>WM_APP <span class="token operator">+</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>                                        <span class="token comment" spellcheck="true">// Restart video</span>
+                bRestartVideo <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+                <span class="token keyword">break</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">//没有事件，默认执行这里</span>
+            bRunPause <span class="token operator">?</span> <span class="token function">wav_pause</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span> <span class="token operator">:</span> <span class="token function">wav_pause</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">// No messages are waiting</span>
+            <span class="token function">SplashDestroy</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">RunIdle</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+PeekMessage是一个Windows API函数。该函数为一个消息检查线程消息队列，并将该消息<span class="token punctuation">(</span>如果存在<span class="token punctuation">)</span>放于指定的结构。 由于这里是刚初始化，所以没有事件，调用<span class="token function">ShowWindow</span><span class="token punctuation">(</span>hScrnWnd<span class="token punctuation">,</span> nAppShowCmd<span class="token punctuation">)</span><span class="token punctuation">;</span> 
+那么默认的窗口也就显示出来了<span class="token punctuation">,</span>如果没有事件的化，默认执行 RunIdle <span class="token punctuation">,</span>RunIdle 会执行 RunFrame来更新界面
 
-// With or without sound, run one frame.
-// If bDraw is true, it's the last frame before we are up to date, and so we should draw the screen
-static int RunFrame(int bDraw, int bPause)
-{
-    static int bPrevPause = 0;
-    static int bPrevDraw = 0;
+<span class="token comment" spellcheck="true">// With or without sound, run one frame.</span>
+<span class="token comment" spellcheck="true">// If bDraw is true, it's the last frame before we are up to date, and so we should draw the screen</span>
+<span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">RunFrame</span><span class="token punctuation">(</span><span class="token keyword">int</span> bDraw<span class="token punctuation">,</span> <span class="token keyword">int</span> bPause<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">static</span> <span class="token keyword">int</span> bPrevPause <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">static</span> <span class="token keyword">int</span> bPrevDraw <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
 
-    if (bPrevDraw && !bPause) {
-        VidPaint(0);                            // paint the screen (no need to validate)
-    }
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>bPrevDraw <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>bPause<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">VidPaint</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                            <span class="token comment" spellcheck="true">// paint the screen (no need to validate)</span>
+    <span class="token punctuation">}</span>
 
-    if (!bDrvOkay) {//由于我们还没有加载对应的引擎，所以会执行到这里
-        return 1;
-    }
-    .....
-}
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>bDrvOkay<span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token comment" spellcheck="true">//由于我们还没有加载对应的引擎，所以会执行到这里</span>
+        <span class="token keyword">return</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 
-上面就是显示默认的流程，现在点击加载游戏，查看对应的流程,也即是上面分析的onCommand中的 第一个case语句
-static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
-{
-    if (bLoading) {
-        return;
-    }
+上面就是显示默认的流程，现在点击加载游戏，查看对应的流程<span class="token punctuation">,</span>也即是上面分析的onCommand中的 第一个<span class="token keyword">case</span>语句
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">OnCommand</span><span class="token punctuation">(</span>HWND <span class="token comment" spellcheck="true">/*hDlg*/</span><span class="token punctuation">,</span> <span class="token keyword">int</span> id<span class="token punctuation">,</span> HWND <span class="token comment" spellcheck="true">/*hwndCtl*/</span><span class="token punctuation">,</span> UINT codeNotify<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>bLoading<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    switch (id) {
-        case MENU_LOAD://普通的单机选择游戏事件
-        {
-            ...
-            nGame = SelDialog(0, hScrnWnd);        // Bring up select dialog to pick a driver
+    <span class="token keyword">switch</span> <span class="token punctuation">(</span>id<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">case</span> MENU_LOAD<span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>普通的单机选择游戏事件
+        <span class="token punctuation">{</span>
+            <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+            nGame <span class="token operator">=</span> <span class="token function">SelDialog</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> hScrnWnd<span class="token punctuation">)</span><span class="token punctuation">;</span>        <span class="token comment" spellcheck="true">// Bring up select dialog to pick a driver</span>
 
-            extern bool bDialogCancel;
+            <span class="token keyword">extern</span> <span class="token keyword">bool</span> bDialogCancel<span class="token punctuation">;</span>
 
-            if (nGame >= 0 && bDialogCancel == false) {
-                DrvExit();
-                DrvInit(nGame, true);            // Init the game driver
-                .....
-                break;
-            } 
-            ...
-        }
-        ...
-    }
-    ...
-}
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>nGame <span class="token operator">>=</span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> bDialogCancel <span class="token operator">==</span> <span class="token boolean">false</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token function">DrvExit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token function">DrvInit</span><span class="token punctuation">(</span>nGame<span class="token punctuation">,</span> <span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>            <span class="token comment" spellcheck="true">// Init the game driver</span>
+                <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+                <span class="token keyword">break</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> 
+            <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+        <span class="token punctuation">}</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token punctuation">}</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 
-首先显示选择游戏的对话框     nGame = SelDialog(0, hScrnWnd); 当游戏关闭的时候，会返回选择的游戏对应的索引
-DrvInit(nGame, true);初始化对应的引擎
+首先显示选择游戏的对话框     nGame <span class="token operator">=</span> <span class="token function">SelDialog</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> hScrnWnd<span class="token punctuation">)</span><span class="token punctuation">;</span> 当游戏关闭的时候，会返回选择的游戏对应的索引
+<span class="token function">DrvInit</span><span class="token punctuation">(</span>nGame<span class="token punctuation">,</span> <span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>初始化对应的引擎
 
-int DrvInit(int nDrvNum, bool bRestore)
-{
-    ...
-    DrvExit();                        // 确保退出
-    MediaExit();
+<span class="token keyword">int</span> <span class="token function">DrvInit</span><span class="token punctuation">(</span><span class="token keyword">int</span> nDrvNum<span class="token punctuation">,</span> <span class="token keyword">bool</span> bRestore<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token function">DrvExit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                        <span class="token comment" spellcheck="true">// 确保退出</span>
+    <span class="token function">MediaExit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    nBurnDrvActive = nDrvNum;        // Set the driver number      保存当前下载的游戏引擎对应的下标索引
+    nBurnDrvActive <span class="token operator">=</span> nDrvNum<span class="token punctuation">;</span>        <span class="token comment" spellcheck="true">// Set the driver number      保存当前下载的游戏引擎对应的下标索引</span>
 
-    ...
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
 
-    // Define nMaxPlayers early; GameInpInit() needs it (normally defined in DoLibInit()).
-    nMaxPlayers = BurnDrvGetMaxPlayers();
-    GameInpInit();                    // Init game input
-    ...
+    <span class="token comment" spellcheck="true">// Define nMaxPlayers early; GameInpInit() needs it (normally defined in DoLibInit()).</span>
+    nMaxPlayers <span class="token operator">=</span> <span class="token function">BurnDrvGetMaxPlayers</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">GameInpInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                    <span class="token comment" spellcheck="true">// Init game input</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
 
-    bDrvOkay = 1;                        // Okay to use all BurnDrv functions   初始化完成之后，标识引擎准备好了
-    ...
-}
+    bDrvOkay <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>                        <span class="token comment" spellcheck="true">// Okay to use all BurnDrv functions   初始化完成之后，标识引擎准备好了</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 
-BurnDrvGetMaxPlayers(); 获取到当前游戏引擎支持的游戏玩家数量,其实很简单，就从支持的引擎结构体数组中，获取到对应的引擎结构体，然后获取到对应的成员
-extern "C" INT32 BurnDrvGetMaxPlayers()
-{
-    return pDriver[nBurnDrvActive]->Players;
-}
+<span class="token function">BurnDrvGetMaxPlayers</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 获取到当前游戏引擎支持的游戏玩家数量<span class="token punctuation">,</span>其实很简单，就从支持的引擎结构体数组中，获取到对应的引擎结构体，然后获取到对应的成员
+<span class="token keyword">extern</span> <span class="token string">"C"</span> INT32 <span class="token function">BurnDrvGetMaxPlayers</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">return</span> pDriver<span class="token punctuation">[</span>nBurnDrvActive<span class="token punctuation">]</span><span class="token operator">-</span><span class="token operator">></span>Players<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-GameInpInit();执行初始化游戏按键信息
-INT32 GameInpInit()
-{
-    // Count the number of inputs  计算输入按键的数量
-    nGameInpCount = 0;
-    nMacroCount = 0;
-    nMaxMacro = nMaxPlayers * 52;
+<span class="token function">GameInpInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>执行初始化游戏按键信息
+INT32 <span class="token function">GameInpInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// Count the number of inputs  计算输入按键的数量</span>
+    nGameInpCount <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    nMacroCount <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    nMaxMacro <span class="token operator">=</span> nMaxPlayers <span class="token operator">*</span> <span class="token number">52</span><span class="token punctuation">;</span>
 
-    for (UINT32 i = 0; i < 0x1000; i++) {
-        nRet = BurnDrvGetInputInfo(NULL,i);
-        if (nRet) {                                                        // end of input list
-            nGameInpCount = i;
-            break;
-        }
-    }
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>UINT32 i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">0x1000</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        nRet <span class="token operator">=</span> <span class="token function">BurnDrvGetInputInfo</span><span class="token punctuation">(</span><span class="token constant">NULL</span><span class="token punctuation">,</span>i<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>nRet<span class="token punctuation">)</span> <span class="token punctuation">{</span>                                                        <span class="token comment" spellcheck="true">// end of input list</span>
+            nGameInpCount <span class="token operator">=</span> i<span class="token punctuation">;</span>
+            <span class="token keyword">break</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
 
-    // Allocate space for all the inputs  给当前游戏最多支持输入按键分配内存空间
-    INT32 nSize = (nGameInpCount + nMaxMacro) * sizeof(struct GameInp);
-    GameInp = (struct GameInp*)malloc(nSize);
-    if (GameInp == NULL) {
-        return 1;
-    }
-    memset(GameInp, 0, nSize);
+    <span class="token comment" spellcheck="true">// Allocate space for all the inputs  给当前游戏最多支持输入按键分配内存空间</span>
+    INT32 nSize <span class="token operator">=</span> <span class="token punctuation">(</span>nGameInpCount <span class="token operator">+</span> nMaxMacro<span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token keyword">struct</span> GameInp<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    GameInp <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">struct</span> GameInp<span class="token operator">*</span><span class="token punctuation">)</span><span class="token function">malloc</span><span class="token punctuation">(</span>nSize<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>GameInp <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token function">memset</span><span class="token punctuation">(</span>GameInp<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> nSize<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    //给上面分配的内存按键赋值操作，赋值引擎按键的真正的内容
-    GameInpBlank(1);
-    ...
-}
+    <span class="token comment" spellcheck="true">//给上面分配的内存按键赋值操作，赋值引擎按键的真正的内容</span>
+    <span class="token function">GameInpBlank</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 
-nRet = BurnDrvGetInputInfo(NULL,i); 获取到按键的信息
-extern "C" INT32 BurnDrvGetInputInfo(struct BurnInputInfo* pii, UINT32 i)    // Forward to drivers function
-{
-    return pDriver[nBurnDrvActive]->GetInputInfo(pii, i);
-}
+nRet <span class="token operator">=</span> <span class="token function">BurnDrvGetInputInfo</span><span class="token punctuation">(</span><span class="token constant">NULL</span><span class="token punctuation">,</span>i<span class="token punctuation">)</span><span class="token punctuation">;</span> 获取到按键的信息
+<span class="token keyword">extern</span> <span class="token string">"C"</span> INT32 <span class="token function">BurnDrvGetInputInfo</span><span class="token punctuation">(</span><span class="token keyword">struct</span> BurnInputInfo<span class="token operator">*</span> pii<span class="token punctuation">,</span> UINT32 i<span class="token punctuation">)</span>    <span class="token comment" spellcheck="true">// Forward to drivers function</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">return</span> pDriver<span class="token punctuation">[</span>nBurnDrvActive<span class="token punctuation">]</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">GetInputInfo</span><span class="token punctuation">(</span>pii<span class="token punctuation">,</span> i<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 也即是对应的引擎结构体数组中，获取到对应的引擎结构体，然后获取到对应的成员，这里假设当前的引擎结构体为
-struct BurnDriver BurnDrvgames88 = {
-    "88games", NULL, NULL, NULL, "1988",
-    "'88 Games\0", NULL, "Konami", "GX861",
-    NULL, NULL, NULL, NULL,
-    BDF_GAME_WORKING, 4, HARDWARE_PREFIX_KONAMI, GBF_SPORTSMISC, 0,
-    NULL, games88RomInfo, games88RomName, NULL, NULL, games88InputInfo, games88DIPInfo,
-    DrvInit, DrvExit, DrvFrame, DrvDraw, DrvScan, &DrvRecalc, 0x800,
-    304, 224, 4, 3
-};
-那么这个成员对应的也即是games88InputInfo函数指针,这个函数指针的定义是在宏里面定义的 也即是 STDINPUTINFO(games88) 下面是这个宏的具体实现 宏里面##代表字符串的拼接
-#define STDINPUTINFO(Name)                                                \
+<span class="token keyword">struct</span> BurnDriver BurnDrvgames88 <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token string">"88games"</span><span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">,</span> <span class="token string">"1988"</span><span class="token punctuation">,</span>
+    <span class="token string">"'88 Games\0"</span><span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">,</span> <span class="token string">"Konami"</span><span class="token punctuation">,</span> <span class="token string">"GX861"</span><span class="token punctuation">,</span>
+    <span class="token constant">NULL</span><span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">,</span>
+    BDF_GAME_WORKING<span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">,</span> HARDWARE_PREFIX_KONAMI<span class="token punctuation">,</span> GBF_SPORTSMISC<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span>
+    <span class="token constant">NULL</span><span class="token punctuation">,</span> games88RomInfo<span class="token punctuation">,</span> games88RomName<span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">,</span> games88InputInfo<span class="token punctuation">,</span> games88DIPInfo<span class="token punctuation">,</span>
+    DrvInit<span class="token punctuation">,</span> DrvExit<span class="token punctuation">,</span> DrvFrame<span class="token punctuation">,</span> DrvDraw<span class="token punctuation">,</span> DrvScan<span class="token punctuation">,</span> <span class="token operator">&amp;</span>DrvRecalc<span class="token punctuation">,</span> <span class="token number">0x800</span><span class="token punctuation">,</span>
+    <span class="token number">304</span><span class="token punctuation">,</span> <span class="token number">224</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">,</span> <span class="token number">3</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+那么这个成员对应的也即是games88InputInfo函数指针<span class="token punctuation">,</span>这个函数指针的定义是在宏里面定义的 也即是 <span class="token function">STDINPUTINFO</span><span class="token punctuation">(</span>games88<span class="token punctuation">)</span> 下面是这个宏的具体实现 宏里面##代表字符串的拼接
+<span class="token macro property">#<span class="token directive keyword">define</span> STDINPUTINFO(Name)                                                \
 static INT32 Name##InputInfo(struct BurnInputInfo* pii, UINT32 i)        \
 {                                                                        \
     if (i >= sizeof(Name##InputList) / sizeof(Name##InputList[0])) {    \
@@ -1023,413 +1019,413 @@ static INT32 Name##InputInfo(struct BurnInputInfo* pii, UINT32 i)        \
         *pii = Name##InputList[i];                                        \
     }                                                                    \
     return 0;                                                            \
-}
-所以宏STDINPUTINFO(games88) 展开大致是这样的 
-static INT32 games88InputInfo(struct BurnInputInfo* pii, UINT32 i)        
-{                                                                        
-    if (i >= sizeof(games88InputList) / sizeof(games88InputList[0])) {    
-        return 1;                                                        
-    }                                                                    
-    if (pii) {                                                            
-        *pii = games88InputList[i];                                        
-    }                                                                    
-    return 0;                                                            
-}
+}</span>
+所以宏<span class="token function">STDINPUTINFO</span><span class="token punctuation">(</span>games88<span class="token punctuation">)</span> 展开大致是这样的 
+<span class="token keyword">static</span> INT32 <span class="token function">games88InputInfo</span><span class="token punctuation">(</span><span class="token keyword">struct</span> BurnInputInfo<span class="token operator">*</span> pii<span class="token punctuation">,</span> UINT32 i<span class="token punctuation">)</span>        
+<span class="token punctuation">{</span>                                                                        
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>i <span class="token operator">>=</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>games88InputList<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>games88InputList<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>    
+        <span class="token keyword">return</span> <span class="token number">1</span><span class="token punctuation">;</span>                                                        
+    <span class="token punctuation">}</span>                                                                    
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>pii<span class="token punctuation">)</span> <span class="token punctuation">{</span>                                                            
+        <span class="token operator">*</span>pii <span class="token operator">=</span> games88InputList<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span>                                        
+    <span class="token punctuation">}</span>                                                                    
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>                                                            
+<span class="token punctuation">}</span>
 而games88InputList 的定义为，其他的函数指针也是大致的逻辑
-static struct BurnInputInfo games88InputList[] = {
-    {"P1 Coin",        BIT_DIGITAL,    DrvJoy1 + 0,    "p1 coin"    },
-    {"P1 Start",        BIT_DIGITAL,    DrvJoy2 + 3,    "p1 start"    },
-    {"P1 Button 1",        BIT_DIGITAL,    DrvJoy2 + 0,    "p1 fire 1"    },
-    {"P1 Button 2",        BIT_DIGITAL,    DrvJoy2 + 1,    "p1 fire 2"    },
-    {"P1 Button 3",        BIT_DIGITAL,    DrvJoy2 + 2,    "p1 fire 3"    },
+<span class="token keyword">static</span> <span class="token keyword">struct</span> BurnInputInfo games88InputList<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">{</span><span class="token string">"P1 Coin"</span><span class="token punctuation">,</span>        BIT_DIGITAL<span class="token punctuation">,</span>    DrvJoy1 <span class="token operator">+</span> <span class="token number">0</span><span class="token punctuation">,</span>    <span class="token string">"p1 coin"</span>    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span><span class="token string">"P1 Start"</span><span class="token punctuation">,</span>        BIT_DIGITAL<span class="token punctuation">,</span>    DrvJoy2 <span class="token operator">+</span> <span class="token number">3</span><span class="token punctuation">,</span>    <span class="token string">"p1 start"</span>    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span><span class="token string">"P1 Button 1"</span><span class="token punctuation">,</span>        BIT_DIGITAL<span class="token punctuation">,</span>    DrvJoy2 <span class="token operator">+</span> <span class="token number">0</span><span class="token punctuation">,</span>    <span class="token string">"p1 fire 1"</span>    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span><span class="token string">"P1 Button 2"</span><span class="token punctuation">,</span>        BIT_DIGITAL<span class="token punctuation">,</span>    DrvJoy2 <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span>    <span class="token string">"p1 fire 2"</span>    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span><span class="token string">"P1 Button 3"</span><span class="token punctuation">,</span>        BIT_DIGITAL<span class="token punctuation">,</span>    DrvJoy2 <span class="token operator">+</span> <span class="token number">2</span><span class="token punctuation">,</span>    <span class="token string">"p1 fire 3"</span>    <span class="token punctuation">}</span><span class="token punctuation">,</span>
 
-    {"P2 Coin",        BIT_DIGITAL,    DrvJoy1 + 1,    "p2 coin"    },
-    {"P2 Start",        BIT_DIGITAL,    DrvJoy2 + 7,    "p2 start"    },
-    {"P2 Button 1",        BIT_DIGITAL,    DrvJoy2 + 4,    "p2 fire 1"    },
-    {"P2 Button 2",        BIT_DIGITAL,    DrvJoy2 + 5,    "p2 fire 2"    },
-    {"P2 Button 3",        BIT_DIGITAL,    DrvJoy2 + 6,    "p2 fire 3"    },
-    ....
-};
+    <span class="token punctuation">{</span><span class="token string">"P2 Coin"</span><span class="token punctuation">,</span>        BIT_DIGITAL<span class="token punctuation">,</span>    DrvJoy1 <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span>    <span class="token string">"p2 coin"</span>    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span><span class="token string">"P2 Start"</span><span class="token punctuation">,</span>        BIT_DIGITAL<span class="token punctuation">,</span>    DrvJoy2 <span class="token operator">+</span> <span class="token number">7</span><span class="token punctuation">,</span>    <span class="token string">"p2 start"</span>    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span><span class="token string">"P2 Button 1"</span><span class="token punctuation">,</span>        BIT_DIGITAL<span class="token punctuation">,</span>    DrvJoy2 <span class="token operator">+</span> <span class="token number">4</span><span class="token punctuation">,</span>    <span class="token string">"p2 fire 1"</span>    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span><span class="token string">"P2 Button 2"</span><span class="token punctuation">,</span>        BIT_DIGITAL<span class="token punctuation">,</span>    DrvJoy2 <span class="token operator">+</span> <span class="token number">5</span><span class="token punctuation">,</span>    <span class="token string">"p2 fire 2"</span>    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span><span class="token string">"P2 Button 3"</span><span class="token punctuation">,</span>        BIT_DIGITAL<span class="token punctuation">,</span>    DrvJoy2 <span class="token operator">+</span> <span class="token number">6</span><span class="token punctuation">,</span>    <span class="token string">"p2 fire 3"</span>    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
 
 BurnInputInfo 结构体定义为 
-struct BurnInputInfo {
-    char* szName;
-    UINT8 nType;
-    union {
-        UINT8* pVal;                    // Most inputs use a char*
-        UINT16* pShortVal;                // All analog inputs use a short*
-    };
-    char* szInfo;
-};
+<span class="token keyword">struct</span> BurnInputInfo <span class="token punctuation">{</span>
+    <span class="token keyword">char</span><span class="token operator">*</span> szName<span class="token punctuation">;</span>
+    UINT8 nType<span class="token punctuation">;</span>
+    <span class="token keyword">union</span> <span class="token punctuation">{</span>
+        UINT8<span class="token operator">*</span> pVal<span class="token punctuation">;</span>                    <span class="token comment" spellcheck="true">// Most inputs use a char*</span>
+        UINT16<span class="token operator">*</span> pShortVal<span class="token punctuation">;</span>                <span class="token comment" spellcheck="true">// All analog inputs use a short*</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span>
+    <span class="token keyword">char</span><span class="token operator">*</span> szInfo<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
 
-DrvJoy1，DrvJoy2,DrvJoy3 本质为一个数组，所以对于上面结构体的第三个成员，类似的DrvJoy1 代表这个数组的首地址 +0或者1等代表指针的偏移，也即是对应的数组的成员
-static UINT8 DrvJoy1[8];
-static UINT8 DrvJoy2[8];
-static UINT8 DrvJoy3[8];
-static UINT8 DrvDips[3];
-static UINT8 DrvInputs[3];
+DrvJoy1，DrvJoy2<span class="token punctuation">,</span>DrvJoy3 本质为一个数组，所以对于上面结构体的第三个成员，类似的DrvJoy1 代表这个数组的首地址 <span class="token operator">+</span><span class="token number">0</span>或者<span class="token number">1</span>等代表指针的偏移，也即是对应的数组的成员
+<span class="token keyword">static</span> UINT8 DrvJoy1<span class="token punctuation">[</span><span class="token number">8</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token keyword">static</span> UINT8 DrvJoy2<span class="token punctuation">[</span><span class="token number">8</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token keyword">static</span> UINT8 DrvJoy3<span class="token punctuation">[</span><span class="token number">8</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token keyword">static</span> UINT8 DrvDips<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token keyword">static</span> UINT8 DrvInputs<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
 
-所以对于DrvJoy1 + 0 代表 DrvJoy1数组的第一个成员的地址  DrvJoy2 + 3代表这个数组的第四个成员的地址
+所以对于DrvJoy1 <span class="token operator">+</span> <span class="token number">0</span> 代表 DrvJoy1数组的第一个成员的地址  DrvJoy2 <span class="token operator">+</span> <span class="token number">3</span>代表这个数组的第四个成员的地址
 
-继续分析 GameInpBlank(1); 函数的实现
-INT32 GameInpBlank(INT32 bDipSwitch)
-{
-    UINT32 i = 0;
-    struct GameInp* pgi = NULL;
+继续分析 <span class="token function">GameInpBlank</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 函数的实现
+INT32 <span class="token function">GameInpBlank</span><span class="token punctuation">(</span>INT32 bDipSwitch<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    UINT32 i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">struct</span> GameInp<span class="token operator">*</span> pgi <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
 
-    // Reset all inputs to undefined (even dip switches, if bDipSwitch==1)
-    if (GameInp == NULL) {
-        return 1;
-    }
+    <span class="token comment" spellcheck="true">// Reset all inputs to undefined (even dip switches, if bDipSwitch==1)</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>GameInp <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    //遍历上一步分配的按键的内存数组，完成赋值操作
-    // Get the targets in the library for the Input Values
-    for (i = 0, pgi = GameInp; i < nGameInpCount; i++, pgi++) {
-        struct BurnInputInfo bii;
-        memset(&bii, 0, sizeof(bii));
-        BurnDrvGetInputInfo(&bii, i);
-        if (bDipSwitch == 0 && (bii.nType & BIT_GROUP_CONSTANT)) {        // Don't blank the dip switches
-            continue;
-        }
+    <span class="token comment" spellcheck="true">//遍历上一步分配的按键的内存数组，完成赋值操作</span>
+    <span class="token comment" spellcheck="true">// Get the targets in the library for the Input Values</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> pgi <span class="token operator">=</span> GameInp<span class="token punctuation">;</span> i <span class="token operator">&lt;</span> nGameInpCount<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">,</span> pgi<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">struct</span> BurnInputInfo bii<span class="token punctuation">;</span>
+        <span class="token function">memset</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>bii<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>bii<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">BurnDrvGetInputInfo</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>bii<span class="token punctuation">,</span> i<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>bDipSwitch <span class="token operator">==</span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span>bii<span class="token punctuation">.</span>nType <span class="token operator">&amp;</span> BIT_GROUP_CONSTANT<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>        <span class="token comment" spellcheck="true">// Don't blank the dip switches</span>
+            <span class="token keyword">continue</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
 
-        memset(pgi, 0, sizeof(*pgi));                                    // Clear input
+        <span class="token function">memset</span><span class="token punctuation">(</span>pgi<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token operator">*</span>pgi<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                                    <span class="token comment" spellcheck="true">// Clear input</span>
 
-        pgi->nType = bii.nType;                                            // store input type                存储按键的类型
-        pgi->Input.pVal = bii.pVal;                                        // store input pointer to value  存储按键的指针，方便我们后面修改按键的内容
+        pgi<span class="token operator">-</span><span class="token operator">></span>nType <span class="token operator">=</span> bii<span class="token punctuation">.</span>nType<span class="token punctuation">;</span>                                            <span class="token comment" spellcheck="true">// store input type                存储按键的类型</span>
+        pgi<span class="token operator">-</span><span class="token operator">></span>Input<span class="token punctuation">.</span>pVal <span class="token operator">=</span> bii<span class="token punctuation">.</span>pVal<span class="token punctuation">;</span>                                        <span class="token comment" spellcheck="true">// store input pointer to value  存储按键的指针，方便我们后面修改按键的内容</span>
 
-        if (bii.nType & BIT_GROUP_CONSTANT) {                            // Further initialisation for constants/DIPs
-            pgi->nInput = GIT_CONSTANT;
-            pgi->Input.Constant.nConst = *bii.pVal;
-        }
-    }
-    ...
-    return 0;
-}
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>bii<span class="token punctuation">.</span>nType <span class="token operator">&amp;</span> BIT_GROUP_CONSTANT<span class="token punctuation">)</span> <span class="token punctuation">{</span>                            <span class="token comment" spellcheck="true">// Further initialisation for constants/DIPs</span>
+            pgi<span class="token operator">-</span><span class="token operator">></span>nInput <span class="token operator">=</span> GIT_CONSTANT<span class="token punctuation">;</span>
+            pgi<span class="token operator">-</span><span class="token operator">></span>Input<span class="token punctuation">.</span>Constant<span class="token punctuation">.</span>nConst <span class="token operator">=</span> <span class="token operator">*</span>bii<span class="token punctuation">.</span>pVal<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-这里重点注意下 pgi->Input.pVal = bii.pVal;     前面已经分析过了 bii.pVal 代表对应引擎对应的按键的地址，类似于DrvJoy1 + 0 代表 DrvJoy1数组的第一个成员的地址
-那么当这个赋值操作完成之后，那么 pgi->Input.pVal 也指向了这个引擎的按键地址，后面当要修改按键的内容的时候，就可以直接修改pgi->Input.pVal中所代表的内容
+这里重点注意下 pgi<span class="token operator">-</span><span class="token operator">></span>Input<span class="token punctuation">.</span>pVal <span class="token operator">=</span> bii<span class="token punctuation">.</span>pVal<span class="token punctuation">;</span>     前面已经分析过了 bii<span class="token punctuation">.</span>pVal 代表对应引擎对应的按键的地址，类似于DrvJoy1 <span class="token operator">+</span> <span class="token number">0</span> 代表 DrvJoy1数组的第一个成员的地址
+那么当这个赋值操作完成之后，那么 pgi<span class="token operator">-</span><span class="token operator">></span>Input<span class="token punctuation">.</span>pVal 也指向了这个引擎的按键地址，后面当要修改按键的内容的时候，就可以直接修改pgi<span class="token operator">-</span><span class="token operator">></span>Input<span class="token punctuation">.</span>pVal中所代表的内容
 
-继续回到 case语句块继续往下执行  nStatus = DoLibInit();    初始化对应的游戏引擎
-static int DoLibInit()                    // Do Init of Burn library driver
-{
-    int nRet = 0;
+继续回到 <span class="token keyword">case</span>语句块继续往下执行  nStatus <span class="token operator">=</span> <span class="token function">DoLibInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>    初始化对应的游戏引擎
+<span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">DoLibInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span>                    <span class="token comment" spellcheck="true">// Do Init of Burn library driver</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">int</span> nRet <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
 
-    //加载引擎对应的zip包
-    if (DrvBzipOpen()) {
-        return 1;
-    }
+    <span class="token comment" spellcheck="true">//加载引擎对应的zip包</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">DrvBzipOpen</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    if ((BurnDrvGetHardwareCode() & HARDWARE_PUBLIC_MASK) != HARDWARE_SNK_MVS) {
-        if (!bQuietLoading) ProgressCreate();
-    }
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">BurnDrvGetHardwareCode</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> HARDWARE_PUBLIC_MASK<span class="token punctuation">)</span> <span class="token operator">!=</span> HARDWARE_SNK_MVS<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>bQuietLoading<span class="token punctuation">)</span> <span class="token function">ProgressCreate</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    //执行对应的引擎初始化操作
-    nRet = BurnDrvInit();
+    <span class="token comment" spellcheck="true">//执行对应的引擎初始化操作</span>
+    nRet <span class="token operator">=</span> <span class="token function">BurnDrvInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    //关闭引擎对应的zip包
-    BzipClose();
+    <span class="token comment" spellcheck="true">//关闭引擎对应的zip包</span>
+    <span class="token function">BzipClose</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    if (!bQuietLoading) ProgressDestroy();
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>bQuietLoading<span class="token punctuation">)</span> <span class="token function">ProgressDestroy</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    if (nRet) {
-        return 3;
-    } else {
-        return 0;
-    }
-}
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>nRet<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token number">3</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
-// Init game emulation (loading any needed roms)
-extern "C" INT32 BurnDrvInit()
-{
-    ...
-    CheatInit();
-    HiscoreInit();
-    BurnStateInit();
-    BurnInitMemoryManager();
-    BurnRandomInit();
+<span class="token comment" spellcheck="true">// Init game emulation (loading any needed roms)</span>
+<span class="token keyword">extern</span> <span class="token string">"C"</span> INT32 <span class="token function">BurnDrvInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token function">CheatInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">HiscoreInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">BurnStateInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">BurnInitMemoryManager</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">BurnRandomInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    //调用对应的引擎初始化，具体就不看了，逻辑就是获取到对应的引擎结构体，执行对应的函数指针
-    nReturnValue = pDriver[nBurnDrvActive]->Init();    // Forward to drivers function
+    <span class="token comment" spellcheck="true">//调用对应的引擎初始化，具体就不看了，逻辑就是获取到对应的引擎结构体，执行对应的函数指针</span>
+    nReturnValue <span class="token operator">=</span> pDriver<span class="token punctuation">[</span>nBurnDrvActive<span class="token punctuation">]</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>    <span class="token comment" spellcheck="true">// Forward to drivers function</span>
 
-    nMaxPlayers = pDriver[nBurnDrvActive]->Players;
-    ....
-}
+    nMaxPlayers <span class="token operator">=</span> pDriver<span class="token punctuation">[</span>nBurnDrvActive<span class="token punctuation">]</span><span class="token operator">-</span><span class="token operator">></span>Players<span class="token punctuation">;</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 
-引擎初始化成功之后，int DrvInit(int nDrvNum, bool bRestore)函数后面，会将 bDrvOkay = 1; 标识引擎准备好了，那么继续回调前面分析的RumLooperMessage
+引擎初始化成功之后，<span class="token keyword">int</span> <span class="token function">DrvInit</span><span class="token punctuation">(</span><span class="token keyword">int</span> nDrvNum<span class="token punctuation">,</span> <span class="token keyword">bool</span> bRestore<span class="token punctuation">)</span>函数后面，会将 bDrvOkay <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span> 标识引擎准备好了，那么继续回调前面分析的RumLooperMessage
 
-当再次执行到 RunIdle();的时候，也即是当前没有任何的按键操作的情况下，界面默认的显示的时候，会调用这个方法渲染游戏的界面,最终会调用到RunFrame 
+当再次执行到 <span class="token function">RunIdle</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>的时候，也即是当前没有任何的按键操作的情况下，界面默认的显示的时候，会调用这个方法渲染游戏的界面<span class="token punctuation">,</span>最终会调用到RunFrame 
 
-static int RunFrame(int bDraw, int bPause)
-{
-    static int bPrevPause = 0;
-    static int bPrevDraw = 0;
+<span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">RunFrame</span><span class="token punctuation">(</span><span class="token keyword">int</span> bDraw<span class="token punctuation">,</span> <span class="token keyword">int</span> bPause<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">static</span> <span class="token keyword">int</span> bPrevPause <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">static</span> <span class="token keyword">int</span> bPrevDraw <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
 
-    if (bPrevDraw && !bPause) {
-        VidPaint(0);                            // paint the screen (no need to validate)
-    }
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>bPrevDraw <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>bPause<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">VidPaint</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                            <span class="token comment" spellcheck="true">// paint the screen (no need to validate)</span>
+    <span class="token punctuation">}</span>
 
-    if (!bDrvOkay) {//判断是否引擎准备好了，此时已经准备好了
-        return 1;
-    }
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>bDrvOkay<span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token comment" spellcheck="true">//判断是否引擎准备好了，此时已经准备好了</span>
+        <span class="token keyword">return</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    ....
-    GetInput(true);                    // Update inputs  获取到键盘的按键内容
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token function">GetInput</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                    <span class="token comment" spellcheck="true">// Update inputs  获取到键盘的按键内容</span>
 
-    ... 
-    BurnDrvFrame();                 //渲染按键
-    ....
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span> 
+    <span class="token function">BurnDrvFrame</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                 <span class="token comment" spellcheck="true">//渲染按键</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
 
-}
+<span class="token punctuation">}</span>
 
-GetInput(true);    这里先分析下，按键的信息的获取
-static int GetInput(bool bCopy)
-{
-    ...
-    InputMake(bCopy);                         // get input
-    ...
-}
-// This will process all PC-side inputs and optionally update the emulated game side.
-INT32 InputMake(bool bCopy)
-{
-    ...
-    for (i = 0, pgi = GameInp; i < nGameInpCount; i++, pgi++) {
-        if (pgi->Input.pVal == NULL) {
-            continue;
-        }
+<span class="token function">GetInput</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>    这里先分析下，按键的信息的获取
+<span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">GetInput</span><span class="token punctuation">(</span><span class="token keyword">bool</span> bCopy<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token function">InputMake</span><span class="token punctuation">(</span>bCopy<span class="token punctuation">)</span><span class="token punctuation">;</span>                         <span class="token comment" spellcheck="true">// get input</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
+<span class="token comment" spellcheck="true">// This will process all PC-side inputs and optionally update the emulated game side.</span>
+INT32 <span class="token function">InputMake</span><span class="token punctuation">(</span><span class="token keyword">bool</span> bCopy<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> pgi <span class="token operator">=</span> GameInp<span class="token punctuation">;</span> i <span class="token operator">&lt;</span> nGameInpCount<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">,</span> pgi<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>pgi<span class="token operator">-</span><span class="token operator">></span>Input<span class="token punctuation">.</span>pVal <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">continue</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
 
-        switch (pgi->nInput) {
-            ....
-            case GIT_SWITCH: {                        // Digital input  默认的按键情况
-                INT32 s = CinpState(pgi->Input.Switch.nCode);          判断当前的按键 被按下的情况  ，具体会调用到window 中的 GetDeviceState 获取到对应的状态
+        <span class="token keyword">switch</span> <span class="token punctuation">(</span>pgi<span class="token operator">-</span><span class="token operator">></span>nInput<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+            <span class="token keyword">case</span> GIT_SWITCH<span class="token operator">:</span> <span class="token punctuation">{</span>                        <span class="token comment" spellcheck="true">// Digital input  默认的按键情况</span>
+                INT32 s <span class="token operator">=</span> <span class="token function">CinpState</span><span class="token punctuation">(</span>pgi<span class="token operator">-</span><span class="token operator">></span>Input<span class="token punctuation">.</span>Switch<span class="token punctuation">.</span>nCode<span class="token punctuation">)</span><span class="token punctuation">;</span>          判断当前的按键 被按下的情况  ，具体会调用到window 中的 GetDeviceState 获取到对应的状态
 
-                if (pgi->nType & BIT_GROUP_ANALOG) {
-                    // Set analog controls to full
-                    if (s) {
-                        pgi->Input.nVal = 0xFFFF;                   如果被按下，赋值为  0xFFFF;    前面已经分析过，这个值指向的就是引擎的按键内容，所以这个改变会导致引擎的按键发生改变
-                    } else {
-                        pgi->Input.nVal = 0x0001;                    如果没有被按下 赋值为  0x0001;    
-                    }
-                    if (bCopy) {
-                        *(pgi->Input.pShortVal) = pgi->Input.nVal;
-                    }
-                } else {
-                    // Binary controls
-                    if (s) {
-                        pgi->Input.nVal = 1;
-                    } else {
-                        pgi->Input.nVal = 0;
-                    }
-                    if (bCopy) {
-                        *(pgi->Input.pVal) = pgi->Input.nVal;
-                    }
-                }
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>pgi<span class="token operator">-</span><span class="token operator">></span>nType <span class="token operator">&amp;</span> BIT_GROUP_ANALOG<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token comment" spellcheck="true">// Set analog controls to full</span>
+                    <span class="token keyword">if</span> <span class="token punctuation">(</span>s<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                        pgi<span class="token operator">-</span><span class="token operator">></span>Input<span class="token punctuation">.</span>nVal <span class="token operator">=</span> <span class="token number">0xFFFF</span><span class="token punctuation">;</span>                   如果被按下，赋值为  <span class="token number">0xFFFF</span><span class="token punctuation">;</span>    前面已经分析过，这个值指向的就是引擎的按键内容，所以这个改变会导致引擎的按键发生改变
+                    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                        pgi<span class="token operator">-</span><span class="token operator">></span>Input<span class="token punctuation">.</span>nVal <span class="token operator">=</span> <span class="token number">0x0001</span><span class="token punctuation">;</span>                    如果没有被按下 赋值为  <span class="token number">0x0001</span><span class="token punctuation">;</span>    
+                    <span class="token punctuation">}</span>
+                    <span class="token keyword">if</span> <span class="token punctuation">(</span>bCopy<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                        <span class="token operator">*</span><span class="token punctuation">(</span>pgi<span class="token operator">-</span><span class="token operator">></span>Input<span class="token punctuation">.</span>pShortVal<span class="token punctuation">)</span> <span class="token operator">=</span> pgi<span class="token operator">-</span><span class="token operator">></span>Input<span class="token punctuation">.</span>nVal<span class="token punctuation">;</span>
+                    <span class="token punctuation">}</span>
+                <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                    <span class="token comment" spellcheck="true">// Binary controls</span>
+                    <span class="token keyword">if</span> <span class="token punctuation">(</span>s<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                        pgi<span class="token operator">-</span><span class="token operator">></span>Input<span class="token punctuation">.</span>nVal <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+                    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                        pgi<span class="token operator">-</span><span class="token operator">></span>Input<span class="token punctuation">.</span>nVal <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+                    <span class="token punctuation">}</span>
+                    <span class="token keyword">if</span> <span class="token punctuation">(</span>bCopy<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                        <span class="token operator">*</span><span class="token punctuation">(</span>pgi<span class="token operator">-</span><span class="token operator">></span>Input<span class="token punctuation">.</span>pVal<span class="token punctuation">)</span> <span class="token operator">=</span> pgi<span class="token operator">-</span><span class="token operator">></span>Input<span class="token punctuation">.</span>nVal<span class="token punctuation">;</span>
+                    <span class="token punctuation">}</span>
+                <span class="token punctuation">}</span>
 
-                break;
-            }
-            case GIT_JOYSLIDER:    {                    // Joystick slider      游戏手柄
-                INT32 nSlider = pgi->Input.Slider.nSliderValue;
-                if (pgi->nType == BIT_ANALOG_REL) {
-                    nSlider -= 0x8000;
-                    nSlider >>= 4;
-                }
+                <span class="token keyword">break</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">case</span> GIT_JOYSLIDER<span class="token operator">:</span>    <span class="token punctuation">{</span>                    <span class="token comment" spellcheck="true">// Joystick slider      游戏手柄</span>
+                INT32 nSlider <span class="token operator">=</span> pgi<span class="token operator">-</span><span class="token operator">></span>Input<span class="token punctuation">.</span>Slider<span class="token punctuation">.</span>nSliderValue<span class="token punctuation">;</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>pgi<span class="token operator">-</span><span class="token operator">></span>nType <span class="token operator">==</span> BIT_ANALOG_REL<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    nSlider <span class="token operator">-</span><span class="token operator">=</span> <span class="token number">0x8000</span><span class="token punctuation">;</span>
+                    nSlider <span class="token operator">>>=</span> <span class="token number">4</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
 
-                pgi->Input.nVal = (UINT16)nSlider;
-                if (bCopy) {
-                    *(pgi->Input.pShortVal) = pgi->Input.nVal;
-                }
-                break;
-            }
-            case GIT_MOUSEAXIS:                        // Mouse axis            鼠标
-                pgi->Input.nVal = (UINT16)(CinpMouseAxis(pgi->Input.MouseAxis.nMouse, pgi->Input.MouseAxis.nAxis) * nAnalogSpeed);
-                if (bCopy) {
-                    *(pgi->Input.pShortVal) = pgi->Input.nVal;
-                }
-                break;
-            }
-            .....
-        }
-    }
-    ....
-    return 0;
-}
+                pgi<span class="token operator">-</span><span class="token operator">></span>Input<span class="token punctuation">.</span>nVal <span class="token operator">=</span> <span class="token punctuation">(</span>UINT16<span class="token punctuation">)</span>nSlider<span class="token punctuation">;</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>bCopy<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token operator">*</span><span class="token punctuation">(</span>pgi<span class="token operator">-</span><span class="token operator">></span>Input<span class="token punctuation">.</span>pShortVal<span class="token punctuation">)</span> <span class="token operator">=</span> pgi<span class="token operator">-</span><span class="token operator">></span>Input<span class="token punctuation">.</span>nVal<span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+                <span class="token keyword">break</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">case</span> GIT_MOUSEAXIS<span class="token operator">:</span>                        <span class="token comment" spellcheck="true">// Mouse axis            鼠标</span>
+                pgi<span class="token operator">-</span><span class="token operator">></span>Input<span class="token punctuation">.</span>nVal <span class="token operator">=</span> <span class="token punctuation">(</span>UINT16<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token function">CinpMouseAxis</span><span class="token punctuation">(</span>pgi<span class="token operator">-</span><span class="token operator">></span>Input<span class="token punctuation">.</span>MouseAxis<span class="token punctuation">.</span>nMouse<span class="token punctuation">,</span> pgi<span class="token operator">-</span><span class="token operator">></span>Input<span class="token punctuation">.</span>MouseAxis<span class="token punctuation">.</span>nAxis<span class="token punctuation">)</span> <span class="token operator">*</span> nAnalogSpeed<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>bCopy<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token operator">*</span><span class="token punctuation">(</span>pgi<span class="token operator">-</span><span class="token operator">></span>Input<span class="token punctuation">.</span>pShortVal<span class="token punctuation">)</span> <span class="token operator">=</span> pgi<span class="token operator">-</span><span class="token operator">></span>Input<span class="token punctuation">.</span>nVal<span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+                <span class="token keyword">break</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
 BurnDrvFrame函数的实现，也即是会调用到对应引擎的函数指针，完成渲染
-extern "C" INT32 BurnDrvFrame()
-{
-    CheatApply();                                    // Apply cheats (if any)
-    HiscoreApply();
-    return pDriver[nBurnDrvActive]->Frame();        // Forward to drivers function
-}
+<span class="token keyword">extern</span> <span class="token string">"C"</span> INT32 <span class="token function">BurnDrvFrame</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token function">CheatApply</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                                    <span class="token comment" spellcheck="true">// Apply cheats (if any)</span>
+    <span class="token function">HiscoreApply</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> pDriver<span class="token punctuation">[</span>nBurnDrvActive<span class="token punctuation">]</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">Frame</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>        <span class="token comment" spellcheck="true">// Forward to drivers function</span>
+<span class="token punctuation">}</span>
 
-由于每次渲染界面都要去获取到对应的按键情况，然后去修改引擎原本的按键内容，执行对应的引擎渲染，那么引擎就能事实的获取到这些按键的情况,这就是大致的流程，当然还有很多细节
+由于每次渲染界面都要去获取到对应的按键情况，然后去修改引擎原本的按键内容，执行对应的引擎渲染，那么引擎就能事实的获取到这些按键的情况<span class="token punctuation">,</span>这就是大致的流程，当然还有很多细节
 </code></pre>
-<h3 id="对战代码实现"><a href="#对战代码实现" class="headerlink" title="对战代码实现"></a>对战代码实现</h3><pre class=" language-C++"><code class="language-C++">static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
-{
-    ...
-    case MENU_STARTNET:
-    {
-        if (Init_Network()) {//判断加载对战库成功，如果成功，显示对战库的对话框
-            MessageBox(hScrnWnd, FBALoadStringEx(hAppInst, IDS_ERR_NO_NETPLAYDLL, true), FBALoadStringEx(hAppInst, IDS_ERR_ERROR, true), MB_OK);
-            break;
-        }
-        ...
-        DoNetGame();
-        ...
-    }
-    ...        
-}
+<h3 id="对战代码实现"><a href="#对战代码实现" class="headerlink" title="对战代码实现"></a>对战代码实现</h3><pre class=" language-cpp"><code class="language-cpp"><span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">OnCommand</span><span class="token punctuation">(</span>HWND <span class="token comment" spellcheck="true">/*hDlg*/</span><span class="token punctuation">,</span> <span class="token keyword">int</span> id<span class="token punctuation">,</span> HWND <span class="token comment" spellcheck="true">/*hwndCtl*/</span><span class="token punctuation">,</span> UINT codeNotify<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token keyword">case</span> MENU_STARTNET<span class="token operator">:</span>
+    <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">Init_Network</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token comment" spellcheck="true">//判断加载对战库成功，如果成功，显示对战库的对话框</span>
+            <span class="token function">MessageBox</span><span class="token punctuation">(</span>hScrnWnd<span class="token punctuation">,</span> <span class="token function">FBALoadStringEx</span><span class="token punctuation">(</span>hAppInst<span class="token punctuation">,</span> IDS_ERR_NO_NETPLAYDLL<span class="token punctuation">,</span> <span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">FBALoadStringEx</span><span class="token punctuation">(</span>hAppInst<span class="token punctuation">,</span> IDS_ERR_ERROR<span class="token punctuation">,</span> <span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">,</span> MB_OK<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">break</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+        <span class="token function">DoNetGame</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token punctuation">}</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>        
+<span class="token punctuation">}</span>
 
-Init_Network() 会判断当前是否有对战库
-int Init_Network(void)
-{
-//#if defined (_UNICODE)
-//    Kaillera_HDLL = LoadLibrary(L"kailleraclient.dll");
-//#else
-    Kaillera_HDLL = LoadLibrary("kailleraclient.dll");
-//#endif
+<span class="token function">Init_Network</span><span class="token punctuation">(</span><span class="token punctuation">)</span> 会判断当前是否有对战库
+<span class="token keyword">int</span> <span class="token function">Init_Network</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+<span class="token comment" spellcheck="true">//#if defined (_UNICODE)</span>
+<span class="token comment" spellcheck="true">//    Kaillera_HDLL = LoadLibrary(L"kailleraclient.dll");</span>
+<span class="token comment" spellcheck="true">//#else</span>
+    Kaillera_HDLL <span class="token operator">=</span> <span class="token function">LoadLibrary</span><span class="token punctuation">(</span><span class="token string">"kailleraclient.dll"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">//#endif</span>
 
-    if (Kaillera_HDLL != NULL)
-    {
-        Kaillera_Get_Version = (int (WINAPI *)(char *version)) GetProcAddress(Kaillera_HDLL, "_kailleraGetVersion@4");
-        Kaillera_Init = (int (WINAPI *)()) GetProcAddress(Kaillera_HDLL, "_kailleraInit@0");
-        Kaillera_Shutdown = (int (WINAPI *)()) GetProcAddress(Kaillera_HDLL, "_kailleraShutdown@0");
-        Kaillera_Set_Infos = (int (WINAPI *)(kailleraInfos *infos)) GetProcAddress(Kaillera_HDLL, "_kailleraSetInfos@4");
-        Kaillera_Select_Server_Dialog = (int (WINAPI *)(HWND parent)) GetProcAddress(Kaillera_HDLL, "_kailleraSelectServerDialog@4");
-        Kaillera_Modify_Play_Values = (int (WINAPI *)(void *values, int size)) GetProcAddress(Kaillera_HDLL, "_kailleraModifyPlayValues@8");
-        Kaillera_Chat_Send = (int (WINAPI *)(char *text)) GetProcAddress(Kaillera_HDLL, "_kailleraChatSend@4");
-        Kaillera_End_Game = (int (WINAPI *)()) GetProcAddress(Kaillera_HDLL, "_kailleraEndGame@0");
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>Kaillera_HDLL <span class="token operator">!=</span> <span class="token constant">NULL</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        Kaillera_Get_Version <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">int</span> <span class="token punctuation">(</span>WINAPI <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">char</span> <span class="token operator">*</span>version<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token function">GetProcAddress</span><span class="token punctuation">(</span>Kaillera_HDLL<span class="token punctuation">,</span> <span class="token string">"_kailleraGetVersion@4"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Kaillera_Init <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">int</span> <span class="token punctuation">(</span>WINAPI <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token function">GetProcAddress</span><span class="token punctuation">(</span>Kaillera_HDLL<span class="token punctuation">,</span> <span class="token string">"_kailleraInit@0"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Kaillera_Shutdown <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">int</span> <span class="token punctuation">(</span>WINAPI <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token function">GetProcAddress</span><span class="token punctuation">(</span>Kaillera_HDLL<span class="token punctuation">,</span> <span class="token string">"_kailleraShutdown@0"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Kaillera_Set_Infos <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">int</span> <span class="token punctuation">(</span>WINAPI <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">(</span>kailleraInfos <span class="token operator">*</span>infos<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token function">GetProcAddress</span><span class="token punctuation">(</span>Kaillera_HDLL<span class="token punctuation">,</span> <span class="token string">"_kailleraSetInfos@4"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Kaillera_Select_Server_Dialog <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">int</span> <span class="token punctuation">(</span>WINAPI <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">(</span>HWND parent<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token function">GetProcAddress</span><span class="token punctuation">(</span>Kaillera_HDLL<span class="token punctuation">,</span> <span class="token string">"_kailleraSelectServerDialog@4"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Kaillera_Modify_Play_Values <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">int</span> <span class="token punctuation">(</span>WINAPI <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">void</span> <span class="token operator">*</span>values<span class="token punctuation">,</span> <span class="token keyword">int</span> size<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token function">GetProcAddress</span><span class="token punctuation">(</span>Kaillera_HDLL<span class="token punctuation">,</span> <span class="token string">"_kailleraModifyPlayValues@8"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Kaillera_Chat_Send <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">int</span> <span class="token punctuation">(</span>WINAPI <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">char</span> <span class="token operator">*</span>text<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token function">GetProcAddress</span><span class="token punctuation">(</span>Kaillera_HDLL<span class="token punctuation">,</span> <span class="token string">"_kailleraChatSend@4"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Kaillera_End_Game <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">int</span> <span class="token punctuation">(</span>WINAPI <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token function">GetProcAddress</span><span class="token punctuation">(</span>Kaillera_HDLL<span class="token punctuation">,</span> <span class="token string">"_kailleraEndGame@0"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        if ((Kaillera_Get_Version != NULL) && (Kaillera_Init != NULL) && (Kaillera_Shutdown != NULL) && (Kaillera_Set_Infos != NULL) && (Kaillera_Select_Server_Dialog != NULL) && (Kaillera_Modify_Play_Values != NULL) && (Kaillera_Chat_Send != NULL) && (Kaillera_End_Game != NULL))
-        {            
-            //执行了Kaillera_Init()函数，进行库的初始化
-            Kaillera_Init();
-            Kaillera_Initialised = 1;
-            return 0;
-        }
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>Kaillera_Get_Version <span class="token operator">!=</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span>Kaillera_Init <span class="token operator">!=</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span>Kaillera_Shutdown <span class="token operator">!=</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span>Kaillera_Set_Infos <span class="token operator">!=</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span>Kaillera_Select_Server_Dialog <span class="token operator">!=</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span>Kaillera_Modify_Play_Values <span class="token operator">!=</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span>Kaillera_Chat_Send <span class="token operator">!=</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span>Kaillera_End_Game <span class="token operator">!=</span> <span class="token constant">NULL</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>            
+            <span class="token comment" spellcheck="true">//执行了Kaillera_Init()函数，进行库的初始化</span>
+            <span class="token function">Kaillera_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            Kaillera_Initialised <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
 
-        FreeLibrary(Kaillera_HDLL);
-    } else {
-    }
+        <span class="token function">FreeLibrary</span><span class="token punctuation">(</span>Kaillera_HDLL<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
 
-    Kaillera_Get_Version = Empty_Kaillera_Get_Version;
-    Kaillera_Init = Empty_Kaillera_Init;
-    Kaillera_Shutdown = Empty_Kaillera_Shutdown;
-    Kaillera_Set_Infos = Empty_Kaillera_Set_Infos;
-    Kaillera_Select_Server_Dialog = Empty_Kaillera_Select_Server_Dialog;
-    Kaillera_Modify_Play_Values = Empty_Kaillera_Modify_Play_Values;
-    Kaillera_Chat_Send = Empty_Kaillera_Chat_Send;
-    Kaillera_End_Game = Empty_Kaillera_End_Game;
+    Kaillera_Get_Version <span class="token operator">=</span> Empty_Kaillera_Get_Version<span class="token punctuation">;</span>
+    Kaillera_Init <span class="token operator">=</span> Empty_Kaillera_Init<span class="token punctuation">;</span>
+    Kaillera_Shutdown <span class="token operator">=</span> Empty_Kaillera_Shutdown<span class="token punctuation">;</span>
+    Kaillera_Set_Infos <span class="token operator">=</span> Empty_Kaillera_Set_Infos<span class="token punctuation">;</span>
+    Kaillera_Select_Server_Dialog <span class="token operator">=</span> Empty_Kaillera_Select_Server_Dialog<span class="token punctuation">;</span>
+    Kaillera_Modify_Play_Values <span class="token operator">=</span> Empty_Kaillera_Modify_Play_Values<span class="token punctuation">;</span>
+    Kaillera_Chat_Send <span class="token operator">=</span> Empty_Kaillera_Chat_Send<span class="token punctuation">;</span>
+    Kaillera_End_Game <span class="token operator">=</span> Empty_Kaillera_End_Game<span class="token punctuation">;</span>
 
-    Kaillera_Initialised = 0;
-    return 1;
-}
+    Kaillera_Initialised <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token number">1</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-上面会加载这个对战库的dll，然后获取到对应的函数指针,对应的也即是对战库提供的头文件的对应的函数指针,获取到之后，存储到本地变量中，方便下次使用
-DLLEXP kailleraGetVersion(char *version);
-/*
+上面会加载这个对战库的dll，然后获取到对应的函数指针<span class="token punctuation">,</span>对应的也即是对战库提供的头文件的对应的函数指针<span class="token punctuation">,</span>获取到之后，存储到本地变量中，方便下次使用
+DLLEXP <span class="token function">kailleraGetVersion</span><span class="token punctuation">(</span><span class="token keyword">char</span> <span class="token operator">*</span>version<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">/*
     kailleraInit:
     Call this method when your program starts
-*/
-DLLEXP kailleraInit();
-/*
+*/</span>
+DLLEXP <span class="token function">kailleraInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">/*
     kailleraShutdown:
     Call this method when your program ends
-*/
-DLLEXP kailleraShutdown();
-....
+*/</span>
+DLLEXP <span class="token function">kailleraShutdown</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
 
 之后执行 DoNetGame 完成对战库的设置
-static void DoNetGame()
-{
-    kailleraInfos ki;
-    char tmpver[128];
-    char* gameList;
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">DoNetGame</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    kailleraInfos ki<span class="token punctuation">;</span>
+    <span class="token keyword">char</span> tmpver<span class="token punctuation">[</span><span class="token number">128</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">char</span><span class="token operator">*</span> gameList<span class="token punctuation">;</span>
 
-    ....获取到当前引擎支持的游戏列表
-    gameList = CreateKailleraList();
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>获取到当前引擎支持的游戏列表
+    gameList <span class="token operator">=</span> <span class="token function">CreateKailleraList</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    ki.appName = tmpver;
-    ki.gameList = gameList;
-    //设置游戏成功的回调
-    ki.gameCallback = &gameCallback;
-    //设置收到聊天的回调
-    ki.chatReceivedCallback = &kChatCallback;
-    //设置客户端掉线的回调
-    ki.clientDroppedCallback = &kDropCallback;
-    ki.moreInfosCallback = NULL;
+    ki<span class="token punctuation">.</span>appName <span class="token operator">=</span> tmpver<span class="token punctuation">;</span>
+    ki<span class="token punctuation">.</span>gameList <span class="token operator">=</span> gameList<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//设置游戏成功的回调</span>
+    ki<span class="token punctuation">.</span>gameCallback <span class="token operator">=</span> <span class="token operator">&amp;</span>gameCallback<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//设置收到聊天的回调</span>
+    ki<span class="token punctuation">.</span>chatReceivedCallback <span class="token operator">=</span> <span class="token operator">&amp;</span>kChatCallback<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//设置客户端掉线的回调</span>
+    ki<span class="token punctuation">.</span>clientDroppedCallback <span class="token operator">=</span> <span class="token operator">&amp;</span>kDropCallback<span class="token punctuation">;</span>
+    ki<span class="token punctuation">.</span>moreInfosCallback <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
 
-    //调用Kaillera对战库的方法，传递参数
-    Kaillera_Set_Infos(&ki);
-    //kailleraSetInfos(&ki);
+    <span class="token comment" spellcheck="true">//调用Kaillera对战库的方法，传递参数</span>
+    <span class="token function">Kaillera_Set_Infos</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>ki<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//kailleraSetInfos(&amp;ki);</span>
 
-    //显示对战库的对话框
-    Kaillera_Select_Server_Dialog(NULL);
-    //kailleraSelectServerDialog(NULL);
-    ....
-}
+    <span class="token comment" spellcheck="true">//显示对战库的对话框</span>
+    <span class="token function">Kaillera_Select_Server_Dialog</span><span class="token punctuation">(</span><span class="token constant">NULL</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//kailleraSelectServerDialog(NULL);</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 
-这样就进入到了对战库的对话框了，而且可以看到如果我们要写测试demo，我们的测试代码可以像上面这样写,我们先看看启动游戏的回调
-static int WINAPI gameCallback(char* game, int player, int numplayers)
-{
-    bool bFound = false;
-    HWND hActive;
+这样就进入到了对战库的对话框了，而且可以看到如果我们要写测试demo，我们的测试代码可以像上面这样写<span class="token punctuation">,</span>我们先看看启动游戏的回调
+<span class="token keyword">static</span> <span class="token keyword">int</span> WINAPI <span class="token function">gameCallback</span><span class="token punctuation">(</span><span class="token keyword">char</span><span class="token operator">*</span> game<span class="token punctuation">,</span> <span class="token keyword">int</span> player<span class="token punctuation">,</span> <span class="token keyword">int</span> numplayers<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">bool</span> bFound <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+    HWND hActive<span class="token punctuation">;</span>
 
-    //根据对战库传递过来的引擎的名称，从我们的引擎列表中查找是否有对应的引擎
-    for (nBurnDrvActive = 0; nBurnDrvActive < nBurnDrvCount; nBurnDrvActive++) {
+    <span class="token comment" spellcheck="true">//根据对战库传递过来的引擎的名称，从我们的引擎列表中查找是否有对应的引擎</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>nBurnDrvActive <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> nBurnDrvActive <span class="token operator">&lt;</span> nBurnDrvCount<span class="token punctuation">;</span> nBurnDrvActive<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
 
-        char* szDecoratedName = DecorateGameName(nBurnDrvActive);
+        <span class="token keyword">char</span><span class="token operator">*</span> szDecoratedName <span class="token operator">=</span> <span class="token function">DecorateGameName</span><span class="token punctuation">(</span>nBurnDrvActive<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        if (!strcmp(szDecoratedName, game)) {
-            bFound = true;
-            break;
-        }
-    }
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">strcmp</span><span class="token punctuation">(</span>szDecoratedName<span class="token punctuation">,</span> game<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            bFound <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+            <span class="token keyword">break</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
 
-    //如果找不到，就销毁Kailler这个对战库
-    if (!bFound) {
-        Kaillera_End_Game();
-        return 1;
-    }
+    <span class="token comment" spellcheck="true">//如果找不到，就销毁Kailler这个对战库</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>bFound<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">Kaillera_End_Game</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    //标识当前是对战的模式
-    kNetGame = 1;
-    ...                                
-    DrvInit(nBurnDrvActive, false);                        // Init the game driver
-    ScrnInit();
-    AudSoundPlay();                                        // Restart sound
-    VidInit();
-    SetFocus(hScrnWnd);
-    ...
-    RunMessageLoop();
-    ...
-}
+    <span class="token comment" spellcheck="true">//标识当前是对战的模式</span>
+    kNetGame <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>                                
+    <span class="token function">DrvInit</span><span class="token punctuation">(</span>nBurnDrvActive<span class="token punctuation">,</span> <span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                        <span class="token comment" spellcheck="true">// Init the game driver</span>
+    <span class="token function">ScrnInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">AudSoundPlay</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                                        <span class="token comment" spellcheck="true">// Restart sound</span>
+    <span class="token function">VidInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SetFocus</span><span class="token punctuation">(</span>hScrnWnd<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token function">RunMessageLoop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 上面的逻辑跟单机实现是很相似的，不同的就是，这里查找对应的引擎 对应的索引，是根据对战库传递的游戏名称来获取到的
 
 相应的收到的聊天的回调，直接在界面上显示既可
-static void WINAPI kChatCallback(char* nick, char* text)
-{
-    TCHAR szTemp[128];
-    _sntprintf(szTemp, 128, _T("%.32hs "), nick);
-    VidSAddChatMsg(szTemp, 0xBFBFFF, ANSIToTCHAR(text, NULL, 0), 0x7F7FFF);
-}
+<span class="token keyword">static</span> <span class="token keyword">void</span> WINAPI <span class="token function">kChatCallback</span><span class="token punctuation">(</span><span class="token keyword">char</span><span class="token operator">*</span> nick<span class="token punctuation">,</span> <span class="token keyword">char</span><span class="token operator">*</span> text<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    TCHAR szTemp<span class="token punctuation">[</span><span class="token number">128</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token function">_sntprintf</span><span class="token punctuation">(</span>szTemp<span class="token punctuation">,</span> <span class="token number">128</span><span class="token punctuation">,</span> <span class="token function">_T</span><span class="token punctuation">(</span><span class="token string">"%.32hs "</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nick<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">VidSAddChatMsg</span><span class="token punctuation">(</span>szTemp<span class="token punctuation">,</span> <span class="token number">0xBFBFFF</span><span class="token punctuation">,</span> <span class="token function">ANSIToTCHAR</span><span class="token punctuation">(</span>text<span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">0x7F7FFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
 这个对战库只是用来传递当前用户的按键情况，由于是实时的，所以响应的代码也是在界面的渲染地方
-static int RunFrame(int bDraw, int bPause)
-{
-    ....
-    if (kNetGame) {
-        GetInput(true);                        // Update inputs   获取到当前的按键情况
-        if (KailleraGetInput()) {            // Synchronize input with Kaillera   同步按键信息
-            return 0;
-        }
-    }
+<span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">RunFrame</span><span class="token punctuation">(</span><span class="token keyword">int</span> bDraw<span class="token punctuation">,</span> <span class="token keyword">int</span> bPause<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>kNetGame<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">GetInput</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                        <span class="token comment" spellcheck="true">// Update inputs   获取到当前的按键情况</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">KailleraGetInput</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>            <span class="token comment" spellcheck="true">// Synchronize input with Kaillera   同步按键信息</span>
+            <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
 
-    //完成界面的渲染
-    BurnDrvFrame();
-    ...
-}
+    <span class="token comment" spellcheck="true">//完成界面的渲染</span>
+    <span class="token function">BurnDrvFrame</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 
-KailleraGetInput() 后面的文章继续介绍
+<span class="token function">KailleraGetInput</span><span class="token punctuation">(</span><span class="token punctuation">)</span> 后面的文章继续介绍
 </code></pre>
 
                 
@@ -1958,9 +1954,7 @@ KailleraGetInput() 后面的文章继续介绍
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概述
-Aria2 Kaillera对战库源码分析以及改进
-
+                            
                         
                     </div>
                     <div class="publish-info">

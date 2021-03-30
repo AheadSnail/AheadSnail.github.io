@@ -501,79 +501,76 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><blockquote>
-<p>Transmission Android CmakeList编译过程</p>
-</blockquote>
-<a id="more"></a>
-<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><blockquote>
+                <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><blockquote>
 <p>上一篇文章中介绍了怎么样在ubuntu下面的采用Ndk,交叉编译链，编译transmission，这篇文章将介绍怎么在Android Studio下面采用CmakeList的方式来编译transmission库，至于为什么要在<br>android Studio中编译是为了我们开发的方便，在Android Studio中采用最新的CmakeList编译的化，是支持断点调试代码，方便我们阅读，修改代码</p>
 </blockquote>
 <h3 id="移植Transmission遇到的问题"><a href="#移植Transmission遇到的问题" class="headerlink" title="移植Transmission遇到的问题"></a>移植Transmission遇到的问题</h3><blockquote>
 <p>既然要移植到Android Studio下面，那么就涉及到要编译哪些文件，还有编译需要的链接的参数，定义的宏等，这些都是我们需要采集的<br>因为Transmission是采用autoconf来维护，自动的生成Makefile的，所以我们可以参考Ubuntu交叉编译之后产生Makefile文件，从里面采集我们需要的这些信息</p>
 </blockquote>
 <p>还记得前面一篇文章中介绍到在编译libevent库的时候采用的NDKr10e ,那是因为Ndk11以上有对这些函数做调整，但是在Android Studio中如果想采用CmakeList来编译的化，最低的Ndk版本不能低于r12要不然会提示下面的这些错误</p>
-<pre class=" language-Cmake"><code class="language-Cmake">CMake Error at D:/sdk/sdk/cmake/3.6.4111459/android.toolchain.cmake:345 (message):
-  Missing file:
-  D:/sdk/android-ndk-r10e-windows-x86_64/android-ndk-r10e/source.properties.
+<pre class=" language-makefile"><code class="language-makefile"><span class="token symbol">CMake Error at D</span><span class="token punctuation">:</span>/sdk/sdk/cmake/3.6.4111459/android.toolchain.cmake<span class="token punctuation">:</span>345 <span class="token punctuation">(</span>message<span class="token punctuation">)</span><span class="token punctuation">:</span>
+<span class="token symbol">  Missing file</span><span class="token punctuation">:</span>
+<span class="token symbol">  D</span><span class="token punctuation">:</span>/sdk/android-ndk-r10e-windows-x86_64/android-ndk-r10e/source.properties.
   Please use NDK r12+.
-Call Stack (most recent call first):
-  D:/sdk/sdk/cmake/3.6.4111459/share/cmake-3.6/Modules/CMakeDetermineSystem.cmake:98 (include)
+<span class="token symbol">Call Stack (most recent call first)</span><span class="token punctuation">:</span>
+<span class="token symbol">  D</span><span class="token punctuation">:</span>/sdk/sdk/cmake/3.6.4111459/share/cmake-3.6/Modules/CMakeDetermineSystem.cmake<span class="token punctuation">:</span>98 <span class="token punctuation">(</span><span class="token keyword">include</span><span class="token punctuation">)</span>
   CMakeLists.txt
-CMake Error: CMAKE_C_COMPILER not set, after EnableLanguage
-CMake Error: CMAKE_CXX_COMPILER not set, after EnableLanguage
+<span class="token symbol">CMake Error</span><span class="token punctuation">:</span> CMAKE_C_COMPILER not set, after EnableLanguage
+<span class="token symbol">CMake Error</span><span class="token punctuation">:</span> CMAKE_CXX_COMPILER not set, after EnableLanguage
 </code></pre>
 <p>所以我们必须要将libevent库采用Ndr12以上来编译，那么这就意味着，我们不能逃避在编译libevent库试出现的 找不到arc4random_addrandom实现的问题,更多的详细信息可以参考</p>
 <blockquote>
 <p><a href="https://github.com/android-ndk/ndk/issues/48" target="_blank" rel="noopener">https://github.com/android-ndk/ndk/issues/48</a><br>通过上面介绍可知，ndk中是有头文件的，但是确找不到对应的实现，下面介绍怎么解决这个问题,这个函数触发是在evutil_rand.c文件中，有这样的代码</p>
 </blockquote>
 <p>evutil_rand.c 中有这样的实现</p>
-<pre class=" language-C++"><code class="language-C++">#ifdef EVENT__HAVE_ARC4RANDOM
-.....
-#else /* !EVENT__HAVE_ARC4RANDOM { */
-....
-#include "./arc4random.c"
-....
-#endif /* } !EVENT__HAVE_ARC4RANDOM */
+<pre class=" language-cpp"><code class="language-cpp"><span class="token macro property">#<span class="token directive keyword">ifdef</span> EVENT__HAVE_ARC4RANDOM</span>
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token macro property">#<span class="token directive keyword">else</span> </span><span class="token comment" spellcheck="true">/* !EVENT__HAVE_ARC4RANDOM { */</span>
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">"./arc4random.c"</span></span>
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token macro property">#<span class="token directive keyword">endif</span> </span><span class="token comment" spellcheck="true">/* } !EVENT__HAVE_ARC4RANDOM */</span>
 
-其中arc4random.c文件中就有定义这个函数
-#ifndef ARC4RANDOM_NOADDRANDOM
-ARC4RANDOM_EXPORT void
-arc4random_addrandom(const unsigned char *dat, int datlen)
-{
-    int j;
-    ARC4_LOCK_();
-    if (!rs_initialized)
-        arc4_stir();
-    for (j = 0; j < datlen; j += 256) {
-        /* arc4_addrandom() ignores all but the first 256 bytes of
+其中arc4random<span class="token punctuation">.</span>c文件中就有定义这个函数
+<span class="token macro property">#<span class="token directive keyword">ifndef</span> ARC4RANDOM_NOADDRANDOM</span>
+ARC4RANDOM_EXPORT <span class="token keyword">void</span>
+<span class="token function">arc4random_addrandom</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">unsigned</span> <span class="token keyword">char</span> <span class="token operator">*</span>dat<span class="token punctuation">,</span> <span class="token keyword">int</span> datlen<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">int</span> j<span class="token punctuation">;</span>
+    <span class="token function">ARC4_LOCK_</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>rs_initialized<span class="token punctuation">)</span>
+        <span class="token function">arc4_stir</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>j <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> j <span class="token operator">&lt;</span> datlen<span class="token punctuation">;</span> j <span class="token operator">+</span><span class="token operator">=</span> <span class="token number">256</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">/* arc4_addrandom() ignores all but the first 256 bytes of
          * its input.  We want to make sure to look at ALL the
          * data in 'dat', just in case the user is doing something
-         * crazy like passing us all the files in /var/log. */
-        arc4_addrandom(dat + j, datlen - j);
-    }
-    ARC4_UNLOCK_();
-}
-#endif
+         * crazy like passing us all the files in /var/log. */</span>
+        <span class="token function">arc4_addrandom</span><span class="token punctuation">(</span>dat <span class="token operator">+</span> j<span class="token punctuation">,</span> datlen <span class="token operator">-</span> j<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token function">ARC4_UNLOCK_</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token macro property">#<span class="token directive keyword">endif</span></span>
 
-evutil_rand.c文件中，有这样的代码，这就是触发调用的入口
-void
-evutil_secure_rng_add_bytes(const char *buf, size_t n)
-{
-    arc4random_addrandom((unsigned char*)buf,
-        n>(size_t)INT_MAX ? INT_MAX : (int)n);
-}
+evutil_rand<span class="token punctuation">.</span>c文件中，有这样的代码，这就是触发调用的入口
+<span class="token keyword">void</span>
+<span class="token function">evutil_secure_rng_add_bytes</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>buf<span class="token punctuation">,</span> size_t n<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token function">arc4random_addrandom</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">unsigned</span> <span class="token keyword">char</span><span class="token operator">*</span><span class="token punctuation">)</span>buf<span class="token punctuation">,</span>
+        n<span class="token operator">></span><span class="token punctuation">(</span>size_t<span class="token punctuation">)</span>INT_MAX <span class="token operator">?</span> INT_MAX <span class="token operator">:</span> <span class="token punctuation">(</span><span class="token keyword">int</span><span class="token punctuation">)</span>n<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <p>通过上面可以知道，如果EVENT__HAVE_ARC4RANDOM = 0,也即是没有定义这个宏的时候，就会将arc4random.c 包含进来，这样 arc4random_addrandom 就会有定义了，下面查看一下这个宏是怎么产生的,由于transmission是采用autoconf来维护的，在他生成makefile文件之前，要先通过configure文件的检查，这个文件主要是检查当前的系统的环境，下面是configure.ac文件的内容</p>
-<pre><code>dnl Checks for library functions.
-AC_CHECK_FUNCS([ \
+<pre class=" language-cpp"><code class="language-cpp">dnl Checks <span class="token keyword">for</span> library functions<span class="token punctuation">.</span>
+<span class="token function">AC_CHECK_FUNCS</span><span class="token punctuation">(</span><span class="token punctuation">[</span> \
   accept4 \
   arc4random \
   arc4random_buf \
   eventfd \
-  ...
-])
-AC_CHECK_FUNCS：检查C标准库中是否存在函数。 如果找到，则定义预处理器宏HAVE_ [function]。它生成一个测试程序，声明一个具有相同名称的函数，然后编译并链接它。
-</code></pre><p>关于autocof语法可以参考 <a href="https://aheadsnail.github.io/2018/04/11/AutoConfig-%E5%B8%B8%E8%A7%81%E7%9A%84%E5%AE%8F%E8%AF%A6%E8%A7%A3/">https://aheadsnail.github.io/2018/04/11/AutoConfig-%E5%B8%B8%E8%A7%81%E7%9A%84%E5%AE%8F%E8%AF%A6%E8%A7%A3/</a></p>
+  <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">]</span><span class="token punctuation">)</span>
+AC_CHECK_FUNCS：检查C标准库中是否存在函数。 如果找到，则定义预处理器宏HAVE_ <span class="token punctuation">[</span>function<span class="token punctuation">]</span>。它生成一个测试程序，声明一个具有相同名称的函数，然后编译并链接它。
+</code></pre>
+<p>关于autocof语法可以参考 <a href="https://aheadsnail.github.io/2018/04/11/AutoConfig-%E5%B8%B8%E8%A7%81%E7%9A%84%E5%AE%8F%E8%AF%A6%E8%A7%A3/">https://aheadsnail.github.io/2018/04/11/AutoConfig-%E5%B8%B8%E8%A7%81%E7%9A%84%E5%AE%8F%E8%AF%A6%E8%A7%A3/</a></p>
 <pre class=" language-java"><code class="language-java">所以上面会去检查系统是否中是否有arc4random 函数，如果有就会定义宏，这些宏生成在event<span class="token operator">-</span>config<span class="token punctuation">.</span>h文件中
 <span class="token comment" spellcheck="true">/* Define to 1 if you have the `arc4random' function. */</span>
 #define EVENT__HAVE_ARC4RANDOM <span class="token number">1</span>
@@ -590,395 +587,395 @@ AC_CHECK_FUNCS：检查C标准库中是否存在函数。 如果找到，则定�
 <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
 修改完之后，重新进行编译，发现又出现了
 </code></pre>
-<p><img src="/uploads/Transmision 交叉编译/libeventndk14编译.png" alt="结果显示"></p>
+<p><img src="/uploads/Transmision 交叉编译/libeventndk14编译.png" alt></p>
 <p>从错误的信息可以看出来，这个函数的定义跟系统的这个对应的这个函数重定义了，系统的函数肯定是不能修改的，那么我们就有必要修改libevent库的函数，就改一个名字而已，下面是修改的内容</p>
-<pre class=" language-C++"><code class="language-C++">arc4random.c中总的要修改下面的内容
-#ifndef ARC4RANDOM_NOADDRANDOM
-ARC4RANDOM_EXPORT void
-my_arc4random_addrandom(const unsigned char *dat, int datlen)
-{
-    int j;
-    ARC4_LOCK_();
-    if (!rs_initialized)
-        arc4_stir();
-    for (j = 0; j < datlen; j += 256) {
-        /* arc4_addrandom() ignores all but the first 256 bytes of
+<pre class=" language-cpp"><code class="language-cpp">arc4random<span class="token punctuation">.</span>c中总的要修改下面的内容
+<span class="token macro property">#<span class="token directive keyword">ifndef</span> ARC4RANDOM_NOADDRANDOM</span>
+ARC4RANDOM_EXPORT <span class="token keyword">void</span>
+<span class="token function">my_arc4random_addrandom</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">unsigned</span> <span class="token keyword">char</span> <span class="token operator">*</span>dat<span class="token punctuation">,</span> <span class="token keyword">int</span> datlen<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">int</span> j<span class="token punctuation">;</span>
+    <span class="token function">ARC4_LOCK_</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>rs_initialized<span class="token punctuation">)</span>
+        <span class="token function">arc4_stir</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>j <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> j <span class="token operator">&lt;</span> datlen<span class="token punctuation">;</span> j <span class="token operator">+</span><span class="token operator">=</span> <span class="token number">256</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">/* arc4_addrandom() ignores all but the first 256 bytes of
          * its input.  We want to make sure to look at ALL the
          * data in 'dat', just in case the user is doing something
-         * crazy like passing us all the files in /var/log. */
-        arc4_addrandom(dat + j, datlen - j);
-    }
-    ARC4_UNLOCK_();
-}
-#endif
+         * crazy like passing us all the files in /var/log. */</span>
+        <span class="token function">arc4_addrandom</span><span class="token punctuation">(</span>dat <span class="token operator">+</span> j<span class="token punctuation">,</span> datlen <span class="token operator">-</span> j<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token function">ARC4_UNLOCK_</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token macro property">#<span class="token directive keyword">endif</span></span>
 
-evutil_rand.c中总的要修改的内容：
-#undef EVENT__HAVE_ARC4RANDOM //手动的取消这个宏
-#ifdef EVENT__HAVE_ARC4RANDOM
-....
+evutil_rand<span class="token punctuation">.</span>c中总的要修改的内容：
+<span class="token macro property">#<span class="token directive keyword">undef</span> EVENT__HAVE_ARC4RANDOM </span><span class="token comment" spellcheck="true">//手动的取消这个宏</span>
+<span class="token macro property">#<span class="token directive keyword">ifdef</span> EVENT__HAVE_ARC4RANDOM</span>
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
 
-void
-evutil_secure_rng_add_bytes(const char *buf, size_t n)
-{
-    my_arc4random_addrandom((unsigned char*)buf,
-        n>(size_t)INT_MAX ? INT_MAX : (int)n);
-}
+<span class="token keyword">void</span>
+<span class="token function">evutil_secure_rng_add_bytes</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>buf<span class="token punctuation">,</span> size_t n<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token function">my_arc4random_addrandom</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">unsigned</span> <span class="token keyword">char</span><span class="token operator">*</span><span class="token punctuation">)</span>buf<span class="token punctuation">,</span>
+        n<span class="token operator">></span><span class="token punctuation">(</span>size_t<span class="token punctuation">)</span>INT_MAX <span class="token operator">?</span> INT_MAX <span class="token operator">:</span> <span class="token punctuation">(</span><span class="token keyword">int</span><span class="token punctuation">)</span>n<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <p>修改完之后，重新编译，通过了，至此这个库已经修改完成</p>
 <p>编译transmission,遇到下面的这个问题</p>
-<p><img src="/uploads/Transmision 交叉编译/ndkr14endpowent.png" alt="结果显示"></p>
+<p><img src="/uploads/Transmision 交叉编译/ndkr14endpowent.png" alt></p>
 <p>经查阅这个函数也是NDK的一个坑，详细信息可以参考<br>endpowent <a href="https://github.com/android-ndk/ndk/issues/77" target="_blank" rel="noopener">https://github.com/android-ndk/ndk/issues/77</a></p>
-<p>这个函数在系统的头文件pwd.h文件中，跟他一起配套使用的方式是getpwuid，endpwent函数一般用来关闭用getpwent打开的密码文件。<br>从上面的文章中可知这个函数是没有实现的，那我们可以在Android的源码中查找这个函数，因为这个是系统的库，那么这个函数肯定存在android的源码中</p>
+<p>这个函数在系统的头文件pwd.h文件中，跟他一起配套使用的方式是getpwuid，endpwent函数一般用来关闭用getpwent打开的密码文件。从上面的文章中可知这个函数是没有实现的，那我们可以在Android的源码中查找这个函数，因为这个是系统的库，那么这个函数肯定存在android的源码中</p>
 <p>查找的结果</p>
-<p><img src="/uploads/Transmision 交叉编译/endpewent查找结果.png" alt="结果显示"></p>
+<p><img src="/uploads/Transmision 交叉编译/endpewent查找结果.png" alt></p>
 <p>其中有这样的查询结果 /bionic/libc/bionic/ndk_cruft.cpp:void endpwent() { }，我们可以进入对应的目录找到这个文件，下面是关键的内容</p>
-<pre class=" language-C++"><code class="language-C++">// This was never implemented in bionic, only needed for ABI compatibility with the NDK.
-// In the M time frame, over 1000 apps have a reference to this!
-void endpwent() { }
+<pre class=" language-cpp"><code class="language-cpp"><span class="token comment" spellcheck="true">// This was never implemented in bionic, only needed for ABI compatibility with the NDK.</span>
+<span class="token comment" spellcheck="true">// In the M time frame, over 1000 apps have a reference to this!</span>
+<span class="token keyword">void</span> <span class="token function">endpwent</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token punctuation">}</span>
 
-// This was removed from BSD.
-void arc4random_stir(void) {
-  // The current implementation stirs itself as needed.
-}
+<span class="token comment" spellcheck="true">// This was removed from BSD.</span>
+<span class="token keyword">void</span> <span class="token function">arc4random_stir</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">// The current implementation stirs itself as needed.</span>
+<span class="token punctuation">}</span>
 
-// This was removed from BSD.
-void arc4random_addrandom(unsigned char*, int) {
-  // The current implementation adds randomness as needed.
-}
+<span class="token comment" spellcheck="true">// This was removed from BSD.</span>
+<span class="token keyword">void</span> <span class="token function">arc4random_addrandom</span><span class="token punctuation">(</span><span class="token keyword">unsigned</span> <span class="token keyword">char</span><span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">int</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">// The current implementation adds randomness as needed.</span>
+<span class="token punctuation">}</span>
 
-可以看到这些函数都是连接找不到实现的，都在同一个文件，而跟endpwent 配套使用的 getpwuid 函数的实现是在 ./bionic/libc/bionic/stubs.cpp 目录
-passwd* getpwuid(uid_t uid) { // NOLINT: implementing bad function.
-  passwd_state_t* state = g_passwd_tls_buffer.get();
-  if (state == NULL) {
-    return NULL;
-  }
+可以看到这些函数都是连接找不到实现的，都在同一个文件，而跟endpwent 配套使用的 getpwuid 函数的实现是在 <span class="token punctuation">.</span><span class="token operator">/</span>bionic<span class="token operator">/</span>libc<span class="token operator">/</span>bionic<span class="token operator">/</span>stubs<span class="token punctuation">.</span>cpp 目录
+passwd<span class="token operator">*</span> <span class="token function">getpwuid</span><span class="token punctuation">(</span>uid_t uid<span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token comment" spellcheck="true">// NOLINT: implementing bad function.</span>
+  passwd_state_t<span class="token operator">*</span> state <span class="token operator">=</span> g_passwd_tls_buffer<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>state <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
 
-  passwd* pw = android_id_to_passwd(state, uid);
-  if (pw != NULL) {
-    return pw;
-  }
-  // Handle OEM range.
-  pw = oem_id_to_passwd(uid, state);
-  if (pw != NULL) {
-    return pw;
-  }
-  return app_id_to_passwd(uid, state);
-}
+  passwd<span class="token operator">*</span> pw <span class="token operator">=</span> <span class="token function">android_id_to_passwd</span><span class="token punctuation">(</span>state<span class="token punctuation">,</span> uid<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>pw <span class="token operator">!=</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> pw<span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token comment" spellcheck="true">// Handle OEM range.</span>
+  pw <span class="token operator">=</span> <span class="token function">oem_id_to_passwd</span><span class="token punctuation">(</span>uid<span class="token punctuation">,</span> state<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>pw <span class="token operator">!=</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> pw<span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">return</span> <span class="token function">app_id_to_passwd</span><span class="token punctuation">(</span>uid<span class="token punctuation">,</span> state<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-可以看到这个函数是有实现的，而且这个函数跟前面的endpwent并不在同一个文件，而且在查找google的测试代码中，也并没有调用endpwent 这个函数,下面是测试的代码
-static void check_getpwuid_r(const char* username, uid_t uid, uid_type_t uid_type) {
-  passwd pwd_storage;
-  char buf[512];
-  int result;
+可以看到这个函数是有实现的，而且这个函数跟前面的endpwent并不在同一个文件，而且在查找google的测试代码中，也并没有调用endpwent 这个函数<span class="token punctuation">,</span>下面是测试的代码
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">check_getpwuid_r</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">char</span><span class="token operator">*</span> username<span class="token punctuation">,</span> uid_t uid<span class="token punctuation">,</span> uid_type_t uid_type<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  passwd pwd_storage<span class="token punctuation">;</span>
+  <span class="token keyword">char</span> buf<span class="token punctuation">[</span><span class="token number">512</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+  <span class="token keyword">int</span> result<span class="token punctuation">;</span>
 
-  errno = 0;
-  passwd* pwd = NULL;
-  result = getpwuid_r(uid, &pwd_storage, buf, sizeof(buf), &pwd);
-  ASSERT_EQ(0, result);
-  ASSERT_EQ(0, errno);
-  SCOPED_TRACE("getpwuid_r");
-  check_passwd(pwd, username, uid, uid_type);
-}
+  errno <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+  passwd<span class="token operator">*</span> pwd <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+  result <span class="token operator">=</span> <span class="token function">getpwuid_r</span><span class="token punctuation">(</span>uid<span class="token punctuation">,</span> <span class="token operator">&amp;</span>pwd_storage<span class="token punctuation">,</span> buf<span class="token punctuation">,</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>buf<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>pwd<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">ASSERT_EQ</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> result<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">ASSERT_EQ</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> errno<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">SCOPED_TRACE</span><span class="token punctuation">(</span><span class="token string">"getpwuid_r"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">check_passwd</span><span class="token punctuation">(</span>pwd<span class="token punctuation">,</span> username<span class="token punctuation">,</span> uid<span class="token punctuation">,</span> uid_type<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 </code></pre>
-<p>通过上面的内容，我们可以直接，简单的将这个函数屏蔽掉，这样就可以编译通过了，最终生成下面的内容<br><img src="/uploads/Transmision 交叉编译/transmission编译结果.png" alt="结果显示"></p>
-<h3 id="Android-CmakeList的编写"><a href="#Android-CmakeList的编写" class="headerlink" title="Android CmakeList的编写"></a>Android CmakeList的编写</h3><pre class=" language-Cmake"><code class="language-Cmake">cmake_minimum_required(VERSION 3.4.1)
+<p>通过上面的内容，我们可以直接，简单的将这个函数屏蔽掉，这样就可以编译通过了，最终生成下面的内容<br><img src="/uploads/Transmision 交叉编译/transmission编译结果.png" alt></p>
+<h3 id="Android-CmakeList的编写"><a href="#Android-CmakeList的编写" class="headerlink" title="Android CmakeList的编写"></a>Android CmakeList的编写</h3><pre class=" language-cpp"><code class="language-cpp"><span class="token function">cmake_minimum_required</span><span class="token punctuation">(</span>VERSION <span class="token number">3.4</span><span class="token punctuation">.</span><span class="token number">1</span><span class="token punctuation">)</span>
 
-#设置变量 自定义变量使用SET(OBJ_NAME xxxx)，使用时${OBJ_NAME}
-set(My_ARIC_SRC ${CMAKE_SOURCE_DIR}/src/main/cpp/src)
-#message( WARNING  "${My_ARIC_SRC}")
+#设置变量 自定义变量使用<span class="token function">SET</span><span class="token punctuation">(</span>OBJ_NAME xxxx<span class="token punctuation">)</span>，使用时$<span class="token punctuation">{</span>OBJ_NAME<span class="token punctuation">}</span>
+<span class="token function">set</span><span class="token punctuation">(</span>My_ARIC_SRC $<span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span><span class="token operator">/</span>src<span class="token operator">/</span>main<span class="token operator">/</span>cpp<span class="token operator">/</span>src<span class="token punctuation">)</span>
+<span class="token macro property">#message( WARNING  "${My_ARIC_SRC}")</span>
 
 #定义宏
-add_definitions( -Din_addr_t=uint32_t
- -D__android__
- -Din_port_t=uint16_t
- -D__TRANSMISSION__
- -DPACKAGE_DATA_DIR="${CMAKE_SOURCE_DIR}"
- -DPACKAGE_NAME=\"transmission\"
- -DPACKAGE_TARNAME=\"transmission\"
- -DPACKAGE_VERSION=\"2.94\"
- -DPACKAGE_STRING=\"transmission\ 2.94\"
- -DPACKAGE_BUGREPORT=\"https://github.com/transmission/transmission\"
- -DPACKAGE_URL=\"\"
- -DPACKAGE=\"transmission\"
- -DVERSION=\"2.94\"
- -DSTDC_HEADERS=1
- -DHAVE_SYS_TYPES_H=1
- -DHAVE_SYS_STAT_H=1
- -DHAVE_STDLIB_H=1
- -DHAVE_STRING_H=1
- -DHAVE_MEMORY_H=1
- -DHAVE_STRINGS_H=1
- -DHAVE_INTTYPES_H=1
- -DHAVE_STDINT_H=1
- -DHAVE_UNISTD_H=1
- -DHAVE_DLFCN_H=1
- -DLT_OBJDIR=\".libs/\"
- -DSTDC_HEADERS=1
- -DTIME_WITH_SYS_TIME=1
- -DHAVE_STDBOOL_H=1
- -DHAVE_PREAD=1
- -DHAVE_PWRITE=1
- -DHAVE_STRLCPY=1
- -DHAVE_DAEMON=1
- -DHAVE_DIRNAME=1
- -DHAVE_BASENAME=1
- -DHAVE_STRCASECMP=1
- -DHAVE_LOCALTIME_R=1
- -DHAVE_MEMMEM=1
- -DHAVE_STRSEP=1
- -DHAVE_SYSLOG=1
- -DHAVE_VALLOC=1
- -DHAVE_POSIX_MEMALIGN=1
- -DHAVE_MKDTEMP=1
- -DHAVE_PTHREAD=1
- -DHAVE_GETMNTENT=1
- -DHAVE_DECL_POSIX_FADVISE=0
- -DWITH_UTP=1
- -DGETTEXT_PACKAGE=\"transmission-gtk\"
- -DHAVE_LOCALE_H=1
- -DHAVE_LC_MESSAGES=1
- -DTR_LIGHTWEIGHT=1
- -DENABLE_STRNATPMPERR
- )
+<span class="token function">add_definitions</span><span class="token punctuation">(</span> <span class="token operator">-</span>Din_addr_t<span class="token operator">=</span>uint32_t
+ <span class="token operator">-</span>D__android__
+ <span class="token operator">-</span>Din_port_t<span class="token operator">=</span>uint16_t
+ <span class="token operator">-</span>D__TRANSMISSION__
+ <span class="token operator">-</span>DPACKAGE_DATA_DIR<span class="token operator">=</span><span class="token string">"${CMAKE_SOURCE_DIR}"</span>
+ <span class="token operator">-</span>DPACKAGE_NAME<span class="token operator">=</span>\"transmission\"
+ <span class="token operator">-</span>DPACKAGE_TARNAME<span class="token operator">=</span>\"transmission\"
+ <span class="token operator">-</span>DPACKAGE_VERSION<span class="token operator">=</span>\"<span class="token number">2.94</span>\"
+ <span class="token operator">-</span>DPACKAGE_STRING<span class="token operator">=</span>\"transmission\ <span class="token number">2.94</span>\"
+ <span class="token operator">-</span>DPACKAGE_BUGREPORT<span class="token operator">=</span>\"https<span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>github<span class="token punctuation">.</span>com<span class="token operator">/</span>transmission<span class="token operator">/</span>transmission\"
+ <span class="token operator">-</span>DPACKAGE_URL<span class="token operator">=</span>\"\"
+ <span class="token operator">-</span>DPACKAGE<span class="token operator">=</span>\"transmission\"
+ <span class="token operator">-</span>DVERSION<span class="token operator">=</span>\"<span class="token number">2.94</span>\"
+ <span class="token operator">-</span>DSTDC_HEADERS<span class="token operator">=</span><span class="token number">1</span>
+ <span class="token operator">-</span>DHAVE_SYS_TYPES_H<span class="token operator">=</span><span class="token number">1</span>
+ <span class="token operator">-</span>DHAVE_SYS_STAT_H<span class="token operator">=</span><span class="token number">1</span>
+ <span class="token operator">-</span>DHAVE_STDLIB_H<span class="token operator">=</span><span class="token number">1</span>
+ <span class="token operator">-</span>DHAVE_STRING_H<span class="token operator">=</span><span class="token number">1</span>
+ <span class="token operator">-</span>DHAVE_MEMORY_H<span class="token operator">=</span><span class="token number">1</span>
+ <span class="token operator">-</span>DHAVE_STRINGS_H<span class="token operator">=</span><span class="token number">1</span>
+ <span class="token operator">-</span>DHAVE_INTTYPES_H<span class="token operator">=</span><span class="token number">1</span>
+ <span class="token operator">-</span>DHAVE_STDINT_H<span class="token operator">=</span><span class="token number">1</span>
+ <span class="token operator">-</span>DHAVE_UNISTD_H<span class="token operator">=</span><span class="token number">1</span>
+ <span class="token operator">-</span>DHAVE_DLFCN_H<span class="token operator">=</span><span class="token number">1</span>
+ <span class="token operator">-</span>DLT_OBJDIR<span class="token operator">=</span>\"<span class="token punctuation">.</span>libs<span class="token operator">/</span>\"
+ <span class="token operator">-</span>DSTDC_HEADERS<span class="token operator">=</span><span class="token number">1</span>
+ <span class="token operator">-</span>DTIME_WITH_SYS_TIME<span class="token operator">=</span><span class="token number">1</span>
+ <span class="token operator">-</span>DHAVE_STDBOOL_H<span class="token operator">=</span><span class="token number">1</span>
+ <span class="token operator">-</span>DHAVE_PREAD<span class="token operator">=</span><span class="token number">1</span>
+ <span class="token operator">-</span>DHAVE_PWRITE<span class="token operator">=</span><span class="token number">1</span>
+ <span class="token operator">-</span>DHAVE_STRLCPY<span class="token operator">=</span><span class="token number">1</span>
+ <span class="token operator">-</span>DHAVE_DAEMON<span class="token operator">=</span><span class="token number">1</span>
+ <span class="token operator">-</span>DHAVE_DIRNAME<span class="token operator">=</span><span class="token number">1</span>
+ <span class="token operator">-</span>DHAVE_BASENAME<span class="token operator">=</span><span class="token number">1</span>
+ <span class="token operator">-</span>DHAVE_STRCASECMP<span class="token operator">=</span><span class="token number">1</span>
+ <span class="token operator">-</span>DHAVE_LOCALTIME_R<span class="token operator">=</span><span class="token number">1</span>
+ <span class="token operator">-</span>DHAVE_MEMMEM<span class="token operator">=</span><span class="token number">1</span>
+ <span class="token operator">-</span>DHAVE_STRSEP<span class="token operator">=</span><span class="token number">1</span>
+ <span class="token operator">-</span>DHAVE_SYSLOG<span class="token operator">=</span><span class="token number">1</span>
+ <span class="token operator">-</span>DHAVE_VALLOC<span class="token operator">=</span><span class="token number">1</span>
+ <span class="token operator">-</span>DHAVE_POSIX_MEMALIGN<span class="token operator">=</span><span class="token number">1</span>
+ <span class="token operator">-</span>DHAVE_MKDTEMP<span class="token operator">=</span><span class="token number">1</span>
+ <span class="token operator">-</span>DHAVE_PTHREAD<span class="token operator">=</span><span class="token number">1</span>
+ <span class="token operator">-</span>DHAVE_GETMNTENT<span class="token operator">=</span><span class="token number">1</span>
+ <span class="token operator">-</span>DHAVE_DECL_POSIX_FADVISE<span class="token operator">=</span><span class="token number">0</span>
+ <span class="token operator">-</span>DWITH_UTP<span class="token operator">=</span><span class="token number">1</span>
+ <span class="token operator">-</span>DGETTEXT_PACKAGE<span class="token operator">=</span>\"transmission<span class="token operator">-</span>gtk\"
+ <span class="token operator">-</span>DHAVE_LOCALE_H<span class="token operator">=</span><span class="token number">1</span>
+ <span class="token operator">-</span>DHAVE_LC_MESSAGES<span class="token operator">=</span><span class="token number">1</span>
+ <span class="token operator">-</span>DTR_LIGHTWEIGHT<span class="token operator">=</span><span class="token number">1</span>
+ <span class="token operator">-</span>DENABLE_STRNATPMPERR
+ <span class="token punctuation">)</span>
 
 #添加头文件的查找目录
-include_directories(
-${CMAKE_SOURCE_DIR}/src/main/cpp/src/include
-${CMAKE_SOURCE_DIR}/src/main/cpp/src/include/libtransmission
-${CMAKE_SOURCE_DIR}/src/main/cpp/src/third-party/libb64
-${CMAKE_SOURCE_DIR}/src/main/cpp/src/third-party/libutp
-${CMAKE_SOURCE_DIR}/src/main/cpp/src/third-party
-${CMAKE_SOURCE_DIR}/src/main/cpp/src/third-party/libnatpmp
-)
+<span class="token function">include_directories</span><span class="token punctuation">(</span>
+$<span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span><span class="token operator">/</span>src<span class="token operator">/</span>main<span class="token operator">/</span>cpp<span class="token operator">/</span>src<span class="token operator">/</span>include
+$<span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span><span class="token operator">/</span>src<span class="token operator">/</span>main<span class="token operator">/</span>cpp<span class="token operator">/</span>src<span class="token operator">/</span>include<span class="token operator">/</span>libtransmission
+$<span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span><span class="token operator">/</span>src<span class="token operator">/</span>main<span class="token operator">/</span>cpp<span class="token operator">/</span>src<span class="token operator">/</span>third<span class="token operator">-</span>party<span class="token operator">/</span>libb64
+$<span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span><span class="token operator">/</span>src<span class="token operator">/</span>main<span class="token operator">/</span>cpp<span class="token operator">/</span>src<span class="token operator">/</span>third<span class="token operator">-</span>party<span class="token operator">/</span>libutp
+$<span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span><span class="token operator">/</span>src<span class="token operator">/</span>main<span class="token operator">/</span>cpp<span class="token operator">/</span>src<span class="token operator">/</span>third<span class="token operator">-</span>party
+$<span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span><span class="token operator">/</span>src<span class="token operator">/</span>main<span class="token operator">/</span>cpp<span class="token operator">/</span>src<span class="token operator">/</span>third<span class="token operator">-</span>party<span class="token operator">/</span>libnatpmp
+<span class="token punctuation">)</span>
 
-#用来输出参数 ${CMAKE_SOURCE_DIR} 代表的就为CmakeList的路径，这里即为app目录
-#message( WARNING  "${CMAKE_SOURCE_DIR}")
+#用来输出参数 $<span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span> 代表的就为CmakeList的路径，这里即为app目录
+<span class="token macro property">#message( WARNING  "${CMAKE_SOURCE_DIR}")</span>
 
-#add_library():添加库，分为两种，一种是需要编译为库的代码，一种是已经编译好的库文件。 一般.so文件，还有STATIC，一般.a文件。IMPORTED表示引用的不是生成的。
-add_library( open-event
+<span class="token macro property">#add_library():添加库，分为两种，一种是需要编译为库的代码，一种是已经编译好的库文件。 一般.so文件，还有STATIC，一般.a文件。IMPORTED表示引用的不是生成的。</span>
+<span class="token function">add_library</span><span class="token punctuation">(</span> open<span class="token operator">-</span>event
              STATIC
-             IMPORTED)
+             IMPORTED<span class="token punctuation">)</span>
 
-# set_target_properties：对于已经编译好的so文件需要引入，所以需要设置 这里cares是名字，然后是PROPERTIES IMPORTED_LOCATION加上库的路径。
-set_target_properties( open-event
+<span class="token macro property"># set_target_properties：对于已经编译好的so文件需要引入，所以需要设置 这里cares是名字，然后是PROPERTIES IMPORTED_LOCATION加上库的路径。</span>
+<span class="token function">set_target_properties</span><span class="token punctuation">(</span> open<span class="token operator">-</span>event
                        PROPERTIES IMPORTED_LOCATION
-                       ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/libevent.a )
+                       $<span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span><span class="token operator">/</span>src<span class="token operator">/</span>main<span class="token operator">/</span>cpp<span class="token operator">/</span>lib<span class="token operator">/</span>libevent<span class="token punctuation">.</span>a <span class="token punctuation">)</span>
 
-add_library( open-event_core
+<span class="token function">add_library</span><span class="token punctuation">(</span> open<span class="token operator">-</span>event_core
              STATIC
-             IMPORTED)
+             IMPORTED<span class="token punctuation">)</span>
 
-set_target_properties( open-event_core
+<span class="token function">set_target_properties</span><span class="token punctuation">(</span> open<span class="token operator">-</span>event_core
                        PROPERTIES IMPORTED_LOCATION
-                       ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/libevent_core.a )
+                       $<span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span><span class="token operator">/</span>src<span class="token operator">/</span>main<span class="token operator">/</span>cpp<span class="token operator">/</span>lib<span class="token operator">/</span>libevent_core<span class="token punctuation">.</span>a <span class="token punctuation">)</span>
 
-add_library( open-event_extra
+<span class="token function">add_library</span><span class="token punctuation">(</span> open<span class="token operator">-</span>event_extra
              STATIC
-             IMPORTED)
+             IMPORTED<span class="token punctuation">)</span>
 
-set_target_properties( open-event_extra
+<span class="token function">set_target_properties</span><span class="token punctuation">(</span> open<span class="token operator">-</span>event_extra
                        PROPERTIES IMPORTED_LOCATION
-                       ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/libevent_extra.a )
+                       $<span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span><span class="token operator">/</span>src<span class="token operator">/</span>main<span class="token operator">/</span>cpp<span class="token operator">/</span>lib<span class="token operator">/</span>libevent_extra<span class="token punctuation">.</span>a <span class="token punctuation">)</span>
 
-add_library( open-event_openssl
+<span class="token function">add_library</span><span class="token punctuation">(</span> open<span class="token operator">-</span>event_openssl
              STATIC
-             IMPORTED)
+             IMPORTED<span class="token punctuation">)</span>
 
-set_target_properties( open-event_openssl
+<span class="token function">set_target_properties</span><span class="token punctuation">(</span> open<span class="token operator">-</span>event_openssl
                        PROPERTIES IMPORTED_LOCATION
-                       ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/libevent_openssl.a )
+                       $<span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span><span class="token operator">/</span>src<span class="token operator">/</span>main<span class="token operator">/</span>cpp<span class="token operator">/</span>lib<span class="token operator">/</span>libevent_openssl<span class="token punctuation">.</span>a <span class="token punctuation">)</span>
 
-add_library( open-event_potheads
+<span class="token function">add_library</span><span class="token punctuation">(</span> open<span class="token operator">-</span>event_potheads
              STATIC
-             IMPORTED)
+             IMPORTED<span class="token punctuation">)</span>
 
-set_target_properties( open-event_potheads
+<span class="token function">set_target_properties</span><span class="token punctuation">(</span> open<span class="token operator">-</span>event_potheads
                        PROPERTIES IMPORTED_LOCATION
-                       ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/libevent_pthreads.a )
+                       $<span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span><span class="token operator">/</span>src<span class="token operator">/</span>main<span class="token operator">/</span>cpp<span class="token operator">/</span>lib<span class="token operator">/</span>libevent_pthreads<span class="token punctuation">.</span>a <span class="token punctuation">)</span>
 
 # 添加两个预编译库
-add_library(openssl-crypto
+<span class="token function">add_library</span><span class="token punctuation">(</span>openssl<span class="token operator">-</span>crypto
     STATIC
-    IMPORTED)
+    IMPORTED<span class="token punctuation">)</span>
 
-set_target_properties(openssl-crypto
+<span class="token function">set_target_properties</span><span class="token punctuation">(</span>openssl<span class="token operator">-</span>crypto
                       PROPERTIES IMPORTED_LOCATION
-                      ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/libcrypto.a )
+                      $<span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span><span class="token operator">/</span>src<span class="token operator">/</span>main<span class="token operator">/</span>cpp<span class="token operator">/</span>lib<span class="token operator">/</span>libcrypto<span class="token punctuation">.</span>a <span class="token punctuation">)</span>
 
-add_library(openssl-ssl
+<span class="token function">add_library</span><span class="token punctuation">(</span>openssl<span class="token operator">-</span>ssl
   STATIC
-  IMPORTED)
+  IMPORTED<span class="token punctuation">)</span>
 
-set_target_properties(openssl-ssl
+<span class="token function">set_target_properties</span><span class="token punctuation">(</span>openssl<span class="token operator">-</span>ssl
                     PROPERTIES IMPORTED_LOCATION
-                    ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/libssl.a )
+                    $<span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span><span class="token operator">/</span>src<span class="token operator">/</span>main<span class="token operator">/</span>cpp<span class="token operator">/</span>lib<span class="token operator">/</span>libssl<span class="token punctuation">.</span>a <span class="token punctuation">)</span>
 
-add_library( open-curl
+<span class="token function">add_library</span><span class="token punctuation">(</span> open<span class="token operator">-</span>curl
              STATIC
-             IMPORTED)
+             IMPORTED<span class="token punctuation">)</span>
 
-set_target_properties( open-curl
+<span class="token function">set_target_properties</span><span class="token punctuation">(</span> open<span class="token operator">-</span>curl
                        PROPERTIES IMPORTED_LOCATION
-                       ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/libcurl.a )
+                       $<span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span><span class="token operator">/</span>src<span class="token operator">/</span>main<span class="token operator">/</span>cpp<span class="token operator">/</span>lib<span class="token operator">/</span>libcurl<span class="token punctuation">.</span>a <span class="token punctuation">)</span>
 
-add_library( open-z
+<span class="token function">add_library</span><span class="token punctuation">(</span> open<span class="token operator">-</span>z
              STATIC
-             IMPORTED)
+             IMPORTED<span class="token punctuation">)</span>
 
-set_target_properties( open-z
+<span class="token function">set_target_properties</span><span class="token punctuation">(</span> open<span class="token operator">-</span>z
                        PROPERTIES IMPORTED_LOCATION
-                       ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/libz.a )
+                       $<span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span><span class="token operator">/</span>src<span class="token operator">/</span>main<span class="token operator">/</span>cpp<span class="token operator">/</span>lib<span class="token operator">/</span>libz<span class="token punctuation">.</span>a <span class="token punctuation">)</span>
 
-#dht的源码
-set(dht_src ${My_ARIC_SRC}/third-party/dht/dht.c )
+<span class="token macro property">#dht的源码</span>
+<span class="token function">set</span><span class="token punctuation">(</span>dht_src $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>third<span class="token operator">-</span>party<span class="token operator">/</span>dht<span class="token operator">/</span>dht<span class="token punctuation">.</span>c <span class="token punctuation">)</span>
 
-#libb64的源码
-set(bb64_src ${My_ARIC_SRC}/third-party/libb64/cdecode.c  ${My_ARIC_SRC}/third-party/libb64/cencode.c )
+<span class="token macro property">#libb64的源码</span>
+<span class="token function">set</span><span class="token punctuation">(</span>bb64_src $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>third<span class="token operator">-</span>party<span class="token operator">/</span>libb64<span class="token operator">/</span>cdecode<span class="token punctuation">.</span>c  $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>third<span class="token operator">-</span>party<span class="token operator">/</span>libb64<span class="token operator">/</span>cencode<span class="token punctuation">.</span>c <span class="token punctuation">)</span>
 
-#libnatpmp的源码
-set(natpmp_src ${My_ARIC_SRC}/third-party/libnatpmp/getgateway.c
-        ${My_ARIC_SRC}/third-party/libnatpmp/natpmp.c
-        ${My_ARIC_SRC}/third-party/libnatpmp/wingettimeofday.c )
+<span class="token macro property">#libnatpmp的源码</span>
+<span class="token function">set</span><span class="token punctuation">(</span>natpmp_src $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>third<span class="token operator">-</span>party<span class="token operator">/</span>libnatpmp<span class="token operator">/</span>getgateway<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>third<span class="token operator">-</span>party<span class="token operator">/</span>libnatpmp<span class="token operator">/</span>natpmp<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>third<span class="token operator">-</span>party<span class="token operator">/</span>libnatpmp<span class="token operator">/</span>wingettimeofday<span class="token punctuation">.</span>c <span class="token punctuation">)</span>
 
-#libutp的源码
-set(utp_src ${My_ARIC_SRC}/third-party/libutp/utp.cpp  ${My_ARIC_SRC}/third-party/libutp/utp_utils.cpp )
+<span class="token macro property">#libutp的源码</span>
+<span class="token function">set</span><span class="token punctuation">(</span>utp_src $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>third<span class="token operator">-</span>party<span class="token operator">/</span>libutp<span class="token operator">/</span>utp<span class="token punctuation">.</span>cpp  $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>third<span class="token operator">-</span>party<span class="token operator">/</span>libutp<span class="token operator">/</span>utp_utils<span class="token punctuation">.</span>cpp <span class="token punctuation">)</span>
 
-#miniupnp的源码
-set(miniupnp_src ${My_ARIC_SRC}/third-party/miniupnp/connecthostport.c
-       ${My_ARIC_SRC}/third-party/miniupnp/igd_desc_parse.c
-       ${My_ARIC_SRC}/third-party/miniupnp/minisoap.c
-       ${My_ARIC_SRC}/third-party/miniupnp/minissdpc.c
-       ${My_ARIC_SRC}/third-party/miniupnp/miniupnpc.c
-       ${My_ARIC_SRC}/third-party/miniupnp/miniwget.c
-       ${My_ARIC_SRC}/third-party/miniupnp/minixml.c
-       ${My_ARIC_SRC}/third-party/miniupnp/portlistingparse.c
-       ${My_ARIC_SRC}/third-party/miniupnp/receivedata.c
-       ${My_ARIC_SRC}/third-party/miniupnp/upnpcommands.c
-       ${My_ARIC_SRC}/third-party/miniupnp/upnpreplyparse.c
-       )
+<span class="token macro property">#miniupnp的源码</span>
+<span class="token function">set</span><span class="token punctuation">(</span>miniupnp_src $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>third<span class="token operator">-</span>party<span class="token operator">/</span>miniupnp<span class="token operator">/</span>connecthostport<span class="token punctuation">.</span>c
+       $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>third<span class="token operator">-</span>party<span class="token operator">/</span>miniupnp<span class="token operator">/</span>igd_desc_parse<span class="token punctuation">.</span>c
+       $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>third<span class="token operator">-</span>party<span class="token operator">/</span>miniupnp<span class="token operator">/</span>minisoap<span class="token punctuation">.</span>c
+       $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>third<span class="token operator">-</span>party<span class="token operator">/</span>miniupnp<span class="token operator">/</span>minissdpc<span class="token punctuation">.</span>c
+       $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>third<span class="token operator">-</span>party<span class="token operator">/</span>miniupnp<span class="token operator">/</span>miniupnpc<span class="token punctuation">.</span>c
+       $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>third<span class="token operator">-</span>party<span class="token operator">/</span>miniupnp<span class="token operator">/</span>miniwget<span class="token punctuation">.</span>c
+       $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>third<span class="token operator">-</span>party<span class="token operator">/</span>miniupnp<span class="token operator">/</span>minixml<span class="token punctuation">.</span>c
+       $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>third<span class="token operator">-</span>party<span class="token operator">/</span>miniupnp<span class="token operator">/</span>portlistingparse<span class="token punctuation">.</span>c
+       $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>third<span class="token operator">-</span>party<span class="token operator">/</span>miniupnp<span class="token operator">/</span>receivedata<span class="token punctuation">.</span>c
+       $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>third<span class="token operator">-</span>party<span class="token operator">/</span>miniupnp<span class="token operator">/</span>upnpcommands<span class="token punctuation">.</span>c
+       $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>third<span class="token operator">-</span>party<span class="token operator">/</span>miniupnp<span class="token operator">/</span>upnpreplyparse<span class="token punctuation">.</span>c
+       <span class="token punctuation">)</span>
 
-#libtransmission的源码
-set(libtransmission_src
-        ${My_ARIC_SRC}/libtransmission/announcer.c
-        ${My_ARIC_SRC}/libtransmission/announcer-http.c
-        ${My_ARIC_SRC}/libtransmission/announcer-udp.c
-        ${My_ARIC_SRC}/libtransmission/bandwidth.c
-        ${My_ARIC_SRC}/libtransmission/bitfield.c
-        ${My_ARIC_SRC}/libtransmission/blocklist.c
-        ${My_ARIC_SRC}/libtransmission/cache.c
-        ${My_ARIC_SRC}/libtransmission/clients.c
-        ${My_ARIC_SRC}/libtransmission/completion.c
-        ${My_ARIC_SRC}/libtransmission/ConvertUTF.c
-        ${My_ARIC_SRC}/libtransmission/crypto.c
-        ${My_ARIC_SRC}/libtransmission/crypto-utils.c
-        ${My_ARIC_SRC}/libtransmission/crypto-utils-fallback.c
-        ${My_ARIC_SRC}/libtransmission/error.c
-        ${My_ARIC_SRC}/libtransmission/fdlimit.c
-        ${My_ARIC_SRC}/libtransmission/file.c
-        ${My_ARIC_SRC}/libtransmission/handshake.c
-        ${My_ARIC_SRC}/libtransmission/history.c
-        ${My_ARIC_SRC}/libtransmission/inout.c
-        ${My_ARIC_SRC}/libtransmission/list.c
-        ${My_ARIC_SRC}/libtransmission/log.c
-        ${My_ARIC_SRC}/libtransmission/magnet.c
-        ${My_ARIC_SRC}/libtransmission/makemeta.c
-        ${My_ARIC_SRC}/libtransmission/metainfo.c
-        ${My_ARIC_SRC}/libtransmission/natpmp.c
-        ${My_ARIC_SRC}/libtransmission/net.c
-        ${My_ARIC_SRC}/libtransmission/peer-io.c
-        ${My_ARIC_SRC}/libtransmission/peer-mgr.c
-        ${My_ARIC_SRC}/libtransmission/peer-msgs.c
-        ${My_ARIC_SRC}/libtransmission/platform.c
-        ${My_ARIC_SRC}/libtransmission/platform-quota.c
-        ${My_ARIC_SRC}/libtransmission/port-forwarding.c
-        ${My_ARIC_SRC}/libtransmission/ptrarray.c
-        ${My_ARIC_SRC}/libtransmission/quark.c
-        ${My_ARIC_SRC}/libtransmission/resume.c
-        ${My_ARIC_SRC}/libtransmission/rpcimpl.c
-        ${My_ARIC_SRC}/libtransmission/rpc-server.c
-        ${My_ARIC_SRC}/libtransmission/session.c
-        ${My_ARIC_SRC}/libtransmission/stats.c
-        ${My_ARIC_SRC}/libtransmission/torrent.c
-        ${My_ARIC_SRC}/libtransmission/torrent-ctor.c
-        ${My_ARIC_SRC}/libtransmission/torrent-magnet.c
-        ${My_ARIC_SRC}/libtransmission/tr-dht.c
-        ${My_ARIC_SRC}/libtransmission/tr-lpd.c
-        ${My_ARIC_SRC}/libtransmission/tr-udp.c
-        ${My_ARIC_SRC}/libtransmission/tr-utp.c
-        ${My_ARIC_SRC}/libtransmission/tr-getopt.c
-        ${My_ARIC_SRC}/libtransmission/trevent.c
-        ${My_ARIC_SRC}/libtransmission/upnp.c
-        ${My_ARIC_SRC}/libtransmission/utils.c
-        ${My_ARIC_SRC}/libtransmission/variant.c
-        ${My_ARIC_SRC}/libtransmission/variant-benc.c
-        ${My_ARIC_SRC}/libtransmission/variant-json.c
-        ${My_ARIC_SRC}/libtransmission/verify.c
-        ${My_ARIC_SRC}/libtransmission/watchdir.c
-        ${My_ARIC_SRC}/libtransmission/watchdir-generic.c
-        ${My_ARIC_SRC}/libtransmission/web.c
-        ${My_ARIC_SRC}/libtransmission/webseed.c
-        ${My_ARIC_SRC}/libtransmission/wildmat.c
-        ${My_ARIC_SRC}/libtransmission/watchdir-inotify.c
-        ${My_ARIC_SRC}/libtransmission/file-posix.c
-        ${My_ARIC_SRC}/libtransmission/crypto-utils-openssl.c
-        )
+<span class="token macro property">#libtransmission的源码</span>
+<span class="token function">set</span><span class="token punctuation">(</span>libtransmission_src
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>announcer<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>announcer<span class="token operator">-</span>http<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>announcer<span class="token operator">-</span>udp<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>bandwidth<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>bitfield<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>blocklist<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>cache<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>clients<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>completion<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>ConvertUTF<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>crypto<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>crypto<span class="token operator">-</span>utils<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>crypto<span class="token operator">-</span>utils<span class="token operator">-</span>fallback<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>error<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>fdlimit<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>file<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>handshake<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>history<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>inout<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>list<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>log<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>magnet<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>makemeta<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>metainfo<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>natpmp<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>net<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>peer<span class="token operator">-</span>io<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>peer<span class="token operator">-</span>mgr<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>peer<span class="token operator">-</span>msgs<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>platform<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>platform<span class="token operator">-</span>quota<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>port<span class="token operator">-</span>forwarding<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>ptrarray<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>quark<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>resume<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>rpcimpl<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>rpc<span class="token operator">-</span>server<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>session<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>stats<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>torrent<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>torrent<span class="token operator">-</span>ctor<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>torrent<span class="token operator">-</span>magnet<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>tr<span class="token operator">-</span>dht<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>tr<span class="token operator">-</span>lpd<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>tr<span class="token operator">-</span>udp<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>tr<span class="token operator">-</span>utp<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>tr<span class="token operator">-</span>getopt<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>trevent<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>upnp<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>utils<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>variant<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>variant<span class="token operator">-</span>benc<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>variant<span class="token operator">-</span>json<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>verify<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>watchdir<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>watchdir<span class="token operator">-</span>generic<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>web<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>webseed<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>wildmat<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>watchdir<span class="token operator">-</span>inotify<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>file<span class="token operator">-</span>posix<span class="token punctuation">.</span>c
+        $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>libtransmission<span class="token operator">/</span>crypto<span class="token operator">-</span>utils<span class="token operator">-</span>openssl<span class="token punctuation">.</span>c
+        <span class="token punctuation">)</span>
 
 
-#daemon的源码
-set(daemon_src ${My_ARIC_SRC}/daemon/daemon.c
- ${My_ARIC_SRC}/daemon/daemon-posix.c
- ${My_ARIC_SRC}/daemon/remote.c )
+<span class="token macro property">#daemon的源码</span>
+<span class="token function">set</span><span class="token punctuation">(</span>daemon_src $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>daemon<span class="token operator">/</span>daemon<span class="token punctuation">.</span>c
+ $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>daemon<span class="token operator">/</span>daemon<span class="token operator">-</span>posix<span class="token punctuation">.</span>c
+ $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>daemon<span class="token operator">/</span>remote<span class="token punctuation">.</span>c <span class="token punctuation">)</span>
 
-#cli的源码
-set(cli_src ${My_ARIC_SRC}/cli/cli.c )
+<span class="token macro property">#cli的源码</span>
+<span class="token function">set</span><span class="token punctuation">(</span>cli_src $<span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span><span class="token operator">/</span>cli<span class="token operator">/</span>cli<span class="token punctuation">.</span>c <span class="token punctuation">)</span>
 
-find_library( # Sets the name of the path variable.
-              log-lib
-              # Specifies the name of the NDK library that
-              # you want CMake to locate.
-              log )
+<span class="token function">find_library</span><span class="token punctuation">(</span> # Sets the name of the path variable<span class="token punctuation">.</span>
+              log<span class="token operator">-</span>lib
+              <span class="token macro property"># Specifies the name of the NDK library that</span>
+              <span class="token macro property"># you want CMake to locate.</span>
+              log <span class="token punctuation">)</span>
 
-add_library( # Sets the name of the library.
+<span class="token function">add_library</span><span class="token punctuation">(</span> # Sets the name of the library<span class="token punctuation">.</span>
              transmission
 
-             # Sets the library as a shared library.
+             <span class="token macro property"># Sets the library as a shared library.</span>
              SHARED
 
-            ${dht_src}
-            ${bb64_src}
-            ${natpmp_src}
-            ${utp_src}
-            ${miniupnp_src}
-            ${libtransmission_src}
-            ${daemon_src}
-            ${cli_src}
+            $<span class="token punctuation">{</span>dht_src<span class="token punctuation">}</span>
+            $<span class="token punctuation">{</span>bb64_src<span class="token punctuation">}</span>
+            $<span class="token punctuation">{</span>natpmp_src<span class="token punctuation">}</span>
+            $<span class="token punctuation">{</span>utp_src<span class="token punctuation">}</span>
+            $<span class="token punctuation">{</span>miniupnp_src<span class="token punctuation">}</span>
+            $<span class="token punctuation">{</span>libtransmission_src<span class="token punctuation">}</span>
+            $<span class="token punctuation">{</span>daemon_src<span class="token punctuation">}</span>
+            $<span class="token punctuation">{</span>cli_src<span class="token punctuation">}</span>
 
             #自己的源码文件
-            src/main/cpp/jni_interface.cpp
-            )
+            src<span class="token operator">/</span>main<span class="token operator">/</span>cpp<span class="token operator">/</span>jni_interface<span class="token punctuation">.</span>cpp
+            <span class="token punctuation">)</span>
 
 
-#链接库文件，第一个代表要生成的target，后面的item为要连接的item,对于如果是通过 IMPORTED_NO_SONAME的方式来导入的
+#链接库文件，第一个代表要生成的target，后面的item为要连接的item<span class="token punctuation">,</span>对于如果是通过 IMPORTED_NO_SONAME的方式来导入的
 #这里注意不推荐使用全路径的方式来导入，一般要通过set_target_properties来指定
-target_link_libraries( transmission
+<span class="token function">target_link_libraries</span><span class="token punctuation">(</span> transmission
 
-                       # Links the target library to the log library
-                       # included in the NDK.
+                       <span class="token macro property"># Links the target library to the log library</span>
+                       <span class="token macro property"># included in the NDK.</span>
 
-                       ${log-lib}
-                       open-z
-                       open-event
-                       open-event_core
-                       open-event_extra
-                       open-event_openssl
-                       open-event_potheads
-                       open-curl
+                       $<span class="token punctuation">{</span>log<span class="token operator">-</span>lib<span class="token punctuation">}</span>
+                       open<span class="token operator">-</span>z
+                       open<span class="token operator">-</span>event
+                       open<span class="token operator">-</span>event_core
+                       open<span class="token operator">-</span>event_extra
+                       open<span class="token operator">-</span>event_openssl
+                       open<span class="token operator">-</span>event_potheads
+                       open<span class="token operator">-</span>curl
                        #最后一个openssl 库文件要放在最后来连接。。。要不然会出现找不到函数的定义问题。。。注意
-                       openssl-ssl openssl-crypto
-                       )
+                       openssl<span class="token operator">-</span>ssl openssl<span class="token operator">-</span>crypto
+                       <span class="token punctuation">)</span>
 </code></pre>
-<p>目录工程为:<br><img src="/uploads/Transmision 交叉编译/transmisionsCmamekList移植.jpg" alt="结果显示"></p>
-<p>编译的结果为：<br><img src="/uploads/Transmision 交叉编译/CmakeList编译结果.png" alt="结果显示"></p>
+<p>目录工程为:<br><img src="/uploads/Transmision 交叉编译/transmisionsCmamekList移植.jpg" alt></p>
+<p>编译的结果为：<br><img src="/uploads/Transmision 交叉编译/CmakeList编译结果.png" alt></p>
 <h3 id="验证是否可以真的下载"><a href="#验证是否可以真的下载" class="headerlink" title="验证是否可以真的下载"></a>验证是否可以真的下载</h3><p>官网的transmission中有一个cli模块，这个是一个命令行模式的，通过了解他的代码，需要传递的参数，大致下了个简单的demo，验证是否可以真的下载</p>
 <pre class=" language-java"><code class="language-java"><span class="token annotation punctuation">@Override</span>
 <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">onClick</span><span class="token punctuation">(</span>View view<span class="token punctuation">)</span>
@@ -1044,36 +1041,36 @@ JNIEXPORT jint JNICALL <span class="token function">Java_com_example_com_transmi
 <span class="token punctuation">}</span>
 </code></pre>
 <p>对应的C源码实现</p>
-<pre class=" language-C++"><code class="language-C++">extern "C" {
-extern int cli_tr_main(int argc, char *argv[]);
-}
+<pre class=" language-cpp"><code class="language-cpp"><span class="token keyword">extern</span> <span class="token string">"C"</span> <span class="token punctuation">{</span>
+<span class="token keyword">extern</span> <span class="token keyword">int</span> <span class="token function">cli_tr_main</span><span class="token punctuation">(</span><span class="token keyword">int</span> argc<span class="token punctuation">,</span> <span class="token keyword">char</span> <span class="token operator">*</span>argv<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-/**
+<span class="token comment" spellcheck="true">/**
  * 线程执行的方法回调
  * @param pVoid
  * @return
- */
-void *run(void *pVoid) {
-    cli_tr_main(argc, argv);
-    return NULL;
-}
+ */</span>
+<span class="token keyword">void</span> <span class="token operator">*</span><span class="token function">run</span><span class="token punctuation">(</span><span class="token keyword">void</span> <span class="token operator">*</span>pVoid<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">cli_tr_main</span><span class="token punctuation">(</span>argc<span class="token punctuation">,</span> argv<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-//命令行的入口函数 这个是cli.c文件的main 函数，这里直接改了个函数名
-int cli_tr_main (int argc, char * argv[])
-{
-  tr_session  * h;
-  tr_ctor     * ctor;
-  tr_torrent  * tor = NULL;
-  tr_variant       settings;
-  const char  * configDir;
-  uint8_t     * fileContents;
-  size_t        fileLength;
-  const char  * str;
+<span class="token comment" spellcheck="true">//命令行的入口函数 这个是cli.c文件的main 函数，这里直接改了个函数名</span>
+<span class="token keyword">int</span> <span class="token function">cli_tr_main</span> <span class="token punctuation">(</span><span class="token keyword">int</span> argc<span class="token punctuation">,</span> <span class="token keyword">char</span> <span class="token operator">*</span> argv<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  tr_session  <span class="token operator">*</span> h<span class="token punctuation">;</span>
+  tr_ctor     <span class="token operator">*</span> ctor<span class="token punctuation">;</span>
+  tr_torrent  <span class="token operator">*</span> tor <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+  tr_variant       settings<span class="token punctuation">;</span>
+  <span class="token keyword">const</span> <span class="token keyword">char</span>  <span class="token operator">*</span> configDir<span class="token punctuation">;</span>
+  uint8_t     <span class="token operator">*</span> fileContents<span class="token punctuation">;</span>
+  size_t        fileLength<span class="token punctuation">;</span>
+  <span class="token keyword">const</span> <span class="token keyword">char</span>  <span class="token operator">*</span> str<span class="token punctuation">;</span>
 
-  .....
-}
+  <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 </code></pre>
-<p>下面是下载的结果,可以看出来，我们的移植是没有出现问题的<br><img src="/uploads/Transmision 交叉编译/transmission结果验证.png" alt="结果显示"></p>
+<p>下面是下载的结果,可以看出来，我们的移植是没有出现问题的<br><img src="/uploads/Transmision 交叉编译/transmission结果验证.png" alt></p>
 
                 
             </div>
@@ -1605,9 +1602,7 @@ int cli_tr_main (int argc, char * argv[])
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概述
-Opus Ubuntu实现交叉编译
-
+                            
                         
                     </div>
                     <div class="publish-info">
@@ -1660,9 +1655,7 @@ Opus Ubuntu实现交叉编译
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概述
-Transmission Ubuntu NDK 交叉编译
-
+                            
                         
                     </div>
                     <div class="publish-info">

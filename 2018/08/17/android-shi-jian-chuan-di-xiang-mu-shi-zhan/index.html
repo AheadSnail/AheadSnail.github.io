@@ -493,11 +493,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><blockquote>
-<p> Android事件传递项目实战</p>
-</blockquote>
-<a id="more"></a>
-<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><blockquote>
+                <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><blockquote>
 <p> Android事件传递,好像大家都懂，无非就是事件从最外层传递进来，然后判断你是否需要拦截事件对应的也就是(onInterceptTouchEvent 事件)，如果这个事件返回了true就代表当前层要<br>拦截事件，那么就会将事件传递给当前控件的TouchEvent，如果在TouchEvent事件中返回了true，那么事件也就被消耗了，如果没有控件想要消耗事件，那么就会将事件一层一层的传递<br>给子View，如果一直都没有控件想要消耗事件，那么事件又会一层一层的传递回来，相应的触发对应的OnTouchEvent方法,</p>
 </blockquote>
 <p>大概的事件传递过程就是这样，但是如果在项目中可能就没有那么简单了，下面就是我在帮我同学解决事件传递的过程, 首先来看需求是怎么样的</p>
@@ -567,7 +563,10 @@
     <span class="token operator">&lt;</span><span class="token operator">/</span>vide<span class="token punctuation">.</span>m4399<span class="token punctuation">.</span>com<span class="token punctuation">.</span>myswiperefreshlayout<span class="token punctuation">.</span>MySwipeRefreshLayout<span class="token operator">></span>
 <span class="token operator">&lt;</span><span class="token operator">/</span>RelativeLayout<span class="token operator">></span>
 </code></pre>
-<p>那这样就有点不解了，为什么按钮接受不到事件的传递，带着这个问题去查找源码,我们知道事件的传递是从外层调用的，这里就简单的从Activity 的 dispatchTouchEvent传递，之后传递给PhoneWindow dispatchTouchEvent，再一层一层的往里面传递，所以我们可以直接在ViewGroup 的dispatchTouchEvent 中查看而且本身PhoneWindow也是一个ViewGroup由于这个方法的内容比较多，这里只会看关键的实现<br><img src="/uploads/Andorid事件传递项目实战/viewGroup事件传递一.png" alt="结果显示"><br>mFirstTouchTarget变量默认是为null的,那么就会往下执行 final boolean disallowIntercept =(mGroupFlags &amp; FLAG_DISALLOW_INTERCEPT)!=0; 这个变量的值我们可以通过设置requestDisallowInterceptTouchEvent(true);将他设置为true，这个方法代表是否需要拦截父类的事件,默认不设置的话为false，那么就会执行 intercepted = onInterceptTouchEvent(ev); 判断当前的view是否需要拦截事件,也即是触发当前View的onInterceptTouchEvent函数，而且同时将返回值赋值给intercepted这里先假设最外层的view在onInterceptTouchEvent 中返回了true，或者通过设置requestDisallowInterceptTouchEvent(true),将intercepted变为了true，会执行什么逻辑<br><img src="/uploads/Andorid事件传递项目实战/View事件传递6.png" alt="结果显示"><br>因为mFirstTouchTarget变量默认是为null的，所以会执行dispatchTransformedTouchEvent函数，下面是该函数的关键部分<br><img src="/uploads/Andorid事件传递项目实战/View事件传递五.png" alt="结果显示"><br>因为这里的child为空，所以会执行  handled = super.dispatchTouchEvent(transformedEvent); 这里执行的是View中对应的方法,下面是该方法关键代码<br><img src="/uploads/Andorid事件传递项目实战/View事件传递7.png" alt="结果显示"><br>通过上面可以知道，如果将intercept设置为true，就会执行自己的onTouchEvent方法，同时返回这个事件的返回值 如果intercepted为false，代表事件不拦截,回到开头的部分，就会有下面的逻辑<br><img src="/uploads/Andorid事件传递项目实战/View事件传递二.png" alt="结果显示"><br>这里判断是否事件取消，是否拦截，如果当前事件没有取消，没有被拦截，而且这里要注意的是if的判断，这里只有事件为MotionEvent.ACTION_DOWN的时候才会往下执行其实这里是在down事件的时候查找到对应的事件消耗对象,如果在down事件结束之后都没有找到事件的消耗者，就执行自己的onTouchEvent方法<br><img src="/uploads/Andorid事件传递项目实战/View事件传递三.png" alt="结果显示"><br><strong>注意</strong> 这里的for循环，这里是从后面的孩子索引开始遍历的<br><img src="/uploads/Andorid事件传递项目实战/判断是否能接受事件.png" alt="结果显示"><br>检查当前view是否具备了接收这个事件的前提，比如是否visibial，是否点击的点 在当前view的范围之内等，如果这些都满足，才会执行事件的传递<br><img src="/uploads/Andorid事件传递项目实战/View事件传递四.png" alt="结果显示"><br>这里会根据上面排序的孩子的情况，遍历执行 dispatchTransformedTouchEvent函数，这个函数是用来传递事件的，下面是这个函数的关键代码<br><img src="/uploads/Andorid事件传递项目实战/View事件传递五.png" alt="结果显示"><br>因为上面是遍历当前view所拥有的孩子情况，那么child肯定不为空，那么就会执行child.dispatchTouchEvent(transformedEvent);，这样就实现了传递事件,然后子View又会继续的传递给他的子view,如果有其中的一个孩子需要接收这个事件，也即是对应的执行onTouchEvent，同时返回了true，这个dispatchTransformedTouchEvent就会返回true，那么就会给mFirstTouchTarget变量赋值代表找到了事件的消耗者了,注意这里是针对上一层才会有赋值<br><img src="/uploads/Andorid事件传递项目实战/View事件传递8.png" alt="结果显示"><br><img src="/uploads/Andorid事件传递项目实战/View事件传递9.png" alt="结果显示"><br><img src="/uploads/Andorid事件传递项目实战/View事件传递11.png" alt="结果显示"><br>这里就会根据mFirstTouchTarget变量是否有完成赋值，如果没有赋值，那么就会执行自己的OnTouchEvent方法判断是否需要拦截事件，如果mFirstTouchTarget已经完成了赋值，就会执行<br>下面的while循环，这里为什么要有一个这样的while循环，是这样的，事件是一层一层传递下去的，如果找到事件的消耗者了，又会一层一层的往上返回，相应的<br>dispatchTransformedTouchEvent函数都会返回true，而我们的mFirstTouchTarget是在当前返回true的时候，赋值的，也即是说mFirstTouchTarget 代表的view不是真实的事件消耗者<br>这是循环调用的关系，比如有三层A B C 假设C层是一个View，而且消耗了事件，那么他的mFirstTouchTarget根本没有机会赋值，因为他没有孩子了,但是上层B的mFirstTouchTarget<br>就准确的记录了C接收到了这个事件，然后再往上返回，那么A的mFirstTouchTarge自然值就为B，所以当找到了事件的时候，要执行while循环，找到真正的下消耗事件的view,而且也是通过<br>调用dispatchTransformedTouchEvent函数 来找,当然如果这个对象就是事件消耗的对象，那么就直接返回true了，</p>
+<p>那这样就有点不解了，为什么按钮接受不到事件的传递，带着这个问题去查找源码,我们知道事件的传递是从外层调用的，这里就简单的从Activity 的 dispatchTouchEvent传递，之后传递给PhoneWindow dispatchTouchEvent，再一层一层的往里面传递，所以我们可以直接在ViewGroup 的dispatchTouchEvent 中查看而且本身PhoneWindow也是一个ViewGroup由于这个方法的内容比较多，这里只会看关键的实现<br><img src="/uploads/Andorid事件传递项目实战/viewGroup事件传递一.png" alt="结果显示"><br>mFirstTouchTarget变量默认是为null的,那么就会往下执行 final boolean disallowIntercept =(mGroupFlags &amp; FLAG_DISALLOW_INTERCEPT)!=0; 这个变量的值我们可以通过设置requestDisallowInterceptTouchEvent(true);将他设置为true，这个方法代表是否需要拦截父类的事件,默认不设置的话为false，那么就会执行 intercepted = onInterceptTouchEvent(ev); 判断当前的view是否需要拦截事件,也即是触发当前View的onInterceptTouchEvent函数，而且同时将返回值赋值给intercepted这里先假设最外层的view在onInterceptTouchEvent 中返回了true，或者通过设置requestDisallowInterceptTouchEvent(true),将intercepted变为了true，会执行什么逻辑<br><img src="/uploads/Andorid事件传递项目实战/View事件传递6.png" alt="结果显示"><br>因为mFirstTouchTarget变量默认是为null的，所以会执行dispatchTransformedTouchEvent函数，下面是该函数的关键部分<br><img src="/uploads/Andorid事件传递项目实战/View事件传递五.png" alt="结果显示"><br>因为这里的child为空，所以会执行  handled = super.dispatchTouchEvent(transformedEvent); 这里执行的是View中对应的方法,下面是该方法关键代码<br><img src="/uploads/Andorid事件传递项目实战/View事件传递7.png" alt="结果显示"><br>通过上面可以知道，如果将intercept设置为true，就会执行自己的onTouchEvent方法，同时返回这个事件的返回值 如果intercepted为false，代表事件不拦截,回到开头的部分，就会有下面的逻辑<br><img src="/uploads/Andorid事件传递项目实战/View事件传递二.png" alt="结果显示"><br>这里判断是否事件取消，是否拦截，如果当前事件没有取消，没有被拦截，而且这里要注意的是if的判断，这里只有事件为MotionEvent.ACTION_DOWN的时候才会往下执行其实这里是在down事件的时候查找到对应的事件消耗对象,如果在down事件结束之后都没有找到事件的消耗者，就执行自己的onTouchEvent方法<br><img src="/uploads/Andorid事件传递项目实战/View事件传递三.png" alt="结果显示"><br><strong>注意</strong> 这里的for循环，这里是从后面的孩子索引开始遍历的<br><img src="/uploads/Andorid事件传递项目实战/判断是否能接受事件.png" alt="结果显示"><br>检查当前view是否具备了接收这个事件的前提，比如是否visibial，是否点击的点 在当前view的范围之内等，如果这些都满足，才会执行事件的传递<br><img src="/uploads/Andorid事件传递项目实战/View事件传递四.png" alt="结果显示"><br>这里会根据上面排序的孩子的情况，遍历执行 dispatchTransformedTouchEvent函数，这个函数是用来传递事件的，下面是这个函数的关键代码<br><img src="/uploads/Andorid事件传递项目实战/View事件传递五.png" alt="结果显示"><br>因为上面是遍历当前view所拥有的孩子情况，那么child肯定不为空，那么就会执行child.dispatchTouchEvent(transformedEvent);，这样就实现了传递事件,然后子View又会继续的传递给他的子view,如果有其中的一个孩子需要接收这个事件，也即是对应的执行onTouchEvent，同时返回了true，这个dispatchTransformedTouchEvent就会返回true，那么就会给mFirstTouchTarget变量赋值代表找到了事件的消耗者了,注意这里是针对上一层才会有赋值<br><img src="/uploads/Andorid事件传递项目实战/View事件传递8.png" alt="结果显示"><br><img src="/uploads/Andorid事件传递项目实战/View事件传递9.png" alt="结果显示"><br><img src="/uploads/Andorid事件传递项目实战/View事件传递11.png" alt="结果显示"></p>
+<blockquote>
+<p>这里就会根据mFirstTouchTarget变量是否有完成赋值，如果没有赋值，那么就会执行自己的OnTouchEvent方法判断是否需要拦截事件，如果mFirstTouchTarget已经完成了赋值，就会执行<br>下面的while循环，这里为什么要有一个这样的while循环，是这样的，事件是一层一层传递下去的，如果找到事件的消耗者了，又会一层一层的往上返回，相应的<br>dispatchTransformedTouchEvent函数都会返回true，而我们的mFirstTouchTarget是在当前返回true的时候，赋值的，也即是说mFirstTouchTarget 代表的view不是真实的事件消耗者<br>这是循环调用的关系，比如有三层A B C 假设C层是一个View，而且消耗了事件，那么他的mFirstTouchTarget根本没有机会赋值，因为他没有孩子了,但是上层B的mFirstTouchTarget<br>就准确的记录了C接收到了这个事件，然后再往上返回，那么A的mFirstTouchTarge自然值就为B，所以当找到了事件的时候，要执行while循环，找到真正的下消耗事件的view,而且也是通过<br>调用dispatchTransformedTouchEvent函数 来找,当然如果这个对象就是事件消耗的对象，那么就直接返回true了，</p>
+</blockquote>
 <p>如果事件不为Action_Down事件又会执行什么?<br><img src="/uploads/Andorid事件传递项目实战/viewGroup事件传递一.png" alt="结果显示"></p>
 <p>当事件不为Action_Down事件，并且mFirstTarget为空的时候，前面已经分析过，会最终执行到OnTouchEvent函数，而如果事件不为Action_Down，但是mFirstTarget不为空的时候，就会判断当前view是否需要拦截事件，也即是触发对应的onInterceptTouchEvent,如果不需要拦截事件，也即是intercepted 返回了false,那么此时就不会再次的触发遍历查找子view，下面是对应的代码体现</p>
 <p><img src="/uploads/Andorid事件传递项目实战/View事件传递二.png" alt="结果显示"></p>
@@ -1471,7 +1470,7 @@ mSwipeRefreshLaout<span class="token punctuation">.</span><span class="token fun
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            java内存区域与内存溢出异常
+                            
                         
                     </div>
                     <div class="publish-info">
@@ -1520,9 +1519,7 @@ mSwipeRefreshLaout<span class="token punctuation">.</span><span class="token fun
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概述
-NdkR17 编译FFmpeg4.0 添加AAC,X264支持
-
+                            
                         
                     </div>
                     <div class="publish-info">

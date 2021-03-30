@@ -497,67 +497,63 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><blockquote>
-<p>Aria2 Kaillera对战库源码分析以及改进</p>
-</blockquote>
-<a id="more"></a>
-<h3 id="Kaillera测试代码的编写"><a href="#Kaillera测试代码的编写" class="headerlink" title="Kaillera测试代码的编写"></a>Kaillera测试代码的编写</h3><p>前面一篇文章大致的介绍了Fba流程，这篇会大致的讲解下Kaillera对战库的实现，以及改进的方式，最后怎么样移植到Android上面,首先是对战库的大致的实现，我们可以在前面调试这个对战库的<br>代码来看代码这样会简单很多，那么我们就可以根据上一篇中发生怎么样使用Kaillera 对战库，下面是对应的测试代码</p>
-<pre class=" language-C"><code class="language-C">static int WINAPI gameCallback(char* game, int player, int numplayers)
-{
-    printf("select game == %s\n",game);
-    printf("game support player == %d\n",player);
-    printf("game support numplayers == %d\n",numplayers);
+                <h3 id="Kaillera测试代码的编写"><a href="#Kaillera测试代码的编写" class="headerlink" title="Kaillera测试代码的编写"></a>Kaillera测试代码的编写</h3><p>前面一篇文章大致的介绍了Fba流程，这篇会大致的讲解下Kaillera对战库的实现，以及改进的方式，最后怎么样移植到Android上面,首先是对战库的大致的实现，我们可以在前面调试这个对战库的<br>代码来看代码这样会简单很多，那么我们就可以根据上一篇中发生怎么样使用Kaillera 对战库，下面是对应的测试代码</p>
+<pre class=" language-cpp"><code class="language-cpp"><span class="token keyword">static</span> <span class="token keyword">int</span> WINAPI <span class="token function">gameCallback</span><span class="token punctuation">(</span><span class="token keyword">char</span><span class="token operator">*</span> game<span class="token punctuation">,</span> <span class="token keyword">int</span> player<span class="token punctuation">,</span> <span class="token keyword">int</span> numplayers<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"select game == %s\n"</span><span class="token punctuation">,</span>game<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"game support player == %d\n"</span><span class="token punctuation">,</span>player<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"game support numplayers == %d\n"</span><span class="token punctuation">,</span>numplayers<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    isBeignGame = true;
+    isBeignGame <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
 
-    //模拟发送游戏数据
-    unsigned char nControls[8 * (4 + 8)] = { 0 };
-    kailleraModifyPlayValues(nControls, 1);
+    <span class="token comment" spellcheck="true">//模拟发送游戏数据</span>
+    <span class="token keyword">unsigned</span> <span class="token keyword">char</span> nControls<span class="token punctuation">[</span><span class="token number">8</span> <span class="token operator">*</span> <span class="token punctuation">(</span><span class="token number">4</span> <span class="token operator">+</span> <span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span> <span class="token number">0</span> <span class="token punctuation">}</span><span class="token punctuation">;</span>
+    <span class="token function">kailleraModifyPlayValues</span><span class="token punctuation">(</span>nControls<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    return 0;
-}
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-static void WINAPI kChatCallback (const char *nick, const char *text)
-{
-    printf("receive chat callBack nick == %s\n", nick);
-    printf("receive chat callBack message == %s\n", text);
-}
+<span class="token keyword">static</span> <span class="token keyword">void</span> WINAPI <span class="token function">kChatCallback</span> <span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>nick<span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>text<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"receive chat callBack nick == %s\n"</span><span class="token punctuation">,</span> nick<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"receive chat callBack message == %s\n"</span><span class="token punctuation">,</span> text<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-static void WINAPI kDropCallback (const char *nick, int playernb)
-{
-    printf("kDropCallback nick == %s\n", nick);
-    printf("kDropCallback playernb == %d\n", playernb);
-}
+<span class="token keyword">static</span> <span class="token keyword">void</span> WINAPI <span class="token function">kDropCallback</span> <span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>nick<span class="token punctuation">,</span> <span class="token keyword">int</span> playernb<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"kDropCallback nick == %s\n"</span><span class="token punctuation">,</span> nick<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"kDropCallback playernb == %d\n"</span><span class="token punctuation">,</span> playernb<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
 
-int main()
-{
-    char version[100] = { 0 };
-    kailleraGetVersion(version);
-    printf("version == %s\n",version);
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">char</span> version<span class="token punctuation">[</span><span class="token number">100</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span> <span class="token number">0</span> <span class="token punctuation">}</span><span class="token punctuation">;</span>
+    <span class="token function">kailleraGetVersion</span><span class="token punctuation">(</span>version<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"version == %s\n"</span><span class="token punctuation">,</span>version<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    //获取支持对战的游戏集合
-    char* gameList;
-    getSupportNetGames(&gameList);
+    <span class="token comment" spellcheck="true">//获取支持对战的游戏集合</span>
+    <span class="token keyword">char</span><span class="token operator">*</span> gameList<span class="token punctuation">;</span>
+    <span class="token function">getSupportNetGames</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>gameList<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    //初始化
-    kailleraInit();
+    <span class="token comment" spellcheck="true">//初始化</span>
+    <span class="token function">kailleraInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    //设置参数信息
-    info.appName = "KailDemo";
-    info.gameList = gameList;
-    info.gameCallback = &gameCallback;
-    info.chatReceivedCallback = &kChatCallback;
-    info.clientDroppedCallback = &kDropCallback;
-    info.moreInfosCallback = NULL;
+    <span class="token comment" spellcheck="true">//设置参数信息</span>
+    info<span class="token punctuation">.</span>appName <span class="token operator">=</span> <span class="token string">"KailDemo"</span><span class="token punctuation">;</span>
+    info<span class="token punctuation">.</span>gameList <span class="token operator">=</span> gameList<span class="token punctuation">;</span>
+    info<span class="token punctuation">.</span>gameCallback <span class="token operator">=</span> <span class="token operator">&amp;</span>gameCallback<span class="token punctuation">;</span>
+    info<span class="token punctuation">.</span>chatReceivedCallback <span class="token operator">=</span> <span class="token operator">&amp;</span>kChatCallback<span class="token punctuation">;</span>
+    info<span class="token punctuation">.</span>clientDroppedCallback <span class="token operator">=</span> <span class="token operator">&amp;</span>kDropCallback<span class="token punctuation">;</span>
+    info<span class="token punctuation">.</span>moreInfosCallback <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
 
-    //设置回调的参数信息
-    kailleraSetInfos(&info);
+    <span class="token comment" spellcheck="true">//设置回调的参数信息</span>
+    <span class="token function">kailleraSetInfos</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>info<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    //打开对话框
-    kailleraSelectServerDialog(NULL);
-    ....
-}
+    <span class="token comment" spellcheck="true">//打开对话框</span>
+    <span class="token function">kailleraSelectServerDialog</span><span class="token punctuation">(</span><span class="token constant">NULL</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <p>测试代码相应的源码结构为：</p>
 <p><img src="/uploads/Fba对战/kaillera对战库源码结构.jpg" alt="结果显示"></p>
@@ -569,10 +565,10 @@ int main()
 <p>进入游戏房间</p>
 <p><img src="/uploads/Fba对战/进入游戏房间.png" alt="结果显示"></p>
 <p>客户端CmakeList的写法</p>
-<pre class=" language-cmake"><code class="language-cmake">cmake_minimum_required(VERSION 3.6.0)
-add_library(kailleraDemo
+<pre class=" language-makefile"><code class="language-makefile">cmake_minimum_required<span class="token punctuation">(</span>VERSION 3.6.0<span class="token punctuation">)</span>
+add_library<span class="token punctuation">(</span>kailleraDemo
     SHARED
-    # Provides a relative path to your source file(s).
+    <span class="token comment" spellcheck="true"># Provides a relative path to your source file(s).</span>
     ../../com_m4399_netplay_KailleraJni.cpp
     ../../common/BsdSocket.cpp
     ../../common/ConfigurationManager.cpp
@@ -602,52 +598,52 @@ add_library(kailleraDemo
     ../../kaiserver/k_utils.cpp
     ../../kaiserver/settings.cpp
     ../../kaiserver/k_server.cpp
-)
-include_directories(../../common ../../interface ../  ../../)
-find_library(log-lib log)
-target_link_libraries(kailleraDemo ${log-lib})
+<span class="token punctuation">)</span>
+include_directories<span class="token punctuation">(</span>../../common ../../interface ../  ../../<span class="token punctuation">)</span>
+find_library<span class="token punctuation">(</span>log-lib log<span class="token punctuation">)</span>
+target_link_libraries<span class="token punctuation">(</span>kailleraDemo <span class="token variable">$</span><span class="token punctuation">{</span>log-lib<span class="token punctuation">}</span><span class="token punctuation">)</span>
 </code></pre>
 <p>服务端的CmakeList写法</p>
-<pre class=" language-cmake"><code class="language-cmake">cmake_minimum_required(VERSION 3.6.0)
-#file (GLOB COMMON_SRC *.cpp EXCLUDE k_server.cpp)
-set (
+<pre class=" language-makefile"><code class="language-makefile">cmake_minimum_required<span class="token punctuation">(</span>VERSION 3.6.0<span class="token punctuation">)</span>
+<span class="token comment" spellcheck="true">#file (GLOB COMMON_SRC *.cpp EXCLUDE k_server.cpp)</span>
+set <span class="token punctuation">(</span>
     COMMON_SRC
     k_socket.cpp
     k_user.cpp
     k_utils.cpp
     settings.cpp
-)
-find_library(llog log)
+<span class="token punctuation">)</span>
+find_library<span class="token punctuation">(</span>llog log<span class="token punctuation">)</span>
 
-add_library(kaisev SHARED k_server.cpp ${COMMON_SRC})
-target_link_libraries(kaisev ${llog})
+add_library<span class="token punctuation">(</span>kaisev SHARED k_server.cpp <span class="token variable">$</span><span class="token punctuation">{</span>COMMON_SRC<span class="token punctuation">}</span><span class="token punctuation">)</span>
+target_link_libraries<span class="token punctuation">(</span>kaisev <span class="token variable">$</span><span class="token punctuation">{</span>llog<span class="token punctuation">}</span><span class="token punctuation">)</span>
 </code></pre>
 <p>由于对战库内部是新建了一个线程，所以对应JNI的调用，要注意线程的问题，要采用这种方法</p>
-<pre class=" language-C++"><code class="language-C++">static void N02CCNV gameClosed ()
-{
-    TRACE();
-    //回调java层，关闭加入游戏的弹窗
-    JNIEnv *env;
-    jVM->GetEnv((void**) &env, JNI_VERSION_1_4);
-    int attached  = 0;
-    if(env==NULL)
-    {
-        attached  = 1;
-        jVM->AttachCurrentThread(&env, NULL);
-    }
-    //sendCommand(LISTCMD_HIDEGAME, 0);
-    if(android_closeJoinGameWindow != NULL)
-    {
-        env->CallStaticVoidMethod(kailleraJni,android_closeJoinGameWindow);
-    }
-    if(attached)
-    {
-        jVM->DetachCurrentThread();
-    }
-    //标识窗口关闭
-    gameWindowVisible = false;
-    TRACE();
-}
+<pre class=" language-cpp"><code class="language-cpp"><span class="token keyword">static</span> <span class="token keyword">void</span> N02CCNV <span class="token function">gameClosed</span> <span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token function">TRACE</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//回调java层，关闭加入游戏的弹窗</span>
+    JNIEnv <span class="token operator">*</span>env<span class="token punctuation">;</span>
+    jVM<span class="token operator">-</span><span class="token operator">></span><span class="token function">GetEnv</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token operator">*</span><span class="token operator">*</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>env<span class="token punctuation">,</span> JNI_VERSION_1_4<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> attached  <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>env<span class="token operator">==</span><span class="token constant">NULL</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        attached  <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+        jVM<span class="token operator">-</span><span class="token operator">></span><span class="token function">AttachCurrentThread</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>env<span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//sendCommand(LISTCMD_HIDEGAME, 0);</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>android_closeJoinGameWindow <span class="token operator">!=</span> <span class="token constant">NULL</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        env<span class="token operator">-</span><span class="token operator">></span><span class="token function">CallStaticVoidMethod</span><span class="token punctuation">(</span>kailleraJni<span class="token punctuation">,</span>android_closeJoinGameWindow<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>attached<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        jVM<span class="token operator">-</span><span class="token operator">></span><span class="token function">DetachCurrentThread</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//标识窗口关闭</span>
+    gameWindowVisible <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+    <span class="token function">TRACE</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h3 id="Kaillera不足以及改进"><a href="#Kaillera不足以及改进" class="headerlink" title="Kaillera不足以及改进"></a>Kaillera不足以及改进</h3><p>代码移植完之后， 下面就来分析Kailler对战库的不足，所以这里先要了解帧锁定以及乐观帧锁定概念</p>
 <h4 id="帧锁定"><a href="#帧锁定" class="headerlink" title="帧锁定"></a>帧锁定</h4><blockquote>
@@ -671,67 +667,67 @@ target_link_libraries(kaisev ${llog})
 <p>虽然网速慢的玩家网络一卡，可能就被网速快的玩家给秒了（其他游戏也差不多）。但是网速慢的玩家不会卡到快的玩家，只会感觉自己操作延迟而已。另一个侧面来说，土豪的网宿一般比较快，我们要照顾。所以相比于帧锁定，乐观帧锁定才是更好的选择，要不然采用帧锁定当多个玩家一起玩游戏，只要有一个玩家网速慢，大家都要等待这个玩家，这样会导致独家都卡顿，显然这是不合理的，</p>
 </blockquote>
 <p>而Kaillera对战库采用的就是帧锁定下面是对应的服务端代码体现：</p>
-<pre class=" language-C++"><code class="language-C++">if(players.length > 0) {
-            //遍历当前所有的玩家，
-            for (int index_ = 0; index_ < players.length; index_++) {
-                k_user * kusr = players.get(index_);
-                //状态为2，代表在游戏中
-                if(kusr->status == 2) {
-                    if (kusr->client_reply_frame <= frame_counter && kusr->untrimmed_used_data == 0) {
-                        if(kusr->has_data() == 0) {
-                            xrv = 0;
-                        } else {
-                            memset(tmp_big_big_buffer, 0, 1024);
-                            int framelen = -1;
-                            bool skip = false;
-                            bool pack_success = false;
-                            if (players.length> 0) {
-                                for (int i = 0; i < players.length; i++){
-                                    k_user * ku = players.get(i);
-                                    if(ku->status == 2) {
-                                        if(ku->client_reply_frame <= frame_counter) {
-                                            //判断当前玩家是否有数据到来，如果没有就退出这个循环
-                                            if(ku->has_data() == 0) {
-                                                xrv = false;
-                                                skip = true;
-                                                break;
-                                            }
-                                            //当前玩家有数据，获取到对应的数据
-                                            int len = ku->peek_frame(tmp_buffer);
-                                            if(len == 0) {
-                                                //如果长度为0，也代表没有数据
-                                                xrv = false;
-                                                skip = true;
-                                                break;
-                                            } else {
-                                                //填充内容
-                                                if(framelen == -1) {
-                                                    framelen = len;
-                                                }
-                                                memcpy(&tmp_big_big_buffer[len * i], tmp_buffer, len);
-                                                //标识可以发送数据
-                                                pack_success = true;
-                                            }
-                                        }
-                                    }
-                                }
-                                if (skip)
-                                {
-                                    continue;
-                                }
-                                //标识是否可以发送数据
-                                if (pack_success) {
-                                    //发送数据
-                                    kusr->send_data(tmp_big_big_buffer, players.length * framelen);
-                                    kusr->untrimmed_used_data = 1;
-                                }
-                            }
-                        }
-                    }
-                }
-        ....        
-    }
-}
+<pre class=" language-cpp"><code class="language-cpp"><span class="token keyword">if</span><span class="token punctuation">(</span>players<span class="token punctuation">.</span>length <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">//遍历当前所有的玩家，</span>
+            <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> index_ <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> index_ <span class="token operator">&lt;</span> players<span class="token punctuation">.</span>length<span class="token punctuation">;</span> index_<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                k_user <span class="token operator">*</span> kusr <span class="token operator">=</span> players<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>index_<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token comment" spellcheck="true">//状态为2，代表在游戏中</span>
+                <span class="token keyword">if</span><span class="token punctuation">(</span>kusr<span class="token operator">-</span><span class="token operator">></span>status <span class="token operator">==</span> <span class="token number">2</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token keyword">if</span> <span class="token punctuation">(</span>kusr<span class="token operator">-</span><span class="token operator">></span>client_reply_frame <span class="token operator">&lt;=</span> frame_counter <span class="token operator">&amp;&amp;</span> kusr<span class="token operator">-</span><span class="token operator">></span>untrimmed_used_data <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                        <span class="token keyword">if</span><span class="token punctuation">(</span>kusr<span class="token operator">-</span><span class="token operator">></span><span class="token function">has_data</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                            xrv <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+                        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                            <span class="token function">memset</span><span class="token punctuation">(</span>tmp_big_big_buffer<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1024</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                            <span class="token keyword">int</span> framelen <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+                            <span class="token keyword">bool</span> skip <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+                            <span class="token keyword">bool</span> pack_success <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+                            <span class="token keyword">if</span> <span class="token punctuation">(</span>players<span class="token punctuation">.</span>length<span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                                <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> players<span class="token punctuation">.</span>length<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+                                    k_user <span class="token operator">*</span> ku <span class="token operator">=</span> players<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                                    <span class="token keyword">if</span><span class="token punctuation">(</span>ku<span class="token operator">-</span><span class="token operator">></span>status <span class="token operator">==</span> <span class="token number">2</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                                        <span class="token keyword">if</span><span class="token punctuation">(</span>ku<span class="token operator">-</span><span class="token operator">></span>client_reply_frame <span class="token operator">&lt;=</span> frame_counter<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                                            <span class="token comment" spellcheck="true">//判断当前玩家是否有数据到来，如果没有就退出这个循环</span>
+                                            <span class="token keyword">if</span><span class="token punctuation">(</span>ku<span class="token operator">-</span><span class="token operator">></span><span class="token function">has_data</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                                                xrv <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+                                                skip <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+                                                <span class="token keyword">break</span><span class="token punctuation">;</span>
+                                            <span class="token punctuation">}</span>
+                                            <span class="token comment" spellcheck="true">//当前玩家有数据，获取到对应的数据</span>
+                                            <span class="token keyword">int</span> len <span class="token operator">=</span> ku<span class="token operator">-</span><span class="token operator">></span><span class="token function">peek_frame</span><span class="token punctuation">(</span>tmp_buffer<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                                            <span class="token keyword">if</span><span class="token punctuation">(</span>len <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                                                <span class="token comment" spellcheck="true">//如果长度为0，也代表没有数据</span>
+                                                xrv <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+                                                skip <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+                                                <span class="token keyword">break</span><span class="token punctuation">;</span>
+                                            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                                                <span class="token comment" spellcheck="true">//填充内容</span>
+                                                <span class="token keyword">if</span><span class="token punctuation">(</span>framelen <span class="token operator">==</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                                                    framelen <span class="token operator">=</span> len<span class="token punctuation">;</span>
+                                                <span class="token punctuation">}</span>
+                                                <span class="token function">memcpy</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>tmp_big_big_buffer<span class="token punctuation">[</span>len <span class="token operator">*</span> i<span class="token punctuation">]</span><span class="token punctuation">,</span> tmp_buffer<span class="token punctuation">,</span> len<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                                                <span class="token comment" spellcheck="true">//标识可以发送数据</span>
+                                                pack_success <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+                                            <span class="token punctuation">}</span>
+                                        <span class="token punctuation">}</span>
+                                    <span class="token punctuation">}</span>
+                                <span class="token punctuation">}</span>
+                                <span class="token keyword">if</span> <span class="token punctuation">(</span>skip<span class="token punctuation">)</span>
+                                <span class="token punctuation">{</span>
+                                    <span class="token keyword">continue</span><span class="token punctuation">;</span>
+                                <span class="token punctuation">}</span>
+                                <span class="token comment" spellcheck="true">//标识是否可以发送数据</span>
+                                <span class="token keyword">if</span> <span class="token punctuation">(</span>pack_success<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                                    <span class="token comment" spellcheck="true">//发送数据</span>
+                                    kusr<span class="token operator">-</span><span class="token operator">></span><span class="token function">send_data</span><span class="token punctuation">(</span>tmp_big_big_buffer<span class="token punctuation">,</span> players<span class="token punctuation">.</span>length <span class="token operator">*</span> framelen<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                                    kusr<span class="token operator">-</span><span class="token operator">></span>untrimmed_used_data <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+                                <span class="token punctuation">}</span>
+                            <span class="token punctuation">}</span>
+                        <span class="token punctuation">}</span>
+                    <span class="token punctuation">}</span>
+                <span class="token punctuation">}</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>        
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <p>从上面的逻辑可以发现，当其中有一个玩家没有数据到来的时候，就退出了这个循环，尽管其他的玩家有数据，也要等待这个玩家的数据到来，显然这就是帧锁定的关键实现,</p>
 <h4 id="大量发送冗余数据包"><a href="#大量发送冗余数据包" class="headerlink" title="大量发送冗余数据包"></a>大量发送冗余数据包</h4><blockquote>
@@ -743,73 +739,73 @@ target_link_libraries(kaisev ${llog})
 <p><img src="/uploads/Fba对战/服务端发送冗余数据.png" alt="结果显示"></p>
 <p>客户端以及服务端是怎么样保证数据按照顺序到达，由于采用的是udp实现的，所以肯定会存在丢包的情况，相应的就应该有集合来保存双方发送的数据包，方便重发数据，还要有标识，标识当前数据包的序列号，以及当前已经接受的数据包的序列号，类比于tcp的化，就是seq以及ack</p>
 <p>客户端同步代码的实现</p>
-<pre class=" language-C++"><code class="language-C++">// recv input data
-int  N02CCNV recvSyncData(void * value, const int /*len*/)
-{
-    if (state==RUNNING) {
-        if (++gameInfo.frame >= gameInfo.delay) {
-        //判断是否有接受到数据，如果没有就一直处于while循环，那客户端就阻塞了,也就达到了同步
-            while (gameInfo.inBuffer.length() < gameInfo.totalInputLength && state == RUNNING) {
-                stepRunning();
-        }
-        ....
-        memcpy(value, gameInfo.defaultInput, gameInfo.totalInputLength);
-    }
+<pre class=" language-cpp"><code class="language-cpp"><span class="token comment" spellcheck="true">// recv input data</span>
+<span class="token keyword">int</span>  N02CCNV <span class="token function">recvSyncData</span><span class="token punctuation">(</span><span class="token keyword">void</span> <span class="token operator">*</span> value<span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">int</span> <span class="token comment" spellcheck="true">/*len*/</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>state<span class="token operator">==</span>RUNNING<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">++</span>gameInfo<span class="token punctuation">.</span>frame <span class="token operator">>=</span> gameInfo<span class="token punctuation">.</span>delay<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//判断是否有接受到数据，如果没有就一直处于while循环，那客户端就阻塞了,也就达到了同步</span>
+            <span class="token keyword">while</span> <span class="token punctuation">(</span>gameInfo<span class="token punctuation">.</span>inBuffer<span class="token punctuation">.</span><span class="token function">length</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&lt;</span> gameInfo<span class="token punctuation">.</span>totalInputLength <span class="token operator">&amp;&amp;</span> state <span class="token operator">==</span> RUNNING<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token function">stepRunning</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+        <span class="token function">memcpy</span><span class="token punctuation">(</span>value<span class="token punctuation">,</span> gameInfo<span class="token punctuation">.</span>defaultInput<span class="token punctuation">,</span> gameInfo<span class="token punctuation">.</span>totalInputLength<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    return -1;
-}
+    <span class="token keyword">return</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <p>前面说过客户端，以及服务端都会发送冗余的数据包，对应的找到正确的数据包的体现</p>
-<pre class=" language-C++"><code class="language-C++">void dataArrivalCallback()
-{
+<pre class=" language-cpp"><code class="language-cpp"><span class="token keyword">void</span> <span class="token function">dataArrivalCallback</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
 
-    int bufLen = BIG_RECV_BUFFER_SIZE;
+    <span class="token keyword">int</span> bufLen <span class="token operator">=</span> BIG_RECV_BUFFER_SIZE<span class="token punctuation">;</span>
 
-    //从lastAddress地址中接收数据，数据存储在bigRecvBuff中
-    if (BsdSocket::recvFrom(BsdSocket::bigRecvBuffer, bufLen, lastAddress)) {
-        //当在客户端接收到服务端发送的HELLOW000的时候，就将这个状态改为了INSTRMSGS
-        if (state == INSTRMSGS) {
-            TRACE();
-            //LOGBUFFER("Received", BsdSocket::bigRecvBuffer, bufLen);
-            if (bufLen > 1 + 4 + 2) {
-                char instructionsCount = *bigRecvBuffer;
-                //找到当前应该要解析的数据包索引号
-                while (searchProcessInstruction(lastReceivedInstruction+1, reinterpret_cast<unsigned char*>(bigRecvBuffer+1), bufLen, instructionsCount))
-                {
-                    lastReceivedInstruction++;
-                }
-                } else {
-                    require(bufLen > 1 + 4 + 2);
-                }
-            } else {
-                TRACE();
-                core::dataArrivalCallback(BsdSocket::bigRecvBuffer, bufLen);
-            }
-    } else {
-        LOG(Socket Error occured %i, errno);
-    }
-    TRACE();
-}
+    <span class="token comment" spellcheck="true">//从lastAddress地址中接收数据，数据存储在bigRecvBuff中</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>BsdSocket<span class="token operator">::</span><span class="token function">recvFrom</span><span class="token punctuation">(</span>BsdSocket<span class="token operator">::</span>bigRecvBuffer<span class="token punctuation">,</span> bufLen<span class="token punctuation">,</span> lastAddress<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//当在客户端接收到服务端发送的HELLOW000的时候，就将这个状态改为了INSTRMSGS</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>state <span class="token operator">==</span> INSTRMSGS<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token function">TRACE</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">//LOGBUFFER("Received", BsdSocket::bigRecvBuffer, bufLen);</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>bufLen <span class="token operator">></span> <span class="token number">1</span> <span class="token operator">+</span> <span class="token number">4</span> <span class="token operator">+</span> <span class="token number">2</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">char</span> instructionsCount <span class="token operator">=</span> <span class="token operator">*</span>bigRecvBuffer<span class="token punctuation">;</span>
+                <span class="token comment" spellcheck="true">//找到当前应该要解析的数据包索引号</span>
+                <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token function">searchProcessInstruction</span><span class="token punctuation">(</span>lastReceivedInstruction<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token keyword">reinterpret_cast</span><span class="token operator">&lt;</span><span class="token keyword">unsigned</span> <span class="token keyword">char</span><span class="token operator">*</span><span class="token operator">></span><span class="token punctuation">(</span>bigRecvBuffer<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span> bufLen<span class="token punctuation">,</span> instructionsCount<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                <span class="token punctuation">{</span>
+                    lastReceivedInstruction<span class="token operator">++</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+                <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                    <span class="token function">require</span><span class="token punctuation">(</span>bufLen <span class="token operator">></span> <span class="token number">1</span> <span class="token operator">+</span> <span class="token number">4</span> <span class="token operator">+</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                <span class="token function">TRACE</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                core<span class="token operator">::</span><span class="token function">dataArrivalCallback</span><span class="token punctuation">(</span>BsdSocket<span class="token operator">::</span>bigRecvBuffer<span class="token punctuation">,</span> bufLen<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        <span class="token function">LOG</span><span class="token punctuation">(</span>Socket Error occured <span class="token operator">%</span>i<span class="token punctuation">,</span> errno<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token function">TRACE</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-inline bool searchProcessInstruction(unsigned short forSerial, unsigned char * buffer, int bufferLen, int instrsCount) {
-    while (instrsCount > 0) {
-        unsigned short serial = *((unsigned short*)buffer); buffer+= 2;
-        unsigned short length = *((unsigned short*)buffer); buffer+= 2;
-        if (serial == forSerial) {//接受到的数据包是下一个要解析数据包的索引才会返回true，通知有数据
-            TRACE();
-            Instruction instr(buffer, length);
-            core::instructionArrivalCallback(instr);
-            TRACE();
-            return true;
-        } else {
-            buffer += length;
-            bufferLen -= (4 + length);
-            instrsCount--;
-        }
-    }
-    TRACE();
-    return false;
-}
+<span class="token keyword">inline</span> <span class="token keyword">bool</span> <span class="token function">searchProcessInstruction</span><span class="token punctuation">(</span><span class="token keyword">unsigned</span> <span class="token keyword">short</span> forSerial<span class="token punctuation">,</span> <span class="token keyword">unsigned</span> <span class="token keyword">char</span> <span class="token operator">*</span> buffer<span class="token punctuation">,</span> <span class="token keyword">int</span> bufferLen<span class="token punctuation">,</span> <span class="token keyword">int</span> instrsCount<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span>instrsCount <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">unsigned</span> <span class="token keyword">short</span> serial <span class="token operator">=</span> <span class="token operator">*</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">unsigned</span> <span class="token keyword">short</span><span class="token operator">*</span><span class="token punctuation">)</span>buffer<span class="token punctuation">)</span><span class="token punctuation">;</span> buffer<span class="token operator">+</span><span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span>
+        <span class="token keyword">unsigned</span> <span class="token keyword">short</span> length <span class="token operator">=</span> <span class="token operator">*</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">unsigned</span> <span class="token keyword">short</span><span class="token operator">*</span><span class="token punctuation">)</span>buffer<span class="token punctuation">)</span><span class="token punctuation">;</span> buffer<span class="token operator">+</span><span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>serial <span class="token operator">==</span> forSerial<span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token comment" spellcheck="true">//接受到的数据包是下一个要解析数据包的索引才会返回true，通知有数据</span>
+            <span class="token function">TRACE</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            Instruction <span class="token function">instr</span><span class="token punctuation">(</span>buffer<span class="token punctuation">,</span> length<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            core<span class="token operator">::</span><span class="token function">instructionArrivalCallback</span><span class="token punctuation">(</span>instr<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">TRACE</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            buffer <span class="token operator">+</span><span class="token operator">=</span> length<span class="token punctuation">;</span>
+            bufferLen <span class="token operator">-</span><span class="token operator">=</span> <span class="token punctuation">(</span><span class="token number">4</span> <span class="token operator">+</span> length<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            instrsCount<span class="token operator">--</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token function">TRACE</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <p>当然这些问题相应的在服务端也是有的，下面提出对应的解决方案,对应发送冗余数据包的问题，我们可以采用第三库的来实现，由于是基于udp的，所以推荐的有俩个，一个kcp，一个utp，大体的实现<br>思路都是模拟tcp，像utp可能做的更好，他有做对应的tcp的拥塞控制，以及滑动窗口，但是使用都差不多，对于使用层来说，不用理会他的内部实现，他会自动的做到丢包冲发，保证序列号的问题<br>他们不会管理数据的发送，已经数据的接受，对应的这些操作要你来完成，当你收到数据的时候，要丢给他们，他们会解析这些数据，返回给你原始的数据，发送数据的时候，发送之前你要先丢给<br>他们，他们会做进一步的处理，大致就是往头里面添加一些内容，然后处理完之后，会通知你发送数据,具体的使用可以查看官网的demo</p>
 <p>下面是服务端的关键代码实现</p>
@@ -823,199 +819,199 @@ inline bool searchProcessInstruction(unsigned short forSerial, unsigned char * b
 </ol>
 </blockquote>
 <p>收集当前用户是否有操作</p>
-<pre class=" language-C++"><code class="language-C++">//先将第一个玩家的当前按键不为0的值，存储到nControls 里面
-for (i = 0, j = 0; i < nPlayerInputs[0]; i++, j++) {
-    BurnDrvGetInputInfo(&bii, i + nPlayerOffset[0]);
-    //这里要注意 bii.pVal存储的为按键的地址，如果这个按键的值不为0, 会在GetInput(true);的时候完成赋值操作     *(pgi->Input.pVal) = pgi->Input.nVal;
-    if (*bii.pVal && bii.nType == BIT_DIGITAL) {
-        isProcess = 1;//代表用户有操作
-        //记录当前发送的按键信息
-        //WRITE_LOG("BurnInputInfo nPlayerInputs name %s\n",bii.szName);
-        nControls[j >> 3] |= (1 << (j & 7));
-    }
-}
+<pre class=" language-cpp"><code class="language-cpp"><span class="token comment" spellcheck="true">//先将第一个玩家的当前按键不为0的值，存储到nControls 里面</span>
+<span class="token keyword">for</span> <span class="token punctuation">(</span>i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> j <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> nPlayerInputs<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">,</span> j<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">BurnDrvGetInputInfo</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>bii<span class="token punctuation">,</span> i <span class="token operator">+</span> nPlayerOffset<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//这里要注意 bii.pVal存储的为按键的地址，如果这个按键的值不为0, 会在GetInput(true);的时候完成赋值操作     *(pgi->Input.pVal) = pgi->Input.nVal;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">*</span>bii<span class="token punctuation">.</span>pVal <span class="token operator">&amp;&amp;</span> bii<span class="token punctuation">.</span>nType <span class="token operator">==</span> BIT_DIGITAL<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        isProcess <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//代表用户有操作</span>
+        <span class="token comment" spellcheck="true">//记录当前发送的按键信息</span>
+        <span class="token comment" spellcheck="true">//WRITE_LOG("BurnInputInfo nPlayerInputs name %s\n",bii.szName);</span>
+        nControls<span class="token punctuation">[</span>j <span class="token operator">>></span> <span class="token number">3</span><span class="token punctuation">]</span> <span class="token operator">|</span><span class="token operator">=</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">&lt;&lt;</span> <span class="token punctuation">(</span>j <span class="token operator">&amp;</span> <span class="token number">7</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
-//公用按钮的信息  比如Reset,Diagnostic,Service,Volume Up,Volume Down
-//nCommonOffset = 16 存储的是当前游戏支持按键，这里是俩个玩家
-for (i = 0; i < nCommonInputs; i++, j++) {
-    //直接获取到公用按键的信息
-    BurnDrvGetInputInfo(&bii, i + nCommonOffset);
-    //如果公用按键的值不为0，就存储到nControls 里面
-    if (*bii.pVal) {
-        isProcess = 1;//代表用户有操作
-        nControls[j >> 3] |= (1 << (j & 7));
-    }
-}
+<span class="token comment" spellcheck="true">//公用按钮的信息  比如Reset,Diagnostic,Service,Volume Up,Volume Down</span>
+<span class="token comment" spellcheck="true">//nCommonOffset = 16 存储的是当前游戏支持按键，这里是俩个玩家</span>
+<span class="token keyword">for</span> <span class="token punctuation">(</span>i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> nCommonInputs<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">,</span> j<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//直接获取到公用按键的信息</span>
+    <span class="token function">BurnDrvGetInputInfo</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>bii<span class="token punctuation">,</span> i <span class="token operator">+</span> nCommonOffset<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//如果公用按键的值不为0，就存储到nControls 里面</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">*</span>bii<span class="token punctuation">.</span>pVal<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        isProcess <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//代表用户有操作</span>
+        nControls<span class="token punctuation">[</span>j <span class="token operator">>></span> <span class="token number">3</span><span class="token punctuation">]</span> <span class="token operator">|</span><span class="token operator">=</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">&lt;&lt;</span> <span class="token punctuation">(</span>j <span class="token operator">&amp;</span> <span class="token number">7</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
-//发送玩家一当前的按键消息，也同时获取到其他玩家的按键情况，如果返回值为-1，代表失败,直接退出
-//连接网络差的情况下，这个会在这边阻塞，在联网情况下，退出引擎没有反应就是这个地方
-unsigned int startTime = GlobalTimer::getTime();
-//第三个参数 客户端只有按键按下或者放开，就会发送消息给服务端（而不是到每帧开始才采集键盘），isProcess是表示当前的用户有没有操作的意思
-if (kailleraModifyPlayValues(nControls, k,isProcess) == -1) {
-    //如果出现了失败，标识联网队战失败
-    printf("kailleraModifyPlayValues fail kNetGame == 0");
-    kNetGame = 0;
-    //返回1代表连接网络失败
-    return 1;
-}
+<span class="token comment" spellcheck="true">//发送玩家一当前的按键消息，也同时获取到其他玩家的按键情况，如果返回值为-1，代表失败,直接退出</span>
+<span class="token comment" spellcheck="true">//连接网络差的情况下，这个会在这边阻塞，在联网情况下，退出引擎没有反应就是这个地方</span>
+<span class="token keyword">unsigned</span> <span class="token keyword">int</span> startTime <span class="token operator">=</span> GlobalTimer<span class="token operator">::</span><span class="token function">getTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">//第三个参数 客户端只有按键按下或者放开，就会发送消息给服务端（而不是到每帧开始才采集键盘），isProcess是表示当前的用户有没有操作的意思</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">kailleraModifyPlayValues</span><span class="token punctuation">(</span>nControls<span class="token punctuation">,</span> k<span class="token punctuation">,</span>isProcess<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//如果出现了失败，标识联网队战失败</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"kailleraModifyPlayValues fail kNetGame == 0"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    kNetGame <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//返回1代表连接网络失败</span>
+    <span class="token keyword">return</span> <span class="token number">1</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-//最终会调用到对战库的这个方法
-void N02CCNV sendSyncData(const void * value, const int len,int isNeedSend)
-{
-    ...
-    //如果是前面的60帧数据，默认的填充为 第一帧的游戏数据
-    //如果当前没有操作，就没有必要发送数据给服务端，但是客户端界面的响应还是要等服务端的返回内容来填充
-    //客户端只有按键按下或者放开，就会发送消息给服务端（而不是到每帧开始才采集键盘），
-    if (gameInfo.frame + gameInfo.delay > MASK_INITIAL_FRAMES && isNeedSend) {
-        //后面60帧的数据
-        register int requiredBufferLen = len * userInfo.connectionSetting;
-        // if not, send a full packet
-        Instruction data(GAMEDATA);
-        data.writeUnsignedInt16((unsigned short)requiredBufferLen);
-        data.writeBytes(value, requiredBufferLen);
-        send(data);
-    } else {
-        //前面的60帧数据不用发送给服务端，并且后面60帧之后的数据如果没有操作的化，也不用发送给服务端
-        //LOGD("gameInfo.frame %d + gameInfo.delay %d > 60 && isNeedSend %d",gameInfo.frame,gameInfo.delay,isNeedSend);
-        //当gameInfo.frame == gameInfo.delay 帧的时候，数据要传递给服务端，告知当前客户端每次传递游戏内容的长度，这样服务端才知道每次返回多长的长度
-        if(gameInfo.frame == gameInfo.delay)
-        {
-            register int requiredBufferLen = len * userInfo.connectionSetting;
-            Instruction data(GAMEDATA);
-            data.writeUnsignedInt16((unsigned short)requiredBufferLen);
-            data.writeBytes(value, requiredBufferLen);
-            send(data);
-        }
-    }    
-}
+<span class="token comment" spellcheck="true">//最终会调用到对战库的这个方法</span>
+<span class="token keyword">void</span> N02CCNV <span class="token function">sendSyncData</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">void</span> <span class="token operator">*</span> value<span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">int</span> len<span class="token punctuation">,</span><span class="token keyword">int</span> isNeedSend<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token comment" spellcheck="true">//如果是前面的60帧数据，默认的填充为 第一帧的游戏数据</span>
+    <span class="token comment" spellcheck="true">//如果当前没有操作，就没有必要发送数据给服务端，但是客户端界面的响应还是要等服务端的返回内容来填充</span>
+    <span class="token comment" spellcheck="true">//客户端只有按键按下或者放开，就会发送消息给服务端（而不是到每帧开始才采集键盘），</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>gameInfo<span class="token punctuation">.</span>frame <span class="token operator">+</span> gameInfo<span class="token punctuation">.</span>delay <span class="token operator">></span> MASK_INITIAL_FRAMES <span class="token operator">&amp;&amp;</span> isNeedSend<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//后面60帧的数据</span>
+        <span class="token keyword">register</span> <span class="token keyword">int</span> requiredBufferLen <span class="token operator">=</span> len <span class="token operator">*</span> userInfo<span class="token punctuation">.</span>connectionSetting<span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">// if not, send a full packet</span>
+        Instruction <span class="token function">data</span><span class="token punctuation">(</span>GAMEDATA<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        data<span class="token punctuation">.</span><span class="token function">writeUnsignedInt16</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">unsigned</span> <span class="token keyword">short</span><span class="token punctuation">)</span>requiredBufferLen<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        data<span class="token punctuation">.</span><span class="token function">writeBytes</span><span class="token punctuation">(</span>value<span class="token punctuation">,</span> requiredBufferLen<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">send</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//前面的60帧数据不用发送给服务端，并且后面60帧之后的数据如果没有操作的化，也不用发送给服务端</span>
+        <span class="token comment" spellcheck="true">//LOGD("gameInfo.frame %d + gameInfo.delay %d > 60 &amp;&amp; isNeedSend %d",gameInfo.frame,gameInfo.delay,isNeedSend);</span>
+        <span class="token comment" spellcheck="true">//当gameInfo.frame == gameInfo.delay 帧的时候，数据要传递给服务端，告知当前客户端每次传递游戏内容的长度，这样服务端才知道每次返回多长的长度</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span>gameInfo<span class="token punctuation">.</span>frame <span class="token operator">==</span> gameInfo<span class="token punctuation">.</span>delay<span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token keyword">register</span> <span class="token keyword">int</span> requiredBufferLen <span class="token operator">=</span> len <span class="token operator">*</span> userInfo<span class="token punctuation">.</span>connectionSetting<span class="token punctuation">;</span>
+            Instruction <span class="token function">data</span><span class="token punctuation">(</span>GAMEDATA<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            data<span class="token punctuation">.</span><span class="token function">writeUnsignedInt16</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">unsigned</span> <span class="token keyword">short</span><span class="token punctuation">)</span>requiredBufferLen<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            data<span class="token punctuation">.</span><span class="token function">writeBytes</span><span class="token punctuation">(</span>value<span class="token punctuation">,</span> requiredBufferLen<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">send</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>    
+<span class="token punctuation">}</span>
 </code></pre>
 <p>其次是 2. 服务端每秒钟20-50次向所有客户端发送更新消息（包含所有客户端的操作和递增的帧号）：update=（FrameID，player_keyboards）响应的代码体现是</p>
-<pre class=" language-C++"><code class="language-C++">//乐观帧的机制实现,乐观帧的实现原理即为，不管当前的玩家有没有数据到来，只要到了服务端发送数据的时间，就收集当前所有玩家距离上一次
-//收集到的数据包，发送给每一个用户，这样块的用户就不用等待慢的用户。。。
-bool k_user::k_game::game_data_time_to_send()
-{
-    ....
-    //每15毫秒发送一次数据包
-    unsigned int currentTime = GlobalTimer::getTime();
-    if (currentTime - last_send_time > 15)
-    {
-        MyLOG("time to collect all players game data \n");
-        //收集所有的玩家数据包的信息
-        collect_all_players_game_data();
-        last_send_time = currentTime;
-    }
-    ...
-}
-//收集所有的玩家数据包的信息
-void k_user::k_game::collect_all_players_game_data()
-{
-    //用来存储当前时间点，应该要发送出去的全部数据
-    char  big_send_buffer[1024];
-    //用来存储一个数据包里面存储的玩家的信息
-    char  package_tmp_buffer[256];
-    //用来记录每一个玩家应该要传输的内容
-    char  tmp_buffer[256];
-    //重置传输的buff
-    memset(big_send_buffer, 0, 1024);
+<pre class=" language-cpp"><code class="language-cpp"><span class="token comment" spellcheck="true">//乐观帧的机制实现,乐观帧的实现原理即为，不管当前的玩家有没有数据到来，只要到了服务端发送数据的时间，就收集当前所有玩家距离上一次</span>
+<span class="token comment" spellcheck="true">//收集到的数据包，发送给每一个用户，这样块的用户就不用等待慢的用户。。。</span>
+<span class="token keyword">bool</span> k_user<span class="token operator">::</span>k_game<span class="token operator">::</span><span class="token function">game_data_time_to_send</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token comment" spellcheck="true">//每15毫秒发送一次数据包</span>
+    <span class="token keyword">unsigned</span> <span class="token keyword">int</span> currentTime <span class="token operator">=</span> GlobalTimer<span class="token operator">::</span><span class="token function">getTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>currentTime <span class="token operator">-</span> last_send_time <span class="token operator">></span> <span class="token number">15</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token function">MyLOG</span><span class="token punctuation">(</span><span class="token string">"time to collect all players game data \n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//收集所有的玩家数据包的信息</span>
+        <span class="token function">collect_all_players_game_data</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        last_send_time <span class="token operator">=</span> currentTime<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
+<span class="token comment" spellcheck="true">//收集所有的玩家数据包的信息</span>
+<span class="token keyword">void</span> k_user<span class="token operator">::</span>k_game<span class="token operator">::</span><span class="token function">collect_all_players_game_data</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//用来存储当前时间点，应该要发送出去的全部数据</span>
+    <span class="token keyword">char</span>  big_send_buffer<span class="token punctuation">[</span><span class="token number">1024</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//用来存储一个数据包里面存储的玩家的信息</span>
+    <span class="token keyword">char</span>  package_tmp_buffer<span class="token punctuation">[</span><span class="token number">256</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//用来记录每一个玩家应该要传输的内容</span>
+    <span class="token keyword">char</span>  tmp_buffer<span class="token punctuation">[</span><span class="token number">256</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//重置传输的buff</span>
+    <span class="token function">memset</span><span class="token punctuation">(</span>big_send_buffer<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1024</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    //将每一个玩家当前的数据收集起来,这中有可能玩家A收集到了5个数据包，玩家B收集到了1个数据包，这里的全部数据的发送，要取最大的，也即是自己也要封装5个数据包的内容
-    //至于玩家B的数据包是在玩家A第二个数据包收集的时候，收到的，还是第三个数据包收集的，这里不关心。。。只要保证传递一次就好了，客户端解析玩之后，就会表现一样
-    int player_receive_max_count = 0;
-    if (players.length > 0) {
-        //确定当前哪个玩家收集到了最多的数据包
-        for (int i = 0; i < players.length; i++) {
-            k_user * ku = players.get(i);
-            if (ku->receive_package_count > player_receive_max_count)
-            {
-                player_receive_max_count = ku->receive_package_count;
-            }
-        }
+    <span class="token comment" spellcheck="true">//将每一个玩家当前的数据收集起来,这中有可能玩家A收集到了5个数据包，玩家B收集到了1个数据包，这里的全部数据的发送，要取最大的，也即是自己也要封装5个数据包的内容</span>
+    <span class="token comment" spellcheck="true">//至于玩家B的数据包是在玩家A第二个数据包收集的时候，收到的，还是第三个数据包收集的，这里不关心。。。只要保证传递一次就好了，客户端解析玩之后，就会表现一样</span>
+    <span class="token keyword">int</span> player_receive_max_count <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>players<span class="token punctuation">.</span>length <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//确定当前哪个玩家收集到了最多的数据包</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> players<span class="token punctuation">.</span>length<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            k_user <span class="token operator">*</span> ku <span class="token operator">=</span> players<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>ku<span class="token operator">-</span><span class="token operator">></span>receive_package_count <span class="token operator">></span> player_receive_max_count<span class="token punctuation">)</span>
+            <span class="token punctuation">{</span>
+                player_receive_max_count <span class="token operator">=</span> ku<span class="token operator">-</span><span class="token operator">></span>receive_package_count<span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
 
-        //如果到了服务端要收集发送数据包的时候，没有接受到数据包的到来，服务端也要发送一个数据包，保持帧步进
-        //防止客户端没有收到update信息，而出现卡主的现象
-        if (player_receive_max_count == 0)
-        {
-            player_receive_max_count = 1;
-        }
+        <span class="token comment" spellcheck="true">//如果到了服务端要收集发送数据包的时候，没有接受到数据包的到来，服务端也要发送一个数据包，保持帧步进</span>
+        <span class="token comment" spellcheck="true">//防止客户端没有收到update信息，而出现卡主的现象</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>player_receive_max_count <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            player_receive_max_count <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
 
-        //用来标识总的要发送的长度,第一个字节存储为当前要发送数据包的总的个数
-        int totalLength = 1;
-        //防止首地址发生改变，用另一个指针变量指向他
-        char * temp_big_buff = big_send_buffer;
+        <span class="token comment" spellcheck="true">//用来标识总的要发送的长度,第一个字节存储为当前要发送数据包的总的个数</span>
+        <span class="token keyword">int</span> totalLength <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//防止首地址发生改变，用另一个指针变量指向他</span>
+        <span class="token keyword">char</span> <span class="token operator">*</span> temp_big_buff <span class="token operator">=</span> big_send_buffer<span class="token punctuation">;</span>
 
-        //用一个字节来标识有多少个数据包的存在
-        *temp_big_buff++ = player_receive_max_count;
-        //以接受到的数据包的数量为循环，每次循环，就将所有的玩家数据都收集起来，然后下一个数据包
-        for (int j = 0; j < player_receive_max_count; j++)
-        {
-            //收集五个数据包
-            int peer_package_data_len = 0;//标识当前数据包的总长度
-            for (int i = 0; i < players.length; i++)
-            {
-                k_user * ku = players.get(i);
-                //当前玩家的状态是处于游戏中的
-                if (ku->status == 2) {
-                    //当前玩家有数据，拉取当前玩家在服务端时间间隔之内收集到的数据包,peel_frame不会移除收集到的内容
-                    int len = ku->get_data(tmp_buffer);
-                    MyLOG("username %s real receive len %d \n", ku->username, len);
-                    //当前玩家没有数据到来，这个玩家当前的数据用0来填充
-                    int finally_frame_size = 0;
-                    if (len == 0) {
-                        if (ku->frame_size == -1)
-                        {
-                            finally_frame_size = 9;
-                        }
-                        else {
-                            finally_frame_size = ku->frame_size;
-                        }
-                        memset(tmp_buffer, 0, finally_frame_size);
-                        //填充的长度就为每次数据的长度
-                        len = finally_frame_size;
-                    }
-                    //当前数据包的总和
-                    peer_package_data_len += len;
-                    //将当前玩家收集的数据，添加到package_tmp_buffer里面
-                    memcpy(&package_tmp_buffer[len * i], tmp_buffer, len);
-                }
-            }
-            //将temp_big_buff转为 unsigned short * ，转为什么没有关系，数据类型只是设计到了怎么解析，怎么写入,存储当前数据包里面游戏数据的长度
-            (*(unsigned short *)temp_big_buff) = peer_package_data_len;
-            //俩个字节存储当前的这个数据包有多少个gameData字节
-            temp_big_buff += 2;
-            totalLength += 2;
-            //再将package_tmp_buffer里面的内容，添加到temp_big_buff里面
-            memcpy(temp_big_buff, package_tmp_buffer, peer_package_data_len);
-            //指针位移
-            temp_big_buff += peer_package_data_len;
-            totalLength += peer_package_data_len;
-        }
+        <span class="token comment" spellcheck="true">//用一个字节来标识有多少个数据包的存在</span>
+        <span class="token operator">*</span>temp_big_buff<span class="token operator">++</span> <span class="token operator">=</span> player_receive_max_count<span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//以接受到的数据包的数量为循环，每次循环，就将所有的玩家数据都收集起来，然后下一个数据包</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> j <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> j <span class="token operator">&lt;</span> player_receive_max_count<span class="token punctuation">;</span> j<span class="token operator">++</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">//收集五个数据包</span>
+            <span class="token keyword">int</span> peer_package_data_len <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//标识当前数据包的总长度</span>
+            <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> players<span class="token punctuation">.</span>length<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span>
+            <span class="token punctuation">{</span>
+                k_user <span class="token operator">*</span> ku <span class="token operator">=</span> players<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token comment" spellcheck="true">//当前玩家的状态是处于游戏中的</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>ku<span class="token operator">-</span><span class="token operator">></span>status <span class="token operator">==</span> <span class="token number">2</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token comment" spellcheck="true">//当前玩家有数据，拉取当前玩家在服务端时间间隔之内收集到的数据包,peel_frame不会移除收集到的内容</span>
+                    <span class="token keyword">int</span> len <span class="token operator">=</span> ku<span class="token operator">-</span><span class="token operator">></span><span class="token function">get_data</span><span class="token punctuation">(</span>tmp_buffer<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token function">MyLOG</span><span class="token punctuation">(</span><span class="token string">"username %s real receive len %d \n"</span><span class="token punctuation">,</span> ku<span class="token operator">-</span><span class="token operator">></span>username<span class="token punctuation">,</span> len<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token comment" spellcheck="true">//当前玩家没有数据到来，这个玩家当前的数据用0来填充</span>
+                    <span class="token keyword">int</span> finally_frame_size <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+                    <span class="token keyword">if</span> <span class="token punctuation">(</span>len <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                        <span class="token keyword">if</span> <span class="token punctuation">(</span>ku<span class="token operator">-</span><span class="token operator">></span>frame_size <span class="token operator">==</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
+                        <span class="token punctuation">{</span>
+                            finally_frame_size <span class="token operator">=</span> <span class="token number">9</span><span class="token punctuation">;</span>
+                        <span class="token punctuation">}</span>
+                        <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                            finally_frame_size <span class="token operator">=</span> ku<span class="token operator">-</span><span class="token operator">></span>frame_size<span class="token punctuation">;</span>
+                        <span class="token punctuation">}</span>
+                        <span class="token function">memset</span><span class="token punctuation">(</span>tmp_buffer<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> finally_frame_size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        <span class="token comment" spellcheck="true">//填充的长度就为每次数据的长度</span>
+                        len <span class="token operator">=</span> finally_frame_size<span class="token punctuation">;</span>
+                    <span class="token punctuation">}</span>
+                    <span class="token comment" spellcheck="true">//当前数据包的总和</span>
+                    peer_package_data_len <span class="token operator">+</span><span class="token operator">=</span> len<span class="token punctuation">;</span>
+                    <span class="token comment" spellcheck="true">//将当前玩家收集的数据，添加到package_tmp_buffer里面</span>
+                    <span class="token function">memcpy</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>package_tmp_buffer<span class="token punctuation">[</span>len <span class="token operator">*</span> i<span class="token punctuation">]</span><span class="token punctuation">,</span> tmp_buffer<span class="token punctuation">,</span> len<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+            <span class="token comment" spellcheck="true">//将temp_big_buff转为 unsigned short * ，转为什么没有关系，数据类型只是设计到了怎么解析，怎么写入,存储当前数据包里面游戏数据的长度</span>
+            <span class="token punctuation">(</span><span class="token operator">*</span><span class="token punctuation">(</span><span class="token keyword">unsigned</span> <span class="token keyword">short</span> <span class="token operator">*</span><span class="token punctuation">)</span>temp_big_buff<span class="token punctuation">)</span> <span class="token operator">=</span> peer_package_data_len<span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">//俩个字节存储当前的这个数据包有多少个gameData字节</span>
+            temp_big_buff <span class="token operator">+</span><span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span>
+            totalLength <span class="token operator">+</span><span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">//再将package_tmp_buffer里面的内容，添加到temp_big_buff里面</span>
+            <span class="token function">memcpy</span><span class="token punctuation">(</span>temp_big_buff<span class="token punctuation">,</span> package_tmp_buffer<span class="token punctuation">,</span> peer_package_data_len<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">//指针位移</span>
+            temp_big_buff <span class="token operator">+</span><span class="token operator">=</span> peer_package_data_len<span class="token punctuation">;</span>
+            totalLength <span class="token operator">+</span><span class="token operator">=</span> peer_package_data_len<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
 
-        //然后给每一个玩家都发送同样的数据
-        for (int i = 0; i < players.length; i++) {
-            k_user * ku = players.get(i);
-            //发送数据
-            ku->send_data(big_send_buffer, totalLength);
-            //标识当前玩家有发送数据出去
-            ku->untrimmed_used_data = 1;
-        }
+        <span class="token comment" spellcheck="true">//然后给每一个玩家都发送同样的数据</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> players<span class="token punctuation">.</span>length<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            k_user <span class="token operator">*</span> ku <span class="token operator">=</span> players<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">//发送数据</span>
+            ku<span class="token operator">-</span><span class="token operator">></span><span class="token function">send_data</span><span class="token punctuation">(</span>big_send_buffer<span class="token punctuation">,</span> totalLength<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">//标识当前玩家有发送数据出去</span>
+            ku<span class="token operator">-</span><span class="token operator">></span>untrimmed_used_data <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
 
-        //删除集合buff里面缓存的内容
-        frame_counter = frame_counter + 1;
-        if (players.length > 0) {
-            for (int edi = 0; edi < players.length; edi++) {
-                k_user * kux = players.get(edi);
-                if (kux->untrimmed_used_data != 0) {
-                    //服务端接受的数据包重置为0
-                    kux->receive_package_count = 0;
-                    //移除服务端收集数据包的时间段内的数据包
-                    //kux->get_data(big_send_buffer);
-                    kux->client_reply_frame++;
-                    kux->untrimmed_used_data = 0;
-                }
-            }
-        }
-    }
-}
+        <span class="token comment" spellcheck="true">//删除集合buff里面缓存的内容</span>
+        frame_counter <span class="token operator">=</span> frame_counter <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>players<span class="token punctuation">.</span>length <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> edi <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> edi <span class="token operator">&lt;</span> players<span class="token punctuation">.</span>length<span class="token punctuation">;</span> edi<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                k_user <span class="token operator">*</span> kux <span class="token operator">=</span> players<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>edi<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>kux<span class="token operator">-</span><span class="token operator">></span>untrimmed_used_data <span class="token operator">!=</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token comment" spellcheck="true">//服务端接受的数据包重置为0</span>
+                    kux<span class="token operator">-</span><span class="token operator">></span>receive_package_count <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+                    <span class="token comment" spellcheck="true">//移除服务端收集数据包的时间段内的数据包</span>
+                    <span class="token comment" spellcheck="true">//kux->get_data(big_send_buffer);</span>
+                    kux<span class="token operator">-</span><span class="token operator">></span>client_reply_frame<span class="token operator">++</span><span class="token punctuation">;</span>
+                    kux<span class="token operator">-</span><span class="token operator">></span>untrimmed_used_data <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <p>最后是：</p>
 <ol>
@@ -1023,118 +1019,118 @@ void k_user::k_game::collect_all_players_game_data()
 <li>客户端如果没有update数据了，就必须等待，直到有新的数据到来。</li>
 <li>客户端如果一下子收到很多连续的update，则快进播放。</li>
 </ol>
-<pre class=" language-C++"><code class="language-C++">// recv input data 同步的接受数据
-int  N02CCNV recvSyncData(void * value, const int len)
-{
-    if (state==RUNNING) {
-       if (++gameInfo.frame >= gameInfo.delay) {
-            //同步等待服务端的关键帧的到来
-            while (!gameInfo.isProcessFinish && state == RUNNING) {
-                stepRunning();
-            }
-            ...
-            //保证在运行的状态下，才去获取数据
-            if(state == RUNNING)
-            {
-                //遍历解析每一个关键帧里面的游戏数据
-                for(int i = 0;i<gameInfo.currentReceiveGameCount;i++) {
-                    //获取到关键帧
-                    k_game_data_ptr kInstructionPtr = gameInfo.inCache.getItem(gameInfo.gameDataForArrayIndex + i);
-                    //解析每一个关键帧里面包含的数据包
-                    unsigned char *gameP = (unsigned char *)kInstructionPtr.body;
-                    //解析游戏数据
-                    //得到有多少个数据包的存在
-                    int packageCount = *gameP;
-                    //指针移动一个字节，指向后面要解析的内容
-                    gameP += 1;
+<pre class=" language-cpp"><code class="language-cpp"><span class="token comment" spellcheck="true">// recv input data 同步的接受数据</span>
+<span class="token keyword">int</span>  N02CCNV <span class="token function">recvSyncData</span><span class="token punctuation">(</span><span class="token keyword">void</span> <span class="token operator">*</span> value<span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">int</span> len<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>state<span class="token operator">==</span>RUNNING<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+       <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">++</span>gameInfo<span class="token punctuation">.</span>frame <span class="token operator">>=</span> gameInfo<span class="token punctuation">.</span>delay<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">//同步等待服务端的关键帧的到来</span>
+            <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token operator">!</span>gameInfo<span class="token punctuation">.</span>isProcessFinish <span class="token operator">&amp;&amp;</span> state <span class="token operator">==</span> RUNNING<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token function">stepRunning</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+            <span class="token comment" spellcheck="true">//保证在运行的状态下，才去获取数据</span>
+            <span class="token keyword">if</span><span class="token punctuation">(</span>state <span class="token operator">==</span> RUNNING<span class="token punctuation">)</span>
+            <span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">//遍历解析每一个关键帧里面的游戏数据</span>
+                <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>i<span class="token operator">&lt;</span>gameInfo<span class="token punctuation">.</span>currentReceiveGameCount<span class="token punctuation">;</span>i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token comment" spellcheck="true">//获取到关键帧</span>
+                    k_game_data_ptr kInstructionPtr <span class="token operator">=</span> gameInfo<span class="token punctuation">.</span>inCache<span class="token punctuation">.</span><span class="token function">getItem</span><span class="token punctuation">(</span>gameInfo<span class="token punctuation">.</span>gameDataForArrayIndex <span class="token operator">+</span> i<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token comment" spellcheck="true">//解析每一个关键帧里面包含的数据包</span>
+                    <span class="token keyword">unsigned</span> <span class="token keyword">char</span> <span class="token operator">*</span>gameP <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">unsigned</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">)</span>kInstructionPtr<span class="token punctuation">.</span>body<span class="token punctuation">;</span>
+                    <span class="token comment" spellcheck="true">//解析游戏数据</span>
+                    <span class="token comment" spellcheck="true">//得到有多少个数据包的存在</span>
+                    <span class="token keyword">int</span> packageCount <span class="token operator">=</span> <span class="token operator">*</span>gameP<span class="token punctuation">;</span>
+                    <span class="token comment" spellcheck="true">//指针移动一个字节，指向后面要解析的内容</span>
+                    gameP <span class="token operator">+</span><span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
 
-                    //客户端收到了服务端多个数据包，客户端要加速的播放处理,遍历处理每一个数据包
-                    while (packageCount > 1) {
-                        memset(nControls,0,INPUTSIZE);
-                        //获取当前这个数据包的长度
-                        unsigned short length = *((unsigned short *) gameP);
-                        //后面的就是游戏的内容了
-                        gameP += 2;
-                        //通知引擎要加速播放，传递的参数为游戏的数据
-                        memcpy(nControls,gameP,length);
-                        //这里要注意不能单单的返回length长度的内容，游戏引擎还会解析对应玩家的按键信息，所以返回的buff的长度要正确
-                        modHelper.speedGameRunInfo(nControls, len);
+                    <span class="token comment" spellcheck="true">//客户端收到了服务端多个数据包，客户端要加速的播放处理,遍历处理每一个数据包</span>
+                    <span class="token keyword">while</span> <span class="token punctuation">(</span>packageCount <span class="token operator">></span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                        <span class="token function">memset</span><span class="token punctuation">(</span>nControls<span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span>INPUTSIZE<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        <span class="token comment" spellcheck="true">//获取当前这个数据包的长度</span>
+                        <span class="token keyword">unsigned</span> <span class="token keyword">short</span> length <span class="token operator">=</span> <span class="token operator">*</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">unsigned</span> <span class="token keyword">short</span> <span class="token operator">*</span><span class="token punctuation">)</span> gameP<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        <span class="token comment" spellcheck="true">//后面的就是游戏的内容了</span>
+                        gameP <span class="token operator">+</span><span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span>
+                        <span class="token comment" spellcheck="true">//通知引擎要加速播放，传递的参数为游戏的数据</span>
+                        <span class="token function">memcpy</span><span class="token punctuation">(</span>nControls<span class="token punctuation">,</span>gameP<span class="token punctuation">,</span>length<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        <span class="token comment" spellcheck="true">//这里要注意不能单单的返回length长度的内容，游戏引擎还会解析对应玩家的按键信息，所以返回的buff的长度要正确</span>
+                        modHelper<span class="token punctuation">.</span><span class="token function">speedGameRunInfo</span><span class="token punctuation">(</span>nControls<span class="token punctuation">,</span> len<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-                        //下一次循环设置
-                        gameP += length;
-                        packageCount--;
-                    }
+                        <span class="token comment" spellcheck="true">//下一次循环设置</span>
+                        gameP <span class="token operator">+</span><span class="token operator">=</span> length<span class="token punctuation">;</span>
+                        packageCount<span class="token operator">--</span><span class="token punctuation">;</span>
+                    <span class="token punctuation">}</span>
 
-                    //标识处理了最后一个关键帧,最后一个关键帧要执行return，要不然客户端会一直等待
-                    if (i == gameInfo.currentReceiveGameCount - 1) {
-                        //客户端正常处理，数据包为1
-                        //获取当前这个数据包的长度
-                        unsigned short length = *((unsigned short *) gameP);
-                        //后面的就是游戏的内容了
-                        gameP += 2;
-                        //最后一个数据包的解析
-                        memcpy(value, gameP, length);
-                    } else {
-                        memset(nControls,0,INPUTSIZE);
-                        //获取当前这个数据包的长度
-                        unsigned short length = *((unsigned short *) gameP);
-                        //后面的就是游戏的内容了
-                        gameP += 2;
-                        //通知引擎要加速播放，传递的参数为游戏的数据
-                        //这里要注意不能单单的返回length长度的内容，游戏引擎还会解析对应玩家的按键信息，所以返回的buff的长度要正确
-                        memcpy(nControls,gameP,length);
-                        modHelper.speedGameRunInfo(nControls, len);   
-                        }
-                    }
-                    return len;
-                }
-        } else {
-            memcpy(value, gameInfo.defaultInput, gameInfo.totalInputLength);
-            return 0;
-        }
-    }
-    LOGD("Ending it here");
-    modHelper.endGame();
-    return -1;
-}
+                    <span class="token comment" spellcheck="true">//标识处理了最后一个关键帧,最后一个关键帧要执行return，要不然客户端会一直等待</span>
+                    <span class="token keyword">if</span> <span class="token punctuation">(</span>i <span class="token operator">==</span> gameInfo<span class="token punctuation">.</span>currentReceiveGameCount <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                        <span class="token comment" spellcheck="true">//客户端正常处理，数据包为1</span>
+                        <span class="token comment" spellcheck="true">//获取当前这个数据包的长度</span>
+                        <span class="token keyword">unsigned</span> <span class="token keyword">short</span> length <span class="token operator">=</span> <span class="token operator">*</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">unsigned</span> <span class="token keyword">short</span> <span class="token operator">*</span><span class="token punctuation">)</span> gameP<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        <span class="token comment" spellcheck="true">//后面的就是游戏的内容了</span>
+                        gameP <span class="token operator">+</span><span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span>
+                        <span class="token comment" spellcheck="true">//最后一个数据包的解析</span>
+                        <span class="token function">memcpy</span><span class="token punctuation">(</span>value<span class="token punctuation">,</span> gameP<span class="token punctuation">,</span> length<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                        <span class="token function">memset</span><span class="token punctuation">(</span>nControls<span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span>INPUTSIZE<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        <span class="token comment" spellcheck="true">//获取当前这个数据包的长度</span>
+                        <span class="token keyword">unsigned</span> <span class="token keyword">short</span> length <span class="token operator">=</span> <span class="token operator">*</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">unsigned</span> <span class="token keyword">short</span> <span class="token operator">*</span><span class="token punctuation">)</span> gameP<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        <span class="token comment" spellcheck="true">//后面的就是游戏的内容了</span>
+                        gameP <span class="token operator">+</span><span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span>
+                        <span class="token comment" spellcheck="true">//通知引擎要加速播放，传递的参数为游戏的数据</span>
+                        <span class="token comment" spellcheck="true">//这里要注意不能单单的返回length长度的内容，游戏引擎还会解析对应玩家的按键信息，所以返回的buff的长度要正确</span>
+                        <span class="token function">memcpy</span><span class="token punctuation">(</span>nControls<span class="token punctuation">,</span>gameP<span class="token punctuation">,</span>length<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        modHelper<span class="token punctuation">.</span><span class="token function">speedGameRunInfo</span><span class="token punctuation">(</span>nControls<span class="token punctuation">,</span> len<span class="token punctuation">)</span><span class="token punctuation">;</span>   
+                        <span class="token punctuation">}</span>
+                    <span class="token punctuation">}</span>
+                    <span class="token keyword">return</span> len<span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token function">memcpy</span><span class="token punctuation">(</span>value<span class="token punctuation">,</span> gameInfo<span class="token punctuation">.</span>defaultInput<span class="token punctuation">,</span> gameInfo<span class="token punctuation">.</span>totalInputLength<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"Ending it here"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    modHelper<span class="token punctuation">.</span><span class="token function">endGame</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <p>相应的客户端加速也要在游戏引擎中设置对应的快进的回调，gameSpeedRunCallBack 函数指针</p>
-<pre class=" language-C++"><code class="language-C++">//设置游戏加速的回调
-speedGameInfo.speedGameRunInfo = gameSpeedRunCallBack;
-kailleraSetSpeddGameRunInfo(&speedGameInfo);
+<pre class=" language-cpp"><code class="language-cpp"><span class="token comment" spellcheck="true">//设置游戏加速的回调</span>
+speedGameInfo<span class="token punctuation">.</span>speedGameRunInfo <span class="token operator">=</span> gameSpeedRunCallBack<span class="token punctuation">;</span>
+<span class="token function">kailleraSetSpeddGameRunInfo</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>speedGameInfo<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-//游戏加速的回调
-void gameSpeedRunCallBack(void * data, int len) {
+<span class="token comment" spellcheck="true">//游戏加速的回调</span>
+<span class="token keyword">void</span> <span class="token function">gameSpeedRunCallBack</span><span class="token punctuation">(</span><span class="token keyword">void</span> <span class="token operator">*</span> data<span class="token punctuation">,</span> <span class="token keyword">int</span> len<span class="token punctuation">)</span> <span class="token punctuation">{</span>
 
-    //前面是解析到传递过来的按键信息，然后设置到对应的游戏引擎中
-    //也即是游戏的状态都是取服务端返回的数据的结果，nControls 代表服务端返回的游戏数据，下面解析数据，改变对应的值
-    //到了这里的话，就代表玩家1的按键已经发送到了服务端，而且也已经获取到了其他玩家的按键情况,这里就要解析这些按键的值
-    //playersInputs = {8,8,0,0}  , nPlayerOffset = {0,8,16,16};
-    for (i = 0, j = 0; i < nPlayerInputs[0]; i++, j++) {
-        //获取信息,将信息存储到 bii 中
-        BurnDrvGetInputInfo(&bii, i + nPlayerOffset[0]);
-        if (bii.nType == BIT_DIGITAL) {
-            //*bii.pVal = 0x01; 修改按键的值，只要改为1就表示按了这个按键
-            if (nControls[j >> 3] & (1 << (j & 7))) {
-                //记录收到的操作
-                //WRITE_LOG("BurnInputInfo receive nPlayerInputs name %s\n",bii.szName);
-                *bii.pVal = 0x01;
-            } else {
-                *bii.pVal = 0x00;
-            }
-        }
-    }
-    ....
+    <span class="token comment" spellcheck="true">//前面是解析到传递过来的按键信息，然后设置到对应的游戏引擎中</span>
+    <span class="token comment" spellcheck="true">//也即是游戏的状态都是取服务端返回的数据的结果，nControls 代表服务端返回的游戏数据，下面解析数据，改变对应的值</span>
+    <span class="token comment" spellcheck="true">//到了这里的话，就代表玩家1的按键已经发送到了服务端，而且也已经获取到了其他玩家的按键情况,这里就要解析这些按键的值</span>
+    <span class="token comment" spellcheck="true">//playersInputs = {8,8,0,0}  , nPlayerOffset = {0,8,16,16};</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> j <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> nPlayerInputs<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">,</span> j<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//获取信息,将信息存储到 bii 中</span>
+        <span class="token function">BurnDrvGetInputInfo</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>bii<span class="token punctuation">,</span> i <span class="token operator">+</span> nPlayerOffset<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>bii<span class="token punctuation">.</span>nType <span class="token operator">==</span> BIT_DIGITAL<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">//*bii.pVal = 0x01; 修改按键的值，只要改为1就表示按了这个按键</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>nControls<span class="token punctuation">[</span>j <span class="token operator">>></span> <span class="token number">3</span><span class="token punctuation">]</span> <span class="token operator">&amp;</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">&lt;&lt;</span> <span class="token punctuation">(</span>j <span class="token operator">&amp;</span> <span class="token number">7</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">//记录收到的操作</span>
+                <span class="token comment" spellcheck="true">//WRITE_LOG("BurnInputInfo receive nPlayerInputs name %s\n",bii.szName);</span>
+                <span class="token operator">*</span>bii<span class="token punctuation">.</span>pVal <span class="token operator">=</span> <span class="token number">0x01</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                <span class="token operator">*</span>bii<span class="token punctuation">.</span>pVal <span class="token operator">=</span> <span class="token number">0x00</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
 
-    //游戏界面的渲染
-    //都是定义在burn.h 里面的，使用  extern UINT32 nFramesRendered ，这样的方式
-    nFramesRendered++;
-    //正常渲染界面的方法
-    if (VidFrame()) {                    // Do one frame
-        memset(nAudNextSound, 0, nAudSegLen << 2);//extern INT32 nAudSegLen;  在interface.h文件中
-    }
-    SndProcessFrame();
-}
+    <span class="token comment" spellcheck="true">//游戏界面的渲染</span>
+    <span class="token comment" spellcheck="true">//都是定义在burn.h 里面的，使用  extern UINT32 nFramesRendered ，这样的方式</span>
+    nFramesRendered<span class="token operator">++</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//正常渲染界面的方法</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">VidFrame</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>                    <span class="token comment" spellcheck="true">// Do one frame</span>
+        <span class="token function">memset</span><span class="token punctuation">(</span>nAudNextSound<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> nAudSegLen <span class="token operator">&lt;&lt;</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//extern INT32 nAudSegLen;  在interface.h文件中</span>
+    <span class="token punctuation">}</span>
+    <span class="token function">SndProcessFrame</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 </code></pre>
 
                 
@@ -1716,9 +1712,7 @@ void gameSpeedRunCallBack(void * data, int len) {
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概述
-Fba 街机对战实现
-
+                            
                         
                     </div>
                     <div class="publish-info">

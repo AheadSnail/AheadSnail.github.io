@@ -497,11 +497,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><blockquote>
-<p>Lame库编译 以及最新版NDK改动</p>
-</blockquote>
-<a id="more"></a>
-<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><blockquote>
+                <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><blockquote>
 <p>LAME 是最好的MP3编码器，编码高品质MP3的最好也是唯一的选择。LAME本身是控制台程序，需要加外壳程序才比较容易使用，也可以在别的软件(比如EAC)中间调用。是一款出色的MP3压缩程序，它使用了独创的人体听音心理学模型和声学模型，改变了人们对MP3高音发哑、低音发破的音质的印象。 总结来说也就是可以用来压缩原始流，也即是pcm的数据，转为mp3<br>官网地址  ： <a href="http://lame.sourceforge.net/" target="_blank" rel="noopener">http://lame.sourceforge.net/</a></p>
 </blockquote>
 <h3 id="NDK改动"><a href="#NDK改动" class="headerlink" title="NDK改动"></a>NDK改动</h3><blockquote>
@@ -533,221 +529,221 @@ CXXFLAGS<span class="token operator">=</span><span class="token variable">$CFLAG
 </code></pre>
 <p>发现正常的编译成功，可以生成目标文件<br><img src="/uploads/Lame/Lame生成结果.png" alt="结果显示"><br>项目结构显示<br><img src="/uploads/Lame/Lame项目结构.png" alt="结果显示"></p>
 <p>Mp3Encoder.cpp内容</p>
-<pre class=" language-C++"><code class="language-C++">#include "Mp3Encoder.h"
-int Mp3Encoder::Init(const char *pcmFilePath, const char *mp3FilePath, int sampleRate, int channels, int bitRate)
-{
-    int ret = 0;
-    pcmFile = fopen(pcmFilePath,"rb");
-    if(pcmFile == NULL)
-    {
-        ret = -1;
-        return ret;
-    }
+<pre class=" language-cpp"><code class="language-cpp"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">"Mp3Encoder.h"</span></span>
+<span class="token keyword">int</span> Mp3Encoder<span class="token operator">::</span><span class="token function">Init</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>pcmFilePath<span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>mp3FilePath<span class="token punctuation">,</span> <span class="token keyword">int</span> sampleRate<span class="token punctuation">,</span> <span class="token keyword">int</span> channels<span class="token punctuation">,</span> <span class="token keyword">int</span> bitRate<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">int</span> ret <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    pcmFile <span class="token operator">=</span> <span class="token function">fopen</span><span class="token punctuation">(</span>pcmFilePath<span class="token punctuation">,</span><span class="token string">"rb"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>pcmFile <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        ret <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> ret<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    mp3File = fopen(mp3FilePath,"wb");
-    if(mp3File == NULL)
-    {
-        ret = -2;
-        return ret;
-    }
-    //初始化lame 得到
-    lameClient = lame_init();
-    if(lameClient == NULL)
-    {
-        ret = -3;
-        return ret;
-    }
-    //设置对应的参数
-    lame_set_in_samplerate(lameClient,sampleRate);
-    lame_set_out_samplerate(lameClient,sampleRate);
-    lame_set_num_channels(lameClient,channels);
-    lame_set_brate(lameClient,bitRate/1000);
-    lame_init_params(lameClient);
-    return ret;
-}
-void Mp3Encoder::Encoder() {
-    //每次读取一段bufferSize大小的pcm数据buffer，然后再编码该buffer，但是在编码buffer之前得把该buffer的左右声道分开
-    //再送入Lame编码器，最终将编码之后的数据写入到Mp3文件中
-    int bufferSize = 1024 * 256;
-    //分配内存空间,分配一个大小为bufferSize/2 数量的 short数组
-    short * buffer = new short[bufferSize/2];
-    short * leftBuffer = new short[bufferSize/4];
-    short * rightBuffer = new short[bufferSize/4];
+    mp3File <span class="token operator">=</span> <span class="token function">fopen</span><span class="token punctuation">(</span>mp3FilePath<span class="token punctuation">,</span><span class="token string">"wb"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>mp3File <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        ret <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">2</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> ret<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//初始化lame 得到</span>
+    lameClient <span class="token operator">=</span> <span class="token function">lame_init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>lameClient <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        ret <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">3</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> ret<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//设置对应的参数</span>
+    <span class="token function">lame_set_in_samplerate</span><span class="token punctuation">(</span>lameClient<span class="token punctuation">,</span>sampleRate<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">lame_set_out_samplerate</span><span class="token punctuation">(</span>lameClient<span class="token punctuation">,</span>sampleRate<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">lame_set_num_channels</span><span class="token punctuation">(</span>lameClient<span class="token punctuation">,</span>channels<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">lame_set_brate</span><span class="token punctuation">(</span>lameClient<span class="token punctuation">,</span>bitRate<span class="token operator">/</span><span class="token number">1000</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">lame_init_params</span><span class="token punctuation">(</span>lameClient<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> ret<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">void</span> Mp3Encoder<span class="token operator">::</span><span class="token function">Encoder</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//每次读取一段bufferSize大小的pcm数据buffer，然后再编码该buffer，但是在编码buffer之前得把该buffer的左右声道分开</span>
+    <span class="token comment" spellcheck="true">//再送入Lame编码器，最终将编码之后的数据写入到Mp3文件中</span>
+    <span class="token keyword">int</span> bufferSize <span class="token operator">=</span> <span class="token number">1024</span> <span class="token operator">*</span> <span class="token number">256</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//分配内存空间,分配一个大小为bufferSize/2 数量的 short数组</span>
+    <span class="token keyword">short</span> <span class="token operator">*</span> buffer <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token keyword">short</span><span class="token punctuation">[</span>bufferSize<span class="token operator">/</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">short</span> <span class="token operator">*</span> leftBuffer <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token keyword">short</span><span class="token punctuation">[</span>bufferSize<span class="token operator">/</span><span class="token number">4</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">short</span> <span class="token operator">*</span> rightBuffer <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token keyword">short</span><span class="token punctuation">[</span>bufferSize<span class="token operator">/</span><span class="token number">4</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
 
-    //用来存储编码之后的内容
-    unsigned char * mp3_buffer = new unsigned char[bufferSize];
-    size_t readBufferSize = 0;
-    //读取pcm的数据，这里是每次读取2个字节，读取数量为bufferSize/2,short所以每次读取2个字节
-    while((readBufferSize = fread(buffer,2,bufferSize/2,pcmFile)) > 0)
-    {
-        //左右声道分开
-        for(int i = 0;i<readBufferSize;i++)
-        {
-            if(i % 2 == 0)
-            {
-                leftBuffer[i/2] = buffer[i];
-            }else{
-                rightBuffer[i/2] = buffer[i];
-            }
-        }
+    <span class="token comment" spellcheck="true">//用来存储编码之后的内容</span>
+    <span class="token keyword">unsigned</span> <span class="token keyword">char</span> <span class="token operator">*</span> mp3_buffer <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token keyword">unsigned</span> <span class="token keyword">char</span><span class="token punctuation">[</span>bufferSize<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    size_t readBufferSize <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//读取pcm的数据，这里是每次读取2个字节，读取数量为bufferSize/2,short所以每次读取2个字节</span>
+    <span class="token keyword">while</span><span class="token punctuation">(</span><span class="token punctuation">(</span>readBufferSize <span class="token operator">=</span> <span class="token function">fread</span><span class="token punctuation">(</span>buffer<span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span>bufferSize<span class="token operator">/</span><span class="token number">2</span><span class="token punctuation">,</span>pcmFile<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//左右声道分开</span>
+        <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>i<span class="token operator">&lt;</span>readBufferSize<span class="token punctuation">;</span>i<span class="token operator">++</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token keyword">if</span><span class="token punctuation">(</span>i <span class="token operator">%</span> <span class="token number">2</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span>
+            <span class="token punctuation">{</span>
+                leftBuffer<span class="token punctuation">[</span>i<span class="token operator">/</span><span class="token number">2</span><span class="token punctuation">]</span> <span class="token operator">=</span> buffer<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span><span class="token keyword">else</span><span class="token punctuation">{</span>
+                rightBuffer<span class="token punctuation">[</span>i<span class="token operator">/</span><span class="token number">2</span><span class="token punctuation">]</span> <span class="token operator">=</span> buffer<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
 
-        //编码
-        size_t wroteSize = lame_encode_buffer(lameClient,leftBuffer,rightBuffer,readBufferSize/2,mp3_buffer,bufferSize);
-        //写文件内容
-        fwrite(mp3_buffer,1,wroteSize,mp3File);
-    }
+        <span class="token comment" spellcheck="true">//编码</span>
+        size_t wroteSize <span class="token operator">=</span> <span class="token function">lame_encode_buffer</span><span class="token punctuation">(</span>lameClient<span class="token punctuation">,</span>leftBuffer<span class="token punctuation">,</span>rightBuffer<span class="token punctuation">,</span>readBufferSize<span class="token operator">/</span><span class="token number">2</span><span class="token punctuation">,</span>mp3_buffer<span class="token punctuation">,</span>bufferSize<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//写文件内容</span>
+        <span class="token function">fwrite</span><span class="token punctuation">(</span>mp3_buffer<span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span>wroteSize<span class="token punctuation">,</span>mp3File<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    //释放内存
-    delete[] buffer;
-    delete[] leftBuffer;
-    delete[] rightBuffer;
-    delete[] mp3_buffer;
-}
+    <span class="token comment" spellcheck="true">//释放内存</span>
+    <span class="token keyword">delete</span><span class="token punctuation">[</span><span class="token punctuation">]</span> buffer<span class="token punctuation">;</span>
+    <span class="token keyword">delete</span><span class="token punctuation">[</span><span class="token punctuation">]</span> leftBuffer<span class="token punctuation">;</span>
+    <span class="token keyword">delete</span><span class="token punctuation">[</span><span class="token punctuation">]</span> rightBuffer<span class="token punctuation">;</span>
+    <span class="token keyword">delete</span><span class="token punctuation">[</span><span class="token punctuation">]</span> mp3_buffer<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-Mp3Encoder::Mp3Encoder()
-{
+Mp3Encoder<span class="token operator">::</span><span class="token function">Mp3Encoder</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
 
-}
+<span class="token punctuation">}</span>
 
-Mp3Encoder::~Mp3Encoder()
-{
-    if(pcmFile)
-    {
-        fclose(pcmFile);
-        pcmFile = NULL;
-    }
-    if(mp3File)
-    {
-        fclose(mp3File);
-        mp3File = NULL;
-    }
-    if(lameClient)
-    {
-        lame_close(lameClient);
-        lameClient = NULL;
-    }
-}
+Mp3Encoder<span class="token operator">::</span><span class="token operator">~</span><span class="token function">Mp3Encoder</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>pcmFile<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token function">fclose</span><span class="token punctuation">(</span>pcmFile<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        pcmFile <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>mp3File<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token function">fclose</span><span class="token punctuation">(</span>mp3File<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        mp3File <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>lameClient<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token function">lame_close</span><span class="token punctuation">(</span>lameClient<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        lameClient <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
-void Mp3Encoder::Destory() {
-    if(pcmFile)
-    {
-        fclose(pcmFile);
-        pcmFile = NULL;
-    }
-    if(mp3File)
-    {
-        fclose(mp3File);
-        mp3File = NULL;
-    }
-    if(lameClient)
-    {
-        lame_close(lameClient);
-        lameClient = NULL;
-    }
-}
+<span class="token keyword">void</span> Mp3Encoder<span class="token operator">::</span><span class="token function">Destory</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>pcmFile<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token function">fclose</span><span class="token punctuation">(</span>pcmFile<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        pcmFile <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>mp3File<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token function">fclose</span><span class="token punctuation">(</span>mp3File<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        mp3File <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>lameClient<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token function">lame_close</span><span class="token punctuation">(</span>lameClient<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        lameClient <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
-Mp3Encoder.h内容
+Mp3Encoder<span class="token punctuation">.</span>h内容
 
-#ifndef LAMEMP3ENCODER_MP3ENCODER_H
-#define LAMEMP3ENCODER_MP3ENCODER_H
+<span class="token macro property">#<span class="token directive keyword">ifndef</span> LAMEMP3ENCODER_MP3ENCODER_H</span>
+<span class="token macro property">#<span class="token directive keyword">define</span> LAMEMP3ENCODER_MP3ENCODER_H</span>
 
-#include <cstdio>
-#include <lame/lame.h>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;cstdio></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;lame/lame.h></span></span>
 
-class Mp3Encoder
-{
-private:
-    FILE* pcmFile;
-    FILE* mp3File;
-    lame_t lameClient;
+<span class="token keyword">class</span> <span class="token class-name">Mp3Encoder</span>
+<span class="token punctuation">{</span>
+<span class="token keyword">private</span><span class="token operator">:</span>
+    FILE<span class="token operator">*</span> pcmFile<span class="token punctuation">;</span>
+    FILE<span class="token operator">*</span> mp3File<span class="token punctuation">;</span>
+    lame_t lameClient<span class="token punctuation">;</span>
 
-public:
-    Mp3Encoder();
-    ~Mp3Encoder();
-    int Init(const char * pcmFilePath,const char * mp3FilePath,int sampleRate,int channels,int bitRate);
-    void Destory();
-    void Encoder();
-};
+<span class="token keyword">public</span><span class="token operator">:</span>
+    <span class="token function">Mp3Encoder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token operator">~</span><span class="token function">Mp3Encoder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> <span class="token function">Init</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span> pcmFilePath<span class="token punctuation">,</span><span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span> mp3FilePath<span class="token punctuation">,</span><span class="token keyword">int</span> sampleRate<span class="token punctuation">,</span><span class="token keyword">int</span> channels<span class="token punctuation">,</span><span class="token keyword">int</span> bitRate<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">void</span> <span class="token function">Destory</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">void</span> <span class="token function">Encoder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
 
-#endif //LAMEMP3ENCODER_MP3ENCODER_H
+<span class="token macro property">#<span class="token directive keyword">endif</span> </span><span class="token comment" spellcheck="true">//LAMEMP3ENCODER_MP3ENCODER_H</span>
 
-native-lib.cpp文件内容
+native<span class="token operator">-</span>lib<span class="token punctuation">.</span>cpp文件内容
 
-#include <jni.h>
-#include "com_example_administrator_lamemp3encoder_Mp3Encoder.h"
-#include "Mp3Encoder.h"
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;jni.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">"com_example_administrator_lamemp3encoder_Mp3Encoder.h"</span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">"Mp3Encoder.h"</span></span>
 
-Mp3Encoder * encoder;
-
-
-JNIEXPORT jint JNICALL Java_com_example_administrator_lamemp3encoder_Mp3Encoder_init
-        (JNIEnv * env, jobject obj, jstring pcmFilePath, jint audioChannels, jint bitRate, jint sampleRate, jstring mp3FilePath)
-{
-    const char * pcmPath = env->GetStringUTFChars(pcmFilePath,NULL);
-    const char * mp3Path = env->GetStringUTFChars(mp3FilePath,NULL);
-
-    //构建一个对象
-    encoder = new Mp3Encoder();
-    int ret = encoder->Init(pcmPath,mp3Path,sampleRate,audioChannels,bitRate);
-    env->ReleaseStringUTFChars(pcmFilePath,pcmPath);
-    env->ReleaseStringUTFChars(mp3FilePath,mp3Path);
-    return ret;
-}
+Mp3Encoder <span class="token operator">*</span> encoder<span class="token punctuation">;</span>
 
 
-JNIEXPORT void JNICALL Java_com_example_administrator_lamemp3encoder_Mp3Encoder_encode
-        (JNIEnv * env, jobject obj)
-{
-    encoder->Encoder();
-}
+JNIEXPORT jint JNICALL <span class="token function">Java_com_example_administrator_lamemp3encoder_Mp3Encoder_init</span>
+        <span class="token punctuation">(</span>JNIEnv <span class="token operator">*</span> env<span class="token punctuation">,</span> jobject obj<span class="token punctuation">,</span> jstring pcmFilePath<span class="token punctuation">,</span> jint audioChannels<span class="token punctuation">,</span> jint bitRate<span class="token punctuation">,</span> jint sampleRate<span class="token punctuation">,</span> jstring mp3FilePath<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span> pcmPath <span class="token operator">=</span> env<span class="token operator">-</span><span class="token operator">></span><span class="token function">GetStringUTFChars</span><span class="token punctuation">(</span>pcmFilePath<span class="token punctuation">,</span><span class="token constant">NULL</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span> mp3Path <span class="token operator">=</span> env<span class="token operator">-</span><span class="token operator">></span><span class="token function">GetStringUTFChars</span><span class="token punctuation">(</span>mp3FilePath<span class="token punctuation">,</span><span class="token constant">NULL</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">//构建一个对象</span>
+    encoder <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token function">Mp3Encoder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> ret <span class="token operator">=</span> encoder<span class="token operator">-</span><span class="token operator">></span><span class="token function">Init</span><span class="token punctuation">(</span>pcmPath<span class="token punctuation">,</span>mp3Path<span class="token punctuation">,</span>sampleRate<span class="token punctuation">,</span>audioChannels<span class="token punctuation">,</span>bitRate<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    env<span class="token operator">-</span><span class="token operator">></span><span class="token function">ReleaseStringUTFChars</span><span class="token punctuation">(</span>pcmFilePath<span class="token punctuation">,</span>pcmPath<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    env<span class="token operator">-</span><span class="token operator">></span><span class="token function">ReleaseStringUTFChars</span><span class="token punctuation">(</span>mp3FilePath<span class="token punctuation">,</span>mp3Path<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> ret<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
 
-JNIEXPORT void JNICALL Java_com_example_administrator_lamemp3encoder_Mp3Encoder_destroy
-        (JNIEnv *env, jobject obj)
-{
-    encoder->Destory();
-}
+JNIEXPORT <span class="token keyword">void</span> JNICALL <span class="token function">Java_com_example_administrator_lamemp3encoder_Mp3Encoder_encode</span>
+        <span class="token punctuation">(</span>JNIEnv <span class="token operator">*</span> env<span class="token punctuation">,</span> jobject obj<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    encoder<span class="token operator">-</span><span class="token operator">></span><span class="token function">Encoder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+
+JNIEXPORT <span class="token keyword">void</span> JNICALL <span class="token function">Java_com_example_administrator_lamemp3encoder_Mp3Encoder_destroy</span>
+        <span class="token punctuation">(</span>JNIEnv <span class="token operator">*</span>env<span class="token punctuation">,</span> jobject obj<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    encoder<span class="token operator">-</span><span class="token operator">></span><span class="token function">Destory</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <p>CMakeLists.txt文件内容:</p>
-<pre class=" language-Cmake"><code class="language-Cmake">cmake_minimum_required(VERSION 3.4.1)
-add_library( open-lame
+<pre class=" language-bash"><code class="language-bash">cmake_minimum_required<span class="token punctuation">(</span>VERSION 3.4.1<span class="token punctuation">)</span>
+add_library<span class="token punctuation">(</span> open-lame
              STATIC
-             IMPORTED)
-set_target_properties( open-lame
+             IMPORTED<span class="token punctuation">)</span>
+set_target_properties<span class="token punctuation">(</span> open-lame
                        PROPERTIES IMPORTED_LOCATION
-                       ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/libmp3lame.a )
+                       <span class="token variable">${CMAKE_SOURCE_DIR}</span>/src/main/cpp/lib/libmp3lame.a <span class="token punctuation">)</span>
 
-#添加头文件的查找目录
-include_directories( ${CMAKE_SOURCE_DIR}/src/main/cpp/include )
+<span class="token comment" spellcheck="true">#添加头文件的查找目录</span>
+include_directories<span class="token punctuation">(</span> <span class="token variable">${CMAKE_SOURCE_DIR}</span>/src/main/cpp/include <span class="token punctuation">)</span>
 
 
-add_library( # Sets the name of the library.
+add_library<span class="token punctuation">(</span> <span class="token comment" spellcheck="true"># Sets the name of the library.</span>
              native-lib
 
-             # Sets the library as a shared library.
+             <span class="token comment" spellcheck="true"># Sets the library as a shared library.</span>
              SHARED
 
-             # Provides a relative path to your source file(s).
+             <span class="token comment" spellcheck="true"># Provides a relative path to your source file(s).</span>
              src/main/cpp/Mp3Ecnoder.cpp
-             src/main/cpp/native-lib.cpp )
+             src/main/cpp/native-lib.cpp <span class="token punctuation">)</span>
 
 
-find_library( # Sets the name of the path variable.
+find_library<span class="token punctuation">(</span> <span class="token comment" spellcheck="true"># Sets the name of the path variable.</span>
               log-lib
 
-              # Specifies the name of the NDK library that
-              # you want CMake to locate.
-              log )
+              <span class="token comment" spellcheck="true"># Specifies the name of the NDK library that</span>
+              <span class="token comment" spellcheck="true"># you want CMake to locate.</span>
+              log <span class="token punctuation">)</span>
 
 
-target_link_libraries( # Specifies the target library.
+target_link_libraries<span class="token punctuation">(</span> <span class="token comment" spellcheck="true"># Specifies the target library.</span>
                        native-lib
 
-                       # Links the target library to the log library
-                       # included in the NDK.
-                       ${log-lib}
+                       <span class="token comment" spellcheck="true"># Links the target library to the log library</span>
+                       <span class="token comment" spellcheck="true"># included in the NDK.</span>
+                       <span class="token variable">${log-lib}</span>
 
-                       open-lame )
+                       open-lame <span class="token punctuation">)</span>
 </code></pre>
 <p>Android Studio NDK 版本情况<br><img src="/uploads/Lame/NDK最新版本.png" alt="结果显示"><br><img src="/uploads/Lame/Android Studio NDK设置.png" alt="结果显示"></p>
 <p>通过上图可以知道，当前使用NDK为最新版 之后执行编译会产生下面的这样的结果：</p>
@@ -1412,9 +1408,7 @@ CFLAGS<span class="token operator">=</span><span class="token variable">$CPPFLAG
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概述
-NdkR17 编译FFmpeg4.0 添加AAC,X264支持
-
+                            
                         
                     </div>
                     <div class="publish-info">
@@ -1471,9 +1465,7 @@ NdkR17 编译FFmpeg4.0 添加AAC,X264支持
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概述
-Opus结合SoundTouch Android实现
-
+                            
                         
                     </div>
                     <div class="publish-info">

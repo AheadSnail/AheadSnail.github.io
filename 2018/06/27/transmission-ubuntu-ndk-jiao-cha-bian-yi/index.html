@@ -497,11 +497,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><blockquote>
-<p>Transmission Ubuntu NDK 交叉编译</p>
-</blockquote>
-<a id="more"></a>
-<h3 id="什么是Transmission"><a href="#什么是Transmission" class="headerlink" title="什么是Transmission?"></a>什么是Transmission?</h3><blockquote>
+                <h3 id="什么是Transmission"><a href="#什么是Transmission" class="headerlink" title="什么是Transmission?"></a>什么是Transmission?</h3><blockquote>
 <p>Transmission是一种BitTorrent客户端，特点是一个跨平台的后端和其上的简洁的用户界面。Transmission以MIT许可证和GNU通用公共许可证双许可证授权，因此是一款自由软件<br>优点是<br>开源跨平台，由社区志愿者开发<br>绝无各种广告及浏览器工具栏插件等<br>完全免费，绝无收费高级版与免费基础版等区别<br>数据加密、损坏修复<br>来源交换 (支持Bittorrent、Ares、迅雷、Vuze和μTorrent等等)<br>硬件资源消耗极低，甚至比某些命令行BT工具都要低<br>可以选择种子中要下载的文件<br>支持encryption、web界面、远程控制、磁力链接、DHT、uTP、uPnP、NAT-PMP<br>支持目录监控、全局或单一速度限制<br>制作种子、快速继续<br>黑名单，可以按时升级(资料来自PeerGuardian和PeerBlock)<br>单一监听端口、带宽计划、整理(过滤)<br>HTTPS tracker支持以及tracker编辑功能支持<br>IPv6支持<br>对应不同平台有着特定的图形用户界面。</p>
 </blockquote>
 <h3 id="为什么要研究Transmission？"><a href="#为什么要研究Transmission？" class="headerlink" title="为什么要研究Transmission？"></a>为什么要研究Transmission？</h3><blockquote>
@@ -527,8 +523,8 @@ $ <span class="token function">tar</span> xjf transmission-2.51.tar.bz2
 $ <span class="token function">cd</span> transmission-2.51
 CFLAGS<span class="token operator">=</span><span class="token string">"-Os -march=native"</span> ./configure <span class="token operator">&amp;&amp;</span> <span class="token function">make</span> <span class="token operator">&amp;&amp;</span> checkinstall
 </code></pre>
-<p>如果正常没有错误的化，是这样的<br><img src="/uploads/Transmision 交叉编译/ubuntu编译.png" alt="结果显示"></p>
-<p>生成的结果：<br><img src="/uploads/Transmision 交叉编译/ubuntu生成的文件.png" alt="结果显示"></p>
+<p>如果正常没有错误的化，是这样的<br><img src="/uploads/Transmision 交叉编译/ubuntu编译.png" alt></p>
+<p>生成的结果：<br><img src="/uploads/Transmision 交叉编译/ubuntu生成的文件.png" alt></p>
 <h3 id="Transmission-NDK-交叉编译"><a href="#Transmission-NDK-交叉编译" class="headerlink" title="Transmission NDK 交叉编译"></a>Transmission NDK 交叉编译</h3><blockquote>
 <p>如果采用交叉编译的化，就要自己生成这些依赖库，这里需要手动的编译的库文件有libcurl ,libevent openssl,所以要提前下载好这些文件，对应的我们编译都是采用最新版本的库<br>libevent 最新库的下载地址  <a href="https://github.com/libevent/libevent/releases/download/release-2.1.8-stable/libevent-2.1.8-stable.tar.gz" target="_blank" rel="noopener">https://github.com/libevent/libevent/releases/download/release-2.1.8-stable/libevent-2.1.8-stable.tar.gz</a><br>openssl 最新库的下载地址  <a href="https://www.openssl.org/source/openssl-1.0.2o.tar.gz" target="_blank" rel="noopener">https://www.openssl.org/source/openssl-1.0.2o.tar.gz</a><br>curl  最新库的下载地址    <a href="https://curl.haxx.se/download/curl-7.60.0.tar.gz" target="_blank" rel="noopener">https://curl.haxx.se/download/curl-7.60.0.tar.gz</a><br>transmission 最新的下载地址  <a href="https://raw.githubusercontent.com/transmission/transmission-releases/master/transmission-2.94.tar.xz" target="_blank" rel="noopener">https://raw.githubusercontent.com/transmission/transmission-releases/master/transmission-2.94.tar.xz</a></p>
 </blockquote>
@@ -575,51 +571,51 @@ build_openssl <span class="token string">"arm"</span>
 <span class="token keyword">echo</span> <span class="token string">"build openssl success"</span>
 <span class="token keyword">exit</span> 1
 </code></pre>
-<p>这里需要注意的是,如果GCC 不是这样指定的化，会出现 error: C compiler cannot create executables的错误 ,sysroot 也即是指定环境的意思<br>export CC=”$NDK/toolchains/${ACT_ARCH}-${PLATFROM}-4.9/prebuilt/linux-x86_64/bin/${ACT_ARCH}-${PLATFROM}-gcc –sysroot=${SYSROOT}”</p>
+<p>这里需要注意的是</p>
+<blockquote>
+<p>如果GCC 不是这样指定的化，会出现 error: C compiler cannot create executables的错误 ,sysroot 也即是指定环境的意思<br>export CC=”$NDK/toolchains/${ACT_ARCH}-${PLATFROM}-4.9/prebuilt/linux-x86_64/bin/${ACT_ARCH}-${PLATFROM}-gcc –sysroot=${SYSROOT}”</p>
+</blockquote>
 <p>下面是介绍为什么要这样写的原因  这个一般是跟ndk相关的错误,某些头文件或者obj文件找不到。可以编写个简单的hello world源文件测试</p>
-<pre class=" language-C++"><code class="language-C++">#include 
-int main() { 
-printf("Hello world."); 
-return 0; 
-} 
+<pre class=" language-cpp"><code class="language-cpp"><span class="token macro property">#<span class="token directive keyword">include</span> </span>
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> 
+<span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"Hello world."</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
+<span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span> 
+<span class="token punctuation">}</span> 
 
-使用ndk中的编译器进行编译,如
+使用ndk中的编译器进行编译<span class="token punctuation">,</span>如
 
-export $ANDROID_NDK=/home/longjing/tools/Android/android-ndk-r15c 
-$ANDROID_NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-linux-androideabi-gcc test.c 
-编译果然报错,找不到头文件
+<span class="token keyword">export</span> $ANDROID_NDK<span class="token operator">=</span><span class="token operator">/</span>home<span class="token operator">/</span>longjing<span class="token operator">/</span>tools<span class="token operator">/</span>Android<span class="token operator">/</span>android<span class="token operator">-</span>ndk<span class="token operator">-</span>r15c 
+$ANDROID_NDK<span class="token operator">/</span>toolchains<span class="token operator">/</span>arm<span class="token operator">-</span>linux<span class="token operator">-</span>androideabi<span class="token number">-4.9</span><span class="token operator">/</span>prebuilt<span class="token operator">/</span>linux<span class="token operator">-</span>x86_64<span class="token operator">/</span>bin<span class="token operator">/</span>arm<span class="token operator">-</span>linux<span class="token operator">-</span>androideabi<span class="token operator">-</span>gcc test<span class="token punctuation">.</span>c 
+编译果然报错<span class="token punctuation">,</span>找不到头文件
 
-../test.c:16:19: fatal error: stdio.h: No such file or directory 
-#include 
-^ 
-compilation terminated. 
-既然是测试文件,那干脆就去掉include语句,再删除printf语句,重新编译看下结果
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token operator">/</span>test<span class="token punctuation">.</span>c<span class="token operator">:</span><span class="token number">16</span><span class="token operator">:</span><span class="token number">19</span><span class="token operator">:</span> fatal error<span class="token operator">:</span> stdio<span class="token punctuation">.</span>h<span class="token operator">:</span> No such file <span class="token operator">or</span> directory 
+<span class="token macro property">#<span class="token directive keyword">include</span> </span>
+<span class="token operator">^</span> 
+compilation terminated<span class="token punctuation">.</span> 
+既然是测试文件<span class="token punctuation">,</span>那干脆就去掉include语句<span class="token punctuation">,</span>再删除printf语句<span class="token punctuation">,</span>重新编译看下结果
 
-//#include 
-int main() { 
-//printf("Hello world."); 
-return 0; 
-} 
+<span class="token comment" spellcheck="true">//#include </span>
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> 
+<span class="token comment" spellcheck="true">//printf("Hello world."); </span>
+<span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span> 
+<span class="token punctuation">}</span> 
 这下就告诉你obj文件找不到了
 
-/home/longjing/tools/Android/android-ndk-r15c/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/../lib/gcc/arm-linux-androideabi/4.9.x/../../../../arm-linux-androideabi/bin/ld: error: cannot open crtbegin_dynamic.o: No such file or directory 
-/home/longjing/tools/Android/android-ndk-r15c/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/../lib/gcc/arm-linux-androideabi/4.9.x/../../../../arm-linux-androideabi/bin/ld: error: cannot open crtend_android.o: No such file or directory 
-/home/longjing/tools/Android/android-ndk-r15c/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/../lib/gcc/arm-linux-androideabi/4.9.x/../../../../arm-linux-androideabi/bin/ld: error: cannot find -lc 
-/home/longjing/tools/Android/android-ndk-r15c/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/../lib/gcc/arm-linux-androideabi/4.9.x/../../../../arm-linux-androideabi/bin/ld: error: cannot find -ldl 
-collect2: error: ld returned 1 exit status 
-使用find命令在ndk目录下搜索下crtend_android.o文件
+<span class="token operator">/</span>home<span class="token operator">/</span>longjing<span class="token operator">/</span>tools<span class="token operator">/</span>Android<span class="token operator">/</span>android<span class="token operator">-</span>ndk<span class="token operator">-</span>r15c<span class="token operator">/</span>toolchains<span class="token operator">/</span>arm<span class="token operator">-</span>linux<span class="token operator">-</span>androideabi<span class="token number">-4.9</span><span class="token operator">/</span>prebuilt<span class="token operator">/</span>linux<span class="token operator">-</span>x86_64<span class="token operator">/</span>bin<span class="token operator">/</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token operator">/</span>lib<span class="token operator">/</span>gcc<span class="token operator">/</span>arm<span class="token operator">-</span>linux<span class="token operator">-</span>androideabi<span class="token operator">/</span><span class="token number">4.9</span><span class="token punctuation">.</span>x<span class="token operator">/</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token operator">/</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token operator">/</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token operator">/</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token operator">/</span>arm<span class="token operator">-</span>linux<span class="token operator">-</span>androideabi<span class="token operator">/</span>bin<span class="token operator">/</span>ld<span class="token operator">:</span> error<span class="token operator">:</span> cannot open crtbegin_dynamic<span class="token punctuation">.</span>o<span class="token operator">:</span> No such file <span class="token operator">or</span> directory 
+<span class="token operator">/</span>home<span class="token operator">/</span>longjing<span class="token operator">/</span>tools<span class="token operator">/</span>Android<span class="token operator">/</span>android<span class="token operator">-</span>ndk<span class="token operator">-</span>r15c<span class="token operator">/</span>toolchains<span class="token operator">/</span>arm<span class="token operator">-</span>linux<span class="token operator">-</span>androideabi<span class="token number">-4.9</span><span class="token operator">/</span>prebuilt<span class="token operator">/</span>linux<span class="token operator">-</span>x86_64<span class="token operator">/</span>bin<span class="token operator">/</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token operator">/</span>lib<span class="token operator">/</span>gcc<span class="token operator">/</span>arm<span class="token operator">-</span>linux<span class="token operator">-</span>androideabi<span class="token operator">/</span><span class="token number">4.9</span><span class="token punctuation">.</span>x<span class="token operator">/</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token operator">/</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token operator">/</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token operator">/</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token operator">/</span>arm<span class="token operator">-</span>linux<span class="token operator">-</span>androideabi<span class="token operator">/</span>bin<span class="token operator">/</span>ld<span class="token operator">:</span> error<span class="token operator">:</span> cannot open crtend_android<span class="token punctuation">.</span>o<span class="token operator">:</span> No such file <span class="token operator">or</span> directory 
+<span class="token operator">/</span>home<span class="token operator">/</span>longjing<span class="token operator">/</span>tools<span class="token operator">/</span>Android<span class="token operator">/</span>android<span class="token operator">-</span>ndk<span class="token operator">-</span>r15c<span class="token operator">/</span>toolchains<span class="token operator">/</span>arm<span class="token operator">-</span>linux<span class="token operator">-</span>androideabi<span class="token number">-4.9</span><span class="token operator">/</span>prebuilt<span class="token operator">/</span>linux<span class="token operator">-</span>x86_64<span class="token operator">/</span>bin<span class="token operator">/</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token operator">/</span>lib<span class="token operator">/</span>gcc<span class="token operator">/</span>arm<span class="token operator">-</span>linux<span class="token operator">-</span>androideabi<span class="token operator">/</span><span class="token number">4.9</span><span class="token punctuation">.</span>x<span class="token operator">/</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token operator">/</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token operator">/</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token operator">/</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token operator">/</span>arm<span class="token operator">-</span>linux<span class="token operator">-</span>androideabi<span class="token operator">/</span>bin<span class="token operator">/</span>ld<span class="token operator">:</span> error<span class="token operator">:</span> cannot find <span class="token operator">-</span>lc 
+<span class="token operator">/</span>home<span class="token operator">/</span>longjing<span class="token operator">/</span>tools<span class="token operator">/</span>Android<span class="token operator">/</span>android<span class="token operator">-</span>ndk<span class="token operator">-</span>r15c<span class="token operator">/</span>toolchains<span class="token operator">/</span>arm<span class="token operator">-</span>linux<span class="token operator">-</span>androideabi<span class="token number">-4.9</span><span class="token operator">/</span>prebuilt<span class="token operator">/</span>linux<span class="token operator">-</span>x86_64<span class="token operator">/</span>bin<span class="token operator">/</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token operator">/</span>lib<span class="token operator">/</span>gcc<span class="token operator">/</span>arm<span class="token operator">-</span>linux<span class="token operator">-</span>androideabi<span class="token operator">/</span><span class="token number">4.9</span><span class="token punctuation">.</span>x<span class="token operator">/</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token operator">/</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token operator">/</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token operator">/</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token operator">/</span>arm<span class="token operator">-</span>linux<span class="token operator">-</span>androideabi<span class="token operator">/</span>bin<span class="token operator">/</span>ld<span class="token operator">:</span> error<span class="token operator">:</span> cannot find <span class="token operator">-</span>ldl 
+collect2<span class="token operator">:</span> error<span class="token operator">:</span> ld returned <span class="token number">1</span> exit status 
+使用find命令在ndk目录下搜索下crtend_android<span class="token punctuation">.</span>o文件
 
-cd /home/longjing/tools/Android/android-ndk-r15c 
-find . -iname crtend_android.o
+cd <span class="token operator">/</span>home<span class="token operator">/</span>longjing<span class="token operator">/</span>tools<span class="token operator">/</span>Android<span class="token operator">/</span>android<span class="token operator">-</span>ndk<span class="token operator">-</span>r15c 
+find <span class="token punctuation">.</span> <span class="token operator">-</span>iname crtend_android<span class="token punctuation">.</span>o
 </code></pre>
-<p><img src="/uploads/Transmision 交叉编译/c canot create.jpg" alt="结果显示"></p>
-<pre><code>可以看到,obj文件都是存在的。那么怎么解决呢?既然找不到,那就给你个路径
-$ANDROID_NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-linux-androideabi-gcc test.c --sysroot=$ANDROID_NDK/platforms/android-9/arch-arm 
-最后重新编译,错误消失了。
-</code></pre><p><img src="/uploads/Transmision 交叉编译/test编译成功.png" alt="结果显示"></p>
-<pre><code>通过上面的脚本文件可以知道，我们的编译成功之后存放的目录为/thin/arm/ 目录下，如果这个目录就会存放编译产生的文件，其中lib目录如果有下面的俩个红色的就代表成功了，
-至于这里这么多是因为没有再次的编译了，这是全部编译成功产生的文件
-</code></pre><p><img src="/uploads/Transmision 交叉编译/openssl编译结果.png" alt="结果显示"></p>
+<p><img src="/uploads/Transmision 交叉编译/c canot create.jpg" alt></p>
+<p>可以看到,obj文件都是存在的。那么怎么解决呢?既然找不到,那就给你个路径<br>$ANDROID_NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-linux-androideabi-gcc test.c –sysroot=$ANDROID_NDK/platforms/android-9/arch-arm<br>最后重新编译,错误消失了。</p>
+<p><img src="/uploads/Transmision 交叉编译/test编译成功.png" alt></p>
+<p>通过上面的脚本文件可以知道，我们的编译成功之后存放的目录为/thin/arm/ 目录下，如果这个目录就会存放编译产生的文件，其中lib目录如果有下面的俩个红色的就代表成功了，<br>至于这里这么多是因为没有再次的编译了，这是全部编译成功产生的文件</p>
+<p><img src="/uploads/Transmision 交叉编译/openssl编译结果.png" alt></p>
 <h4 id="编译libevent"><a href="#编译libevent" class="headerlink" title="编译libevent"></a>编译libevent</h4><p>下面是编译的脚本文件</p>
 <pre class=" language-bash"><code class="language-bash">LIBEVENT_SOURCE<span class="token operator">=</span><span class="token string">"libevent-2.1.8-stable"</span>
 FAT<span class="token operator">=</span><span class="token string">"TS-Android"</span>
@@ -670,12 +666,12 @@ build_libevent<span class="token punctuation">(</span><span class="token punctua
 <span class="token punctuation">}</span>
 </code></pre>
 <p>这里要注意的，这里一定要使用ndkr11以下的版本，要不然会出现找不到arc4random_addrandom 之类的错误，这主要是因为ndkr11以上，有对这个函数最修改 下面分别在对应的r10e ，r14b中查询这个函数</p>
-<p>r10e 查询的结果为：<br><img src="/uploads/Transmision 交叉编译/arc4andomR10查询结果.png" alt="结果显示"></p>
-<p>r14b中查询的结果为：<br><img src="/uploads/Transmision 交叉编译/arc4r14b查询结果.png" alt="结果显示"></p>
+<p>r10e 查询的结果为：<br><img src="/uploads/Transmision 交叉编译/arc4andomR10查询结果.png" alt></p>
+<p>r14b中查询的结果为：<br><img src="/uploads/Transmision 交叉编译/arc4r14b查询结果.png" alt></p>
 <p>可以看到俩者是有区别的，更加详细的信息可以查询<br>arc4random_addrandom的改动 <a href="https://github.com/android-ndk/ndk/issues/48" target="_blank" rel="noopener">https://github.com/android-ndk/ndk/issues/48</a></p>
 <p>所以这里要使用ndkr11以下的版本来编译，要不然会编译不过</p>
 <p>通过上面的脚本文件可以知道，我们的编译成功之后存放的目录为/thin/arm/ 目录下，如果这个目录就会存放编译产生的文件，其中lib目录如果有下面的俩个红色的就代表成功了，<br>至于这里这么多是因为没有再次的编译了，这是全部编译成功产生的文件</p>
-<p><img src="/uploads/Transmision 交叉编译/libevent编译结果.png" alt="结果显示"></p>
+<p><img src="/uploads/Transmision 交叉编译/libevent编译结果.png" alt></p>
 <h4 id="编译curl"><a href="#编译curl" class="headerlink" title="编译curl"></a>编译curl</h4><p>下面是编译的脚本文件</p>
 <pre class=" language-bash"><code class="language-bash">CURL_SOURCE<span class="token operator">=</span><span class="token string">"curl-7.60.0"</span>
 FAT<span class="token operator">=</span><span class="token string">"TS-Android"</span>
@@ -727,8 +723,8 @@ build_Curl<span class="token punctuation">(</span><span class="token punctuation
 <span class="token keyword">exit</span> 1
 </code></pre>
 <p>通过上面的脚本文件可以知道，我们的编译成功之后存放的目录为/thin/arm/ 目录下，如果这个目录就会存放编译产生的文件，其中lib目录如果有下面的俩个红色的就代表成功了，<br>至于这里这么多是因为没有再次的编译了，这是全部编译成功产生的文件</p>
-<p><img src="/uploads/Transmision 交叉编译/curl编译结果.png" alt="结果显示"></p>
-<p>最终这三个库编译出来的内容为<br><img src="/uploads/Transmision 交叉编译/外部依赖库编译结果.png" alt="结果显示"></p>
+<p><img src="/uploads/Transmision 交叉编译/curl编译结果.png" alt></p>
+<p>最终这三个库编译出来的内容为<br><img src="/uploads/Transmision 交叉编译/外部依赖库编译结果.png" alt></p>
 <h4 id="编译-transmission2-9-4"><a href="#编译-transmission2-9-4" class="headerlink" title="编译 transmission2.9.4"></a>编译 transmission2.9.4</h4><p>下面是编译的脚本文件</p>
 <pre class=" language-bash"><code class="language-bash">SOURCE<span class="token operator">=</span><span class="token string">"transmission-2.94"</span>
 FAT<span class="token operator">=</span><span class="token string">"TS-Android"</span>
@@ -835,256 +831,256 @@ NEED_RECONFIGURE<span class="token operator">=</span>yes
 </code></pre>
 <p>在上面的脚本中有这样的一句 export CFLAGS=”$CFLAGS -Din_addr_t=uint32_t  -D<strong>android</strong>  -Din_port_t=uint16_t”，后面的-Din_addr_t=uint32_t  -D<strong>android</strong>  -Din_port_t=uint16_t<br>的意思是给in_addr_t ,in_port_t 赋值，定义<strong>android</strong> 这样的宏，可以看出来，我们要对应的修改代码，原本也是transimssion的官网介绍默认是不支持android的，也即是android的编译要自己做一些<br>修改，</p>
 <h3 id="源码对应的修改内容"><a href="#源码对应的修改内容" class="headerlink" title="源码对应的修改内容"></a>源码对应的修改内容</h3><h4 id="miniwget-c文件"><a href="#miniwget-c文件" class="headerlink" title="miniwget.c文件"></a>miniwget.c文件</h4><p>third-party\miniupnp\miniwget.c文件 修改的内容为：</p>
-<pre class=" language-C++"><code class="language-C++">#if defined(__sun) || defined(sun) || defined(__android__)
-#define MIN(x,y) (((x)<(y))?(x):(y))
-#endif
+<pre class=" language-cpp"><code class="language-cpp"><span class="token macro property">#<span class="token directive keyword">if</span> defined(__sun) || defined(sun) || defined(__android__)</span>
+<span class="token macro property">#<span class="token directive keyword">define</span> MIN(x,y) (((x)&lt;(y))?(x):(y))</span>
+<span class="token macro property">#<span class="token directive keyword">endif</span></span>
 </code></pre>
 <h4 id="variant-c"><a href="#variant-c" class="headerlink" title="variant.c"></a>variant.c</h4><p>libtransmission目录下的variant.c 修改的内容为：</p>
-<pre class=" language-C++"><code class="language-C++">#ifndef __android__
-#include <locale.h> /* setlocale() */
-#endif
+<pre class=" language-cpp"><code class="language-cpp"><span class="token macro property">#<span class="token directive keyword">ifndef</span> __android__</span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;locale.h></span> </span><span class="token comment" spellcheck="true">/* setlocale() */</span>
+<span class="token macro property">#<span class="token directive keyword">endif</span></span>
 
-static void
-use_numeric_locale (struct locale_context * context,
-                    const char            * locale_name)
-{
-#ifdef HAVE_USELOCALE
+<span class="token keyword">static</span> <span class="token keyword">void</span>
+<span class="token function">use_numeric_locale</span> <span class="token punctuation">(</span><span class="token keyword">struct</span> locale_context <span class="token operator">*</span> context<span class="token punctuation">,</span>
+                    <span class="token keyword">const</span> <span class="token keyword">char</span>            <span class="token operator">*</span> locale_name<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+<span class="token macro property">#<span class="token directive keyword">ifdef</span> HAVE_USELOCALE</span>
 
-  context->new_locale = newlocale (LC_NUMERIC_MASK, locale_name, NULL);
-  context->old_locale = uselocale (context->new_locale);
+  context<span class="token operator">-</span><span class="token operator">></span>new_locale <span class="token operator">=</span> <span class="token function">newlocale</span> <span class="token punctuation">(</span>LC_NUMERIC_MASK<span class="token punctuation">,</span> locale_name<span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  context<span class="token operator">-</span><span class="token operator">></span>old_locale <span class="token operator">=</span> <span class="token function">uselocale</span> <span class="token punctuation">(</span>context<span class="token operator">-</span><span class="token operator">></span>new_locale<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-#else
+<span class="token macro property">#<span class="token directive keyword">else</span></span>
 
-#if defined (HAVE__CONFIGTHREADLOCALE) && defined (_ENABLE_PER_THREAD_LOCALE)
-  context->old_thread_config = _configthreadlocale (_ENABLE_PER_THREAD_LOCALE);
-#endif
+<span class="token macro property">#<span class="token directive keyword">if</span> defined (HAVE__CONFIGTHREADLOCALE) &amp;&amp; defined (_ENABLE_PER_THREAD_LOCALE)</span>
+  context<span class="token operator">-</span><span class="token operator">></span>old_thread_config <span class="token operator">=</span> <span class="token function">_configthreadlocale</span> <span class="token punctuation">(</span>_ENABLE_PER_THREAD_LOCALE<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token macro property">#<span class="token directive keyword">endif</span></span>
 
-#ifndef __android__
-  context->category = LC_NUMERIC;
-#endif
+<span class="token macro property">#<span class="token directive keyword">ifndef</span> __android__</span>
+  context<span class="token operator">-</span><span class="token operator">></span>category <span class="token operator">=</span> LC_NUMERIC<span class="token punctuation">;</span>
+<span class="token macro property">#<span class="token directive keyword">endif</span></span>
 
-  tr_strlcpy (context->old_locale, setlocale (context->category, NULL), sizeof (context->old_locale));
-  setlocale (context->category, locale_name);
+  <span class="token function">tr_strlcpy</span> <span class="token punctuation">(</span>context<span class="token operator">-</span><span class="token operator">></span>old_locale<span class="token punctuation">,</span> <span class="token function">setlocale</span> <span class="token punctuation">(</span>context<span class="token operator">-</span><span class="token operator">></span>category<span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token keyword">sizeof</span> <span class="token punctuation">(</span>context<span class="token operator">-</span><span class="token operator">></span>old_locale<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">setlocale</span> <span class="token punctuation">(</span>context<span class="token operator">-</span><span class="token operator">></span>category<span class="token punctuation">,</span> locale_name<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-#endif
-}
+<span class="token macro property">#<span class="token directive keyword">endif</span></span>
+<span class="token punctuation">}</span>
 
-bool
-tr_variantGetReal (const tr_variant * v, double * setme)
-{
-  bool success = false;
+<span class="token keyword">bool</span>
+<span class="token function">tr_variantGetReal</span> <span class="token punctuation">(</span><span class="token keyword">const</span> tr_variant <span class="token operator">*</span> v<span class="token punctuation">,</span> <span class="token keyword">double</span> <span class="token operator">*</span> setme<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token keyword">bool</span> success <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
 
-  if (!success && ((success = tr_variantIsReal (v))))
-    *setme = v->val.d;
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>success <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>success <span class="token operator">=</span> <span class="token function">tr_variantIsReal</span> <span class="token punctuation">(</span>v<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token operator">*</span>setme <span class="token operator">=</span> v<span class="token operator">-</span><span class="token operator">></span>val<span class="token punctuation">.</span>d<span class="token punctuation">;</span>
 
-  if (!success && ((success = tr_variantIsInt (v))))
-    *setme = v->val.i;
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>success <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>success <span class="token operator">=</span> <span class="token function">tr_variantIsInt</span> <span class="token punctuation">(</span>v<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token operator">*</span>setme <span class="token operator">=</span> v<span class="token operator">-</span><span class="token operator">></span>val<span class="token punctuation">.</span>i<span class="token punctuation">;</span>
 
-  if (!success && tr_variantIsString (v))
-    {
-      char * endptr;
-#ifndef __android__
-      struct locale_context locale_ctx;
-#endif
-      //struct locale_context locale_ctx;
-      double d;
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>success <span class="token operator">&amp;&amp;</span> <span class="token function">tr_variantIsString</span> <span class="token punctuation">(</span>v<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+      <span class="token keyword">char</span> <span class="token operator">*</span> endptr<span class="token punctuation">;</span>
+<span class="token macro property">#<span class="token directive keyword">ifndef</span> __android__</span>
+      <span class="token keyword">struct</span> locale_context locale_ctx<span class="token punctuation">;</span>
+<span class="token macro property">#<span class="token directive keyword">endif</span></span>
+      <span class="token comment" spellcheck="true">//struct locale_context locale_ctx;</span>
+      <span class="token keyword">double</span> d<span class="token punctuation">;</span>
 
-      /* the json spec requires a '.' decimal point regardless of locale */
-#ifndef __android__
-      use_numeric_locale (&locale_ctx, "C");
-#endif
-      //use_numeric_locale (&locale_ctx, "C");
+      <span class="token comment" spellcheck="true">/* the json spec requires a '.' decimal point regardless of locale */</span>
+<span class="token macro property">#<span class="token directive keyword">ifndef</span> __android__</span>
+      <span class="token function">use_numeric_locale</span> <span class="token punctuation">(</span><span class="token operator">&amp;</span>locale_ctx<span class="token punctuation">,</span> <span class="token string">"C"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token macro property">#<span class="token directive keyword">endif</span></span>
+      <span class="token comment" spellcheck="true">//use_numeric_locale (&amp;locale_ctx, "C");</span>
 
-      d  = strtod (getStr (v), &endptr);
-      //restore_locale (&locale_ctx);
-#ifndef __android__
-      restore_locale (&locale_ctx);
-#endif
+      d  <span class="token operator">=</span> <span class="token function">strtod</span> <span class="token punctuation">(</span><span class="token function">getStr</span> <span class="token punctuation">(</span>v<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>endptr<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token comment" spellcheck="true">//restore_locale (&amp;locale_ctx);</span>
+<span class="token macro property">#<span class="token directive keyword">ifndef</span> __android__</span>
+      <span class="token function">restore_locale</span> <span class="token punctuation">(</span><span class="token operator">&amp;</span>locale_ctx<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token macro property">#<span class="token directive keyword">endif</span></span>
 
-      if ((success = (getStr (v) != endptr) && !*endptr))
-        *setme = d;
-    }
-  return success;
-}
+      <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>success <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token function">getStr</span> <span class="token punctuation">(</span>v<span class="token punctuation">)</span> <span class="token operator">!=</span> endptr<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span><span class="token operator">*</span>endptr<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token operator">*</span>setme <span class="token operator">=</span> d<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token keyword">return</span> success<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-struct evbuffer *
-tr_variantToBuf (const tr_variant * v, tr_variant_fmt fmt)
-{
-#ifndef __android__
-  struct locale_context locale_ctx;
-#endif
+<span class="token keyword">struct</span> evbuffer <span class="token operator">*</span>
+<span class="token function">tr_variantToBuf</span> <span class="token punctuation">(</span><span class="token keyword">const</span> tr_variant <span class="token operator">*</span> v<span class="token punctuation">,</span> tr_variant_fmt fmt<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+<span class="token macro property">#<span class="token directive keyword">ifndef</span> __android__</span>
+  <span class="token keyword">struct</span> locale_context locale_ctx<span class="token punctuation">;</span>
+<span class="token macro property">#<span class="token directive keyword">endif</span></span>
 
-  //struct locale_context locale_ctx;
-  struct evbuffer * buf = evbuffer_new();
+  <span class="token comment" spellcheck="true">//struct locale_context locale_ctx;</span>
+  <span class="token keyword">struct</span> evbuffer <span class="token operator">*</span> buf <span class="token operator">=</span> <span class="token function">evbuffer_new</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-  //use_numeric_locale (&locale_ctx, "C");
-#ifndef __android__
-  /* parse with LC_NUMERIC="C" to ensure a "." decimal separator */
-  use_numeric_locale (&locale_ctx, "C");
-#endif
+  <span class="token comment" spellcheck="true">//use_numeric_locale (&amp;locale_ctx, "C");</span>
+<span class="token macro property">#<span class="token directive keyword">ifndef</span> __android__</span>
+  <span class="token comment" spellcheck="true">/* parse with LC_NUMERIC="C" to ensure a "." decimal separator */</span>
+  <span class="token function">use_numeric_locale</span> <span class="token punctuation">(</span><span class="token operator">&amp;</span>locale_ctx<span class="token punctuation">,</span> <span class="token string">"C"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token macro property">#<span class="token directive keyword">endif</span></span>
 
-  evbuffer_expand (buf, 4096); /* alloc a little memory to start off with */
+  <span class="token function">evbuffer_expand</span> <span class="token punctuation">(</span>buf<span class="token punctuation">,</span> <span class="token number">4096</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">/* alloc a little memory to start off with */</span>
 
-  switch (fmt)
-    {
-      case TR_VARIANT_FMT_BENC:
-        tr_variantToBufBenc (v, buf);
-        break;
+  <span class="token keyword">switch</span> <span class="token punctuation">(</span>fmt<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+      <span class="token keyword">case</span> TR_VARIANT_FMT_BENC<span class="token operator">:</span>
+        <span class="token function">tr_variantToBufBenc</span> <span class="token punctuation">(</span>v<span class="token punctuation">,</span> buf<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">break</span><span class="token punctuation">;</span>
 
-      case TR_VARIANT_FMT_JSON:
-        tr_variantToBufJson (v, buf, false);
-        break;
+      <span class="token keyword">case</span> TR_VARIANT_FMT_JSON<span class="token operator">:</span>
+        <span class="token function">tr_variantToBufJson</span> <span class="token punctuation">(</span>v<span class="token punctuation">,</span> buf<span class="token punctuation">,</span> <span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">break</span><span class="token punctuation">;</span>
 
-      case TR_VARIANT_FMT_JSON_LEAN:
-        tr_variantToBufJson (v, buf, true);
-        break;
-    }
+      <span class="token keyword">case</span> TR_VARIANT_FMT_JSON_LEAN<span class="token operator">:</span>
+        <span class="token function">tr_variantToBufJson</span> <span class="token punctuation">(</span>v<span class="token punctuation">,</span> buf<span class="token punctuation">,</span> <span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">break</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-  //restore_locale (&locale_ctx);
-#ifndef __android__
-  /* restore the previous locale */
-  restore_locale (&locale_ctx);
-#endif
-  return buf;
-}
+  <span class="token comment" spellcheck="true">//restore_locale (&amp;locale_ctx);</span>
+<span class="token macro property">#<span class="token directive keyword">ifndef</span> __android__</span>
+  <span class="token comment" spellcheck="true">/* restore the previous locale */</span>
+  <span class="token function">restore_locale</span> <span class="token punctuation">(</span><span class="token operator">&amp;</span>locale_ctx<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token macro property">#<span class="token directive keyword">endif</span></span>
+  <span class="token keyword">return</span> buf<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-int
-tr_variantFromBuf (tr_variant      * setme,
-                   tr_variant_fmt    fmt,
-                   const void      * buf,
-                   size_t            buflen,
-                   const char      * optional_source,
-                   const char     ** setme_end)
-{
-  int err;
-  struct locale_context locale_ctx;
+<span class="token keyword">int</span>
+<span class="token function">tr_variantFromBuf</span> <span class="token punctuation">(</span>tr_variant      <span class="token operator">*</span> setme<span class="token punctuation">,</span>
+                   tr_variant_fmt    fmt<span class="token punctuation">,</span>
+                   <span class="token keyword">const</span> <span class="token keyword">void</span>      <span class="token operator">*</span> buf<span class="token punctuation">,</span>
+                   size_t            buflen<span class="token punctuation">,</span>
+                   <span class="token keyword">const</span> <span class="token keyword">char</span>      <span class="token operator">*</span> optional_source<span class="token punctuation">,</span>
+                   <span class="token keyword">const</span> <span class="token keyword">char</span>     <span class="token operator">*</span><span class="token operator">*</span> setme_end<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token keyword">int</span> err<span class="token punctuation">;</span>
+  <span class="token keyword">struct</span> locale_context locale_ctx<span class="token punctuation">;</span>
 
-  //use_numeric_locale (&locale_ctx, "C");
-#ifndef __android__
-  /* parse with LC_NUMERIC="C" to ensure a "." decimal separator */
-  use_numeric_locale (&locale_ctx, "C");
-#endif
+  <span class="token comment" spellcheck="true">//use_numeric_locale (&amp;locale_ctx, "C");</span>
+<span class="token macro property">#<span class="token directive keyword">ifndef</span> __android__</span>
+  <span class="token comment" spellcheck="true">/* parse with LC_NUMERIC="C" to ensure a "." decimal separator */</span>
+  <span class="token function">use_numeric_locale</span> <span class="token punctuation">(</span><span class="token operator">&amp;</span>locale_ctx<span class="token punctuation">,</span> <span class="token string">"C"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token macro property">#<span class="token directive keyword">endif</span></span>
 
-  switch (fmt)
-    {
-      case TR_VARIANT_FMT_JSON:
-      case TR_VARIANT_FMT_JSON_LEAN:
-        err = tr_jsonParse (optional_source, buf, buflen, setme, setme_end);
-        break;
+  <span class="token keyword">switch</span> <span class="token punctuation">(</span>fmt<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+      <span class="token keyword">case</span> TR_VARIANT_FMT_JSON<span class="token operator">:</span>
+      <span class="token keyword">case</span> TR_VARIANT_FMT_JSON_LEAN<span class="token operator">:</span>
+        err <span class="token operator">=</span> <span class="token function">tr_jsonParse</span> <span class="token punctuation">(</span>optional_source<span class="token punctuation">,</span> buf<span class="token punctuation">,</span> buflen<span class="token punctuation">,</span> setme<span class="token punctuation">,</span> setme_end<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">break</span><span class="token punctuation">;</span>
 
-      default /* TR_VARIANT_FMT_BENC */:
-        err = tr_variantParseBenc (buf, ((const char*)buf)+buflen, setme, setme_end);
-        break;
-    }
+      <span class="token keyword">default</span> <span class="token comment" spellcheck="true">/* TR_VARIANT_FMT_BENC */</span><span class="token operator">:</span>
+        err <span class="token operator">=</span> <span class="token function">tr_variantParseBenc</span> <span class="token punctuation">(</span>buf<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">char</span><span class="token operator">*</span><span class="token punctuation">)</span>buf<span class="token punctuation">)</span><span class="token operator">+</span>buflen<span class="token punctuation">,</span> setme<span class="token punctuation">,</span> setme_end<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">break</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-  //restore_locale (&locale_ctx);
-  /* restore the previous locale */
-#ifndef __android__
-  restore_locale (&locale_ctx);
-#endif
-  return err;
-}
+  <span class="token comment" spellcheck="true">//restore_locale (&amp;locale_ctx);</span>
+  <span class="token comment" spellcheck="true">/* restore the previous locale */</span>
+<span class="token macro property">#<span class="token directive keyword">ifndef</span> __android__</span>
+  <span class="token function">restore_locale</span> <span class="token punctuation">(</span><span class="token operator">&amp;</span>locale_ctx<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token macro property">#<span class="token directive keyword">endif</span></span>
+  <span class="token keyword">return</span> err<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h4 id="platform-quote-c"><a href="#platform-quote-c" class="headerlink" title="platform-quote.c"></a>platform-quote.c</h4><p>transmission源码中的libtransmission目录下的platform-quote.c 修改的内容为：</p>
-<pre class=" language-C++"><code class="language-C++">#elif defined (__sun)
-  #include <sys/fs/ufs_quota.h> /* quotactl */
- #elif defined (__android__)
-  #include <linux/quota.h>
- #else
-  #include <sys/quota.h> /* quotactl() */
- #endif
+<pre class=" language-cpp"><code class="language-cpp"><span class="token macro property">#<span class="token directive keyword">elif</span> defined (__sun)</span>
+  <span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;sys/fs/ufs_quota.h></span> </span><span class="token comment" spellcheck="true">/* quotactl */</span>
+ <span class="token macro property">#<span class="token directive keyword">elif</span> defined (__android__)</span>
+  <span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;linux/quota.h></span></span>
+ <span class="token macro property">#<span class="token directive keyword">else</span></span>
+  <span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;sys/quota.h></span> </span><span class="token comment" spellcheck="true">/* quotactl() */</span>
+ <span class="token macro property">#<span class="token directive keyword">endif</span></span>
 
 
- /* disabel quota on android */
-#ifndef __android__
-#ifndef _WIN32
-static const char *
-getdev (const char * path)
-{
+ <span class="token comment" spellcheck="true">/* disabel quota on android */</span>
+<span class="token macro property">#<span class="token directive keyword">ifndef</span> __android__</span>
+<span class="token macro property">#<span class="token directive keyword">ifndef</span> _WIN32</span>
+<span class="token keyword">static</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>
+<span class="token function">getdev</span> <span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span> path<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
 
-#endif /* disabel quota on android */
+<span class="token macro property">#<span class="token directive keyword">endif</span> </span><span class="token comment" spellcheck="true">/* disabel quota on android */</span>
 
-static int64_t
-tr_getDiskFreeSpace (const char * path)
-{
+<span class="token keyword">static</span> int64_t
+<span class="token function">tr_getDiskFreeSpace</span> <span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span> path<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
 
 
-struct tr_device_info *
-tr_device_info_create (const char * path)
-{
-  struct tr_device_info * info;
+<span class="token keyword">struct</span> tr_device_info <span class="token operator">*</span>
+<span class="token function">tr_device_info_create</span> <span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span> path<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token keyword">struct</span> tr_device_info <span class="token operator">*</span> info<span class="token punctuation">;</span>
 
-  info = tr_new0 (struct tr_device_info, 1);
-  info->path = tr_strdup (path);
-#ifndef _WIN32
-#ifndef __android__
-  info->device = tr_strdup (getblkdev (path));
-  info->fstype = tr_strdup (getfstype (path));
-#endif
-#endif
+  info <span class="token operator">=</span> <span class="token function">tr_new0</span> <span class="token punctuation">(</span><span class="token keyword">struct</span> tr_device_info<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  info<span class="token operator">-</span><span class="token operator">></span>path <span class="token operator">=</span> <span class="token function">tr_strdup</span> <span class="token punctuation">(</span>path<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token macro property">#<span class="token directive keyword">ifndef</span> _WIN32</span>
+<span class="token macro property">#<span class="token directive keyword">ifndef</span> __android__</span>
+  info<span class="token operator">-</span><span class="token operator">></span>device <span class="token operator">=</span> <span class="token function">tr_strdup</span> <span class="token punctuation">(</span><span class="token function">getblkdev</span> <span class="token punctuation">(</span>path<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  info<span class="token operator">-</span><span class="token operator">></span>fstype <span class="token operator">=</span> <span class="token function">tr_strdup</span> <span class="token punctuation">(</span><span class="token function">getfstype</span> <span class="token punctuation">(</span>path<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token macro property">#<span class="token directive keyword">endif</span></span>
+<span class="token macro property">#<span class="token directive keyword">endif</span></span>
 
-  return info;
-}
+  <span class="token keyword">return</span> info<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
 int64_t
-tr_device_info_get_free_space (const struct tr_device_info * info)
-{
-  int64_t free_space;
+<span class="token function">tr_device_info_get_free_space</span> <span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">struct</span> tr_device_info <span class="token operator">*</span> info<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  int64_t free_space<span class="token punctuation">;</span>
 
-  if ((info == NULL) || (info->path == NULL))
-    {
-      errno = EINVAL;
-      free_space = -1;
-    }
-  else
-    {
-#ifndef __android__
-      free_space = tr_getQuotaFreeSpace (info);
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>info <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token operator">||</span> <span class="token punctuation">(</span>info<span class="token operator">-</span><span class="token operator">></span>path <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+      errno <span class="token operator">=</span> EINVAL<span class="token punctuation">;</span>
+      free_space <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token keyword">else</span>
+    <span class="token punctuation">{</span>
+<span class="token macro property">#<span class="token directive keyword">ifndef</span> __android__</span>
+      free_space <span class="token operator">=</span> <span class="token function">tr_getQuotaFreeSpace</span> <span class="token punctuation">(</span>info<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-      if (free_space < 0)
-#endif
-        free_space = tr_getDiskFreeSpace (info->path);
-    }
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>free_space <span class="token operator">&lt;</span> <span class="token number">0</span><span class="token punctuation">)</span>
+<span class="token macro property">#<span class="token directive keyword">endif</span></span>
+        free_space <span class="token operator">=</span> <span class="token function">tr_getDiskFreeSpace</span> <span class="token punctuation">(</span>info<span class="token operator">-</span><span class="token operator">></span>path<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-  return free_space;
-}
+  <span class="token keyword">return</span> free_space<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h4 id="util-c"><a href="#util-c" class="headerlink" title="util.c"></a>util.c</h4><p>libtransmission目录下的util.c 修改的内容为：</p>
-<pre class=" language-C++"><code class="language-C++">double
-tr_truncd (double x, int precision)
-{
-  char * pt;
-  char buf[128];
-  const int max_precision = (int) log10 (1.0 / DBL_EPSILON) - 1;
-  tr_snprintf (buf, sizeof (buf), "%.*f", max_precision, x);
-#ifndef __android__ // android doesn't support lconv ?
-  if ((pt = strstr (buf, localeconv ()->decimal_point)))
-    pt[precision ? precision+1 : 0] = '\0';
-#endif
-  return atof (buf);
-}
+<pre class=" language-cpp"><code class="language-cpp"><span class="token keyword">double</span>
+<span class="token function">tr_truncd</span> <span class="token punctuation">(</span><span class="token keyword">double</span> x<span class="token punctuation">,</span> <span class="token keyword">int</span> precision<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token keyword">char</span> <span class="token operator">*</span> pt<span class="token punctuation">;</span>
+  <span class="token keyword">char</span> buf<span class="token punctuation">[</span><span class="token number">128</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+  <span class="token keyword">const</span> <span class="token keyword">int</span> max_precision <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">int</span><span class="token punctuation">)</span> <span class="token function">log10</span> <span class="token punctuation">(</span><span class="token number">1.0</span> <span class="token operator">/</span> DBL_EPSILON<span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">;</span>
+  <span class="token function">tr_snprintf</span> <span class="token punctuation">(</span>buf<span class="token punctuation">,</span> <span class="token keyword">sizeof</span> <span class="token punctuation">(</span>buf<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">"%.*f"</span><span class="token punctuation">,</span> max_precision<span class="token punctuation">,</span> x<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token macro property">#<span class="token directive keyword">ifndef</span> __android__ </span><span class="token comment" spellcheck="true">// android doesn't support lconv ?</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>pt <span class="token operator">=</span> <span class="token function">strstr</span> <span class="token punctuation">(</span>buf<span class="token punctuation">,</span> <span class="token function">localeconv</span> <span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span>decimal_point<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    pt<span class="token punctuation">[</span>precision <span class="token operator">?</span> precision<span class="token operator">+</span><span class="token number">1</span> <span class="token operator">:</span> <span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">'\0'</span><span class="token punctuation">;</span>
+<span class="token macro property">#<span class="token directive keyword">endif</span></span>
+  <span class="token keyword">return</span> <span class="token function">atof</span> <span class="token punctuation">(</span>buf<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h4 id="util-h"><a href="#util-h" class="headerlink" title="util.h"></a>util.h</h4><p>libtransmission目录下的util.h 修改的内容为：</p>
-<pre class=" language-C++"><code class="language-C++">/** @brief Private libtransmission function to update tr_time ()'s counter */
-static inline void tr_timeUpdate (time_t now) { __tr_current_time = now; }
+<pre class=" language-cpp"><code class="language-cpp"><span class="token comment" spellcheck="true">/** @brief Private libtransmission function to update tr_time ()'s counter */</span>
+<span class="token keyword">static</span> <span class="token keyword">inline</span> <span class="token keyword">void</span> <span class="token function">tr_timeUpdate</span> <span class="token punctuation">(</span>time_t now<span class="token punctuation">)</span> <span class="token punctuation">{</span> __tr_current_time <span class="token operator">=</span> now<span class="token punctuation">;</span> <span class="token punctuation">}</span>
 
-#ifdef WIN32
- #include <windef.h> /* MAX_PATH */
- #define TR_PATH_MAX (MAX_PATH + 1)
-#else
- #include <limits.h> /* PATH_MAX */
- #ifdef PATH_MAX
-  #define TR_PATH_MAX PATH_MAX
- #else
-  #define TR_PATH_MAX 4096
- #endif
-#endif
+<span class="token macro property">#<span class="token directive keyword">ifdef</span> WIN32</span>
+ <span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;windef.h></span> </span><span class="token comment" spellcheck="true">/* MAX_PATH */</span>
+ <span class="token macro property">#<span class="token directive keyword">define</span> TR_PATH_MAX (MAX_PATH + 1)</span>
+<span class="token macro property">#<span class="token directive keyword">else</span></span>
+ <span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;limits.h></span> </span><span class="token comment" spellcheck="true">/* PATH_MAX */</span>
+ <span class="token macro property">#<span class="token directive keyword">ifdef</span> PATH_MAX</span>
+  <span class="token macro property">#<span class="token directive keyword">define</span> TR_PATH_MAX PATH_MAX</span>
+ <span class="token macro property">#<span class="token directive keyword">else</span></span>
+  <span class="token macro property">#<span class="token directive keyword">define</span> TR_PATH_MAX 4096</span>
+ <span class="token macro property">#<span class="token directive keyword">endif</span></span>
+<span class="token macro property">#<span class="token directive keyword">endif</span></span>
 
-/** @brief Portability wrapper for htonll () that uses the system implementation if available */
-uint64_t tr_htonll (uint64_t);
+<span class="token comment" spellcheck="true">/** @brief Portability wrapper for htonll () that uses the system implementation if available */</span>
+uint64_t <span class="token function">tr_htonll</span> <span class="token punctuation">(</span>uint64_t<span class="token punctuation">)</span><span class="token punctuation">;</span>
 </code></pre>
 <p>这些内容修改完之后，就可以执行脚本的执行了，如果正常执行的没有错误的化，会生成下面的文件 因为脚本指定了 –prefix=$THIN/$ARCH 所以会在/thin/arm/目录下生成对应的内容</p>
-<p><img src="/uploads/Transmision 交叉编译/transmission编译结果.png" alt="结果显示"></p>
+<p><img src="/uploads/Transmision 交叉编译/transmission编译结果.png" alt></p>
 <h3 id="交叉编译总结"><a href="#交叉编译总结" class="headerlink" title="交叉编译总结"></a>交叉编译总结</h3><blockquote>
 <p>至此Transmission交叉编译成功,我们为什么要先在ubuntu下面交叉编译，是为了后面移植到android studio 编译做准备，接下来会介绍怎么在Android Studio 中采用CmakeList直接编译源码<br>弄成一个可以调试的NDK项目,这样对于我们的开发能做到事半功倍的效果</p>
 </blockquote>
@@ -1615,9 +1611,7 @@ uint64_t tr_htonll (uint64_t);
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概述
-Transmission Android CmakeList编译过程
-
+                            
                         
                     </div>
                     <div class="publish-info">
@@ -1674,9 +1668,7 @@ Transmission Android CmakeList编译过程
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概述
-Opus Visual Studio配置
-
+                            
                         
                     </div>
                     <div class="publish-info">

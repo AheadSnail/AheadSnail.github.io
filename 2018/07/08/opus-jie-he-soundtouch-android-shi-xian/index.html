@@ -501,11 +501,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><blockquote>
-<p>Opus结合SoundTouch Android实现</p>
-</blockquote>
-<a id="more"></a>
-<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><blockquote>
+                <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><blockquote>
 <p>前面一篇文章介绍到SoundTouch可以做到变声的效果，大致的效果是可以做到变速，变音调，还可以结合使用，官网也有提供Android版本的实现，也即是上一篇文章中介绍到的<br>下载下来的源码目录里面有一个Android-lib的目录，甚至连NDK的Android.mk文件都写好了，是一个可以在Eclipse直接运行的<br>SoundTouch的优缺点:<br>优点是:<br>SoundTouch是一个很小的开源库，源码文件很少，是纯c++写法<br>缺点是:<br>SoundTouch 提供的变音效果不够多，最起码是比QQ的效果少<br>SoundTouch只能操作Wav文件，不能操作其他格式的文件</p>
 </blockquote>
 <h3 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h3><blockquote>
@@ -629,134 +625,134 @@ JNIEXPORT jint JNICALL <span class="token function">Java_example_com_opussoundto
 </code></pre>
 <p>对应这里private native final int processFile(long handle, short [] inputData,int inputLength, short [] outputData,int outputMaxLength); 为什么处理之后的返回的数据是一个short 类型的,原因是AudioTracker 处理float类型的数据有Api的限制，所以这里返回的结果为short类型</p>
 <p>下面是文件的结构图</p>
-<p><img src="/uploads/SoundTouchopus/文件目录结构图.png" alt="结果显示"></p>
+<p><img src="/uploads/SoundTouchopus/文件目录结构图.png" alt></p>
 <p>下面是对应的Android.mk文件编写</p>
-<pre class=" language-Makefile"><code class="language-Makefile">LOCAL_PATH := $(call my-dir)
+<pre class=" language-makefile"><code class="language-makefile">LOCAL_PATH <span class="token operator">:=</span> <span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">call</span> my-dir<span class="token punctuation">)</span>
 
-$(warning ${LOCAL_PATH})
+<span class="token variable">$</span><span class="token punctuation">(</span><span class="token keyword">warning</span> <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span><span class="token punctuation">)</span>
 
-include $(CLEAR_VARS)
-LOCAL_MODULE    := FLAc
-LOCAL_SRC_FILES := ${LOCAL_PATH}/Opus/lib/libFLAC.a
-include $(PREBUILT_STATIC_LIBRARY)
+<span class="token keyword">include</span> <span class="token variable">$</span><span class="token punctuation">(</span>CLEAR_VARS<span class="token punctuation">)</span>
+LOCAL_MODULE    <span class="token operator">:=</span> FLAc
+LOCAL_SRC_FILES <span class="token operator">:=</span> <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/Opus/lib/libFLAC.a
+<span class="token keyword">include</span> <span class="token variable">$</span><span class="token punctuation">(</span>PREBUILT_STATIC_LIBRARY<span class="token punctuation">)</span>
 
-include $(CLEAR_VARS)
-LOCAL_MODULE    := Ogg
-LOCAL_SRC_FILES := ${LOCAL_PATH}/Opus/lib/libogg.a
-include $(PREBUILT_STATIC_LIBRARY)
-
-
-include $(CLEAR_VARS)
-LOCAL_MODULE    := Opus
-LOCAL_SRC_FILES := ${LOCAL_PATH}/Opus/lib/libopus.a
-include $(PREBUILT_STATIC_LIBRARY)
+<span class="token keyword">include</span> <span class="token variable">$</span><span class="token punctuation">(</span>CLEAR_VARS<span class="token punctuation">)</span>
+LOCAL_MODULE    <span class="token operator">:=</span> Ogg
+LOCAL_SRC_FILES <span class="token operator">:=</span> <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/Opus/lib/libogg.a
+<span class="token keyword">include</span> <span class="token variable">$</span><span class="token punctuation">(</span>PREBUILT_STATIC_LIBRARY<span class="token punctuation">)</span>
 
 
-include $(CLEAR_VARS)
-LOCAL_CPPFLAGS := -Wall -std=c++11 -DANDROID -D__SOFTFP__ -frtti -DHAVE_PTHREAD -DSOUNDTOUCH_DISABLE_X86_OPTIMIZATIONS -finline-functions -ffast-math -O2 -fexceptions
-LOCAL_C_INCLUDES = ${LOCAL_PATH}/SoundTouch/include
-LOCAL_MODULE    := soundtouch
-
-LOCAL_SRC_FILES := \
-            ${LOCAL_PATH}/SoundTouch/src/AAFilter.cpp \
-            ${LOCAL_PATH}/SoundTouch/src/FIFOSampleBuffer.cpp \
-            ${LOCAL_PATH}/SoundTouch/src/FIRFilter.cpp \
-            ${LOCAL_PATH}/SoundTouch/src/cpu_detect_x86.cpp \
-            ${LOCAL_PATH}/SoundTouch/src/sse_optimized.cpp \
-            ${LOCAL_PATH}/SoundTouch/src/RateTransposer.cpp \
-            ${LOCAL_PATH}/SoundTouch/src/SoundTouch.cpp \
-            ${LOCAL_PATH}/SoundTouch/src/InterpolateCubic.cpp \
-            ${LOCAL_PATH}/SoundTouch/src/InterpolateLinear.cpp \
-            ${LOCAL_PATH}/SoundTouch/src/InterpolateShannon.cpp \
-            ${LOCAL_PATH}/SoundTouch/src/TDStretch.cpp \
-            ${LOCAL_PATH}/SoundTouch/src/BPMDetect.cpp  \
-            ${LOCAL_PATH}/SoundTouch/src/PeakFinder.cpp
-
-include $(BUILD_STATIC_LIBRARY)
-
-#此变量指向的构建脚本用于取消定义下面“开发者定义的变量”一节中列出的几乎全部 LOCAL_XXX 变量。（模块之前使用这个，会清除LOCAL的系统变量） 在描述新模块之前
-include $(CLEAR_VARS)
-
-LOCAL_MODULE        := opusSoundTouch
-
-#这是要编译的源代码文件列表。 只要列出要传递给编译器的文件
-LOCAL_SRC_FILES     := \
-        ${LOCAL_PATH}/Opus/opustools/src/opus_header.c \
-        ${LOCAL_PATH}/Opus/opustools/src/picture.c \
-        ${LOCAL_PATH}/Opus/opustools/src/resample.c \
-        ${LOCAL_PATH}/Opus/opustools/src/audio-in.c \
-        ${LOCAL_PATH}/Opus/opustools/src/diag_range.c \
-        ${LOCAL_PATH}/Opus/opustools/src/flac.c \
-        ${LOCAL_PATH}/Opus/opustools/src/lpc.c \
-        ${LOCAL_PATH}/Opus/opustools/win32/unicode_support.c \
-        ${LOCAL_PATH}/Opus/opustools/src/wav_io.c \
-        ${LOCAL_PATH}/Opus/opustools/src/opusinfo.c \
-        ${LOCAL_PATH}/Opus/opustools/src/info_opus.c \
-        ${LOCAL_PATH}/mydecoder.c \
-        ${LOCAL_PATH}/myencode.c \
-        ${LOCAL_PATH}/soundtouch-jni.cpp
+<span class="token keyword">include</span> <span class="token variable">$</span><span class="token punctuation">(</span>CLEAR_VARS<span class="token punctuation">)</span>
+LOCAL_MODULE    <span class="token operator">:=</span> Opus
+LOCAL_SRC_FILES <span class="token operator">:=</span> <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/Opus/lib/libopus.a
+<span class="token keyword">include</span> <span class="token variable">$</span><span class="token punctuation">(</span>PREBUILT_STATIC_LIBRARY<span class="token punctuation">)</span>
 
 
-LOCAL_C_INCLUDES := \
-                    ${LOCAL_PATH}/Opus/include \
-                    ${LOCAL_PATH}/Opus/include/opus \
-                    ${LOCAL_PATH}/Opus/opustools/include \
-                    ${LOCAL_PATH}/Opus/opustools/src \
-                    ${LOCAL_PATH}/SoundTouch/include
+<span class="token keyword">include</span> <span class="token variable">$</span><span class="token punctuation">(</span>CLEAR_VARS<span class="token punctuation">)</span>
+LOCAL_CPPFLAGS <span class="token operator">:=</span> -Wall -std<span class="token operator">=</span>c++11 -DANDROID -D__SOFTFP__ -frtti -DHAVE_PTHREAD -DSOUNDTOUCH_DISABLE_X86_OPTIMIZATIONS -finline-functions -ffast-math -O2 -fexceptions
+LOCAL_C_INCLUDES <span class="token operator">=</span> <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/SoundTouch/<span class="token keyword">include</span>
+LOCAL_MODULE    <span class="token operator">:=</span> soundtouch
 
-LOCAL_CFLAGS     := -w -std=c11 -Os -fno-strict-aliasing -fprefetch-loop-arrays
-LOCAL_CFLAGS     += -DHAVE_CONFIG_H -DOPUSTOOLS -DSPX_RESAMPLE_EXPORT= -DRANDOM_PREFIX=opustools -DOUTSIDE_SPEEX -DFLOATING_POINT -fno-math-errno -DANDROID -D__SOFTFP__
+LOCAL_SRC_FILES <span class="token operator">:=</span> \
+            <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/SoundTouch/src/AAFilter.cpp \
+            <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/SoundTouch/src/FIFOSampleBuffer.cpp \
+            <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/SoundTouch/src/FIRFilter.cpp \
+            <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/SoundTouch/src/cpu_detect_x86.cpp \
+            <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/SoundTouch/src/sse_optimized.cpp \
+            <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/SoundTouch/src/RateTransposer.cpp \
+            <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/SoundTouch/src/SoundTouch.cpp \
+            <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/SoundTouch/src/InterpolateCubic.cpp \
+            <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/SoundTouch/src/InterpolateLinear.cpp \
+            <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/SoundTouch/src/InterpolateShannon.cpp \
+            <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/SoundTouch/src/TDStretch.cpp \
+            <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/SoundTouch/src/BPMDetect.cpp  \
+            <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/SoundTouch/src/PeakFinder.cpp
 
-LOCAL_CPPFLAGS     := -DBSD=1 -ffast-math -Os -funroll-loops -std=c++11
-LOCAL_CPPFLAGS  += -DHAVE_CONFIG_H -DOPUSTOOLS -DSPX_RESAMPLE_EXPORT= -DRANDOM_PREFIX=opustools -DOUTSIDE_SPEEX -DFLOATING_POINT -DANDROID -D__SOFTFP__
+<span class="token keyword">include</span> <span class="token variable">$</span><span class="token punctuation">(</span>BUILD_STATIC_LIBRARY<span class="token punctuation">)</span>
 
-LOCAL_LDLIBS     := -llog
+<span class="token comment" spellcheck="true">#此变量指向的构建脚本用于取消定义下面“开发者定义的变量”一节中列出的几乎全部 LOCAL_XXX 变量。（模块之前使用这个，会清除LOCAL的系统变量） 在描述新模块之前</span>
+<span class="token keyword">include</span> <span class="token variable">$</span><span class="token punctuation">(</span>CLEAR_VARS<span class="token punctuation">)</span>
 
-LOCAL_STATIC_LIBRARIES := FLAc Ogg Opus soundtouch
+LOCAL_MODULE        <span class="token operator">:=</span> opusSoundTouch
 
-include $(BUILD_SHARED_LIBRARY)
+<span class="token comment" spellcheck="true">#这是要编译的源代码文件列表。 只要列出要传递给编译器的文件</span>
+LOCAL_SRC_FILES     <span class="token operator">:=</span> \
+        <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/Opus/opustools/src/opus_header.c \
+        <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/Opus/opustools/src/picture.c \
+        <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/Opus/opustools/src/resample.c \
+        <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/Opus/opustools/src/audio-in.c \
+        <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/Opus/opustools/src/diag_range.c \
+        <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/Opus/opustools/src/flac.c \
+        <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/Opus/opustools/src/lpc.c \
+        <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/Opus/opustools/win32/unicode_support.c \
+        <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/Opus/opustools/src/wav_io.c \
+        <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/Opus/opustools/src/opusinfo.c \
+        <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/Opus/opustools/src/info_opus.c \
+        <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/mydecoder.c \
+        <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/myencode.c \
+        <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/soundtouch-jni.cpp
+
+
+LOCAL_C_INCLUDES <span class="token operator">:=</span> \
+                    <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/Opus/<span class="token keyword">include</span> \
+                    <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/Opus/<span class="token keyword">include</span>/opus \
+                    <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/Opus/opustools/<span class="token keyword">include</span> \
+                    <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/Opus/opustools/src \
+                    <span class="token variable">$</span><span class="token punctuation">{</span>LOCAL_PATH<span class="token punctuation">}</span>/SoundTouch/<span class="token keyword">include</span>
+
+LOCAL_CFLAGS     <span class="token operator">:=</span> -w -std<span class="token operator">=</span>c11 -Os -fno-strict-aliasing -fprefetch-loop-arrays
+LOCAL_CFLAGS     <span class="token operator">+=</span> -DHAVE_CONFIG_H -DOPUSTOOLS -DSPX_RESAMPLE_EXPORT<span class="token operator">=</span> -DRANDOM_PREFIX<span class="token operator">=</span>opustools -DOUTSIDE_SPEEX -DFLOATING_POINT -fno-math-errno -DANDROID -D__SOFTFP__
+
+LOCAL_CPPFLAGS     <span class="token operator">:=</span> -DBSD<span class="token operator">=</span>1 -ffast-math -Os -funroll-loops -std<span class="token operator">=</span>c++11
+LOCAL_CPPFLAGS  <span class="token operator">+=</span> -DHAVE_CONFIG_H -DOPUSTOOLS -DSPX_RESAMPLE_EXPORT<span class="token operator">=</span> -DRANDOM_PREFIX<span class="token operator">=</span>opustools -DOUTSIDE_SPEEX -DFLOATING_POINT -DANDROID -D__SOFTFP__
+
+LOCAL_LDLIBS     <span class="token operator">:=</span> -llog
+
+LOCAL_STATIC_LIBRARIES <span class="token operator">:=</span> FLAc Ogg Opus soundtouch
+
+<span class="token keyword">include</span> <span class="token variable">$</span><span class="token punctuation">(</span>BUILD_SHARED_LIBRARY<span class="token punctuation">)</span>
 </code></pre>
 <p>上面的MakeFile文件中要注意的一个点</p>
-<pre class=" language-C++"><code class="language-C++">这里要注意的一个是-DANDROID -D__SOFTFP__ 这个涉及到了SoundTouch 决定SAMPLETYPE 类型，在STTypes.h中有这样代码
-#if (defined(__SOFTFP__) && defined(ANDROID))
-        // For Android compilation: Force use of Integer samples in case that
-        // compilation uses soft-floating point emulation - soft-fp is way too slow
-        #undef  SOUNDTOUCH_FLOAT_SAMPLES
-        #define SOUNDTOUCH_INTEGER_SAMPLES      1
-#endif
+<pre class=" language-cpp"><code class="language-cpp">这里要注意的一个是<span class="token operator">-</span>DANDROID <span class="token operator">-</span>D__SOFTFP__ 这个涉及到了SoundTouch 决定SAMPLETYPE 类型，在STTypes<span class="token punctuation">.</span>h中有这样代码
+<span class="token macro property">#<span class="token directive keyword">if</span> (defined(__SOFTFP__) &amp;&amp; defined(ANDROID))</span>
+        <span class="token comment" spellcheck="true">// For Android compilation: Force use of Integer samples in case that</span>
+        <span class="token comment" spellcheck="true">// compilation uses soft-floating point emulation - soft-fp is way too slow</span>
+        <span class="token macro property">#<span class="token directive keyword">undef</span>  SOUNDTOUCH_FLOAT_SAMPLES</span>
+        <span class="token macro property">#<span class="token directive keyword">define</span> SOUNDTOUCH_INTEGER_SAMPLES      1</span>
+<span class="token macro property">#<span class="token directive keyword">endif</span></span>
 
-#ifdef SOUNDTOUCH_INTEGER_SAMPLES
-    // 16bit integer sample type
-    typedef short SAMPLETYPE;
-    // data type for sample accumulation: Use 32bit integer to prevent overflows
-    typedef long  LONG_SAMPLETYPE;
+<span class="token macro property">#<span class="token directive keyword">ifdef</span> SOUNDTOUCH_INTEGER_SAMPLES</span>
+    <span class="token comment" spellcheck="true">// 16bit integer sample type</span>
+    <span class="token keyword">typedef</span> <span class="token keyword">short</span> SAMPLETYPE<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">// data type for sample accumulation: Use 32bit integer to prevent overflows</span>
+    <span class="token keyword">typedef</span> <span class="token keyword">long</span>  LONG_SAMPLETYPE<span class="token punctuation">;</span>
 
-    #ifdef SOUNDTOUCH_FLOAT_SAMPLES
-    // check that only one sample type is defined
-    #error "conflicting sample types defined"
-    #endif // SOUNDTOUCH_FLOAT_SAMPLES
+    <span class="token macro property">#<span class="token directive keyword">ifdef</span> SOUNDTOUCH_FLOAT_SAMPLES</span>
+    <span class="token comment" spellcheck="true">// check that only one sample type is defined</span>
+    <span class="token macro property">#<span class="token directive keyword">error</span> "conflicting sample types defined"</span>
+    <span class="token macro property">#<span class="token directive keyword">endif</span> </span><span class="token comment" spellcheck="true">// SOUNDTOUCH_FLOAT_SAMPLES</span>
 
-    #ifdef SOUNDTOUCH_ALLOW_X86_OPTIMIZATIONS
-         / Allow MMX optimizations (not available in X64 mode)
-        #if (!_M_X64)
-            #define SOUNDTOUCH_ALLOW_MMX   1
-        #endif
-    #endif
-#else
+    <span class="token macro property">#<span class="token directive keyword">ifdef</span> SOUNDTOUCH_ALLOW_X86_OPTIMIZATIONS</span>
+         <span class="token operator">/</span> Allow MMX <span class="token function">optimizations</span> <span class="token punctuation">(</span><span class="token operator">not</span> available in X64 mode<span class="token punctuation">)</span>
+        <span class="token macro property">#<span class="token directive keyword">if</span> (!_M_X64)</span>
+            <span class="token macro property">#<span class="token directive keyword">define</span> SOUNDTOUCH_ALLOW_MMX   1</span>
+        <span class="token macro property">#<span class="token directive keyword">endif</span></span>
+    <span class="token macro property">#<span class="token directive keyword">endif</span></span>
+<span class="token macro property">#<span class="token directive keyword">else</span></span>
 </code></pre>
 <p>因为前面介绍SoundTouch native接口说到，要使用short 类型的 ，所以这里的SAMPLETYPE 类型也要为short，所以要加上这个宏的定义</p>
 <p>Application.mk 文件的编写：</p>
-<pre class=" language-Makefile"><code class="language-Makefile">APP_PLATFORM := android-14
-APP_ABI := armeabi-v7a
-NDK_TOOLCHAIN_VERSION := 4.9
-APP_STL := gnustl_static
+<pre class=" language-makefile"><code class="language-makefile">APP_PLATFORM <span class="token operator">:=</span> android-14
+APP_ABI <span class="token operator">:=</span> armeabi-v7a
+NDK_TOOLCHAIN_VERSION <span class="token operator">:=</span> 4.9
+APP_STL <span class="token operator">:=</span> gnustl_static
 
-#APP_OPTIM 将此可选变量定义为 release 或 debug。在构建应用的模块时可使用它来更改优化级别。
-#APP_CFLAGS 此变量用于存储构建系统在为任何模块编译任何 C 或 C++ 源代码时传递到编译器的一组 C 编译器标志 也即是全局的
-#APP_LDFLAGS 此变量包含构建系统在仅构建 C++ 源文件时传递到编译器的一组 C++ 编译器标志 也即是全局的
-#APP_PLATFORM  此变量包含目标 Android 平台的名称。例如，android-3 指定 Android 1.5 系统映像
-#APP_STL  默认情况下，NDK 构建系统为 Android 系统提供的最小 C++ 运行时库 (system/lib/libstdc++.so) 提供 C++ 标头
-#NDK_TOOLCHAIN_VERSION 将此变量定义为 4.9 或 4.8 以选择 GCC 编译器的版本。 64 位 ABI 默认使用版本 4.9 ，32 位 ABI 默认使用版本 4.8
+<span class="token comment" spellcheck="true">#APP_OPTIM 将此可选变量定义为 release 或 debug。在构建应用的模块时可使用它来更改优化级别。</span>
+<span class="token comment" spellcheck="true">#APP_CFLAGS 此变量用于存储构建系统在为任何模块编译任何 C 或 C++ 源代码时传递到编译器的一组 C 编译器标志 也即是全局的</span>
+<span class="token comment" spellcheck="true">#APP_LDFLAGS 此变量包含构建系统在仅构建 C++ 源文件时传递到编译器的一组 C++ 编译器标志 也即是全局的</span>
+<span class="token comment" spellcheck="true">#APP_PLATFORM  此变量包含目标 Android 平台的名称。例如，android-3 指定 Android 1.5 系统映像</span>
+<span class="token comment" spellcheck="true">#APP_STL  默认情况下，NDK 构建系统为 Android 系统提供的最小 C++ 运行时库 (system/lib/libstdc++.so) 提供 C++ 标头</span>
+<span class="token comment" spellcheck="true">#NDK_TOOLCHAIN_VERSION 将此变量定义为 4.9 或 4.8 以选择 GCC 编译器的版本。 64 位 ABI 默认使用版本 4.9 ，32 位 ABI 默认使用版本 4.8</span>
 </code></pre>
 <p>修改app目录下的build.gradle文件</p>
 <pre class=" language-gradle"><code class="language-gradle">defaultConfig{
@@ -779,9 +775,9 @@ externalNativeBuild {
 }
 </code></pre>
 <p>执行编译产生的结果：</p>
-<p><img src="/uploads/SoundTouchopus/OpusSoundTouch编译之后内容.png" alt="结果显示"></p>
+<p><img src="/uploads/SoundTouchopus/OpusSoundTouch编译之后内容.png" alt></p>
 <p>录音部分跟之前的Opus一样，这里主要讲下播放部分,下面是界面的展示</p>
-<p><img src="/uploads/SoundTouchopus/界面视图.png" alt="结果显示"></p>
+<p><img src="/uploads/SoundTouchopus/界面视图.png" alt></p>
 <p>我们可以在播放的时候，设置好，音调跟音速 然后点击播放按钮</p>
 <pre class=" language-java"><code class="language-java">
 File sdCard <span class="token operator">=</span> Environment<span class="token punctuation">.</span><span class="token function">getExternalStorageDirectory</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -1534,9 +1530,7 @@ OpusDecoder 解码部分的实现：
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概述
-Lame库编译 以及最新版NDK改动
-
+                            
                         
                     </div>
                     <div class="publish-info">

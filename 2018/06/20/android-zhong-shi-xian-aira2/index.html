@@ -497,15 +497,13 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><blockquote>
-<p>Android 中利用Aria2 完成一个P2P的下载神器</p>
-</blockquote>
-<a id="more"></a>
-<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>上一篇文章中，介绍了怎么将Aria2库移植到了AndroidStudio中，而且使用了最新的编译方式CmakeList的方式接入，在接下来的一个月实现Android p2p下载的时候，发现使用CmakeList来编译真的<br>很重要，因为他可以使你断点调试代码。。如果不能调试的化。。那么这个工作的进程就会大打折扣，甚至有可能误解，现在请允许我来吹一下目前的实现成果</p>
+                <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>上一篇文章中，介绍了怎么将Aria2库移植到了AndroidStudio中，而且使用了最新的编译方式CmakeList的方式接入，在接下来的一个月实现Android p2p下载的时候，发现使用CmakeList来编译真的<br>很重要，因为他可以使你断点调试代码。。如果不能调试的化。。那么这个工作的进程就会大打折扣，甚至有可能误解，现在请允许我来吹一下目前的实现成果</p>
+<blockquote>
 <p>1.首先我们是用使用Aria2库实现的，所以对于他的优点我们肯定是有的，他的优点有aria2是一款用于下载文件的工具。 支持的协议是HTTP（S），FTP，SFTP，BitTorrent和Metalink。<br>aria2可以从多种来源/协议下载文件，并尝试利用您的最大下载带宽。它支持从HTTP（S）/ FTP / SFTP和BitTorrent同时下载文件，而从HTTP（S）/ FTP / SFTP下载的数据则上传到BitTorrent群。<br>使用Metalink块校验和，aria2在下载文件时自动验证数据块。网络上关于他的各种优点也是有很多。。不太懂的可以自行百度<br>2.支持并发下载，支持断点下载<br>2.当下载磁力链接或者本地的种子文件，Metalink文件的时候，支持选择文件下载,做到想下什么就下什么文件<br>3.下载的过程中支持暂停，恢复，删除操作</p>
-<h3 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h3><p>支持并发下下载<br><img src="/uploads/Arir2Android实现/Aria并发下载.jpg" alt="结果显示"></p>
-<p>支持选择文件下载<br><img src="/uploads/Arir2Android实现/Aria2支持选择文件.jpg" alt="结果显示"></p>
-<p>支持断点下载，甚至可以做到当你出现异常的情况导致退出，下次进来也可以断点下载<br><img src="/uploads/Arir2Android实现/Aria2支持断点下载.jpg" alt="结果显示"></p>
+</blockquote>
+<h3 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h3><p>支持并发下下载<br><img src="/uploads/Arir2Android实现/Aria并发下载.jpg" alt></p>
+<p>支持选择文件下载<br><img src="/uploads/Arir2Android实现/Aria2支持选择文件.jpg" alt></p>
+<p>支持断点下载，甚至可以做到当你出现异常的情况导致退出，下次进来也可以断点下载<br><img src="/uploads/Arir2Android实现/Aria2支持断点下载.jpg" alt></p>
 <h3 id="JNI接口"><a href="#JNI接口" class="headerlink" title="JNI接口"></a>JNI接口</h3><pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">/**
  * Project Name: Aria2AndroidProject
  * File Name:    AriaApi.java
@@ -817,305 +815,305 @@
     <span class="token punctuation">}</span>
 <span class="token punctuation">}</span>
 </code></pre>
-<h3 id="JNI函数的编写"><a href="#JNI函数的编写" class="headerlink" title="JNI函数的编写"></a>JNI函数的编写</h3><pre class=" language-C++"><code class="language-C++">由于下载涉及到了一些耗时的操作，所以我们会在JNI中创建一个子线程来执行这些内容
-//2创建子线程,用于下载，检测等,创建成功之后，就会执行run的回调
-if (pthread_create(&pthread_tid, NULL, run, NULL)) {
-    //创建失败
-    pthread_detach(pthread_tid);
-    rev = 1;
-    return rev;
-}
-return rev;
+<h3 id="JNI函数的编写"><a href="#JNI函数的编写" class="headerlink" title="JNI函数的编写"></a>JNI函数的编写</h3><pre class=" language-cpp"><code class="language-cpp">由于下载涉及到了一些耗时的操作，所以我们会在JNI中创建一个子线程来执行这些内容
+<span class="token comment" spellcheck="true">//2创建子线程,用于下载，检测等,创建成功之后，就会执行run的回调</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">pthread_create</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>pthread_tid<span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">,</span> run<span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//创建失败</span>
+    <span class="token function">pthread_detach</span><span class="token punctuation">(</span>pthread_tid<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    rev <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> rev<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">return</span> rev<span class="token punctuation">;</span>
 
-//全局的配置选项
-static aria2::KeyVals gloableOptions;
+<span class="token comment" spellcheck="true">//全局的配置选项</span>
+<span class="token keyword">static</span> aria2<span class="token operator">::</span>KeyVals gloableOptions<span class="token punctuation">;</span>
 
-/**
+<span class="token comment" spellcheck="true">/**
  * 线程执行的方法回调
  * @param pVoid
  * @return
- */
-void *run(void *pVoid) {
-    //创建默认的config对象 构造函数填充所有成员的默认值。
-    aria2::SessionConfig config;
-    //添加下载的监听回调
-    config.downloadEventCallback = downloadEventCallback;
-    //如果keepRunning成员为true，则即使没有要执行的下载，运行（会话，RUN_ONCE）也会返回1 ，也即是下面的这个调用 int rv = aria2::run(session, aria2::RUN_ONCE);也会返回1
-    config.keepRunning = true;
+ */</span>
+<span class="token keyword">void</span> <span class="token operator">*</span><span class="token function">run</span><span class="token punctuation">(</span><span class="token keyword">void</span> <span class="token operator">*</span>pVoid<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//创建默认的config对象 构造函数填充所有成员的默认值。</span>
+    aria2<span class="token operator">::</span>SessionConfig config<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//添加下载的监听回调</span>
+    config<span class="token punctuation">.</span>downloadEventCallback <span class="token operator">=</span> downloadEventCallback<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//如果keepRunning成员为true，则即使没有要执行的下载，运行（会话，RUN_ONCE）也会返回1 ，也即是下面的这个调用 int rv = aria2::run(session, aria2::RUN_ONCE);也会返回1</span>
+    config<span class="token punctuation">.</span>keepRunning <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
 
-    //指定Aria2日志输出的文件,这个可选择，这里选择是为了方便开发得到信息
-    gloableOptions.push_back(std::pair<std::string, std::string> ("log", c_Aria2LogPath));
-    // 指定日志的级别 "--log-level=debug";
-    gloableOptions.push_back(std::pair<std::string, std::string> ("log-level", "debug"));
-    //gloableOptions中可以添加很多的参数选项，有关参数的详细，可以查看官网
-    ....
-    //使用这些选项创建新的Session对象作为附加参数。 这些选项被视为在命令行中指定给aria2c传递的命令行。 如果成功，该函数返回指向创建的Session对象的指针，或返回NULL。
-    //请注意，每个进程只能创建一个Session对象。
-    globalSession = aria2::sessionNew(gloableOptions, config);
-    if(globalSession == NULL){
-        LOGD("Create session error direct exit");
-        pthread_exit(NULL);
-    }
-    auto start = std::chrono::steady_clock::now();
-    for(;;){
-        //执行事件轮询和操作, 如果|模式|是 ：c：macro：`RUN_DEFAULT`，这个函数在没有下载时返回 留下来处理。 在这种情况下，这个函数返回0。
-        //如果|模式| 是：c：macro：`RUN_ONCE`，这个函数返回之后  在当前的实现中，事件轮询1秒内超时。如果函数返回0则代表出现了异常.否则，返回1，表示该 调用者必须调用此函数一次或多次完成下载。
-        //只有执行了aria2::shoutdow();函数这个返回值才会为1，所以会退出无限循环
-        int rv = aria2::run(globalSession, aria2::RUN_ONCE);
-        if (rv != 1) {
-            LOGD("aria2 thread_run exit");
-            break;
-        }
-        auto now = std::chrono::steady_clock::now();
-        auto count = std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count();
-        //如果任务队列不为空，执行任务，所以这个任务可以是下载，暂停，恢复等,并发的
-        while (!jobQueue.empty()) {
-            std::unique_ptr<Job> job = jobQueue.pop();
-            int ret = job->execute(globalSession);
-            //得到错误的信息
-            if(ret != 0){
-                std::string errorInfo = job->getErrorInfo();
-                ShowToastCallbackForAndroid(errorInfo);
-            }else{
-                //执行任务成功之后的
-                job->executeSuccess();
-            }
-        }
-        //每隔500毫秒更新一次界面
-        if (count >= 500) {
-            start = now;
-            //获取到全局的下载统计
-            aria2::GlobalStat gstat = aria2::getGlobalStat(globalSession);
-            //回调通知总体的下载状况
-            downLoadTotalInfoCallBack(gstat);
-            //获取到全局的正在下载的数量
-            std::vector<aria2::A2Gid> gids = aria2::getActiveDownload(globalSession);
-            //用来存储所有的下载的状态集合
-            std::vector<DownloadStatus> v;
-            for (auto gid : gids) {
-                //获取到每一个正在下载任务的详细对象，获取到里面的信息
-                aria2::DownloadHandle* dh = aria2::getDownloadHandle(globalSession, gid);
-                //任务不为空，获取到里面的信息
-                if (dh) {
-                    //封装一个下载的任务结构体对象
-                    DownloadStatus st;
-                    st.gid = gid;
-                    //以字节为单位返回此下载的总长度。
-                    st.totalLength = dh->getTotalLength();
-                    //以字节为单位返回此下载的完整长度。
-                    st.completedLength = dh->getCompletedLength();
-                    //返回此下载的下载速度，单位为字节/秒。
-                    st.downloadSpeed = dh->getDownloadSpeed();
-                    //返回此下载的上传速度，单位为字节/秒。
-                    st.uploadSpeed = dh->getUploadSpeed();
-                    //赋值followGid
-                    aria2::A2Gid followGid = dh->getFollowing();
-                    if(!aria2::isNull(followGid)){
-                        //LOGD("followGid %s",aria2::gidToHex(followGid).c_str());// 磁力链接下载会先下载元数据，再继续下载，所以存在一个followGid
-                        st.followGid = followGid;
-                    }
-                    //获取到当前的连接数
-                    st.numbersConnection = dh->getConnections();
-                    //获取到当前可用的种子数
-                    st.usefulSeedNumbers = aria2::getFindUsefulSeedNumbers(globalSession,gid);
-                    //保存下载的目录保存的地方
-                    st.dir = dh->getDir();
-                    int numbers = dh->getNumFiles();
-                    //获取用户选择的文件
-                    int selectCount = 0;
-                        for (int i = 1; i <= numbers; i++) {
-                            aria2::FileData file = dh->getFile(i);
-                            if (file.selected) {
-                                selectCount++;
-                            }
-                    }
-                    //当前下载所包含的文件数量
-                    st.fileNumbsers = selectCount;
-                    //返回文件数，及是当前下载的地址里面包含有多少个文件要下载
-                    if (dh->getNumFiles() > 0) {
-                        aria2::FileData file = dh->getFile(1);
-                        st.filename = file.path;                        //文件名
-                    }
-                    //添加到下载的状态的集合里面
-                    v.push_back(std::move(st));
-                    //这边使用完之后，就要移除掉
-                    aria2::deleteDownloadHandle(dh);
-                }
-            }
-            //回调给Android，更新界面
-            downloadInfoChangeCallBackForAndroid(v);
-        }
-    }
-    //调用sessionFinal（）很重要，因为它执行下载后操作，包括保存会话和销毁会话对象。 所以没有调用这个函数会导致失去下载进度和内存泄漏。 sessionFinal（）返回在EXIT STATUS中定义的代码
-    int rv = aria2::sessionFinal(globalSession);
-    LOGD("aria2 sessionFinal after");
-    return reinterpret_cast<void *>(rv);
-}
+    <span class="token comment" spellcheck="true">//指定Aria2日志输出的文件,这个可选择，这里选择是为了方便开发得到信息</span>
+    gloableOptions<span class="token punctuation">.</span><span class="token function">push_back</span><span class="token punctuation">(</span>std<span class="token operator">::</span>pair<span class="token operator">&lt;</span>std<span class="token operator">::</span>string<span class="token punctuation">,</span> std<span class="token operator">::</span>string<span class="token operator">></span> <span class="token punctuation">(</span><span class="token string">"log"</span><span class="token punctuation">,</span> c_Aria2LogPath<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">// 指定日志的级别 "--log-level=debug";</span>
+    gloableOptions<span class="token punctuation">.</span><span class="token function">push_back</span><span class="token punctuation">(</span>std<span class="token operator">::</span>pair<span class="token operator">&lt;</span>std<span class="token operator">::</span>string<span class="token punctuation">,</span> std<span class="token operator">::</span>string<span class="token operator">></span> <span class="token punctuation">(</span><span class="token string">"log-level"</span><span class="token punctuation">,</span> <span class="token string">"debug"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//gloableOptions中可以添加很多的参数选项，有关参数的详细，可以查看官网</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token comment" spellcheck="true">//使用这些选项创建新的Session对象作为附加参数。 这些选项被视为在命令行中指定给aria2c传递的命令行。 如果成功，该函数返回指向创建的Session对象的指针，或返回NULL。</span>
+    <span class="token comment" spellcheck="true">//请注意，每个进程只能创建一个Session对象。</span>
+    globalSession <span class="token operator">=</span> aria2<span class="token operator">::</span><span class="token function">sessionNew</span><span class="token punctuation">(</span>gloableOptions<span class="token punctuation">,</span> config<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>globalSession <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"Create session error direct exit"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">pthread_exit</span><span class="token punctuation">(</span><span class="token constant">NULL</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">auto</span> start <span class="token operator">=</span> std<span class="token operator">::</span>chrono<span class="token operator">::</span>steady_clock<span class="token operator">::</span><span class="token function">now</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token punctuation">;</span><span class="token punctuation">;</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//执行事件轮询和操作, 如果|模式|是 ：c：macro：`RUN_DEFAULT`，这个函数在没有下载时返回 留下来处理。 在这种情况下，这个函数返回0。</span>
+        <span class="token comment" spellcheck="true">//如果|模式| 是：c：macro：`RUN_ONCE`，这个函数返回之后  在当前的实现中，事件轮询1秒内超时。如果函数返回0则代表出现了异常.否则，返回1，表示该 调用者必须调用此函数一次或多次完成下载。</span>
+        <span class="token comment" spellcheck="true">//只有执行了aria2::shoutdow();函数这个返回值才会为1，所以会退出无限循环</span>
+        <span class="token keyword">int</span> rv <span class="token operator">=</span> aria2<span class="token operator">::</span><span class="token function">run</span><span class="token punctuation">(</span>globalSession<span class="token punctuation">,</span> aria2<span class="token operator">::</span>RUN_ONCE<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>rv <span class="token operator">!=</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"aria2 thread_run exit"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">break</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">auto</span> now <span class="token operator">=</span> std<span class="token operator">::</span>chrono<span class="token operator">::</span>steady_clock<span class="token operator">::</span><span class="token function">now</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">auto</span> count <span class="token operator">=</span> std<span class="token operator">::</span>chrono<span class="token operator">::</span>duration_cast<span class="token operator">&lt;</span>std<span class="token operator">::</span>chrono<span class="token operator">::</span>milliseconds<span class="token operator">></span><span class="token punctuation">(</span>now <span class="token operator">-</span> start<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">count</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//如果任务队列不为空，执行任务，所以这个任务可以是下载，暂停，恢复等,并发的</span>
+        <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token operator">!</span>jobQueue<span class="token punctuation">.</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            std<span class="token operator">::</span>unique_ptr<span class="token operator">&lt;</span>Job<span class="token operator">></span> job <span class="token operator">=</span> jobQueue<span class="token punctuation">.</span><span class="token function">pop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">int</span> ret <span class="token operator">=</span> job<span class="token operator">-</span><span class="token operator">></span><span class="token function">execute</span><span class="token punctuation">(</span>globalSession<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">//得到错误的信息</span>
+            <span class="token keyword">if</span><span class="token punctuation">(</span>ret <span class="token operator">!=</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+                std<span class="token operator">::</span>string errorInfo <span class="token operator">=</span> job<span class="token operator">-</span><span class="token operator">></span><span class="token function">getErrorInfo</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token function">ShowToastCallbackForAndroid</span><span class="token punctuation">(</span>errorInfo<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span><span class="token keyword">else</span><span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">//执行任务成功之后的</span>
+                job<span class="token operator">-</span><span class="token operator">></span><span class="token function">executeSuccess</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+        <span class="token comment" spellcheck="true">//每隔500毫秒更新一次界面</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>count <span class="token operator">>=</span> <span class="token number">500</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            start <span class="token operator">=</span> now<span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">//获取到全局的下载统计</span>
+            aria2<span class="token operator">::</span>GlobalStat gstat <span class="token operator">=</span> aria2<span class="token operator">::</span><span class="token function">getGlobalStat</span><span class="token punctuation">(</span>globalSession<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">//回调通知总体的下载状况</span>
+            <span class="token function">downLoadTotalInfoCallBack</span><span class="token punctuation">(</span>gstat<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">//获取到全局的正在下载的数量</span>
+            std<span class="token operator">::</span>vector<span class="token operator">&lt;</span>aria2<span class="token operator">::</span>A2Gid<span class="token operator">></span> gids <span class="token operator">=</span> aria2<span class="token operator">::</span><span class="token function">getActiveDownload</span><span class="token punctuation">(</span>globalSession<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">//用来存储所有的下载的状态集合</span>
+            std<span class="token operator">::</span>vector<span class="token operator">&lt;</span>DownloadStatus<span class="token operator">></span> v<span class="token punctuation">;</span>
+            <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">auto</span> gid <span class="token operator">:</span> gids<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">//获取到每一个正在下载任务的详细对象，获取到里面的信息</span>
+                aria2<span class="token operator">::</span>DownloadHandle<span class="token operator">*</span> dh <span class="token operator">=</span> aria2<span class="token operator">::</span><span class="token function">getDownloadHandle</span><span class="token punctuation">(</span>globalSession<span class="token punctuation">,</span> gid<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token comment" spellcheck="true">//任务不为空，获取到里面的信息</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>dh<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token comment" spellcheck="true">//封装一个下载的任务结构体对象</span>
+                    DownloadStatus st<span class="token punctuation">;</span>
+                    st<span class="token punctuation">.</span>gid <span class="token operator">=</span> gid<span class="token punctuation">;</span>
+                    <span class="token comment" spellcheck="true">//以字节为单位返回此下载的总长度。</span>
+                    st<span class="token punctuation">.</span>totalLength <span class="token operator">=</span> dh<span class="token operator">-</span><span class="token operator">></span><span class="token function">getTotalLength</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token comment" spellcheck="true">//以字节为单位返回此下载的完整长度。</span>
+                    st<span class="token punctuation">.</span>completedLength <span class="token operator">=</span> dh<span class="token operator">-</span><span class="token operator">></span><span class="token function">getCompletedLength</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token comment" spellcheck="true">//返回此下载的下载速度，单位为字节/秒。</span>
+                    st<span class="token punctuation">.</span>downloadSpeed <span class="token operator">=</span> dh<span class="token operator">-</span><span class="token operator">></span><span class="token function">getDownloadSpeed</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token comment" spellcheck="true">//返回此下载的上传速度，单位为字节/秒。</span>
+                    st<span class="token punctuation">.</span>uploadSpeed <span class="token operator">=</span> dh<span class="token operator">-</span><span class="token operator">></span><span class="token function">getUploadSpeed</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token comment" spellcheck="true">//赋值followGid</span>
+                    aria2<span class="token operator">::</span>A2Gid followGid <span class="token operator">=</span> dh<span class="token operator">-</span><span class="token operator">></span><span class="token function">getFollowing</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span>aria2<span class="token operator">::</span><span class="token function">isNull</span><span class="token punctuation">(</span>followGid<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+                        <span class="token comment" spellcheck="true">//LOGD("followGid %s",aria2::gidToHex(followGid).c_str());// 磁力链接下载会先下载元数据，再继续下载，所以存在一个followGid</span>
+                        st<span class="token punctuation">.</span>followGid <span class="token operator">=</span> followGid<span class="token punctuation">;</span>
+                    <span class="token punctuation">}</span>
+                    <span class="token comment" spellcheck="true">//获取到当前的连接数</span>
+                    st<span class="token punctuation">.</span>numbersConnection <span class="token operator">=</span> dh<span class="token operator">-</span><span class="token operator">></span><span class="token function">getConnections</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token comment" spellcheck="true">//获取到当前可用的种子数</span>
+                    st<span class="token punctuation">.</span>usefulSeedNumbers <span class="token operator">=</span> aria2<span class="token operator">::</span><span class="token function">getFindUsefulSeedNumbers</span><span class="token punctuation">(</span>globalSession<span class="token punctuation">,</span>gid<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token comment" spellcheck="true">//保存下载的目录保存的地方</span>
+                    st<span class="token punctuation">.</span>dir <span class="token operator">=</span> dh<span class="token operator">-</span><span class="token operator">></span><span class="token function">getDir</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token keyword">int</span> numbers <span class="token operator">=</span> dh<span class="token operator">-</span><span class="token operator">></span><span class="token function">getNumFiles</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token comment" spellcheck="true">//获取用户选择的文件</span>
+                    <span class="token keyword">int</span> selectCount <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+                        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span> i <span class="token operator">&lt;=</span> numbers<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                            aria2<span class="token operator">::</span>FileData file <span class="token operator">=</span> dh<span class="token operator">-</span><span class="token operator">></span><span class="token function">getFile</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                            <span class="token keyword">if</span> <span class="token punctuation">(</span>file<span class="token punctuation">.</span>selected<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                                selectCount<span class="token operator">++</span><span class="token punctuation">;</span>
+                            <span class="token punctuation">}</span>
+                    <span class="token punctuation">}</span>
+                    <span class="token comment" spellcheck="true">//当前下载所包含的文件数量</span>
+                    st<span class="token punctuation">.</span>fileNumbsers <span class="token operator">=</span> selectCount<span class="token punctuation">;</span>
+                    <span class="token comment" spellcheck="true">//返回文件数，及是当前下载的地址里面包含有多少个文件要下载</span>
+                    <span class="token keyword">if</span> <span class="token punctuation">(</span>dh<span class="token operator">-</span><span class="token operator">></span><span class="token function">getNumFiles</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                        aria2<span class="token operator">::</span>FileData file <span class="token operator">=</span> dh<span class="token operator">-</span><span class="token operator">></span><span class="token function">getFile</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        st<span class="token punctuation">.</span>filename <span class="token operator">=</span> file<span class="token punctuation">.</span>path<span class="token punctuation">;</span>                        <span class="token comment" spellcheck="true">//文件名</span>
+                    <span class="token punctuation">}</span>
+                    <span class="token comment" spellcheck="true">//添加到下载的状态的集合里面</span>
+                    v<span class="token punctuation">.</span><span class="token function">push_back</span><span class="token punctuation">(</span>std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>st<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token comment" spellcheck="true">//这边使用完之后，就要移除掉</span>
+                    aria2<span class="token operator">::</span><span class="token function">deleteDownloadHandle</span><span class="token punctuation">(</span>dh<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+            <span class="token comment" spellcheck="true">//回调给Android，更新界面</span>
+            <span class="token function">downloadInfoChangeCallBackForAndroid</span><span class="token punctuation">(</span>v<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//调用sessionFinal（）很重要，因为它执行下载后操作，包括保存会话和销毁会话对象。 所以没有调用这个函数会导致失去下载进度和内存泄漏。 sessionFinal（）返回在EXIT STATUS中定义的代码</span>
+    <span class="token keyword">int</span> rv <span class="token operator">=</span> aria2<span class="token operator">::</span><span class="token function">sessionFinal</span><span class="token punctuation">(</span>globalSession<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"aria2 sessionFinal after"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token keyword">reinterpret_cast</span><span class="token operator">&lt;</span><span class="token keyword">void</span> <span class="token operator">*</span><span class="token operator">></span><span class="token punctuation">(</span>rv<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
 可以看到我们在run方法中写了一个无限循环的逻辑，让他一直的执行任务
-//如果任务队列不为空，执行任务，所以这个任务可以是下载，暂停，恢复等,并发的
-        while (!jobQueue.empty()) {
-            std::unique_ptr<Job> job = jobQueue.pop();
-            int ret = job->execute(globalSession);
-            //得到错误的信息
-            if(ret != 0){
-                std::string errorInfo = job->getErrorInfo();
-                ShowToastCallbackForAndroid(errorInfo);
-            }else{
-                //执行任务成功之后的
-                job->executeSuccess();
-            }
-        }
+<span class="token comment" spellcheck="true">//如果任务队列不为空，执行任务，所以这个任务可以是下载，暂停，恢复等,并发的</span>
+        <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token operator">!</span>jobQueue<span class="token punctuation">.</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            std<span class="token operator">::</span>unique_ptr<span class="token operator">&lt;</span>Job<span class="token operator">></span> job <span class="token operator">=</span> jobQueue<span class="token punctuation">.</span><span class="token function">pop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">int</span> ret <span class="token operator">=</span> job<span class="token operator">-</span><span class="token operator">></span><span class="token function">execute</span><span class="token punctuation">(</span>globalSession<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">//得到错误的信息</span>
+            <span class="token keyword">if</span><span class="token punctuation">(</span>ret <span class="token operator">!=</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+                std<span class="token operator">::</span>string errorInfo <span class="token operator">=</span> job<span class="token operator">-</span><span class="token operator">></span><span class="token function">getErrorInfo</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token function">ShowToastCallbackForAndroid</span><span class="token punctuation">(</span>errorInfo<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span><span class="token keyword">else</span><span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">//执行任务成功之后的</span>
+                job<span class="token operator">-</span><span class="token operator">></span><span class="token function">executeSuccess</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
 
 其中的JobQueue是一个全局的变量，这样当要执行什么任务的时候，都要添加到这个队列里面，然后来执行        
-typedef SynchronizedQueue<Job> JobQueue;
-//维护一个工作队列,
-static JobQueue jobQueue;    
+<span class="token keyword">typedef</span> SynchronizedQueue<span class="token operator">&lt;</span>Job<span class="token operator">></span> JobQueue<span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">//维护一个工作队列,</span>
+<span class="token keyword">static</span> JobQueue jobQueue<span class="token punctuation">;</span>    
 
-//Job抽象接口
-struct Job {
-    virtual ~Job() = default;
-    virtual std::string getErrorInfo() = 0;
-    virtual int execute(aria2::Session *session) = 0;
-    //执行任务成功,不强制需要实现
-    virtual void executeSuccess(){
+<span class="token comment" spellcheck="true">//Job抽象接口</span>
+<span class="token keyword">struct</span> Job <span class="token punctuation">{</span>
+    <span class="token keyword">virtual</span> <span class="token operator">~</span><span class="token function">Job</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token keyword">default</span><span class="token punctuation">;</span>
+    <span class="token keyword">virtual</span> std<span class="token operator">::</span>string <span class="token function">getErrorInfo</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">virtual</span> <span class="token keyword">int</span> <span class="token function">execute</span><span class="token punctuation">(</span>aria2<span class="token operator">::</span>Session <span class="token operator">*</span>session<span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//执行任务成功,不强制需要实现</span>
+    <span class="token keyword">virtual</span> <span class="token keyword">void</span> <span class="token function">executeSuccess</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
 
-    }
-};
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
 
 所以具体的子类可以实现要实现的方法，比如
-//暂停的任务 int pauseDownload(Session* session, A2Gid gid, bool force)
-struct PauseDownloadJob : public Job{
-    //构造函数，完成赋初值
-    PauseDownloadJob(aria2::A2Gid gid,bool force) : gid(gid),force(force) {}
-    virtual std::string getErrorInfo()
-    {
-        return "gid" + aria2::gidToHex(gid) + "暂停任务失败";
-    }
-    //执行暂停的实现
-    virtual int execute(aria2::Session* session)
-    {
-        int ret = aria2::pauseDownload(session,gid,force);
-        LOGD("pauseDownloadJob execute ret %d",ret);
-        return ret;
-    }
+<span class="token comment" spellcheck="true">//暂停的任务 int pauseDownload(Session* session, A2Gid gid, bool force)</span>
+<span class="token keyword">struct</span> PauseDownloadJob <span class="token operator">:</span> <span class="token keyword">public</span> Job<span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//构造函数，完成赋初值</span>
+    <span class="token function">PauseDownloadJob</span><span class="token punctuation">(</span>aria2<span class="token operator">::</span>A2Gid gid<span class="token punctuation">,</span><span class="token keyword">bool</span> force<span class="token punctuation">)</span> <span class="token operator">:</span> <span class="token function">gid</span><span class="token punctuation">(</span>gid<span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token function">force</span><span class="token punctuation">(</span>force<span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+    <span class="token keyword">virtual</span> std<span class="token operator">::</span>string <span class="token function">getErrorInfo</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token string">"gid"</span> <span class="token operator">+</span> aria2<span class="token operator">::</span><span class="token function">gidToHex</span><span class="token punctuation">(</span>gid<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"暂停任务失败"</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//执行暂停的实现</span>
+    <span class="token keyword">virtual</span> <span class="token keyword">int</span> <span class="token function">execute</span><span class="token punctuation">(</span>aria2<span class="token operator">::</span>Session<span class="token operator">*</span> session<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token keyword">int</span> ret <span class="token operator">=</span> aria2<span class="token operator">::</span><span class="token function">pauseDownload</span><span class="token punctuation">(</span>session<span class="token punctuation">,</span>gid<span class="token punctuation">,</span>force<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"pauseDownloadJob execute ret %d"</span><span class="token punctuation">,</span>ret<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> ret<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    bool force;
-    //要暂停任务的唯一标识gid
-    aria2::A2Gid gid;
-};
+    <span class="token keyword">bool</span> force<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//要暂停任务的唯一标识gid</span>
+    aria2<span class="token operator">::</span>A2Gid gid<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
 
-比如 添加下载的url,支持添加http 连接，或者磁力链接 ,
-JNIEXPORT void JNICALL Java_com_example_com_aria2libandroidproject_AriaApi_Aria2AddUrlDownLoad
-        (JNIEnv * env, jclass clz, jstring javaDownloadUrl,jint jDownLoadId)
-{
-    const char * downloadUri = env->GetStringUTFChars(javaDownloadUrl,NULL);
-    //定义一个集合用来存储我们传递的url,这里目前只支持传递一个
-    std::vector<std::string> uris = {downloadUri};
-    //构建完成之后，将当前的任务 封装成一个AddUriJob 对象，里面有对应的下载uri 跟 下载的参数选项,然后添加到jobq_ 任务队列里面,这里下载的选项传递的是null，用全局的
-    //std::move函数可以以非常简单的方式将左值引用转换为右值引用,move 将左值变成右值 std::move是将对象的状态或者所有权从一个对象转移到另一个对象，只是转移，没有内存的搬迁或者内存拷贝
-    //左值引用的基本语法：type &引用名 = 左值表达式；  右值引用的基本语法type &&引用名 = 右值表达式；
-    jobQueue.push(std::unique_ptr<Job>(new AddUriJob(std::move(uris), std::move(gloableOptions),jDownLoadId)));
-}
+比如 添加下载的url<span class="token punctuation">,</span>支持添加http 连接，或者磁力链接 <span class="token punctuation">,</span>
+JNIEXPORT <span class="token keyword">void</span> JNICALL <span class="token function">Java_com_example_com_aria2libandroidproject_AriaApi_Aria2AddUrlDownLoad</span>
+        <span class="token punctuation">(</span>JNIEnv <span class="token operator">*</span> env<span class="token punctuation">,</span> jclass <span class="token class-name">clz</span><span class="token punctuation">,</span> jstring javaDownloadUrl<span class="token punctuation">,</span>jint jDownLoadId<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span> downloadUri <span class="token operator">=</span> env<span class="token operator">-</span><span class="token operator">></span><span class="token function">GetStringUTFChars</span><span class="token punctuation">(</span>javaDownloadUrl<span class="token punctuation">,</span><span class="token constant">NULL</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//定义一个集合用来存储我们传递的url,这里目前只支持传递一个</span>
+    std<span class="token operator">::</span>vector<span class="token operator">&lt;</span>std<span class="token operator">::</span>string<span class="token operator">></span> uris <span class="token operator">=</span> <span class="token punctuation">{</span>downloadUri<span class="token punctuation">}</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//构建完成之后，将当前的任务 封装成一个AddUriJob 对象，里面有对应的下载uri 跟 下载的参数选项,然后添加到jobq_ 任务队列里面,这里下载的选项传递的是null，用全局的</span>
+    <span class="token comment" spellcheck="true">//std::move函数可以以非常简单的方式将左值引用转换为右值引用,move 将左值变成右值 std::move是将对象的状态或者所有权从一个对象转移到另一个对象，只是转移，没有内存的搬迁或者内存拷贝</span>
+    <span class="token comment" spellcheck="true">//左值引用的基本语法：type &amp;引用名 = 左值表达式；  右值引用的基本语法type &amp;&amp;引用名 = 右值表达式；</span>
+    jobQueue<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>std<span class="token operator">::</span>unique_ptr<span class="token operator">&lt;</span>Job<span class="token operator">></span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token function">AddUriJob</span><span class="token punctuation">(</span>std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>uris<span class="token punctuation">)</span><span class="token punctuation">,</span> std<span class="token operator">::</span><span class="token function">move</span><span class="token punctuation">(</span>gloableOptions<span class="token punctuation">)</span><span class="token punctuation">,</span>jDownLoadId<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-/**
+<span class="token comment" spellcheck="true">/**
  * 销毁函数，在应用程序退出的时候，执行这个方法
- */
-JNIEXPORT jint JNICALL Java_com_example_com_aria2libandroidproject_AriaApi_Aria2Destroy
-        (JNIEnv * env, jclass clz)
-{
-    //添加一个关闭的任务，这个任务执行的化，就会终止无限循环，所以要添加这个任务
-    jobQueue.push(std::unique_ptr<Job>(new ShutdownJob(true)));
-    //代码中如果没有pthread_join主线程会很快结束从而使整个进程结束，从而使创建的线程没有机会开始执行就结束了。
-    //加入pthread_join后，主线程会一直等待直到等待的线程结束自己才结束，使创建的线程有机会执行。
-    pthread_join(pthread_tid,NULL);
-    //如果到了这里说明终止的Job已经被执行完毕了，可以执行销毁了
-    //释放全局数据。 如果成功，该函数返回0，否则返回负的错误代码。 在应用程序结束时只调用一次该函数。
-    int rev = aria2::libraryDeinit();
-    pthread_kill (pthread_tid,SIGUSR1);
-    LOGD("aria2 destroy");
-    return rev;
-}
+ */</span>
+JNIEXPORT jint JNICALL <span class="token function">Java_com_example_com_aria2libandroidproject_AriaApi_Aria2Destroy</span>
+        <span class="token punctuation">(</span>JNIEnv <span class="token operator">*</span> env<span class="token punctuation">,</span> jclass <span class="token class-name">clz</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//添加一个关闭的任务，这个任务执行的化，就会终止无限循环，所以要添加这个任务</span>
+    jobQueue<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>std<span class="token operator">::</span>unique_ptr<span class="token operator">&lt;</span>Job<span class="token operator">></span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token function">ShutdownJob</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//代码中如果没有pthread_join主线程会很快结束从而使整个进程结束，从而使创建的线程没有机会开始执行就结束了。</span>
+    <span class="token comment" spellcheck="true">//加入pthread_join后，主线程会一直等待直到等待的线程结束自己才结束，使创建的线程有机会执行。</span>
+    <span class="token function">pthread_join</span><span class="token punctuation">(</span>pthread_tid<span class="token punctuation">,</span><span class="token constant">NULL</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//如果到了这里说明终止的Job已经被执行完毕了，可以执行销毁了</span>
+    <span class="token comment" spellcheck="true">//释放全局数据。 如果成功，该函数返回0，否则返回负的错误代码。 在应用程序结束时只调用一次该函数。</span>
+    <span class="token keyword">int</span> rev <span class="token operator">=</span> aria2<span class="token operator">::</span><span class="token function">libraryDeinit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">pthread_kill</span> <span class="token punctuation">(</span>pthread_tid<span class="token punctuation">,</span>SIGUSR1<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"aria2 destroy"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> rev<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-//关闭的任务
-struct ShutdownJob : public Job {
-    ShutdownJob(bool force) : force(force) {}
-    virtual int execute(aria2::Session* session)
-    {
-        //终止无限循环的关键代码,当执行了这段代码之后，int rv = aria2::run(globalSession, aria2::RUN_ONCE); 才会返回1，这样才会进入break，退出无限循环
-        int ret = aria2::shutdown(session, force);
-        return ret;
-    }
-    virtual std::string getErrorInfo()
-    {
-        return "shutDown任务失败";
-    }
-    bool force;
-};
+<span class="token comment" spellcheck="true">//关闭的任务</span>
+<span class="token keyword">struct</span> ShutdownJob <span class="token operator">:</span> <span class="token keyword">public</span> Job <span class="token punctuation">{</span>
+    <span class="token function">ShutdownJob</span><span class="token punctuation">(</span><span class="token keyword">bool</span> force<span class="token punctuation">)</span> <span class="token operator">:</span> <span class="token function">force</span><span class="token punctuation">(</span>force<span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+    <span class="token keyword">virtual</span> <span class="token keyword">int</span> <span class="token function">execute</span><span class="token punctuation">(</span>aria2<span class="token operator">::</span>Session<span class="token operator">*</span> session<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//终止无限循环的关键代码,当执行了这段代码之后，int rv = aria2::run(globalSession, aria2::RUN_ONCE); 才会返回1，这样才会进入break，退出无限循环</span>
+        <span class="token keyword">int</span> ret <span class="token operator">=</span> aria2<span class="token operator">::</span><span class="token function">shutdown</span><span class="token punctuation">(</span>session<span class="token punctuation">,</span> force<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> ret<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">virtual</span> std<span class="token operator">::</span>string <span class="token function">getErrorInfo</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token string">"shutDown任务失败"</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">bool</span> force<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
 
 
-//System.loadLibrary的时候会回调这个函数,初始化一些资源,可以将一些经常要使用到的变量变成一个全局的变量，这样下次使用的时候就可以快速的获取到
-int JNI_OnLoad(JavaVM* vm, void* reserved) {
+<span class="token comment" spellcheck="true">//System.loadLibrary的时候会回调这个函数,初始化一些资源,可以将一些经常要使用到的变量变成一个全局的变量，这样下次使用的时候就可以快速的获取到</span>
+<span class="token keyword">int</span> <span class="token function">JNI_OnLoad</span><span class="token punctuation">(</span>JavaVM<span class="token operator">*</span> vm<span class="token punctuation">,</span> <span class="token keyword">void</span><span class="token operator">*</span> reserved<span class="token punctuation">)</span> <span class="token punctuation">{</span>
 
-    JNIEnv *env;
-    if(vm ->GetEnv((void**) &env, JNI_VERSION_1_4) != JNI_OK)
-    {
-        LOGD("Failed to get the environment using GetEnv()");
-        return -1;
-    }
-    //持有env的引用
-    jVM = vm;
-    //demo/kaillera/org/myapplication/KailleraJni com.example.com.aria2libandroidproject
-    aria2ApiClass = env->FindClass ("com/example/com/aria2libandroidproject/AriaApi");
-    if(aria2ApiClass == NULL)
-    {
-        LOGD("Failed to find class com.example.com.aria2libandroidproject.AriaApi");
-        return -1;
-    }
-    aria2ApiClass = (jclass) env->NewGlobalRef(aria2ApiClass);
-    //找到对应的method   public static void showToast(byte[] message)
-    android_showToast = env->GetStaticMethodID(aria2ApiClass,"showToast","([B)V");
-    if(android_showToast == NULL)
-    {
-        LOGD("Failed to find method showToast");
-        return -1;
-    }
-    ....
-}
+    JNIEnv <span class="token operator">*</span>env<span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>vm <span class="token operator">-</span><span class="token operator">></span><span class="token function">GetEnv</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token operator">*</span><span class="token operator">*</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>env<span class="token punctuation">,</span> JNI_VERSION_1_4<span class="token punctuation">)</span> <span class="token operator">!=</span> JNI_OK<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"Failed to get the environment using GetEnv()"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//持有env的引用</span>
+    jVM <span class="token operator">=</span> vm<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//demo/kaillera/org/myapplication/KailleraJni com.example.com.aria2libandroidproject</span>
+    aria2ApiClass <span class="token operator">=</span> env<span class="token operator">-</span><span class="token operator">></span><span class="token function">FindClass</span> <span class="token punctuation">(</span><span class="token string">"com/example/com/aria2libandroidproject/AriaApi"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>aria2ApiClass <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"Failed to find class com.example.com.aria2libandroidproject.AriaApi"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    aria2ApiClass <span class="token operator">=</span> <span class="token punctuation">(</span>jclass<span class="token punctuation">)</span> env<span class="token operator">-</span><span class="token operator">></span><span class="token function">NewGlobalRef</span><span class="token punctuation">(</span>aria2ApiClass<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//找到对应的method   public static void showToast(byte[] message)</span>
+    android_showToast <span class="token operator">=</span> env<span class="token operator">-</span><span class="token operator">></span><span class="token function">GetStaticMethodID</span><span class="token punctuation">(</span>aria2ApiClass<span class="token punctuation">,</span><span class="token string">"showToast"</span><span class="token punctuation">,</span><span class="token string">"([B)V"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>android_showToast <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token function">LOGD</span><span class="token punctuation">(</span><span class="token string">"Failed to find method showToast"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
 
-/**
+<span class="token comment" spellcheck="true">/**
  * 回调执行Android中的showToast方法
  * @param info
- */
-void ShowToastCallbackForAndroid(std::string info){
-    //回调java层，弹出toast 由于我们是在子线程中触发的，所以在子线程中要使用下面的方式来回调执行Android的代码
-    JNIEnv *env;
-    jVM->GetEnv((void**) &env, JNI_VERSION_1_4);
-    int attached  = 0;
-    if(env==NULL)
-    {
-        attached  = 1;
-        jVM->AttachCurrentThread(&env, NULL);
-    }
-    //showToast(LISTCMD_HIDEGAME, 0);
-    if(android_showToast != NULL)
-    {
-        //直接使用env->NewStringUTF() 在部分的手机有问题，所以这里先转成jbyteArray数组，对应的android就为byte[]数组
-        const char * c_info = info.c_str();
-        int strLen = strlen(c_info);
-        jbyteArray byteArray = env->NewByteArray(strLen);
-        env->SetByteArrayRegion(byteArray, 0, strLen, reinterpret_cast<const jbyte*>(c_info));
-        env->CallStaticVoidMethod(aria2ApiClass,android_showToast,byteArray);
-        //释放局部引用
-        env->DeleteLocalRef(byteArray);
-    }
-    if(attached)
-    {
-        jVM->DetachCurrentThread();
-    }
-}
+ */</span>
+<span class="token keyword">void</span> <span class="token function">ShowToastCallbackForAndroid</span><span class="token punctuation">(</span>std<span class="token operator">::</span>string info<span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//回调java层，弹出toast 由于我们是在子线程中触发的，所以在子线程中要使用下面的方式来回调执行Android的代码</span>
+    JNIEnv <span class="token operator">*</span>env<span class="token punctuation">;</span>
+    jVM<span class="token operator">-</span><span class="token operator">></span><span class="token function">GetEnv</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token operator">*</span><span class="token operator">*</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>env<span class="token punctuation">,</span> JNI_VERSION_1_4<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> attached  <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>env<span class="token operator">==</span><span class="token constant">NULL</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        attached  <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+        jVM<span class="token operator">-</span><span class="token operator">></span><span class="token function">AttachCurrentThread</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>env<span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//showToast(LISTCMD_HIDEGAME, 0);</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>android_showToast <span class="token operator">!=</span> <span class="token constant">NULL</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//直接使用env->NewStringUTF() 在部分的手机有问题，所以这里先转成jbyteArray数组，对应的android就为byte[]数组</span>
+        <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span> c_info <span class="token operator">=</span> info<span class="token punctuation">.</span><span class="token function">c_str</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">int</span> strLen <span class="token operator">=</span> <span class="token function">strlen</span><span class="token punctuation">(</span>c_info<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        jbyteArray byteArray <span class="token operator">=</span> env<span class="token operator">-</span><span class="token operator">></span><span class="token function">NewByteArray</span><span class="token punctuation">(</span>strLen<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        env<span class="token operator">-</span><span class="token operator">></span><span class="token function">SetByteArrayRegion</span><span class="token punctuation">(</span>byteArray<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> strLen<span class="token punctuation">,</span> <span class="token keyword">reinterpret_cast</span><span class="token operator">&lt;</span><span class="token keyword">const</span> jbyte<span class="token operator">*</span><span class="token operator">></span><span class="token punctuation">(</span>c_info<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        env<span class="token operator">-</span><span class="token operator">></span><span class="token function">CallStaticVoidMethod</span><span class="token punctuation">(</span>aria2ApiClass<span class="token punctuation">,</span>android_showToast<span class="token punctuation">,</span>byteArray<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//释放局部引用</span>
+        env<span class="token operator">-</span><span class="token operator">></span><span class="token function">DeleteLocalRef</span><span class="token punctuation">(</span>byteArray<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>attached<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        jVM<span class="token operator">-</span><span class="token operator">></span><span class="token function">DetachCurrentThread</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </code></pre>
-<p>整体来讲目前已经可以满足我一个做为种子用户的需求,我也是基于种子用户的角度来实现的<br>以上就是主要的实现，对于部分的细节，关于Android界面就没有必要详解了，最后贴下项目的工程结构<br><img src="/uploads/Arir2Android实现/Aria2工厂目录.png" alt="结果显示"></p>
+<p>整体来讲目前已经可以满足我一个做为种子用户的需求,我也是基于种子用户的角度来实现的<br>以上就是主要的实现，对于部分的细节，关于Android界面就没有必要详解了，最后贴下项目的工程结构<br><img src="/uploads/Arir2Android实现/Aria2工厂目录.png" alt></p>
 
                 
             </div>
@@ -1694,9 +1692,7 @@ Android Aop 理解
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            概述
-Window下OOLLVM Android编译环境搭建
-
+                            
                         
                     </div>
                     <div class="publish-info">

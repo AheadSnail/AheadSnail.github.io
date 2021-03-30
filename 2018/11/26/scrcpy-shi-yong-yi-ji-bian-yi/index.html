@@ -938,109 +938,109 @@ externalNativeBuild {
 }
 </code></pre>
 <p>CMakeLists.txt的内容为</p>
-<pre class=" language-CMakeLists"><code class="language-CMakeLists">cmake_minimum_required(VERSION 3.4.1)
+<pre class=" language-makefile"><code class="language-makefile">cmake_minimum_required<span class="token punctuation">(</span>VERSION 3.4.1<span class="token punctuation">)</span>
 
-#添加头文件的查找目录
-include_directories(${CMAKE_SOURCE_DIR}/src/main/cpp/include
-                    ${CMAKE_SOURCE_DIR}/src/main/cpp/include/SDL2
-                    ${CMAKE_SOURCE_DIR}/src/main/cpp/src )
+<span class="token comment" spellcheck="true">#添加头文件的查找目录</span>
+include_directories<span class="token punctuation">(</span><span class="token variable">$</span><span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span>/src/main/cpp/<span class="token keyword">include</span>
+                    <span class="token variable">$</span><span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span>/src/main/cpp/<span class="token keyword">include</span>/SDL2
+                    <span class="token variable">$</span><span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span>/src/main/cpp/src <span class="token punctuation">)</span>
 
 
-#libavcodec
-add_library( libavcodec
+<span class="token comment" spellcheck="true">#libavcodec</span>
+add_library<span class="token punctuation">(</span> libavcodec
         SHARED
-        IMPORTED)
+        IMPORTED<span class="token punctuation">)</span>
 
-set_target_properties( libavcodec
+set_target_properties<span class="token punctuation">(</span> libavcodec
 PROPERTIES IMPORTED_LOCATION
-${CMAKE_SOURCE_DIR}/src/main/cpp/libs/${ANDROID_ABI}/libavcodec.so )
+<span class="token variable">$</span><span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span>/src/main/cpp/libs/<span class="token variable">$</span><span class="token punctuation">{</span>ANDROID_ABI<span class="token punctuation">}</span>/libavcodec.so <span class="token punctuation">)</span>
 
-#libavformat
-add_library( libavformat
+<span class="token comment" spellcheck="true">#libavformat</span>
+add_library<span class="token punctuation">(</span> libavformat
         SHARED
-        IMPORTED)
+        IMPORTED<span class="token punctuation">)</span>
 
-set_target_properties( libavformat
+set_target_properties<span class="token punctuation">(</span> libavformat
         PROPERTIES IMPORTED_LOCATION
-        ${CMAKE_SOURCE_DIR}/src/main/cpp/libs/${ANDROID_ABI}/libavformat.so )
+        <span class="token variable">$</span><span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span>/src/main/cpp/libs/<span class="token variable">$</span><span class="token punctuation">{</span>ANDROID_ABI<span class="token punctuation">}</span>/libavformat.so <span class="token punctuation">)</span>
 
 
-#libavutil
-add_library( libavutil
+<span class="token comment" spellcheck="true">#libavutil</span>
+add_library<span class="token punctuation">(</span> libavutil
         SHARED
-        IMPORTED)
+        IMPORTED<span class="token punctuation">)</span>
 
-set_target_properties( libavutil
+set_target_properties<span class="token punctuation">(</span> libavutil
         PROPERTIES IMPORTED_LOCATION
-        ${CMAKE_SOURCE_DIR}/src/main/cpp/libs/${ANDROID_ABI}/libavutil.so )
+        <span class="token variable">$</span><span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span>/src/main/cpp/libs/<span class="token variable">$</span><span class="token punctuation">{</span>ANDROID_ABI<span class="token punctuation">}</span>/libavutil.so <span class="token punctuation">)</span>
 
 
-#SDL2
-add_library( libSDL2
+<span class="token comment" spellcheck="true">#SDL2</span>
+add_library<span class="token punctuation">(</span> libSDL2
         SHARED
-        IMPORTED)
+        IMPORTED<span class="token punctuation">)</span>
 
-set_target_properties( libSDL2
+set_target_properties<span class="token punctuation">(</span> libSDL2
         PROPERTIES IMPORTED_LOCATION
-        ${CMAKE_SOURCE_DIR}/src/main/cpp/libs/${ANDROID_ABI}/libSDL2.so )
+        <span class="token variable">$</span><span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span>/src/main/cpp/libs/<span class="token variable">$</span><span class="token punctuation">{</span>ANDROID_ABI<span class="token punctuation">}</span>/libSDL2.so <span class="token punctuation">)</span>
 
-#SDL2 辅助库
-add_library( libhidapi
+<span class="token comment" spellcheck="true">#SDL2 辅助库</span>
+add_library<span class="token punctuation">(</span> libhidapi
         SHARED
-        IMPORTED)
+        IMPORTED<span class="token punctuation">)</span>
 
-set_target_properties( libhidapi
+set_target_properties<span class="token punctuation">(</span> libhidapi
         PROPERTIES IMPORTED_LOCATION
-        ${CMAKE_SOURCE_DIR}/src/main/cpp/libs/${ANDROID_ABI}/libhidapi.so )
+        <span class="token variable">$</span><span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span>/src/main/cpp/libs/<span class="token variable">$</span><span class="token punctuation">{</span>ANDROID_ABI<span class="token punctuation">}</span>/libhidapi.so <span class="token punctuation">)</span>
 
 
-#设置变量 自定义变量使用SET(OBJ_NAME xxxx)，使用时${OBJ_NAME}
-set(My_ARIC_SRC ${CMAKE_SOURCE_DIR}/src/main/cpp/src)
-#message( WARNING  "${My_ARIC_SRC}")
+<span class="token comment" spellcheck="true">#设置变量 自定义变量使用SET(OBJ_NAME xxxx)，使用时${OBJ_NAME}</span>
+set<span class="token punctuation">(</span>My_ARIC_SRC <span class="token variable">$</span><span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span>/src/main/cpp/src<span class="token punctuation">)</span>
+<span class="token comment" spellcheck="true">#message( WARNING  "${My_ARIC_SRC}")</span>
 
-set(scraptSrc
-        ${My_ARIC_SRC}/main.c
-        ${My_ARIC_SRC}/command.c
-        ${My_ARIC_SRC}/control_event.c
-        ${My_ARIC_SRC}/controller.c
-        ${My_ARIC_SRC}/convert.c
-        ${My_ARIC_SRC}/decoder.c
-        ${My_ARIC_SRC}/device.c
-        ${My_ARIC_SRC}/file_handler.c
-        ${My_ARIC_SRC}/fps_counter.c
-        ${My_ARIC_SRC}/frames.c
-        ${My_ARIC_SRC}/input_manager.c
-        ${My_ARIC_SRC}/lock_util.c
-        ${My_ARIC_SRC}/net.c
-        ${My_ARIC_SRC}/recorder.c
-        ${My_ARIC_SRC}/scrcpy.c
-        ${My_ARIC_SRC}/screen.c
-        ${My_ARIC_SRC}/server.c
-        ${My_ARIC_SRC}/sys/unix/command.c
-        ${My_ARIC_SRC}/sys/unix/net.c
-        ${My_ARIC_SRC}/str_util.c
-        ${My_ARIC_SRC}/tiny_xpm.c )
+set<span class="token punctuation">(</span>scraptSrc
+        <span class="token variable">$</span><span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span>/main.c
+        <span class="token variable">$</span><span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span>/command.c
+        <span class="token variable">$</span><span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span>/control_event.c
+        <span class="token variable">$</span><span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span>/controller.c
+        <span class="token variable">$</span><span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span>/convert.c
+        <span class="token variable">$</span><span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span>/decoder.c
+        <span class="token variable">$</span><span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span>/device.c
+        <span class="token variable">$</span><span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span>/file_handler.c
+        <span class="token variable">$</span><span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span>/fps_counter.c
+        <span class="token variable">$</span><span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span>/frames.c
+        <span class="token variable">$</span><span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span>/input_manager.c
+        <span class="token variable">$</span><span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span>/lock_util.c
+        <span class="token variable">$</span><span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span>/net.c
+        <span class="token variable">$</span><span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span>/recorder.c
+        <span class="token variable">$</span><span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span>/scrcpy.c
+        <span class="token variable">$</span><span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span>/screen.c
+        <span class="token variable">$</span><span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span>/server.c
+        <span class="token variable">$</span><span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span>/sys/unix/command.c
+        <span class="token variable">$</span><span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span>/sys/unix/net.c
+        <span class="token variable">$</span><span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span>/str_util.c
+        <span class="token variable">$</span><span class="token punctuation">{</span>My_ARIC_SRC<span class="token punctuation">}</span>/tiny_xpm.c <span class="token punctuation">)</span>
 
-add_library( # Sets the name of the library.
+add_library<span class="token punctuation">(</span> <span class="token comment" spellcheck="true"># Sets the name of the library.</span>
         native-lib
 
-        # Sets the library as a shared library.
+        <span class="token comment" spellcheck="true"># Sets the library as a shared library.</span>
         SHARED
 
-        ${CMAKE_SOURCE_DIR}/src/main/cpp/scrapyClient.cpp
+        <span class="token variable">$</span><span class="token punctuation">{</span>CMAKE_SOURCE_DIR<span class="token punctuation">}</span>/src/main/cpp/scrapyClient.cpp
 
-        # Provides a relative path to your source file(s).
-        ${scraptSrc} )
+        <span class="token comment" spellcheck="true"># Provides a relative path to your source file(s).</span>
+        <span class="token variable">$</span><span class="token punctuation">{</span>scraptSrc<span class="token punctuation">}</span> <span class="token punctuation">)</span>
 
 
-find_library( # Sets the name of the path variable.
+find_library<span class="token punctuation">(</span> <span class="token comment" spellcheck="true"># Sets the name of the path variable.</span>
         log-lib
 
-        # Specifies the name of the NDK library that
-        # you want CMake to locate.
-        log )
+        <span class="token comment" spellcheck="true"># Specifies the name of the NDK library that</span>
+        <span class="token comment" spellcheck="true"># you want CMake to locate.</span>
+        log <span class="token punctuation">)</span>
 
-target_link_libraries( # Specifies the target library.
+target_link_libraries<span class="token punctuation">(</span> <span class="token comment" spellcheck="true"># Specifies the target library.</span>
         native-lib
 
         libavcodec
@@ -1049,7 +1049,7 @@ target_link_libraries( # Specifies the target library.
         libSDL2
         libhidapi
 
-        ${log-lib} )
+        <span class="token variable">$</span><span class="token punctuation">{</span>log-lib<span class="token punctuation">}</span> <span class="token punctuation">)</span>
 </code></pre>
 <p>scrcpy编译结果<br><img src="/uploads/scrcypy编译/scrcpy编译完成.png" alt="结果显示"><br>scrcpy 调试<br><img src="/uploads/scrcypy编译/scrcpyAndroid编译可调试.png" alt="结果显示"></p>
 <h3 id="手机并不具备Adb命令"><a href="#手机并不具备Adb命令" class="headerlink" title="手机并不具备Adb命令"></a>手机并不具备Adb命令</h3><blockquote>
